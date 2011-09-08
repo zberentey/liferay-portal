@@ -47,8 +47,8 @@ import java.util.List;
  *
  * <p>
  * Social equity actions are identified by an action ID and a
- * <code>className</code> that is the model name of the asset the action can be
- * executed on.
+ * <code>className</code> that is the model name of the asset on which the
+ * action can be executed.
  * </p>
  *
  * @author Zsolt Berentey
@@ -58,12 +58,12 @@ public class SocialEquitySettingLocalServiceImpl
 	extends SocialEquitySettingLocalServiceBaseImpl {
 
 	/**
-	 * Returns all settings for a social equity action.
+	 * Returns all the settings for the social equity action.
 	 *
 	 * @param  groupId the primary key of the group
 	 * @param  className the class name for the target asset
 	 * @param  actionId the ID of the action
-	 * @return the settings for the action
+	 * @return the settings for the social equity action
 	 * @throws SystemException if a system exception occurred
 	 */
 	public List<SocialEquitySetting> getEquitySettings(
@@ -76,12 +76,12 @@ public class SocialEquitySettingLocalServiceImpl
 	}
 
 	/**
-	 * Returns all settings for a social equity action.
+	 * Returns all the settings for the social equity action.
 	 *
 	 * @param  groupId the primary key of the group
 	 * @param  classNameId the ID of the target asset's class
 	 * @param  actionId the ID of the action
-	 * @return the settings for the action
+	 * @return the settings for the social equity action
 	 * @throws SystemException if a system exception occurred
 	 */
 	public List<SocialEquitySetting> getEquitySettings(
@@ -169,13 +169,14 @@ public class SocialEquitySettingLocalServiceImpl
 	}
 
 	/**
-	 * Updates settings for a model (asset type) in a group.
+	 * Updates settings for the model (asset type) in the group.
 	 *
 	 * <p>
-	 * This method accepts a list of <code>SocialEquityActionMapping</code>s. A
+	 * This method accepts a list of social equity action mappings. A
 	 * <code>SocialEquityActionMapping</code> contains both participation and
-	 * information settings for an action. This is the class that is used by
-	 * the portal to store the default settings for social equity actions.
+	 * information settings for an action. The
+	 * <code>SocialEquityActionMapping</code> class is used by the portal to
+	 * store the default settings for social equity actions.
 	 * </p>
 	 *
 	 * @param  groupId the primary key of the group
