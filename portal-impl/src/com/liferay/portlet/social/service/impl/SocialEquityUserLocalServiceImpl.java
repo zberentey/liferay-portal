@@ -29,11 +29,12 @@ import com.liferay.portlet.social.service.base.SocialEquityUserLocalServiceBaseI
 import java.util.List;
 
 /**
- * The local service for dealing with equity scores and ranking for a user.
+ * The local service for dealing with user equity scores and ranking.
  *
  * <p>
  * This service provides methods for retrieving the participation and
- * contribution scores of a user as well as some dealing with user ranking.
+ * contribution scores of users and provides some methods for dealing with user
+ * ranking.
  * </p>
  *
  * @author Zsolt Berentey
@@ -42,7 +43,7 @@ public class SocialEquityUserLocalServiceImpl
 	extends SocialEquityUserLocalServiceBaseImpl {
 
 	/**
-	 * Removes ranking for a user for all groups.
+	 * Removes ranking for the user with respect to all groups.
 	 *
 	 * <p>
 	 * This method is called by the portal when a user is deactivated.
@@ -75,13 +76,13 @@ public class SocialEquityUserLocalServiceImpl
 	}
 
 	/**
-	 * Returns the contribution equity score for a user.
+	 * Returns the contribution equity score for the user.
 	 *
 	 * <p>
 	 * This method should only be used if social equity is turned on for only
-	 * one group as it returns the contribution score for the first group it
-	 * finds and the first group can be different from one execution to
-	 * another.
+	 * one group, as it returns the contribution score for the first group it
+	 * finds. The first group found can be different from one execution to the
+	 * next.
 	 * </p>
 	 *
 	 * @param  userId the primary key of the user
@@ -95,7 +96,8 @@ public class SocialEquityUserLocalServiceImpl
 	}
 
 	/**
-	 * Returns the contribution equity score of a user for a group.
+	 * Returns the contribution equity score of the user with respect to the
+	 * group.
 	 *
 	 * @param  userId the primary key of the user
 	 * @param  groupId the primary key of the group
@@ -114,13 +116,13 @@ public class SocialEquityUserLocalServiceImpl
 	}
 
 	/**
-	 * Returns the participation equity score for a user.
+	 * Returns the participation equity score for the user.
 	 *
 	 * <p>
 	 * This method should only be used if social equity is turned on for only
-	 * one group as it returns the participation score for the first group it
-	 * finds and the first group can be different from one execution to
-	 * another.
+	 * one group, as it returns the participation score for the first group it
+	 * finds. The first group found can be different from one execution to the
+	 * next.
 	 * </p>
 	 *
 	 * @param  userId the primary key of the user
@@ -134,7 +136,8 @@ public class SocialEquityUserLocalServiceImpl
 	}
 
 	/**
-	 * Returns the participation equity score of a user for a group.
+	 * Returns the participation equity score of the user with respect to the
+	 * group.
 	 *
 	 * @param  userId the primary key of the user
 	 * @param  groupId the primary key of the group
@@ -153,7 +156,7 @@ public class SocialEquityUserLocalServiceImpl
 	}
 
 	/**
-	 * Returns the rank for a user in a group based on his or her personal
+	 * Returns the rank of the user in the group based on the user's personal
 	 * equity.
 	 *
 	 * @param  groupId the primary key of the group
@@ -173,8 +176,8 @@ public class SocialEquityUserLocalServiceImpl
 	}
 
 	/**
-	 * Returns an ordered list of <code>SocialEquityUser</code> ordered by
-	 * their ranking in a group with a ranking greater than zero.
+	 * Returns an ordered range of all the social equity users in the group
+	 * with rankings greater than zero.
 	 *
 	 * <p>
 	 * Useful when paginating results. Returns a maximum of <code>end -
@@ -189,9 +192,9 @@ public class SocialEquityUserLocalServiceImpl
 	 * @param  groupId the primary key of the group
 	 * @param  start the lower bound of the range of results
 	 * @param  end the upper bound of the range of results (not inclusive)
-	 * @param  orderByComparator the comparator to order
-	 *         <code>SocialEquityUser</code>s (optionally <code>null</code>)
-	 * @return the ordered range of <code>SocialEquityUser</code>s
+	 * @param  orderByComparator the comparator to order the social equity
+	 *         users (optionally <code>null</code>)
+	 * @return the ordered range of the social equity users
 	 * @throws SystemException if a system exception occurred
 	 */
 	public List<SocialEquityUser> getRankedEquityUsers(
@@ -204,12 +207,12 @@ public class SocialEquityUserLocalServiceImpl
 	}
 
 	/**
-	 * Returns the number of <code>SocialEquityUser</code>s in a group that
-	 * have rankings greater than zero.
+	 * Returns the number of the social equity users in the group with rankings
+	 * greater than zero.
 	 *
 	 * @param  groupId the primary key of the group
-	 * @return the number of <code>SocialEquityUser</code>s with rankings
-	 *         greater than zero
+	 * @return the number of social equity users with rankings greater than
+	 *         zero
 	 * @throws SystemException if a system exception occurred
 	 */
 	public int getRankedEquityUsersCount(long groupId) throws SystemException {
