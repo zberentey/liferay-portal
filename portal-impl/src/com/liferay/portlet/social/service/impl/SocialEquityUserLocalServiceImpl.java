@@ -177,7 +177,9 @@ public class SocialEquityUserLocalServiceImpl
 
 	/**
 	 * Returns an ordered range of all the social equity users in the group
-	 * with rankings greater than zero.
+	 * with rankings greater than zero. It is strongly suggested to use {@link
+	 * com.liferay.portlet.social.util.comparator.SocialEquityUserRankComparator}
+	 * as the ordering comparator.
 	 *
 	 * <p>
 	 * Useful when paginating results. Returns a maximum of <code>end -
@@ -193,7 +195,9 @@ public class SocialEquityUserLocalServiceImpl
 	 * @param  start the lower bound of the range of results
 	 * @param  end the upper bound of the range of results (not inclusive)
 	 * @param  orderByComparator the comparator to order the social equity
-	 *         users (optionally <code>null</code>)
+	 *         users, such as {@link
+	 *         com.liferay.portlet.social.util.comparator.SocialEquityUserRankComparator}
+	 *         (optionally <code>null</code>)
 	 * @return the ordered range of the social equity users
 	 * @throws SystemException if a system exception occurred
 	 */
