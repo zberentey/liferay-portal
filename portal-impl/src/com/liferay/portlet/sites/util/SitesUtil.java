@@ -157,7 +157,7 @@ public class SitesUtil {
 	}
 
 	public static void copyLayout(
-			Layout sourceLayout, Layout targetLayout,
+			long userId, Layout sourceLayout, Layout targetLayout,
 			ServiceContext serviceContext)
 		throws Exception {
 
@@ -173,9 +173,9 @@ public class SitesUtil {
 			new long[] {sourceLayout.getLayoutId()}, parameterMap, null, null);
 
 		try {
-			LayoutServiceUtil.importLayouts(
-				targetLayout.getGroupId(), targetLayout.isPrivateLayout(),
-				parameterMap, file);
+			LayoutLocalServiceUtil.importLayouts(
+				userId, targetLayout.getGroupId(),
+				targetLayout.isPrivateLayout(),	parameterMap, file);
 		}
 		finally {
 			file.delete();
@@ -540,15 +540,17 @@ public class SitesUtil {
 			lastCopyDate = new Date(GetterUtil.getLong(lastCopyDateString));
 		}
 
-		if (isLayoutLocked(layout)) {
-			if ((lastCopyDate == null) ||
-				lastCopyDate.before(templateLayout.getModifiedDate())) {
+		if ((lastCopyDate != null) &&
+				lastCopyDate.after(templateLayout.getModifiedDate())) {
+			return false;
+		}
 
+		if (isLayoutLocked(layout)) {
 				return true;
-			}
 		}
 		else if ((layoutModifiedDate == null) ||
-				 !layoutModifiedDate.after(templateLayout.getModifiedDate())) {
+				((lastCopyDate != null) &&
+					layoutModifiedDate.before(lastCopyDate))) {
 
 			return true;
 		}
