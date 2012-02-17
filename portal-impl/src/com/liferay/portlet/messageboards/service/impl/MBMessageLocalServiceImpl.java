@@ -1863,13 +1863,13 @@ public class MBMessageLocalServiceImpl extends MBMessageLocalServiceBaseImpl {
 		boolean update = GetterUtil.getBoolean(
 			(String)serviceContext.getAttribute("update"));
 
-		if (!update && MBUtil.getEmailMessageAddedEnabled(preferences)) {
+		if (oldStatus != WorkflowConstants.STATUS_APPROVED) {
+			update = false;
 		}
-		else if (update &&
-				((oldStatus != WorkflowConstants.STATUS_APPROVED) ||
-					MBUtil.getEmailMessageUpdatedEnabled(preferences))) {
-		}
-		else {
+
+		if ((!update && !MBUtil.getEmailMessageAddedEnabled(preferences)) ||
+			(update && !MBUtil.getEmailMessageUpdatedEnabled(preferences))) {
+
 			return;
 		}
 
@@ -1933,7 +1933,7 @@ public class MBMessageLocalServiceImpl extends MBMessageLocalServiceBaseImpl {
 		String body = null;
 		String signature = null;
 
-		if (update && (oldStatus == WorkflowConstants.STATUS_APPROVED)) {
+		if (update) {
 			subjectPrefix = MBUtil.getEmailMessageUpdatedSubjectPrefix(
 				preferences);
 			body = MBUtil.getEmailMessageUpdatedBody(preferences);
