@@ -1453,7 +1453,9 @@ public class MBMessageLocalServiceImpl extends MBMessageLocalServiceBaseImpl {
 
 		// Workflow
 
-		serviceContext.setAttribute("update", Boolean.TRUE.toString());
+		if (message.getStatus() == WorkflowConstants.STATUS_APPROVED) {
+			serviceContext.setAttribute("update", Boolean.TRUE.toString());
+		}
 
 		WorkflowHandlerRegistryUtil.startWorkflowInstance(
 			companyId, message.getGroupId(), userId,
