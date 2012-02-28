@@ -45,7 +45,9 @@
 
 <hr />
 
+<#if serverInfo??>
 <i>${serverInfo}</i>
+</#if>
 
 </body>
 
