@@ -21,6 +21,8 @@ import com.liferay.portal.NoSuchLayoutException;
 import com.liferay.portal.NoSuchLayoutRevisionException;
 import com.liferay.portal.RemoteExportException;
 import com.liferay.portal.RemoteOptionsException;
+import com.liferay.portal.kernel.dao.orm.QueryPos;
+import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.language.LanguageUtil;
@@ -30,6 +32,7 @@ import com.liferay.portal.kernel.lar.UserIdStrategy;
 import com.liferay.portal.kernel.messaging.DestinationNames;
 import com.liferay.portal.kernel.messaging.MessageBusUtil;
 import com.liferay.portal.kernel.messaging.MessageStatus;
+import com.liferay.portal.kernel.repository.model.FileVersion;
 import com.liferay.portal.kernel.scheduler.SchedulerEngineUtil;
 import com.liferay.portal.kernel.staging.LayoutStagingUtil;
 import com.liferay.portal.kernel.staging.Staging;
@@ -84,10 +87,16 @@ import com.liferay.portal.service.http.LayoutServiceHttp;
 import com.liferay.portal.service.permission.GroupPermissionUtil;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortalUtil;
+import com.liferay.portal.util.PropsValues;
 import com.liferay.portal.util.SessionClicks;
 import com.liferay.portal.util.WebKeys;
 import com.liferay.portlet.PortalPreferences;
 import com.liferay.portlet.PortletPreferencesFactoryUtil;
+import com.liferay.portlet.documentlibrary.model.DLFileEntry;
+import com.liferay.portlet.documentlibrary.model.DLFileVersion;
+import com.liferay.portlet.documentlibrary.service.DLAppLocalServiceUtil;
+import com.liferay.portlet.documentlibrary.service.DLFileEntryLocalServiceUtil;
+import com.liferay.portlet.documentlibrary.service.DLFileVersionLocalServiceUtil;
 
 import java.io.File;
 
@@ -495,6 +504,10 @@ public class StagingImpl implements Staging {
 			checkDefaultLayoutSetBranches(
 				userId, liveGroup, branchingPublic, branchingPrivate, false,
 				serviceContext);
+
+			if (PropsValues.DL_KEEP_LAST_LIVE_FILE_VERSION_ONLY) {
+				deletePreviousFileVersions(liveGroup.getGroupId());
+			}
 		}
 		else {
 			GroupLocalServiceUtil.updateGroup(
@@ -1432,6 +1445,32 @@ public class StagingImpl implements Staging {
 			}
 		}
 	}
+
+	protected void deletePreviousFileVersions(long groupId) 
+			throws PortalException, SystemException {
+
+			List<DLFileEntry> groupFileEntries = 
+				DLFileEntryLocalServiceUtil.getGroupFileEntries(
+					groupId, QueryUtil.ALL_POS, QueryUtil.ALL_POS);
+
+			if (groupFileEntries != null) {
+				for (DLFileEntry fileEntry : groupFileEntries) {
+
+					DLFileVersion latestVersion = fileEntry.getLatestFileVersion(
+						false);
+
+					List<DLFileVersion> fileVersions = fileEntry.getFileVersions(
+						WorkflowConstants.STATUS_ANY);
+
+					fileVersions.remove(latestVersion);
+
+					for (DLFileVersion fileVersion : fileVersions) {
+						DLFileVersionLocalServiceUtil.deleteDLFileVersion(
+							fileVersion);
+					}
+				}
+			}
+		}
 
 	protected void deleteRecentLayoutRevisionId(
 		PortalPreferences portalPreferences, long layoutSetBranchId,
