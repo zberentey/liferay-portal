@@ -133,7 +133,8 @@ public class DLFileEntryLocalServiceImpl
 			DLUtil.getGroupIds(groupId), folderId, fileEntryTypeId);
 		Date now = new Date();
 
-		validateFile(groupId, folderId, title, extension, file, is);
+		validateFile(
+			groupId, folderId, title, sourceFileName, extension, file, is);
 
 		long fileEntryId = counterLocalService.increment();
 
@@ -1778,19 +1779,17 @@ public class DLFileEntryLocalServiceImpl
 	}
 
 	protected void validateFile(
-			long groupId, long folderId, String title, String extension,
-			File file, InputStream is)
+			long groupId, long folderId, String title, String sourceFileName,
+			String extension, File file, InputStream is)
 		throws PortalException, SystemException {
 
-		String fileName = title;
-
-		validateFileName(fileName);
+		validateFileName(sourceFileName);
 
 		if (file != null) {
-			DLStoreUtil.validate(fileName, true, file);
+			DLStoreUtil.validate(sourceFileName, true, file);
 		}
 		else {
-			DLStoreUtil.validate(fileName, true, is);
+			DLStoreUtil.validate(sourceFileName, true, is);
 		}
 
 		validateFile(groupId, folderId, 0, title, extension);
