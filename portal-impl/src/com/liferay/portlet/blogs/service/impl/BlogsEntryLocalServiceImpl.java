@@ -20,6 +20,7 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.IndexerRegistryUtil;
+import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -84,6 +85,7 @@ import net.htmlparser.jericho.StartTag;
  * @author Thiago Moreira
  * @author Juan Fernández
  * @author Zsolt Berentey
+ * @author Mate Thurzo
  */
 public class BlogsEntryLocalServiceImpl extends BlogsEntryLocalServiceBaseImpl {
 
@@ -714,17 +716,74 @@ public class BlogsEntryLocalServiceImpl extends BlogsEntryLocalServiceBaseImpl {
 			guestPermissions);
 	}
 
+	public void updateFutureEntries() throws PortalException, SystemException {
+		Date now = new Date();
+
+		List<BlogsEntry> futureEntries =
+			blogsEntryPersistence.findByS_LtD(
+				WorkflowConstants.STATUS_APPROVED_FUTURE_ADD, now);
+
+		ServiceContext serviceContext = null;
+
+		for (BlogsEntry futureEntry : futureEntries) {
+			serviceContext = new ServiceContext();
+
+			String[] trackbacks = StringUtil.split(futureEntry.getTrackbacks());
+			String layoutFullURL = PortalUtil.getLayoutFullURL(
+				futureEntry.getGroupId(), PortletKeys.BLOGS);
+
+			serviceContext.setAttribute("trackbacks", trackbacks);
+			serviceContext.setScopeGroupId(futureEntry.getGroupId());
+			serviceContext.setLayoutFullURL(layoutFullURL);
+			serviceContext.setCommand(Constants.ADD);
+
+			updateStatus(
+				futureEntry.getStatusByUserId(), futureEntry.getEntryId(),
+				WorkflowConstants.STATUS_APPROVED, serviceContext);
+		}
+
+		futureEntries =
+			blogsEntryPersistence.findByS_LtD(
+				WorkflowConstants.STATUS_APPROVED_FUTURE_UPDATE, now);
+
+		for (BlogsEntry futureEntry : futureEntries) {
+			serviceContext = new ServiceContext();
+
+			String[] trackbacks = StringUtil.split(futureEntry.getTrackbacks());
+			String layoutFullURL = PortalUtil.getLayoutFullURL(
+				futureEntry.getGroupId(), PortletKeys.BLOGS);
+
+			serviceContext.setAttribute("trackbacks", trackbacks);
+			serviceContext.setScopeGroupId(futureEntry.getGroupId());
+			serviceContext.setLayoutFullURL(layoutFullURL);
+			serviceContext.setCommand(Constants.UPDATE);
+
+			updateStatus(
+				futureEntry.getStatusByUserId(), futureEntry.getEntryId(),
+				WorkflowConstants.STATUS_APPROVED, serviceContext);
+		}
+	}
+
 	public BlogsEntry updateStatus(
 			long userId, long entryId, int status,
 			ServiceContext serviceContext)
 		throws PortalException, SystemException {
 
-		// Entry
-
-		User user = userPersistence.findByPrimaryKey(userId);
+		BlogsEntry entry = blogsEntryPersistence.findByPrimaryKey(entryId);
 		Date now = new Date();
 
-		BlogsEntry entry = blogsEntryPersistence.findByPrimaryKey(entryId);
+		if ((status == WorkflowConstants.STATUS_APPROVED) &&
+			entry.getDisplayDate().after(now)) {
+
+			if (serviceContext.isCommandAdd()) {
+				status = WorkflowConstants.STATUS_APPROVED_FUTURE_ADD;
+			}
+			else if (serviceContext.isCommandUpdate()) {
+				status = WorkflowConstants.STATUS_APPROVED_FUTURE_UPDATE;
+			}
+		}
+
+		User user = userPersistence.findByPrimaryKey(userId);
 
 		int oldStatus = entry.getStatus();
 
