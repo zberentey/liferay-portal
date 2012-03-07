@@ -73,6 +73,10 @@ public class WorkflowConstants {
 
 	public static final int STATUS_APPROVED = 0;
 
+	public static final int STATUS_APPROVED_FUTURE_ADD = 8;
+
+	public static final int STATUS_APPROVED_FUTURE_UPDATE = 9;
+
 	public static final int STATUS_DENIED = 4;
 
 	public static final int STATUS_DRAFT = 2;
