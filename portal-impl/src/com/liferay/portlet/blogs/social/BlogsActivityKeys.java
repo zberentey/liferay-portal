@@ -16,12 +16,15 @@ package com.liferay.portlet.blogs.social;
 
 /**
  * @author Brian Wing Shun Chan
+ * @author Mate Thurzo
  */
 public class BlogsActivityKeys {
 
 	public static final int ADD_COMMENT = 1;
 
 	public static final int ADD_ENTRY = 2;
+
+	public static final int PUSHED_TO_FUTURE = 4;
 
 	public static final int UPDATE_ENTRY = 3;
 

@@ -14,8 +14,11 @@
 
 package com.liferay.portlet.blogs.service.impl;
 
+import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
+import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.search.Indexer;
@@ -75,6 +78,7 @@ import java.util.Set;
 
 import javax.portlet.PortletPreferences;
 
+import com.liferay.portlet.social.model.SocialActivity;
 import net.htmlparser.jericho.Source;
 import net.htmlparser.jericho.StartTag;
 
@@ -772,45 +776,21 @@ public class BlogsEntryLocalServiceImpl extends BlogsEntryLocalServiceBaseImpl {
 		BlogsEntry entry = blogsEntryPersistence.findByPrimaryKey(entryId);
 		Date now = new Date();
 
-		if ((status == WorkflowConstants.STATUS_APPROVED) &&
-			entry.getDisplayDate().after(now)) {
-
-			if (serviceContext.isCommandAdd()) {
-				status = WorkflowConstants.STATUS_APPROVED_FUTURE_ADD;
-			}
-			else if (serviceContext.isCommandUpdate()) {
-				status = WorkflowConstants.STATUS_APPROVED_FUTURE_UPDATE;
-			}
-		}
-
 		User user = userPersistence.findByPrimaryKey(userId);
 
 		int oldStatus = entry.getStatus();
-
-		entry.setModifiedDate(serviceContext.getModifiedDate(now));
-		entry.setStatus(status);
-		entry.setStatusByUserId(user.getUserId());
-		entry.setStatusByUserName(user.getFullName());
-		entry.setStatusDate(serviceContext.getModifiedDate(now));
-
-		blogsEntryPersistence.update(entry, false);
+		int newStatus = status;
 
 		Indexer indexer = IndexerRegistryUtil.nullSafeGetIndexer(
 			BlogsEntry.class);
 
 		if (status == WorkflowConstants.STATUS_APPROVED) {
 
-			// Statistics
+			//pushing entry to approved
 
-			blogsStatsUserLocalService.updateStatsUser(
-				entry.getGroupId(), user.getUserId(), entry.getDisplayDate());
+			if (!entry.getDisplayDate().after(now)) {
 
-			if (oldStatus != WorkflowConstants.STATUS_APPROVED) {
-
-				// Asset
-
-				assetEntryLocalService.updateVisible(
-					BlogsEntry.class.getName(), entryId, true);
+				// approve and publish it now
 
 				// Social
 
@@ -828,39 +808,105 @@ public class BlogsEntryLocalServiceImpl extends BlogsEntryLocalServiceBaseImpl {
 						BlogsEntry.class.getName(), entryId,
 						BlogsActivityKeys.ADD_ENTRY, StringPool.BLANK, 0);
 				}
+
+				// Indexer
+
+				indexer.reindex(entry);
+
+				if (oldStatus != WorkflowConstants.STATUS_APPROVED) {
+
+					// Asset
+
+					assetEntryLocalService.updateVisible(
+						BlogsEntry.class.getName(), entryId, true);
+
+					// Subscriptions
+
+					notifySubscribers(entry, serviceContext);
+
+					// Ping
+
+					String[] trackbacks = (String[])serviceContext.getAttribute(
+						"trackbacks");
+					Boolean pingOldTrackbacks = GetterUtil.getBoolean(
+						(String)serviceContext.getAttribute(
+							"pingOldTrackbacks"));
+
+					pingGoogle(entry, serviceContext);
+					pingPingback(entry, serviceContext);
+					pingTrackbacks(
+						entry, trackbacks, pingOldTrackbacks, serviceContext);
+				}
+
 			}
+			else {
 
-			// Indexer
+				// approve and publish it later
 
-			indexer.reindex(entry);
+				if (serviceContext.isCommandAdd()) {
+					newStatus = WorkflowConstants.STATUS_APPROVED_FUTURE_ADD;
+				}
+				else if (serviceContext.isCommandUpdate()) {
+					newStatus =
+						WorkflowConstants.STATUS_APPROVED_FUTURE_UPDATE;
+				}
 
-			// Subscriptions
+				if (oldStatus == WorkflowConstants.STATUS_DRAFT_FROM_APPROVED) {
 
-			notifySubscribers(entry, serviceContext);
+					// the entry has been edited with a new future display date
 
-			// Ping
+					// update activities with the future display date, so the
+					// activities portlet can handle the display correctly
 
-			String[] trackbacks = (String[])serviceContext.getAttribute(
-				"trackbacks");
-			Boolean pingOldTrackbacks = GetterUtil.getBoolean(
-				(String)serviceContext.getAttribute("pingOldTrackbacks"));
+					JSONObject extraData = JSONFactoryUtil.createJSONObject();
+					extraData.put("display-date", entry.getDisplayDate());
 
-			pingGoogle(entry, serviceContext);
-			pingPingback(entry, serviceContext);
-			pingTrackbacks(
-				entry, trackbacks, pingOldTrackbacks, serviceContext);
+					List<SocialActivity> activities =
+						socialActivityLocalService.getActivities(
+							0, BlogsEntry.class.getName(), entryId,
+							QueryUtil.ALL_POS, QueryUtil.ALL_POS);
+
+					for (SocialActivity activity : activities) {
+						activity.setExtraData(extraData.toString());
+
+						socialActivityLocalService.updateSocialActivity(
+							activity);
+					}
+
+					// adding new activity noting that it has been pushed
+					// to the future
+
+					socialActivityLocalService.addUniqueActivity(
+						user.getUserId(), entry.getGroupId(),
+						BlogsEntry.class.getName(), entryId,
+						BlogsActivityKeys.PUSHED_TO_FUTURE,
+						extraData.toString(), 0);
+
+					// Asset
+
+					assetEntryLocalService.updateVisible(
+						BlogsEntry.class.getName(), entryId, false);
+
+					// Indexer
+
+					indexer.delete(entry);
+
+				}
+			}
 		}
-		else if (status != WorkflowConstants.STATUS_APPROVED) {
 
-			// Asset
+		entry.setModifiedDate(serviceContext.getModifiedDate(now));
+		entry.setStatus(newStatus);
+		entry.setStatusByUserId(user.getUserId());
+		entry.setStatusByUserName(user.getFullName());
+		entry.setStatusDate(serviceContext.getModifiedDate(now));
 
-			assetEntryLocalService.updateVisible(
-				BlogsEntry.class.getName(), entryId, false);
+		blogsEntryPersistence.update(entry, false);
 
-			// Indexer
+		// Statistics
 
-			indexer.delete(entry);
-		}
+		blogsStatsUserLocalService.updateStatsUser(
+			entry.getGroupId(), user.getUserId(), entry.getDisplayDate());
 
 		return entry;
 	}

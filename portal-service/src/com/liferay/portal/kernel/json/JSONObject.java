@@ -28,6 +28,10 @@ public interface JSONObject {
 
 	public boolean getBoolean(String key, boolean defaultValue);
 
+	public Date getDate(String key);
+
+	public Date getDate(String key, Date defaultValue);
+
 	public double getDouble(String key);
 
 	public double getDouble(String key, double defaultValue);
