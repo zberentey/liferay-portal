@@ -15,6 +15,7 @@
 package com.liferay.portlet.sitesadmin.util;
 
 import com.liferay.portal.model.Group;
+import com.liferay.portal.service.ServiceContext;
 
 import javax.portlet.PortletRequest;
 
@@ -22,18 +23,6 @@ import javax.portlet.PortletRequest;
  * @author Zsolt Szabo
  */
 public class SitesAdminUtil {
-
-	public static boolean getActive(
-		PortletRequest portletRequest, boolean defaultActive) {
-
-		return getSitesAdmin().getActive(portletRequest, defaultActive);
-	}
-
-	public static String[] getAssetTagNames(
-		PortletRequest portletRequest, Group liveGroup) throws Exception{
-
-		return getSitesAdmin().getAssetTagNames(portletRequest, liveGroup);
-	}
 
 	public static long getRemoteGroupId(
 		PortletRequest portletRequest, String defaultRemoteGroupId) {
@@ -48,13 +37,6 @@ public class SitesAdminUtil {
 		return getSitesAdmin().getRemotePort(portletRequest, defaultRemotePort);
 	}
 
-	public static boolean getSecureConnection(
-		PortletRequest portletRequest, String defaultSecureConnection) {
-
-		return getSitesAdmin().getSecureConnection(
-			portletRequest, defaultSecureConnection);
-	}
-
 	public static SitesAdmin getSitesAdmin() {
 		return _sitesAdmin;
 	}
@@ -65,8 +47,22 @@ public class SitesAdminUtil {
 		return getSitesAdmin().getStagingType(liveGroup, portletRequest);
 	}
 
-	public static int getType(PortletRequest portletRequest, int defaultType) {
-		return getSitesAdmin().getType(portletRequest, defaultType);
+	public static void updateAssetCategoryIds(
+			PortletRequest portletRequest, Group liveGroup,
+			ServiceContext serviceContext)
+		throws Exception{
+
+		getSitesAdmin().updateAssetCategoryIds(
+			portletRequest, liveGroup, serviceContext);
+	}
+
+	public static void updateAssetTagNames(
+			PortletRequest portletRequest, Group liveGroup,
+			ServiceContext serviceContext)
+		throws Exception{
+
+		getSitesAdmin().updateAssetTagNames(
+			portletRequest, liveGroup, serviceContext);
 	}
 
 	public void setSitesAdmin(SitesAdmin sitesAdmin) {

@@ -15,13 +15,18 @@
 package com.liferay.portlet.sitesadmin.util;
 
 import com.liferay.portal.kernel.staging.StagingConstants;
+import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.Group;
+import com.liferay.portal.service.ServiceContext;
+import com.liferay.portlet.asset.model.AssetCategory;
 import com.liferay.portlet.asset.model.AssetTag;
+import com.liferay.portlet.asset.service.AssetCategoryServiceUtil;
 import com.liferay.portlet.asset.service.AssetTagServiceUtil;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.portlet.PortletRequest;
@@ -30,36 +35,6 @@ import javax.portlet.PortletRequest;
  * @author Zsolt Szabo
  */
 public class SitesAdminImpl implements SitesAdmin {
-
-	public boolean getActive(
-		PortletRequest portletRequest, boolean defaultActive) {
-
-		String active = portletRequest.getParameter("active");
-
-		if (Validator.isNull(active)) {
-			return defaultActive;
-		}
-
-		return Boolean.parseBoolean(active);
-	}
-
-	public String[] getAssetTagNames(
-		PortletRequest portletRequest, Group liveGroup) throws Exception{
-
-		List<AssetTag> tags = AssetTagServiceUtil.getTags(
-			liveGroup.getClassName(), liveGroup.getClassPK());
-
-		String defaultAssetTagNames = ListUtil.toString(
-			tags, AssetTag.NAME_ACCESSOR);
-
-		String assetTagNames = portletRequest.getParameter("assetTagNames");
-
-		if (assetTagNames == null) {
-			assetTagNames = defaultAssetTagNames;
-		}
-
-		return StringUtil.split(assetTagNames);
-	}
 
 	public long getRemoteGroupId(
 		PortletRequest portletRequest, String defaultRemoteGroupId) {
@@ -93,25 +68,6 @@ public class SitesAdminImpl implements SitesAdmin {
 		return Integer.parseInt(remotePort);
 	}
 
-	public boolean getSecureConnection(
-		PortletRequest portletRequest, String defaultSecureConnection) {
-
-		String secureConnection = portletRequest.getParameter(
-			"secureConnection");
-
-		if (Validator.isNull(secureConnection) &&
-			(defaultSecureConnection == null)) {
-
-			return SitesAdmin.DEFAULT_SECURE_CONNECTION;
-		}
-
-		if (Validator.isNull(secureConnection)) {
-			return Boolean.parseBoolean(defaultSecureConnection);
-		}
-
-		return Boolean.parseBoolean(secureConnection);
-	}
-
 	public int getStagingType(Group liveGroup, PortletRequest portletRequest) {
 		String stagingType = portletRequest.getParameter("stagingType");
 
@@ -130,14 +86,46 @@ public class SitesAdminImpl implements SitesAdmin {
 		return Integer.parseInt(stagingType);
 	}
 
-	public int getType(PortletRequest portletRequest, int defaultType) {
-		String type = portletRequest.getParameter("type");
+	public void updateAssetCategoryIds(
+			PortletRequest portletRequest, Group liveGroup,
+			ServiceContext serviceContext)
+		throws Exception{
 
-		if (Validator.isNull(type)) {
-			return defaultType;
+		if (serviceContext.getAssetCategoryIds().length > 0) {
+			return;
 		}
 
-		return Integer.parseInt(type);
+		List<AssetCategory> categories = AssetCategoryServiceUtil.getCategories(
+			liveGroup.getClassName(), liveGroup.getClassPK());
+
+		List<Long> assetCategoryIdsList = new ArrayList<Long>();
+
+		for (AssetCategory category : categories) {
+			assetCategoryIdsList.add(category.getCategoryId());
+		}
+
+		serviceContext.setAssetCategoryIds(
+			ArrayUtil.toArray(
+				assetCategoryIdsList.toArray(
+					new Long[assetCategoryIdsList.size()])));
+	}
+
+	public void updateAssetTagNames(
+			PortletRequest portletRequest, Group liveGroup,
+			ServiceContext serviceContext)
+		throws Exception{
+
+		if (serviceContext.getAssetTagNames().length > 0) {
+			return;
+		}
+
+		List<AssetTag> tags = AssetTagServiceUtil.getTags(
+			liveGroup.getClassName(), liveGroup.getClassPK());
+
+		String defaultAssetTagNames = ListUtil.toString(
+			tags, AssetTag.NAME_ACCESSOR);
+
+		serviceContext.setAssetTagNames(StringUtil.split(defaultAssetTagNames));
 	}
 
 }

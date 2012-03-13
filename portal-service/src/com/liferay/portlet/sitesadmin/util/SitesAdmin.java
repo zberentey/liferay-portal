@@ -15,6 +15,7 @@
 package com.liferay.portlet.sitesadmin.util;
 
 import com.liferay.portal.model.Group;
+import com.liferay.portal.service.ServiceContext;
 
 import javax.portlet.PortletRequest;
 
@@ -29,23 +30,22 @@ public interface SitesAdmin {
 
 	public static final boolean DEFAULT_SECURE_CONNECTION = false;
 
-	public boolean getActive(
-		PortletRequest portletRequest, boolean defaultActive);
-
-	public String[] getAssetTagNames(
-		PortletRequest portletRequest, Group liveGroup) throws Exception;
-
 	public long getRemoteGroupId(
 		PortletRequest portletRequest, String defaultRemoteGroupId);
 
 	public int getRemotePort(
 		PortletRequest portletRequest, String defaultRemotePort);
 
-	public boolean getSecureConnection(
-		PortletRequest portletRequest, String defaultSecureConnection);
-
 	public int getStagingType(Group liveGroup, PortletRequest portletRequest);
 
-	public int getType(PortletRequest portletRequest, int defaultType);
+	public void updateAssetCategoryIds(
+			PortletRequest portletRequest, Group liveGroup,
+			ServiceContext serviceContext)
+		throws Exception;
+
+	public void updateAssetTagNames(
+			PortletRequest portletRequest, Group liveGroup,
+			ServiceContext serviceContext)
+		throws Exception;
 
 }

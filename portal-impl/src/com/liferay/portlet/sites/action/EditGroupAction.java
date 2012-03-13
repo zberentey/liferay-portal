@@ -352,8 +352,8 @@ public class EditGroupAction extends PortletAction {
 
 			liveGroup = GroupLocalServiceUtil.getGroup(liveGroupId);
 
-			active = SitesAdminUtil.getActive(
-				actionRequest, liveGroup.getActive());
+			active = ParamUtil.getBoolean(
+				actionRequest, "active", liveGroup.getActive());
 			description = ParamUtil.getString(
 				actionRequest, "description", liveGroup.getDescription());
 			friendlyURL = ParamUtil.getString(
@@ -361,10 +361,13 @@ public class EditGroupAction extends PortletAction {
 			name = ParamUtil.getString(
 				actionRequest, "name", liveGroup.getName());
 			oldFriendlyURL = liveGroup.getFriendlyURL();
-			type = SitesAdminUtil.getType(actionRequest, liveGroup.getType());
+			type = ParamUtil.getInteger(
+				actionRequest, "type", liveGroup.getType());
 
-			serviceContext.setAssetTagNames(SitesAdminUtil.getAssetTagNames(
-				actionRequest, liveGroup));
+			SitesAdminUtil.updateAssetCategoryIds(
+				actionRequest, liveGroup, serviceContext);
+			SitesAdminUtil.updateAssetTagNames(
+				actionRequest, liveGroup, serviceContext);
 
 			liveGroup = GroupServiceUtil.updateGroup(
 				liveGroupId, name, description, type, friendlyURL, active,
@@ -419,6 +422,8 @@ public class EditGroupAction extends PortletAction {
 		typeSettingsProperties.setProperty("false-robots.txt", publicRobots);
 		typeSettingsProperties.setProperty("true-robots.txt", privateRobots);
 
+		// Layout set prototypes
+
 		LayoutSet publicLayoutSet = liveGroup.getPublicLayoutSet();
 		LayoutSet privateLayoutSet = liveGroup.getPrivateLayoutSet();
 
@@ -440,12 +445,20 @@ public class EditGroupAction extends PortletAction {
 
 			oldStagingFriendlyURL = stagingGroup.getFriendlyURL();
 
+			LayoutSet stagingPublicLayoutSet =
+				stagingGroup.getPublicLayoutSet();
+			LayoutSet stagingPrivateLayoutSet =
+				stagingGroup.getPrivateLayoutSet();
+
 			publicVirtualHost = ParamUtil.getString(
-				actionRequest, "stagingPublicVirtualHost");
+				actionRequest, "stagingPublicVirtualHost",
+				stagingPublicLayoutSet.getVirtualHostname());
 			privateVirtualHost = ParamUtil.getString(
-				actionRequest, "stagingPrivateVirtualHost");
+				actionRequest, "stagingPrivateVirtualHost",
+				stagingPrivateLayoutSet.getVirtualHostname());
 			friendlyURL = ParamUtil.getString(
-				actionRequest, "stagingFriendlyURL");
+				actionRequest, "stagingFriendlyURL",
+				stagingGroup.getFriendlyURL());
 
 			LayoutSetServiceUtil.updateVirtualHost(
 				stagingGroup.getGroupId(), false, publicVirtualHost);
@@ -459,11 +472,6 @@ public class EditGroupAction extends PortletAction {
 
 		liveGroup = GroupServiceUtil.updateGroup(
 			liveGroup.getGroupId(), typeSettingsProperties.toString());
-
-		// Layout set prototypes
-
-		privateLayoutSet = liveGroup.getPrivateLayoutSet();
-		publicLayoutSet = liveGroup.getPublicLayoutSet();
 
 		if (!liveGroup.isStaged()) {
 			long privateLayoutSetPrototypeId = ParamUtil.getLong(

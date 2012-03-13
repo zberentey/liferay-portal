@@ -1374,9 +1374,10 @@ public class StagingImpl implements Staging {
 			int remotePort = SitesAdminUtil.getRemotePort(
 				portletRequest,
 				liveGroup.getTypeSettingsProperty("remotePort"));
-			boolean secureConnection = SitesAdminUtil.getSecureConnection(
-				portletRequest,
-				liveGroup.getTypeSettingsProperty("secureConnection"));
+			boolean secureConnection = ParamUtil.getBoolean(
+				portletRequest, "secureConnection",
+				Boolean.parseBoolean(
+					liveGroup.getTypeSettingsProperty("secureConnection")));
 
 			enableRemoteStaging(
 				userId, scopeGroup, liveGroup, branchingPublic,
