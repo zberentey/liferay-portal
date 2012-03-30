@@ -1239,3 +1239,5 @@ Liferay.Service.registerClass(
 		updatePage: true
 	}
 );
+
+Liferay.Service.register("Liferay.Service.Trash", "com.liferay.portlet.trash.service");
