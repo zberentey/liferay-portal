@@ -64,24 +64,28 @@ public class EditTrashEntryAction extends PortletAction {
 			getForward(renderRequest, "portlet.trash.view"));
 	}
 	
-	protected void deleteTrashEntry (ActionRequest actionRequest) {
+	protected void deleteTrashEntry (ActionRequest actionRequest)
+		throws Exception {
+
 		String className = ParamUtil.getString(actionRequest, "className");
 		long classPK = ParamUtil.getLong(actionRequest, "classPK");
 
 		TrashHandler trashHandler = TrashHandlerRegistryUtil.getTrashHandler(
 				className);
 
-		trashHandler.deleteTrashEntry(className, classPK);
+		trashHandler.deleteTrashEntry(classPK);
 	}
 
-	protected void restoreTrashEntry (ActionRequest actionRequest) {
+	protected void restoreTrashEntry (ActionRequest actionRequest)
+		throws Exception{
+
 		String className = ParamUtil.getString(actionRequest, "className");
 		long classPK = ParamUtil.getLong(actionRequest, "classPK");
 
 		TrashHandler trashHandler = TrashHandlerRegistryUtil.getTrashHandler(
 				className);
 
-		trashHandler.restoreTrashEntry(className, classPK);
+		trashHandler.restoreTrashEntry(classPK);
 	}
 
 }
