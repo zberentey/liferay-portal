@@ -124,6 +124,7 @@ AssetEntry assetEntry = (AssetEntry)request.getAttribute("view_entry_content.jsp
 
 								<liferay-ui:icon-delete
 									label="<%= true %>"
+									message="move-to-recycle-bin"
 									url="<%= deleteEntryURL %>"
 								/>
 							</td>
