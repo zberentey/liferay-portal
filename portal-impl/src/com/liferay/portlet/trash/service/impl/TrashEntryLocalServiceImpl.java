@@ -26,6 +26,7 @@ import java.util.List;
 
 /**
  * @author Zsolt Berentey
+ * @author Manuel de la Peña
  */
 public class TrashEntryLocalServiceImpl extends TrashEntryLocalServiceBaseImpl {
 
@@ -70,6 +71,10 @@ public class TrashEntryLocalServiceImpl extends TrashEntryLocalServiceBaseImpl {
 		throws SystemException {
 
 		return trashEntryPersistence.findByGroupId(groupId);
+	}
+
+	public int getEntriesCount(long groupId) throws SystemException {
+		return trashEntryPersistence.countByGroupId(groupId);
 	}
 
 	public TrashEntry getEntry(String className, long classPK)
