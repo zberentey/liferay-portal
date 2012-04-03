@@ -14,11 +14,13 @@
 
 package com.liferay.portlet.documentlibrary.model.impl;
 
+import com.ecyrd.jspwiki.workflow.Workflow;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.UnicodeProperties;
+import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.security.auth.PrincipalThreadLocal;
 import com.liferay.portlet.documentlibrary.model.DLFileEntry;
 import com.liferay.portlet.documentlibrary.model.DLFolder;
@@ -34,6 +36,7 @@ import java.io.InputStream;
 /**
  * @author Jorge Ferrer
  * @author Alexander Chow
+ * @author Manuel de la Peña
  */
 public class DLFileVersionImpl extends DLFileVersionBaseImpl {
 
@@ -109,6 +112,10 @@ public class DLFileVersionImpl extends DLFileVersionBaseImpl {
 
 	public String getIcon() {
 		return DLUtil.getFileIcon(getExtension());
+	}
+
+	public boolean isDeleted() {
+		return (getStatus() == WorkflowConstants.STATUS_DELETED);
 	}
 
 	@Override

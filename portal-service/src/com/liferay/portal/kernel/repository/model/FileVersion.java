@@ -24,6 +24,7 @@ import java.util.Date;
 
 /**
  * @author Alexander Chow
+ * @author Manuel de la Peña
  */
 public interface FileVersion extends RepositoryModel<FileVersion> {
 
@@ -85,6 +86,8 @@ public interface FileVersion extends RepositoryModel<FileVersion> {
 	public boolean isApproved();
 
 	public boolean isDefaultRepository();
+
+	public boolean isDeleted();
 
 	public boolean isDraft();
 

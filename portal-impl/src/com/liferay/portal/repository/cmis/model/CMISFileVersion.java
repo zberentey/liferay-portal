@@ -51,6 +51,7 @@ import org.apache.chemistry.opencmis.commons.exceptions.CmisObjectNotFoundExcept
 
 /**
  * @author Alexander Chow
+ * @author Manuel de la Peña
  */
 public class CMISFileVersion extends CMISModel implements FileVersion {
 
@@ -264,6 +265,10 @@ public class CMISFileVersion extends CMISModel implements FileVersion {
 	}
 
 	public boolean isDefaultRepository() {
+		return false;
+	}
+
+	public boolean isDeleted() {
 		return false;
 	}
 
