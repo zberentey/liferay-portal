@@ -603,6 +603,14 @@ public class DLFileEntryLocalServiceUtil {
 			serviceContext);
 	}
 
+	public static com.liferay.portlet.trash.model.TrashEntry moveToTrash(
+		long userId, long fileEntryId,
+		com.liferay.portal.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getService().moveToTrash(userId, fileEntryId, serviceContext);
+	}
+
 	public static void revertFileEntry(long userId, long fileEntryId,
 		java.lang.String version,
 		com.liferay.portal.service.ServiceContext serviceContext)

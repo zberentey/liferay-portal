@@ -598,6 +598,15 @@ public class DLFileEntryLocalServiceWrapper implements DLFileEntryLocalService,
 			newFolderId, serviceContext);
 	}
 
+	public com.liferay.portlet.trash.model.TrashEntry moveToTrash(long userId,
+		long fileEntryId,
+		com.liferay.portal.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return _dlFileEntryLocalService.moveToTrash(userId, fileEntryId,
+			serviceContext);
+	}
+
 	public void revertFileEntry(long userId, long fileEntryId,
 		java.lang.String version,
 		com.liferay.portal.service.ServiceContext serviceContext)
