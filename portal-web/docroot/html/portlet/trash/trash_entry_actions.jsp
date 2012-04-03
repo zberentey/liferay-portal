@@ -32,6 +32,7 @@ long trashEntry2EntryId = trashEntry2.getEntryId();
 
 	<portlet:actionURL var="restoreTrashEntryURL">
 		<portlet:param name="struts_action" value="/trash/restore_entry" />
+		<portlet:param name="cmd" value="<%= Constants.RESTORE %>" />
 		<portlet:param name="redirect" value="<%= redirect %>" />
 		<portlet:param name="p_t_i_d" value="<%= String.valueOf(trashEntry2EntryId) %>" />
 	</portlet:actionURL>
@@ -44,6 +45,7 @@ long trashEntry2EntryId = trashEntry2.getEntryId();
 
 	<portlet:actionURL var="deleteTrashEntryURL">
 		<portlet:param name="struts_action" value="/trash/delete_entry" />
+		<portlet:param name="cmd" value="<%= Constants.DELETE %>" />
 		<portlet:param name="redirect" value="<%= redirect %>" />
 		<portlet:param name="p_t_i_d" value="<%= String.valueOf(trashEntry2EntryId) %>" />
 	</portlet:actionURL>

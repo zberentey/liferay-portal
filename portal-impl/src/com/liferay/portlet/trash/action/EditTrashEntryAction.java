@@ -16,6 +16,7 @@ package com.liferay.portlet.trash.action;
 
 import com.liferay.portal.kernel.trash.TrashHandler;
 import com.liferay.portal.kernel.trash.TrashHandlerRegistryUtil;
+import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.struts.PortletAction;
 import com.liferay.portlet.trash.model.TrashEntry;
@@ -34,12 +35,49 @@ import org.apache.struts.action.ActionMapping;
 /**
  * @author Manuel de la Peña
  */
-public class RestoreTrashEntryAction extends PortletAction {
+public class EditTrashEntryAction extends PortletAction {
 
 	@Override
 	public void processAction(
 			ActionMapping mapping, ActionForm form, PortletConfig portletConfig,
 			ActionRequest actionRequest, ActionResponse actionResponse)
+		throws Exception {
+
+		String cmd = ParamUtil.getString(actionRequest, Constants.CMD);
+
+		if (cmd.equals(Constants.DELETE)) {
+			deleteTrashEntries(actionRequest);
+		}
+		else if (cmd.equals(Constants.RESTORE)) {
+			restoreTrashEntries(actionRequest);
+		}
+	}
+
+	@Override
+	public ActionForward render(
+			ActionMapping mapping, ActionForm form, PortletConfig portletConfig,
+			RenderRequest renderRequest, RenderResponse renderResponse)
+		throws Exception {
+
+		return mapping.findForward(
+			getForward(renderRequest, "portlet.trash.view"));
+	}
+
+	private void deleteTrashEntries(ActionRequest actionRequest)
+		throws Exception {
+
+		long trashEntryId = ParamUtil.getLong(actionRequest, "p_t_i_d");
+
+		TrashEntry trashEntry = TrashEntryLocalServiceUtil.getTrashEntry(
+			trashEntryId);
+
+		TrashHandler trashHandler = TrashHandlerRegistryUtil.getTrashHandler(
+			trashEntry.getClassName());
+
+		trashHandler.deleteTrashEntry(trashEntry.getEntryId());
+	}
+
+	private void restoreTrashEntries(ActionRequest actionRequest)
 		throws Exception {
 
 		long trashEntryId = ParamUtil.getLong(actionRequest, "p_t_i_d");
@@ -51,16 +89,6 @@ public class RestoreTrashEntryAction extends PortletAction {
 			trashEntry.getClassName());
 
 		trashHandler.restoreTrashEntry(trashEntry.getClassPK());
-	}
-
-	@Override
-	public ActionForward render(
-			ActionMapping mapping, ActionForm form, PortletConfig portletConfig,
-			RenderRequest renderRequest, RenderResponse renderResponse)
-		throws Exception {
-
-		return mapping.findForward(
-			getForward(renderRequest, "portlet.trash.view"));
 	}
 
 }
