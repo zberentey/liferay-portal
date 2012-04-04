@@ -27,6 +27,7 @@ import java.util.List;
 
 /**
  * @author Alexander Chow
+ * @author Manuel de la Peña
  */
 public interface FileEntry extends RepositoryModel<FileEntry> {
 
@@ -143,6 +144,8 @@ public interface FileEntry extends RepositoryModel<FileEntry> {
 	public boolean isCheckedOut();
 
 	public boolean isDefaultRepository();
+
+	public boolean isDeleted();
 
 	public boolean isSupportsLocking();
 

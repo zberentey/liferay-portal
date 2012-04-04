@@ -59,6 +59,7 @@ import org.apache.chemistry.opencmis.commons.exceptions.CmisObjectNotFoundExcept
 
 /**
  * @author Alexander Chow
+ * @author Manuel de la Peña
  */
 public class CMISFileEntry extends CMISModel implements FileEntry {
 
@@ -437,6 +438,10 @@ public class CMISFileEntry extends CMISModel implements FileEntry {
 	}
 
 	public boolean isDefaultRepository() {
+		return false;
+	}
+
+	public boolean isDeleted() {
 		return false;
 	}
 

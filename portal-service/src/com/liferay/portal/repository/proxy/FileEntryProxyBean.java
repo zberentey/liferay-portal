@@ -32,6 +32,7 @@ import java.util.Map;
 
 /**
  * @author Mika Koivisto
+ * @author Manuel de la Peña
  */
 public class FileEntryProxyBean
 	extends RepositoryModelProxyBean implements FileEntry {
@@ -238,6 +239,10 @@ public class FileEntryProxyBean
 
 	public boolean isDefaultRepository() {
 		return _fileEntry.isDefaultRepository();
+	}
+
+	public boolean isDeleted() {
+		return _fileEntry.isDeleted();
 	}
 
 	public boolean isEscapedModel() {

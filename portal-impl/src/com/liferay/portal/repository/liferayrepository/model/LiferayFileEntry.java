@@ -37,6 +37,7 @@ import java.util.Map;
 
 /**
  * @author Alexander Chow
+ * @author Manuel de la Peña
  */
 public class LiferayFileEntry extends LiferayModel implements FileEntry {
 
@@ -256,6 +257,10 @@ public class LiferayFileEntry extends LiferayModel implements FileEntry {
 		else {
 			return false;
 		}
+	}
+
+	public boolean isDeleted() {
+		return _dlFileEntry.isDeleted();
 	}
 
 	public boolean isEscapedModel() {
