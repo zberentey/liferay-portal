@@ -715,6 +715,10 @@ public class DLFileEntryWrapper implements DLFileEntry,
 		return _dlFileEntry.isCheckedOut();
 	}
 
+	public boolean isDeleted() {
+		return _dlFileEntry.isDeleted();
+	}
+
 	public void setExtraSettingsProperties(
 		com.liferay.portal.kernel.util.UnicodeProperties extraSettingsProperties) {
 		_dlFileEntry.setExtraSettingsProperties(extraSettingsProperties);
