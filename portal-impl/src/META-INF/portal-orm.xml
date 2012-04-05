@@ -3164,6 +3164,9 @@
 			<basic name="graceValue" />
 			<basic name="startPeriod" />
 			<basic name="endPeriod" />
+			<basic name="active">
+				<column name="ACTIVE_" />
+			</basic>
 			<transient name="className" />
 			<transient name="primaryKey" />
 			<transient name="primaryKeyObj" />
@@ -3435,6 +3438,7 @@
 				<temporal>TIMESTAMP</temporal>
 			</basic>
 			<basic name="typeSettings" />
+			<transient name="className" />
 			<transient name="primaryKey" />
 			<transient name="primaryKeyObj" />
 		</attributes>

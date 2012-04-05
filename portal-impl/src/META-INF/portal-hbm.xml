@@ -2379,6 +2379,7 @@
 		<property name="graceValue" type="com.liferay.portal.dao.orm.hibernate.IntegerType" />
 		<property name="startPeriod" type="com.liferay.portal.dao.orm.hibernate.IntegerType" />
 		<property name="endPeriod" type="com.liferay.portal.dao.orm.hibernate.IntegerType" />
+		<property name="active" type="com.liferay.portal.dao.orm.hibernate.BooleanType" column="active_" />
 	</class>
 	<class name="com.liferay.portlet.social.model.impl.SocialActivityLimitImpl" table="SocialActivityLimit">
 		<cache usage="read-write" />

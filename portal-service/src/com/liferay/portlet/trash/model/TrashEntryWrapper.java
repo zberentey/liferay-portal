@@ -119,6 +119,10 @@ public class TrashEntryWrapper implements TrashEntry, ModelWrapper<TrashEntry> {
 		return _trashEntry.getClassName();
 	}
 
+	public void setClassName(java.lang.String className) {
+		_trashEntry.setClassName(className);
+	}
+
 	/**
 	* Returns the class name ID of this trash entry.
 	*

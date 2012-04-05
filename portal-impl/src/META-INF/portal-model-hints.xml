@@ -2359,6 +2359,7 @@
 		<field name="graceValue" type="int" />
 		<field name="startPeriod" type="int" />
 		<field name="endPeriod" type="int" />
+		<field name="active" type="boolean" />
 	</model>
 	<model name="com.liferay.portlet.social.model.SocialActivityLimit">
 		<field name="activityLimitId" type="long" />

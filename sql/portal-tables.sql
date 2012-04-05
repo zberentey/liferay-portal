@@ -1874,7 +1874,8 @@ create table SocialActivityCounter (
 	totalValue INTEGER,
 	graceValue INTEGER,
 	startPeriod INTEGER,
-	endPeriod INTEGER
+	endPeriod INTEGER,
+	active_ BOOLEAN
 );
 
 create table SocialActivityLimit (
