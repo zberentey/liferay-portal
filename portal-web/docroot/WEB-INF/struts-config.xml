@@ -526,6 +526,10 @@
 			<forward name="portlet.document_library.error" path="portlet.document_library.error" />
 		</action>
 
+		<action path="/document_library/restore_entry" type="com.liferay.portlet.trash.action.EditTrashEntryAction">
+			<forward name="portlet.document_library.view" path="portlet.document_library.view" />
+		</action>
+
 		<action path="/document_library/search" type="com.liferay.portlet.documentlibrary.action.SearchAction">
 			<forward name="portlet.document_library.view" path="portlet.document_library.view" />
 		</action>
@@ -1829,11 +1833,15 @@
 
 		<!-- Trash -->
 
-		<action path="/trash/delete_entry" type="com.liferay.portlet.trash.action.DeleteTrashEntryAction">
+		<action path="/trash/delete_entry" type="com.liferay.portlet.trash.action.EditTrashEntryAction">
 			<forward name="portlet.trash.view" path="portlet.trash.view" />
 		</action>
 
-		<action path="/trash/restore_entry" type="com.liferay.portlet.trash.action.RestoreTrashEntryAction">
+		<action path="/trash/process_trash" type="com.liferay.portlet.trash.action.EditTrashEntryAction">
+			<forward name="portlet.trash.view" path="portlet.trash.view" />
+		</action>
+
+		<action path="/trash/restore_entry" type="com.liferay.portlet.trash.action.EditTrashEntryAction">
 			<forward name="portlet.trash.view" path="portlet.trash.view" />
 		</action>
 

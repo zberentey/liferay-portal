@@ -59,6 +59,8 @@ public class WorkflowConstants {
 
 	public static final String LABEL_DENIED = "denied";
 
+	public static final String LABEL_DELETED = "deleted";
+
 	public static final String LABEL_DRAFT = "draft";
 
 	public static final String LABEL_EXPIRED = "expired";
@@ -72,6 +74,8 @@ public class WorkflowConstants {
 	public static final int STATUS_ANY = -1;
 
 	public static final int STATUS_APPROVED = 0;
+
+	public static final int STATUS_DELETED = 8;
 
 	public static final int STATUS_DENIED = 4;
 
@@ -93,6 +97,9 @@ public class WorkflowConstants {
 		}
 		else if (status == STATUS_APPROVED) {
 			return LABEL_APPROVED;
+		}
+		else if (status == STATUS_DELETED) {
+			return LABEL_DELETED;
 		}
 		else if (status == STATUS_DENIED) {
 			return LABEL_DENIED;
@@ -123,6 +130,9 @@ public class WorkflowConstants {
 		}
 		else if (label.equals(LABEL_APPROVED)) {
 			return STATUS_APPROVED;
+		}
+		else if (label.equals(LABEL_DELETED)) {
+			return STATUS_DELETED;
 		}
 		else if (label.equals(LABEL_DENIED)) {
 			return STATUS_DENIED;
