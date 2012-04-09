@@ -619,7 +619,7 @@ public class SocialActivityCounterLocalServiceImpl
 		return true;
 	}
 
-	protected void adjustUserContribution(AssetEntry assetEntry, boolean reAdd)
+	protected void adjustUserContribution(AssetEntry assetEntry, boolean enable)
 		throws PortalException, SystemException {
 
 		if (assetEntry == null) {
@@ -628,7 +628,7 @@ public class SocialActivityCounterLocalServiceImpl
 
 		int factor = -1;
 
-		if (reAdd) {
+		if (enable) {
 			factor = 1;
 		}
 
@@ -648,7 +648,7 @@ public class SocialActivityCounterLocalServiceImpl
 				SocialActivityCounterConstants.TYPE_ASSET);
 
 		if ((latestContributionActivityCounter != null) &&
-				(latestPopularityActivityCounter != null)) {
+			(latestPopularityActivityCounter != null)) {
 
 			int startPeriod = SocialCounterPeriodUtil.getStartPeriod();
 
@@ -679,8 +679,7 @@ public class SocialActivityCounterLocalServiceImpl
 
 			latestContributionActivityCounter.setTotalValue(
 				latestContributionActivityCounter.getTotalValue() +
-					(latestPopularityActivityCounter.getTotalValue() *
-						factor));
+					(latestPopularityActivityCounter.getTotalValue() * factor));
 
 			socialActivityCounterPersistence.update(
 				latestContributionActivityCounter, false);
