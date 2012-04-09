@@ -211,6 +211,10 @@ public class WorkflowDefinitionLinkWrapper implements WorkflowDefinitionLink,
 		return _workflowDefinitionLink.getClassName();
 	}
 
+	public void setClassName(java.lang.String className) {
+		_workflowDefinitionLink.setClassName(className);
+	}
+
 	/**
 	* Returns the class name ID of this workflow definition link.
 	*

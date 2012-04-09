@@ -45,7 +45,7 @@ public class AutoEscapeBeanHandler implements InvocationHandler {
 		return _bean;
 	}
 
-	public Object invoke(Object proxy, Method method, Object[] args)
+	public Object invoke(Object proxy, Method method, Object[] arguments)
 		throws Throwable {
 
 		String methodName = method.getName();
@@ -65,7 +65,7 @@ public class AutoEscapeBeanHandler implements InvocationHandler {
 		Object result = null;
 
 		try {
-			result = method.invoke(_bean, args);
+			result = method.invoke(_bean, arguments);
 		}
 		catch (InvocationTargetException ite) {
 			throw ite.getTargetException();

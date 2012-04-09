@@ -63,6 +63,10 @@ public class ClassNameWrapper implements ClassName, ModelWrapper<ClassName> {
 		return _className.getClassName();
 	}
 
+	public void setClassName(java.lang.String className) {
+		_className.setClassName(className);
+	}
+
 	/**
 	* Returns the class name ID of this class name.
 	*

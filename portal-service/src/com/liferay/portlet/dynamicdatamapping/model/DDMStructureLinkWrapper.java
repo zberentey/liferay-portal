@@ -84,6 +84,10 @@ public class DDMStructureLinkWrapper implements DDMStructureLink,
 		return _ddmStructureLink.getClassName();
 	}
 
+	public void setClassName(java.lang.String className) {
+		_ddmStructureLink.setClassName(className);
+	}
+
 	/**
 	* Returns the class name ID of this d d m structure link.
 	*

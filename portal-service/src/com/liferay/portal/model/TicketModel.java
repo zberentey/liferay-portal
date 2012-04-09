@@ -106,6 +106,8 @@ public interface TicketModel extends AttachedModel, BaseModel<Ticket> {
 	 */
 	public String getClassName();
 
+	public void setClassName(String className);
+
 	/**
 	 * Returns the class name ID of this ticket.
 	 *

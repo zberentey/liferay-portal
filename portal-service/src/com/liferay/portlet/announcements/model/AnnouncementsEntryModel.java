@@ -185,6 +185,8 @@ public interface AnnouncementsEntryModel extends AttachedModel, AuditedModel,
 	 */
 	public String getClassName();
 
+	public void setClassName(String className);
+
 	/**
 	 * Returns the class name ID of this announcements entry.
 	 *

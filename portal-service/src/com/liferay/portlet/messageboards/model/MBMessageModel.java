@@ -200,6 +200,8 @@ public interface MBMessageModel extends AttachedModel, BaseModel<MBMessage>,
 	 */
 	public String getClassName();
 
+	public void setClassName(String className);
+
 	/**
 	 * Returns the class name ID of this message-boards message.
 	 *

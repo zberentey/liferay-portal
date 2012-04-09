@@ -79,6 +79,8 @@ public interface DDMStructureLinkModel extends AttachedModel,
 	 */
 	public String getClassName();
 
+	public void setClassName(String className);
+
 	/**
 	 * Returns the class name ID of this d d m structure link.
 	 *

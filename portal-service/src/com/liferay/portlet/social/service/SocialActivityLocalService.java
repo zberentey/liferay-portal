@@ -362,9 +362,10 @@ public interface SocialActivityLocalService extends PersistedModelLocalService {
 			com.liferay.portal.kernel.exception.SystemException;
 
 	/**
-	* Removes stored activities for the asset identified by the class name ID
-	* and class primary key.
+	* Removes stored activities for the asset.
 	*
+	* @param assetEntry the asset from which to remove stored activities
+	* @throws PortalException if a portal exception occurred
 	* @throws SystemException if a system exception occurred
 	*/
 	public void deleteActivities(
@@ -416,7 +417,8 @@ public interface SocialActivityLocalService extends PersistedModelLocalService {
 	* @throws SystemException if a system exception occurred
 	*/
 	public void deleteUserActivities(long userId)
-		throws com.liferay.portal.kernel.exception.SystemException;
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException;
 
 	/**
 	* Returns a range of all the activities done on assets identified by the

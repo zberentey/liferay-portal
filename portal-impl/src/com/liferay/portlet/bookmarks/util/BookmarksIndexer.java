@@ -60,17 +60,16 @@ public class BookmarksIndexer extends BaseIndexer {
 
 	public static final String PORTLET_ID = PortletKeys.BOOKMARKS;
 
+	public BookmarksIndexer() {
+		setPermissionAware(true);
+	}
+
 	public String[] getClassNames() {
 		return CLASS_NAMES;
 	}
 
 	public String getPortletId() {
 		return PORTLET_ID;
-	}
-
-	@Override
-	public boolean isPermissionAware() {
-		return _PERMISSION_AWARE;
 	}
 
 	@Override
@@ -400,7 +399,5 @@ public class BookmarksIndexer extends BaseIndexer {
 			reindexEntries(companyId, groupId, folderId);
 		}
 	}
-
-	private static final boolean _PERMISSION_AWARE = true;
 
 }

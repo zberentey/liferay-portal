@@ -340,8 +340,11 @@ create table Contact_ (
 	userName VARCHAR(75) null,
 	createDate DATE null,
 	modifiedDate DATE null,
+	classNameId LONG,
+	classPK LONG,
 	accountId LONG,
 	parentContactId LONG,
+	emailAddress VARCHAR(75) null,
 	firstName VARCHAR(75) null,
 	middleName VARCHAR(75) null,
 	lastName VARCHAR(75) null,
@@ -1871,7 +1874,8 @@ create table SocialActivityCounter (
 	totalValue INTEGER,
 	graceValue INTEGER,
 	startPeriod INTEGER,
-	endPeriod INTEGER
+	endPeriod INTEGER,
+	active_ BOOLEAN
 );
 
 create table SocialActivityLimit (
@@ -1956,6 +1960,17 @@ create table Ticket (
 	type_ INTEGER,
 	extraInfo TEXT null,
 	expirationDate DATE null
+);
+
+create table TrashEntry (
+	entryId LONG not null primary key,
+	groupId LONG,
+	companyId LONG,
+	classNameId LONG,
+	classPK LONG,
+	status INTEGER,
+	trashedDate DATE null,
+	typeSettings TEXT null
 );
 
 create table User_ (

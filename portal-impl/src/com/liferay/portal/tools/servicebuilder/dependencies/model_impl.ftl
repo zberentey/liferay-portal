@@ -363,6 +363,16 @@ public class ${entity.name}ModelImpl extends BaseModelImpl<${entity.name}> imple
 
 				return PortalUtil.getClassName(getClassNameId());
 			}
+
+			public void setClassName(String className) {
+				long classNameId = 0;
+
+				if (Validator.isNotNull(className)) {
+					classNameId = PortalUtil.getClassNameId(className);
+				}
+
+				setClassNameId(classNameId);
+			}
 		</#if>
 
 		<#if column.jsonEnabled>

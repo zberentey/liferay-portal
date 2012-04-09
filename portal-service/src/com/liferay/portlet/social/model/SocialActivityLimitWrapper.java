@@ -158,6 +158,10 @@ public class SocialActivityLimitWrapper implements SocialActivityLimit,
 		return _socialActivityLimit.getClassName();
 	}
 
+	public void setClassName(java.lang.String className) {
+		_socialActivityLimit.setClassName(className);
+	}
+
 	/**
 	* Returns the class name ID of this social activity limit.
 	*

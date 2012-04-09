@@ -52,17 +52,16 @@ public class CalIndexer extends BaseIndexer {
 
 	public static final String PORTLET_ID = PortletKeys.CALENDAR;
 
+	public CalIndexer() {
+		setPermissionAware(true);
+	}
+
 	public String[] getClassNames() {
 		return CLASS_NAMES;
 	}
 
 	public String getPortletId() {
 		return PORTLET_ID;
-	}
-
-	@Override
-	public boolean isPermissionAware() {
-		return _PERMISSION_AWARE;
 	}
 
 	protected void addReindexCriteria(
@@ -215,7 +214,5 @@ public class CalIndexer extends BaseIndexer {
 		SearchEngineUtil.updateDocuments(
 			getSearchEngineId(), companyId, documents);
 	}
-
-	private static final boolean _PERMISSION_AWARE = true;
 
 }

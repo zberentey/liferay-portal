@@ -229,6 +229,10 @@ public class MBMessageWrapper implements MBMessage, ModelWrapper<MBMessage> {
 		return _mbMessage.getClassName();
 	}
 
+	public void setClassName(java.lang.String className) {
+		_mbMessage.setClassName(className);
+	}
+
 	/**
 	* Returns the class name ID of this message-boards message.
 	*

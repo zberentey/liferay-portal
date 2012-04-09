@@ -137,6 +137,10 @@ public class GroupWrapper implements Group, ModelWrapper<Group> {
 		return _group.getClassName();
 	}
 
+	public void setClassName(java.lang.String className) {
+		_group.setClassName(className);
+	}
+
 	/**
 	* Returns the class name ID of this group.
 	*

@@ -32,7 +32,7 @@ public class ReadOnlyBeanHandler implements InvocationHandler {
 		return _bean;
 	}
 
-	public Object invoke(Object proxy, Method method, Object[] args)
+	public Object invoke(Object proxy, Method method, Object[] arguments)
 		throws Throwable {
 
 		if (method.getName().startsWith("set")) {
@@ -41,7 +41,7 @@ public class ReadOnlyBeanHandler implements InvocationHandler {
 		}
 
 		try {
-			return method.invoke(_bean, args);
+			return method.invoke(_bean, arguments);
 		}
 		catch (InvocationTargetException ite) {
 			throw ite.getTargetException();

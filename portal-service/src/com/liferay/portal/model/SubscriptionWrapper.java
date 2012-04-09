@@ -192,6 +192,10 @@ public class SubscriptionWrapper implements Subscription,
 		return _subscription.getClassName();
 	}
 
+	public void setClassName(java.lang.String className) {
+		_subscription.setClassName(className);
+	}
+
 	/**
 	* Returns the class name ID of this subscription.
 	*

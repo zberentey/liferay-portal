@@ -78,6 +78,8 @@ public interface MBDiscussionModel extends AttachedModel, BaseModel<MBDiscussion
 	 */
 	public String getClassName();
 
+	public void setClassName(String className);
+
 	/**
 	 * Returns the class name ID of this message boards discussion.
 	 *

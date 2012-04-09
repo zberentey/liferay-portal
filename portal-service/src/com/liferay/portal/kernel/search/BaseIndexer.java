@@ -280,15 +280,15 @@ public abstract class BaseIndexer implements Indexer {
 	}
 
 	public boolean isFilterSearch() {
-		return _FILTER_SEARCH;
+		return _filterSearch;
 	}
 
 	public boolean isIndexerEnabled() {
-		return _INDEXER_ENABLED;
+		return _indexerEnabled;
 	}
 
 	public boolean isPermissionAware() {
-		return _PERMISSION_AWARE;
+		return _permissionAware;
 	}
 
 	public boolean isStagingAware() {
@@ -1128,20 +1128,29 @@ public abstract class BaseIndexer implements Indexer {
 		throws Exception {
 	}
 
+	protected void setFilterSearch(boolean filterSearch) {
+		_filterSearch = filterSearch;
+	}
+
+	protected void setIndexerEnabled(boolean indexerEnabled) {
+		_indexerEnabled = indexerEnabled;
+	}
+
+	protected void setPermissionAware(boolean permissionAware) {
+		_permissionAware = permissionAware;
+	}
+
 	protected void setStagingAware(boolean stagingAware) {
 		_stagingAware = stagingAware;
 	}
 
-	private static final boolean _FILTER_SEARCH = false;
-
-	private static final boolean _INDEXER_ENABLED = true;
-
-	private static final boolean _PERMISSION_AWARE = false;
-
 	private static Log _log = LogFactoryUtil.getLog(BaseIndexer.class);
 
+	private boolean _filterSearch;
+	private boolean _indexerEnabled = true;
 	private IndexerPostProcessor[] _indexerPostProcessors =
 		new IndexerPostProcessor[0];
+	private boolean _permissionAware;
 	private String _searchEngineId;
 	private boolean _stagingAware = true;
 

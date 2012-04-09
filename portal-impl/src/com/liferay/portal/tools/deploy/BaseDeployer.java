@@ -133,9 +133,7 @@ public class BaseDeployer implements Deployer {
 		}
 	}
 
-	public void addExtJar(List<String> jars, String resource)
-		throws Exception {
-
+	public void addExtJar(List<String> jars, String resource) throws Exception {
 		Set<String> servletContextNames = ExtRegistry.getServletContextNames();
 
 		for (String servletContextName : servletContextNames) {
@@ -1185,6 +1183,10 @@ public class BaseDeployer implements Deployer {
 		return sb.toString();
 	}
 
+	public Class<?> getPluginContextListenerClass() {
+		return null;
+	}
+
 	public String getPluginPackageLicensesXml(List<License> licenses) {
 		if (licenses.isEmpty()) {
 			return StringPool.BLANK;
@@ -1821,15 +1823,36 @@ public class BaseDeployer implements Deployer {
 		webXmlVersion = GetterUtil.getDouble(
 			webXmlRoot.attributeValue("version"), webXmlVersion);
 
-		// Merge extra content
+		// Merge content
+
+		String pluginContextListenerContent = StringPool.BLANK;
+
+		Class<?> pluginContextListenerClass = getPluginContextListenerClass();
+
+		if (pluginContextListenerClass != null) {
+			StringBundler sb = new StringBundler(5);
+
+			sb.append("<listener>");
+			sb.append("<listener-class>");
+			sb.append(pluginContextListenerClass.getName());
+			sb.append("</listener-class>");
+			sb.append("</listener>");
+
+			pluginContextListenerContent = sb.toString();
+		}
 
 		String extraContent = getExtraContent(
 			webXmlVersion, srcFile, displayName);
 
-		int pos = content.indexOf("</web-app>");
+		int pos = content.indexOf("<listener>");
+
+		if (pos == -1) {
+			pos = content.indexOf("</web-app>");
+		}
 
 		String newContent =
-			content.substring(0, pos) + extraContent + content.substring(pos);
+			content.substring(0, pos) + pluginContextListenerContent +
+				extraContent + content.substring(pos);
 
 		// Replace old package names
 

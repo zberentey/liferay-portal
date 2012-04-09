@@ -131,6 +131,16 @@ public class ${entity.name}Clp extends BaseModelImpl<${entity.name}> implements 
 
 				return PortalUtil.getClassName(getClassNameId());
 			}
+
+			public void setClassName(String className) {
+				long classNameId = 0;
+
+				if (Validator.isNotNull(className)) {
+					classNameId = PortalUtil.getClassNameId(className);
+				}
+
+				setClassNameId(classNameId);
+			}
 		</#if>
 
 		public ${column.type} get${column.methodName}() {

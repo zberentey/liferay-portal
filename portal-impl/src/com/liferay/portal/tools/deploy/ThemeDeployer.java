@@ -15,6 +15,7 @@
 package com.liferay.portal.tools.deploy;
 
 import com.liferay.portal.kernel.plugin.PluginPackage;
+import com.liferay.portal.kernel.servlet.ThemeContextListener;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -73,29 +74,6 @@ public class ThemeDeployer extends BaseDeployer {
 	}
 
 	@Override
-	public String getExtraContent(
-			double webXmlVersion, File srcFile, String displayName)
-		throws Exception {
-
-		StringBundler sb = new StringBundler(7);
-
-		String extraContent = super.getExtraContent(
-			webXmlVersion, srcFile, displayName);
-
-		sb.append(extraContent);
-
-		// ThemeContextListener
-
-		sb.append("<listener>");
-		sb.append("<listener-class>");
-		sb.append("com.liferay.portal.kernel.servlet.ThemeContextListener");
-		sb.append("</listener-class>");
-		sb.append("</listener>");
-
-		return sb.toString();
-	}
-
-	@Override
 	public String getExtraFiltersContent(double webXmlVersion, File srcFile)
 		throws Exception {
 
@@ -115,6 +93,11 @@ public class ThemeDeployer extends BaseDeployer {
 		sb.append(getSpeedFiltersContent(srcFile));
 
 		return sb.toString();
+	}
+
+	@Override
+	public Class<?> getPluginContextListenerClass() {
+		return ThemeContextListener.class;
 	}
 
 	@Override

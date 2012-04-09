@@ -246,6 +246,10 @@ public class PortletItemWrapper implements PortletItem,
 		return _portletItem.getClassName();
 	}
 
+	public void setClassName(java.lang.String className) {
+		_portletItem.setClassName(className);
+	}
+
 	/**
 	* Returns the class name ID of this portlet item.
 	*

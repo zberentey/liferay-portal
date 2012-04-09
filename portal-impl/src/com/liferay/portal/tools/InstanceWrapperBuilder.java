@@ -140,7 +140,9 @@ public class InstanceWrapperBuilder {
 					sb.append(", ");
 				}
 
-				sb.setStringAt("> ", sb.index());
+				sb.setIndex(sb.index() - 1);
+
+				sb.append("> ");
 			}
 
 			sb.append(_getTypeGenericsName(javaMethod.getReturns()));

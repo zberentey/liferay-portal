@@ -156,6 +156,10 @@ public class ExpandoValueWrapper implements ExpandoValue,
 		return _expandoValue.getClassName();
 	}
 
+	public void setClassName(java.lang.String className) {
+		_expandoValue.setClassName(className);
+	}
+
 	/**
 	* Returns the class name ID of this expando value.
 	*

@@ -191,6 +191,10 @@ public class AddressWrapper implements Address, ModelWrapper<Address> {
 		return _address.getClassName();
 	}
 
+	public void setClassName(java.lang.String className) {
+		_address.setClassName(className);
+	}
+
 	/**
 	* Returns the class name ID of this address.
 	*

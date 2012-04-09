@@ -191,6 +191,10 @@ public class PhoneWrapper implements Phone, ModelWrapper<Phone> {
 		return _phone.getClassName();
 	}
 
+	public void setClassName(java.lang.String className) {
+		_phone.setClassName(className);
+	}
+
 	/**
 	* Returns the class name ID of this phone.
 	*

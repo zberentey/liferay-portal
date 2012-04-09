@@ -211,6 +211,10 @@ public class AssetEntryWrapper implements AssetEntry, ModelWrapper<AssetEntry> {
 		return _assetEntry.getClassName();
 	}
 
+	public void setClassName(java.lang.String className) {
+		_assetEntry.setClassName(className);
+	}
+
 	/**
 	* Returns the class name ID of this asset entry.
 	*

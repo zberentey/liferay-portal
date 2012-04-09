@@ -192,6 +192,10 @@ public class EmailAddressWrapper implements EmailAddress,
 		return _emailAddress.getClassName();
 	}
 
+	public void setClassName(java.lang.String className) {
+		_emailAddress.setClassName(className);
+	}
+
 	/**
 	* Returns the class name ID of this email address.
 	*

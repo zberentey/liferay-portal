@@ -19,6 +19,6 @@ package com.liferay.portal.security.ldap;
  */
 public enum LDAPOperation {
 
-	ADD, UPDATE, REMOVE
+	ADD, REMOVE, UPDATE
 
 }

@@ -90,6 +90,8 @@ public interface ExpandoTableModel extends BaseModel<ExpandoTable> {
 	 */
 	public String getClassName();
 
+	public void setClassName(String className);
+
 	/**
 	 * Returns the class name ID of this expando table.
 	 *

@@ -227,6 +227,10 @@ public class RepositoryWrapper implements Repository, ModelWrapper<Repository> {
 		return _repository.getClassName();
 	}
 
+	public void setClassName(java.lang.String className) {
+		_repository.setClassName(className);
+	}
+
 	/**
 	* Returns the class name ID of this repository.
 	*

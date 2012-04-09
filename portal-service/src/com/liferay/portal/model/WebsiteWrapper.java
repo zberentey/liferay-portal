@@ -191,6 +191,10 @@ public class WebsiteWrapper implements Website, ModelWrapper<Website> {
 		return _website.getClassName();
 	}
 
+	public void setClassName(java.lang.String className) {
+		_website.setClassName(className);
+	}
+
 	/**
 	* Returns the class name ID of this website.
 	*

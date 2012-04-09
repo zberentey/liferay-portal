@@ -209,6 +209,8 @@ public interface PortletItemModel extends BaseModel<PortletItem>, GroupedModel {
 	 */
 	public String getClassName();
 
+	public void setClassName(String className);
+
 	/**
 	 * Returns the class name ID of this portlet item.
 	 *

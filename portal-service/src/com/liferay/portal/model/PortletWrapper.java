@@ -1050,6 +1050,8 @@ public class PortletWrapper implements Portlet, ModelWrapper<Portlet> {
 	* Returns the supported processing event from a namespace URI and a local
 	* part.
 	*
+	* @param uri the namespace URI
+	* @param localPart the local part
 	* @return the supported processing event from a namespace URI and a local
 	part
 	*/
@@ -1070,6 +1072,7 @@ public class PortletWrapper implements Portlet, ModelWrapper<Portlet> {
 	/**
 	* Returns the supported public render parameter from an identifier.
 	*
+	* @param identifier the identifier
 	* @return the supported public render parameter from an identifier
 	*/
 	public com.liferay.portal.model.PublicRenderParameter getPublicRenderParameter(
@@ -1081,6 +1084,8 @@ public class PortletWrapper implements Portlet, ModelWrapper<Portlet> {
 	* Returns the supported public render parameter from a namespace URI and a
 	* local part.
 	*
+	* @param uri the namespace URI
+	* @param localPart the local part
 	* @return the supported public render parameter from a namespace URI and a
 	local part
 	*/
@@ -1359,6 +1364,26 @@ public class PortletWrapper implements Portlet, ModelWrapper<Portlet> {
 	}
 
 	/**
+	* Returns the names of the classes that represent trash handlers associated
+	* with the portlet.
+	*
+	* @return the names of the classes that represent trash handlers associated
+	with the portlet
+	*/
+	public java.util.List<java.lang.String> getTrashHandlerClasses() {
+		return _portlet.getTrashHandlerClasses();
+	}
+
+	/**
+	* Returns the trash handler instances of the portlet.
+	*
+	* @return the trash handler instances of the portlet
+	*/
+	public java.util.List<com.liferay.portal.kernel.trash.TrashHandler> getTrashHandlerInstances() {
+		return _portlet.getTrashHandlerInstances();
+	}
+
+	/**
 	* Returns <code>true</code> if the portlet is an undeployed portlet.
 	*
 	* @return <code>true</code> if the portlet is a placeholder of an
@@ -1500,6 +1525,7 @@ public class PortletWrapper implements Portlet, ModelWrapper<Portlet> {
 	* Returns <code>true</code> if the user has the permission to add the
 	* portlet to a layout.
 	*
+	* @param userId the primary key of the user
 	* @return <code>true</code> if the user has the permission to add the
 	portlet to a layout
 	*/
@@ -1521,6 +1547,8 @@ public class PortletWrapper implements Portlet, ModelWrapper<Portlet> {
 	* Returns <code>true</code> if the portlet supports the specified mime type
 	* and portlet mode.
 	*
+	* @param mimeType the mime type
+	* @param portletMode the portlet mode
 	* @return <code>true</code> if the portlet supports the specified mime type
 	and portlet mode
 	*/
@@ -1533,6 +1561,7 @@ public class PortletWrapper implements Portlet, ModelWrapper<Portlet> {
 	* Returns <code>true</code> if the portlet has a role with the specified
 	* name.
 	*
+	* @param roleName the role name
 	* @return <code>true</code> if the portlet has a role with the specified
 	name
 	*/
@@ -1544,6 +1573,8 @@ public class PortletWrapper implements Portlet, ModelWrapper<Portlet> {
 	* Returns <code>true</code> if the portlet supports the specified mime type
 	* and window state.
 	*
+	* @param mimeType the mime type
+	* @param windowState the window state
 	* @return <code>true</code> if the portlet supports the specified mime type
 	and window state
 	*/
@@ -2696,6 +2727,18 @@ public class PortletWrapper implements Portlet, ModelWrapper<Portlet> {
 	*/
 	public void setTimestamp(long timestamp) {
 		_portlet.setTimestamp(timestamp);
+	}
+
+	/**
+	* Sets the name of the classes that represent trash handlers associated
+	* to the portlet.
+	*
+	* @param trashHandlerClasses the names of the classes that represent
+	trash handlers associated with the portlet
+	*/
+	public void setTrashHandlerClasses(
+		java.util.List<java.lang.String> trashHandlerClasses) {
+		_portlet.setTrashHandlerClasses(trashHandlerClasses);
 	}
 
 	/**

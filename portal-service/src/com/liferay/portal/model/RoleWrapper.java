@@ -99,6 +99,10 @@ public class RoleWrapper implements Role, ModelWrapper<Role> {
 		return _role.getClassName();
 	}
 
+	public void setClassName(java.lang.String className) {
+		_role.setClassName(className);
+	}
+
 	/**
 	* Returns the class name ID of this role.
 	*

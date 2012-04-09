@@ -340,9 +340,12 @@ public class CompanyLocalServiceImpl extends CompanyLocalServiceBaseImpl {
 			defaultContact.setUserName(StringPool.BLANK);
 			defaultContact.setCreateDate(now);
 			defaultContact.setModifiedDate(now);
+			defaultContact.setClassName(User.class.getName());
+			defaultContact.setClassPK(defaultUser.getUserId());
 			defaultContact.setAccountId(company.getAccountId());
 			defaultContact.setParentContactId(
 				ContactConstants.DEFAULT_PARENT_CONTACT_ID);
+			defaultContact.setEmailAddress(defaultUser.getEmailAddress());
 			defaultContact.setFirstName(StringPool.BLANK);
 			defaultContact.setMiddleName(StringPool.BLANK);
 			defaultContact.setLastName(StringPool.BLANK);

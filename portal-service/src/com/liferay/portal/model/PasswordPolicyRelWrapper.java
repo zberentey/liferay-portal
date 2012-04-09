@@ -100,6 +100,10 @@ public class PasswordPolicyRelWrapper implements PasswordPolicyRel,
 		return _passwordPolicyRel.getClassName();
 	}
 
+	public void setClassName(java.lang.String className) {
+		_passwordPolicyRel.setClassName(className);
+	}
+
 	/**
 	* Returns the class name ID of this password policy rel.
 	*

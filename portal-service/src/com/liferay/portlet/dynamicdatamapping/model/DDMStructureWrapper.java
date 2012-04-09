@@ -230,6 +230,10 @@ public class DDMStructureWrapper implements DDMStructure,
 		return _ddmStructure.getClassName();
 	}
 
+	public void setClassName(java.lang.String className) {
+		_ddmStructure.setClassName(className);
+	}
+
 	/**
 	* Returns the class name ID of this d d m structure.
 	*

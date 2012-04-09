@@ -15,6 +15,7 @@
 package com.liferay.portal.tools.deploy;
 
 import com.liferay.portal.kernel.plugin.PluginPackage;
+import com.liferay.portal.kernel.servlet.PortletContextListener;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
@@ -118,11 +119,6 @@ public class PortletDeployer extends BaseDeployer {
 
 		StringBundler sb = new StringBundler();
 
-		String extraContent = super.getExtraContent(
-			webXmlVersion, srcFile, displayName);
-
-		sb.append(extraContent);
-
 		if (ServerDetector.isWebSphere()) {
 			sb.append("<context-param>");
 			sb.append("<param-name>");
@@ -156,13 +152,10 @@ public class PortletDeployer extends BaseDeployer {
 			sb.append("</listener>");
 		}
 
-		// PortletContextListener
+		String extraContent = super.getExtraContent(
+			webXmlVersion, srcFile, displayName);
 
-		sb.append("<listener>");
-		sb.append("<listener-class>");
-		sb.append("com.liferay.portal.kernel.servlet.PortletContextListener");
-		sb.append("</listener-class>");
-		sb.append("</listener>");
+		sb.append(extraContent);
 
 		return sb.toString();
 	}
@@ -192,6 +185,11 @@ public class PortletDeployer extends BaseDeployer {
 			getServletContextIncludeFiltersContent(webXmlVersion, srcFile));
 
 		return sb.toString();
+	}
+
+	@Override
+	public Class<?> getPluginContextListenerClass() {
+		return PortletContextListener.class;
 	}
 
 	@Override

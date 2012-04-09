@@ -326,9 +326,10 @@ public class SocialActivityLocalServiceImpl
 	}
 
 	/**
-	 * Removes stored activities for the asset identified by the class name ID
-	 * and class primary key.
+	 * Removes stored activities for the asset.
 	 *
+	 * @param  assetEntry the asset from which to remove stored activities
+	 * @throws PortalException if a portal exception occurred
 	 * @throws SystemException if a system exception occurred
 	 */
 	public void deleteActivities(AssetEntry assetEntry)
@@ -400,7 +401,9 @@ public class SocialActivityLocalServiceImpl
 	 * @param  userId the primary key of the user
 	 * @throws SystemException if a system exception occurred
 	 */
-	public void deleteUserActivities(long userId) throws SystemException {
+	public void deleteUserActivities(long userId)
+		throws PortalException, SystemException {
+
 		List<SocialActivity> activities =
 			socialActivityPersistence.findByUserId(
 				userId, QueryUtil.ALL_POS, QueryUtil.ALL_POS);

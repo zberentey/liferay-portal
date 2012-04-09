@@ -293,7 +293,8 @@ public interface DDLRecordLocalService extends PersistedModelLocalService {
 		throws com.liferay.portal.kernel.exception.SystemException;
 
 	/**
-	* @deprecated {@link #getCompanyRecords(long, int, int, int, int, OrderByComparator)}
+	* @deprecated {@link #getCompanyRecords(long, int, int, int, int,
+	OrderByComparator)}
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public java.util.List<com.liferay.portlet.dynamicdatalists.model.DDLRecord> getCompanyRecords(

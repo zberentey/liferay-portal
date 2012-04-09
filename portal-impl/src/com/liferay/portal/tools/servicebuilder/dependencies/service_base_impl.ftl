@@ -122,7 +122,7 @@ import javax.sql.DataSource;
 		</#if>
 		</#list>
 		 */
-		@Indexable(type= IndexableType.REINDEX)
+		@Indexable(type = IndexableType.REINDEX)
 		public ${entity.name} add${entity.name}(${entity.name} ${entity.varName}) throws ${stringUtil.merge(serviceBaseExceptions)} {
 			${entity.varName}.setNew(true);
 
@@ -156,7 +156,7 @@ import javax.sql.DataSource;
 		</#if>
 		</#list>
 		 */
-		@Indexable(type= IndexableType.DELETE)
+		@Indexable(type = IndexableType.DELETE)
 		public ${entity.name} delete${entity.name}(${entity.PKClassName} ${entity.PKVarName}) throws ${stringUtil.merge(serviceBaseExceptions)} {
 			return ${entity.varName}Persistence.remove(${entity.PKVarName});
 		}
@@ -176,7 +176,7 @@ import javax.sql.DataSource;
 		</#if>
 		</#list>
 		 */
-		@Indexable(type= IndexableType.DELETE)
+		@Indexable(type = IndexableType.DELETE)
 		public ${entity.name} delete${entity.name}(${entity.name} ${entity.varName}) throws ${stringUtil.merge(serviceBaseExceptions)} {
 			return ${entity.varName}Persistence.remove(${entity.varName});
 		}
@@ -335,7 +335,7 @@ import javax.sql.DataSource;
 		</#if>
 		</#list>
 		 */
-		@Indexable(type= IndexableType.REINDEX)
+		@Indexable(type = IndexableType.REINDEX)
 		public ${entity.name} update${entity.name}(${entity.name} ${entity.varName}) throws ${stringUtil.merge(serviceBaseExceptions)} {
 			return update${entity.name}(${entity.varName}, true);
 		}
@@ -354,7 +354,7 @@ import javax.sql.DataSource;
 		</#if>
 		</#list>
 		 */
-		@Indexable(type= IndexableType.REINDEX)
+		@Indexable(type = IndexableType.REINDEX)
 		public ${entity.name} update${entity.name}(${entity.name} ${entity.varName}, boolean merge) throws ${stringUtil.merge(serviceBaseExceptions)} {
 			${entity.varName}.setNew(false);
 

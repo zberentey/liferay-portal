@@ -102,6 +102,10 @@ public class ExpandoTableWrapper implements ExpandoTable,
 		return _expandoTable.getClassName();
 	}
 
+	public void setClassName(java.lang.String className) {
+		_expandoTable.setClassName(className);
+	}
+
 	/**
 	* Returns the class name ID of this expando table.
 	*

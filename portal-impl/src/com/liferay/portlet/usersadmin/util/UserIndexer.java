@@ -27,6 +27,8 @@ import com.liferay.portal.kernel.search.BooleanQuery;
 import com.liferay.portal.kernel.search.BooleanQueryFactoryUtil;
 import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.Field;
+import com.liferay.portal.kernel.search.Indexer;
+import com.liferay.portal.kernel.search.IndexerRegistryUtil;
 import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.search.SearchEngineUtil;
 import com.liferay.portal.kernel.search.Summary;
@@ -34,6 +36,7 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
+import com.liferay.portal.model.Contact;
 import com.liferay.portal.model.Organization;
 import com.liferay.portal.model.User;
 import com.liferay.portal.security.auth.FullNameGenerator;
@@ -65,6 +68,8 @@ public class UserIndexer extends BaseIndexer {
 	public static final String PORTLET_ID = PortletKeys.USERS_ADMIN;
 
 	public UserIndexer() {
+		setIndexerEnabled(PropsValues.USERS_INDEXER_ENABLED);
+		setPermissionAware(true);
 		setStagingAware(false);
 	}
 
@@ -74,16 +79,6 @@ public class UserIndexer extends BaseIndexer {
 
 	public String getPortletId() {
 		return PORTLET_ID;
-	}
-
-	@Override
-	public boolean isIndexerEnabled() {
-		return PropsValues.USERS_INDEXER_ENABLED;
-	}
-
-	@Override
-	public boolean isPermissionAware() {
-		return _PERMISSION_AWARE;
 	}
 
 	@Override
@@ -208,6 +203,10 @@ public class UserIndexer extends BaseIndexer {
 		User user = (User)obj;
 
 		deleteDocument(user.getCompanyId(), user.getUserId());
+
+		Indexer indexer = IndexerRegistryUtil.nullSafeGetIndexer(Contact.class);
+
+		indexer.delete(user.getContact());
 	}
 
 	@Override
@@ -360,6 +359,11 @@ public class UserIndexer extends BaseIndexer {
 
 			SearchEngineUtil.updateDocument(
 				getSearchEngineId(), user.getCompanyId(), document);
+
+			Indexer indexer = IndexerRegistryUtil.nullSafeGetIndexer(
+				Contact.class);
+
+			indexer.reindex(user.getContact());
 		}
 	}
 
@@ -482,7 +486,5 @@ public class UserIndexer extends BaseIndexer {
 		SearchEngineUtil.updateDocuments(
 			getSearchEngineId(), companyId, documents);
 	}
-
-	private static final boolean _PERMISSION_AWARE = true;
 
 }

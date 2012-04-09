@@ -194,6 +194,10 @@ public class RatingsEntryWrapper implements RatingsEntry,
 		return _ratingsEntry.getClassName();
 	}
 
+	public void setClassName(java.lang.String className) {
+		_ratingsEntry.setClassName(className);
+	}
+
 	/**
 	* Returns the class name ID of this ratings entry.
 	*

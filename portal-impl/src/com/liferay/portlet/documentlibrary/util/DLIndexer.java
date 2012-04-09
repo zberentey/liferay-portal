@@ -106,6 +106,11 @@ public class DLIndexer extends BaseIndexer {
 
 	public static final String PORTLET_ID = PortletKeys.DOCUMENT_LIBRARY;
 
+	public DLIndexer() {
+		setFilterSearch(true);
+		setPermissionAware(true);
+	}
+
 	public String[] getClassNames() {
 		return CLASS_NAMES;
 	}
@@ -122,16 +127,6 @@ public class DLIndexer extends BaseIndexer {
 
 		return DLFileEntryPermission.contains(
 			permissionChecker, entryClassPK, ActionKeys.VIEW);
-	}
-
-	@Override
-	public boolean isFilterSearch() {
-		return _FILTER_SEARCH;
-	}
-
-	@Override
-	public boolean isPermissionAware() {
-		return _PERMISSION_AWARE;
 	}
 
 	@Override
@@ -759,10 +754,6 @@ public class DLIndexer extends BaseIndexer {
 			reindex(newIds);
 		}
 	}
-
-	private static final boolean _FILTER_SEARCH = true;
-
-	private static final boolean _PERMISSION_AWARE = true;
 
 	private static Log _log = LogFactoryUtil.getLog(DLIndexer.class);
 

@@ -194,6 +194,10 @@ public class SocialActivityWrapper implements SocialActivity,
 		return _socialActivity.getClassName();
 	}
 
+	public void setClassName(java.lang.String className) {
+		_socialActivity.setClassName(className);
+	}
+
 	/**
 	* Returns the class name ID of this social activity.
 	*

@@ -65,17 +65,16 @@ public class WikiIndexer extends BaseIndexer {
 
 	public static final String PORTLET_ID = PortletKeys.WIKI;
 
+	public WikiIndexer() {
+		setPermissionAware(true);
+	}
+
 	public String[] getClassNames() {
 		return CLASS_NAMES;
 	}
 
 	public String getPortletId() {
 		return PORTLET_ID;
-	}
-
-	@Override
-	public boolean isPermissionAware() {
-		return _PERMISSION_AWARE;
 	}
 
 	@Override
@@ -404,7 +403,5 @@ public class WikiIndexer extends BaseIndexer {
 		SearchEngineUtil.updateDocuments(
 			getSearchEngineId(), companyId, documents);
 	}
-
-	private static final boolean _PERMISSION_AWARE = true;
 
 }

@@ -120,6 +120,8 @@ public interface GroupModel extends AttachedModel, BaseModel<Group> {
 	 */
 	public String getClassName();
 
+	public void setClassName(String className);
+
 	/**
 	 * Returns the class name ID of this group.
 	 *

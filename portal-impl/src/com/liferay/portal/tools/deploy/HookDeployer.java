@@ -15,8 +15,8 @@
 package com.liferay.portal.tools.deploy;
 
 import com.liferay.portal.kernel.plugin.PluginPackage;
+import com.liferay.portal.kernel.servlet.HookContextListener;
 import com.liferay.portal.kernel.util.ServerDetector;
-import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.model.Plugin;
 import com.liferay.portal.util.InitUtil;
 
@@ -68,26 +68,8 @@ public class HookDeployer extends BaseDeployer {
 	}
 
 	@Override
-	public String getExtraContent(
-			double webXmlVersion, File srcFile, String displayName)
-		throws Exception {
-
-		StringBundler sb = new StringBundler(6);
-
-		String extraContent = super.getExtraContent(
-			webXmlVersion, srcFile, displayName);
-
-		sb.append(extraContent);
-
-		// HookContextListener
-
-		sb.append("<listener>");
-		sb.append("<listener-class>");
-		sb.append("com.liferay.portal.kernel.servlet.HookContextListener");
-		sb.append("</listener-class>");
-		sb.append("</listener>");
-
-		return sb.toString();
+	public Class<?> getPluginContextListenerClass() {
+		return HookContextListener.class;
 	}
 
 	@Override

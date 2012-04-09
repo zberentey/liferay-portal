@@ -328,7 +328,8 @@ public class DDLRecordLocalServiceWrapper implements DDLRecordLocalService,
 	}
 
 	/**
-	* @deprecated {@link #getCompanyRecords(long, int, int, int, int, OrderByComparator)}
+	* @deprecated {@link #getCompanyRecords(long, int, int, int, int,
+	OrderByComparator)}
 	*/
 	public java.util.List<com.liferay.portlet.dynamicdatalists.model.DDLRecord> getCompanyRecords(
 		long companyId, int scope, int start, int end,

@@ -405,9 +405,10 @@ public class SocialActivityLocalServiceUtil {
 	}
 
 	/**
-	* Removes stored activities for the asset identified by the class name ID
-	* and class primary key.
+	* Removes stored activities for the asset.
 	*
+	* @param assetEntry the asset from which to remove stored activities
+	* @throws PortalException if a portal exception occurred
 	* @throws SystemException if a system exception occurred
 	*/
 	public static void deleteActivities(
@@ -467,7 +468,8 @@ public class SocialActivityLocalServiceUtil {
 	* @throws SystemException if a system exception occurred
 	*/
 	public static void deleteUserActivities(long userId)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
 		getService().deleteUserActivities(userId);
 	}
 

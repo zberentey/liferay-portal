@@ -211,6 +211,10 @@ public class WorkflowInstanceLinkWrapper implements WorkflowInstanceLink,
 		return _workflowInstanceLink.getClassName();
 	}
 
+	public void setClassName(java.lang.String className) {
+		_workflowInstanceLink.setClassName(className);
+	}
+
 	/**
 	* Returns the class name ID of this workflow instance link.
 	*

@@ -212,6 +212,10 @@ public class SocialRequestWrapper implements SocialRequest,
 		return _socialRequest.getClassName();
 	}
 
+	public void setClassName(java.lang.String className) {
+		_socialRequest.setClassName(className);
+	}
+
 	/**
 	* Returns the class name ID of this social request.
 	*

@@ -337,7 +337,8 @@ public class DDLRecordLocalServiceUtil {
 	}
 
 	/**
-	* @deprecated {@link #getCompanyRecords(long, int, int, int, int, OrderByComparator)}
+	* @deprecated {@link #getCompanyRecords(long, int, int, int, int,
+	OrderByComparator)}
 	*/
 	public static java.util.List<com.liferay.portlet.dynamicdatalists.model.DDLRecord> getCompanyRecords(
 		long companyId, int scope, int start, int end,

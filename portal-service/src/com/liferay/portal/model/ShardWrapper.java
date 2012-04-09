@@ -81,6 +81,10 @@ public class ShardWrapper implements Shard, ModelWrapper<Shard> {
 		return _shard.getClassName();
 	}
 
+	public void setClassName(java.lang.String className) {
+		_shard.setClassName(className);
+	}
+
 	/**
 	* Returns the class name ID of this shard.
 	*

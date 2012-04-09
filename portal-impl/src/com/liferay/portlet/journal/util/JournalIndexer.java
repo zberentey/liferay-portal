@@ -74,17 +74,16 @@ public class JournalIndexer extends BaseIndexer {
 
 	public static final String PORTLET_ID = PortletKeys.JOURNAL;
 
+	public JournalIndexer() {
+		setPermissionAware(true);
+	}
+
 	public String[] getClassNames() {
 		return CLASS_NAMES;
 	}
 
 	public String getPortletId() {
 		return PORTLET_ID;
-	}
-
-	@Override
-	public boolean isPermissionAware() {
-		return _PERMISSION_AWARE;
 	}
 
 	@Override
@@ -616,8 +615,6 @@ public class JournalIndexer extends BaseIndexer {
 	}
 
 	private static final String _FIELD_NAMESPACE = "web_content";
-
-	private static final boolean _PERMISSION_AWARE = true;
 
 	private static Log _log = LogFactoryUtil.getLog(JournalIndexer.class);
 

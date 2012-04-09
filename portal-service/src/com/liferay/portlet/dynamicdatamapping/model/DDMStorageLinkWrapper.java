@@ -102,6 +102,10 @@ public class DDMStorageLinkWrapper implements DDMStorageLink,
 		return _ddmStorageLink.getClassName();
 	}
 
+	public void setClassName(java.lang.String className) {
+		_ddmStorageLink.setClassName(className);
+	}
+
 	/**
 	* Returns the class name ID of this d d m storage link.
 	*

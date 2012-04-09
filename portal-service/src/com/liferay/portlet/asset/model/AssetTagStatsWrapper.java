@@ -102,6 +102,10 @@ public class AssetTagStatsWrapper implements AssetTagStats,
 		return _assetTagStats.getClassName();
 	}
 
+	public void setClassName(java.lang.String className) {
+		_assetTagStats.setClassName(className);
+	}
+
 	/**
 	* Returns the class name ID of this asset tag stats.
 	*

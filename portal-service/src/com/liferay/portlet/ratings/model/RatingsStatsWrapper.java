@@ -84,6 +84,10 @@ public class RatingsStatsWrapper implements RatingsStats,
 		return _ratingsStats.getClassName();
 	}
 
+	public void setClassName(java.lang.String className) {
+		_ratingsStats.setClassName(className);
+	}
+
 	/**
 	* Returns the class name ID of this ratings stats.
 	*

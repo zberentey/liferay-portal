@@ -91,6 +91,8 @@ public interface ${entity.name}Model extends
 			 * @return the fully qualified class name of this ${entity.humanName}
 			 */
 			public String getClassName();
+
+			public void setClassName(String className);
 		</#if>
 
 		<#assign autoEscape = true>

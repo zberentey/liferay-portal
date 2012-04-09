@@ -186,6 +186,8 @@ public interface AssetEntryModel extends AttachedModel, BaseModel<AssetEntry>,
 	 */
 	public String getClassName();
 
+	public void setClassName(String className);
+
 	/**
 	 * Returns the class name ID of this asset entry.
 	 *

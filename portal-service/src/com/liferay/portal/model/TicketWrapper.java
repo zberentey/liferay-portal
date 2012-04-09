@@ -117,6 +117,10 @@ public class TicketWrapper implements Ticket, ModelWrapper<Ticket> {
 		return _ticket.getClassName();
 	}
 
+	public void setClassName(java.lang.String className) {
+		_ticket.setClassName(className);
+	}
+
 	/**
 	* Returns the class name ID of this ticket.
 	*

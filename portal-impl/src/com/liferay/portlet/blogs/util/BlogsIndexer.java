@@ -61,6 +61,11 @@ public class BlogsIndexer extends BaseIndexer {
 
 	public static final String PORTLET_ID = PortletKeys.BLOGS;
 
+	public BlogsIndexer() {
+		setFilterSearch(true);
+		setPermissionAware(true);
+	}
+
 	public String[] getClassNames() {
 		return CLASS_NAMES;
 	}
@@ -77,16 +82,6 @@ public class BlogsIndexer extends BaseIndexer {
 
 		return BlogsEntryPermission.contains(
 			permissionChecker, entryClassPK, ActionKeys.VIEW);
-	}
-
-	@Override
-	public boolean isFilterSearch() {
-		return _FILTER_SEARCH;
-	}
-
-	@Override
-	public boolean isPermissionAware() {
-		return _PERMISSION_AWARE;
 	}
 
 	@Override
@@ -267,9 +262,5 @@ public class BlogsIndexer extends BaseIndexer {
 		SearchEngineUtil.updateDocuments(
 			getSearchEngineId(), companyId, documents);
 	}
-
-	private static final boolean _FILTER_SEARCH = true;
-
-	private static final boolean _PERMISSION_AWARE = true;
 
 }

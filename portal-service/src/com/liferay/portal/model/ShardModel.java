@@ -76,6 +76,8 @@ public interface ShardModel extends AttachedModel, BaseModel<Shard> {
 	 */
 	public String getClassName();
 
+	public void setClassName(String className);
+
 	/**
 	 * Returns the class name ID of this shard.
 	 *

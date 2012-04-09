@@ -212,6 +212,10 @@ public class AnnouncementsEntryWrapper implements AnnouncementsEntry,
 		return _announcementsEntry.getClassName();
 	}
 
+	public void setClassName(java.lang.String className) {
+		_announcementsEntry.setClassName(className);
+	}
+
 	/**
 	* Returns the class name ID of this announcements entry.
 	*

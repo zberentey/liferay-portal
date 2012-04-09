@@ -180,6 +180,8 @@ public interface WorkflowInstanceLinkModel extends AttachedModel,
 	 */
 	public String getClassName();
 
+	public void setClassName(String className);
+
 	/**
 	 * Returns the class name ID of this workflow instance link.
 	 *

@@ -252,6 +252,10 @@ public class JournalArticleWrapper implements JournalArticle,
 		return _journalArticle.getClassName();
 	}
 
+	public void setClassName(java.lang.String className) {
+		_journalArticle.setClassName(className);
+	}
+
 	/**
 	* Returns the class name ID of this journal article.
 	*

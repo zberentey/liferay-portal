@@ -30,4 +30,6 @@ public interface Contact extends ContactModel, PersistedModel {
 	 * Never modify this interface directly. Add methods to {@link com.liferay.portal.model.impl.ContactImpl} and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
 	public java.lang.String getFullName();
+
+	public boolean isUser();
 }

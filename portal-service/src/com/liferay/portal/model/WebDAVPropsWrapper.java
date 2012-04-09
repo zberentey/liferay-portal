@@ -136,6 +136,10 @@ public class WebDAVPropsWrapper implements WebDAVProps,
 		return _webDAVProps.getClassName();
 	}
 
+	public void setClassName(java.lang.String className) {
+		_webDAVProps.setClassName(className);
+	}
+
 	/**
 	* Returns the class name ID of this web d a v props.
 	*

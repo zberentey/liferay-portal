@@ -121,6 +121,10 @@ public class SocialActivitySettingWrapper implements SocialActivitySetting,
 		return _socialActivitySetting.getClassName();
 	}
 
+	public void setClassName(java.lang.String className) {
+		_socialActivitySetting.setClassName(className);
+	}
+
 	/**
 	* Returns the class name ID of this social activity setting.
 	*

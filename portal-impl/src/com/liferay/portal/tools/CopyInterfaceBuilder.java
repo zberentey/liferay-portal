@@ -202,15 +202,17 @@ public class CopyInterfaceBuilder {
 		sb = new StringBundler(imports.size() * 3);
 
 		for (String importClass : imports) {
-			if (!importClass.equals("boolean") &&
-				!importClass.equals("double") && !importClass.equals("int") &&
-				!importClass.equals("long") && !importClass.equals("short") &&
-				!importClass.equals("void")) {
+			if (importClass.equals("boolean") || importClass.equals("byte") ||
+				importClass.equals("double") || importClass.equals("float") ||
+				importClass.equals("int") || importClass.equals("long") ||
+				importClass.equals("short") || importClass.equals("void")) {
 
-				sb.append("import ");
-				sb.append(importClass);
-				sb.append(";");
+				continue;
 			}
+
+			sb.append("import ");
+			sb.append(importClass);
+			sb.append(";");
 		}
 
 		content = StringUtil.replace(content, "[$IMPORTS$]", sb.toString());

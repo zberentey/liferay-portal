@@ -84,6 +84,10 @@ public class MBDiscussionWrapper implements MBDiscussion,
 		return _mbDiscussion.getClassName();
 	}
 
+	public void setClassName(java.lang.String className) {
+		_mbDiscussion.setClassName(className);
+	}
+
 	/**
 	* Returns the class name ID of this message boards discussion.
 	*

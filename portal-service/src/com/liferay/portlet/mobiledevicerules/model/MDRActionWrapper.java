@@ -229,6 +229,10 @@ public class MDRActionWrapper implements MDRAction, ModelWrapper<MDRAction> {
 		return _mdrAction.getClassName();
 	}
 
+	public void setClassName(java.lang.String className) {
+		_mdrAction.setClassName(className);
+	}
+
 	/**
 	* Returns the class name ID of this m d r action.
 	*

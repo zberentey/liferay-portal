@@ -133,6 +133,8 @@ public interface ExpandoValueModel extends AttachedModel, BaseModel<ExpandoValue
 	 */
 	public String getClassName();
 
+	public void setClassName(String className);
+
 	/**
 	 * Returns the class name ID of this expando value.
 	 *

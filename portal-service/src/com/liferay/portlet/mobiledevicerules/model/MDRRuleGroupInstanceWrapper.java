@@ -231,6 +231,10 @@ public class MDRRuleGroupInstanceWrapper implements MDRRuleGroupInstance,
 		return _mdrRuleGroupInstance.getClassName();
 	}
 
+	public void setClassName(java.lang.String className) {
+		_mdrRuleGroupInstance.setClassName(className);
+	}
+
 	/**
 	* Returns the class name ID of this m d r rule group instance.
 	*

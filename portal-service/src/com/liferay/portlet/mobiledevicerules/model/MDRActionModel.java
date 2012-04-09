@@ -201,6 +201,8 @@ public interface MDRActionModel extends AttachedModel, BaseModel<MDRAction>,
 	 */
 	public String getClassName();
 
+	public void setClassName(String className);
+
 	/**
 	 * Returns the class name ID of this m d r action.
 	 *

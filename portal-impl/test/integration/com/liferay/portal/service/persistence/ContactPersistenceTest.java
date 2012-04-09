@@ -90,9 +90,15 @@ public class ContactPersistenceTest {
 
 		newContact.setModifiedDate(ServiceTestUtil.nextDate());
 
+		newContact.setClassNameId(ServiceTestUtil.nextLong());
+
+		newContact.setClassPK(ServiceTestUtil.nextLong());
+
 		newContact.setAccountId(ServiceTestUtil.nextLong());
 
 		newContact.setParentContactId(ServiceTestUtil.nextLong());
+
+		newContact.setEmailAddress(ServiceTestUtil.randomString());
 
 		newContact.setFirstName(ServiceTestUtil.randomString());
 
@@ -155,10 +161,16 @@ public class ContactPersistenceTest {
 		Assert.assertEquals(Time.getShortTimestamp(
 				existingContact.getModifiedDate()),
 			Time.getShortTimestamp(newContact.getModifiedDate()));
+		Assert.assertEquals(existingContact.getClassNameId(),
+			newContact.getClassNameId());
+		Assert.assertEquals(existingContact.getClassPK(),
+			newContact.getClassPK());
 		Assert.assertEquals(existingContact.getAccountId(),
 			newContact.getAccountId());
 		Assert.assertEquals(existingContact.getParentContactId(),
 			newContact.getParentContactId());
+		Assert.assertEquals(existingContact.getEmailAddress(),
+			newContact.getEmailAddress());
 		Assert.assertEquals(existingContact.getFirstName(),
 			newContact.getFirstName());
 		Assert.assertEquals(existingContact.getMiddleName(),
@@ -327,9 +339,15 @@ public class ContactPersistenceTest {
 
 		contact.setModifiedDate(ServiceTestUtil.nextDate());
 
+		contact.setClassNameId(ServiceTestUtil.nextLong());
+
+		contact.setClassPK(ServiceTestUtil.nextLong());
+
 		contact.setAccountId(ServiceTestUtil.nextLong());
 
 		contact.setParentContactId(ServiceTestUtil.nextLong());
+
+		contact.setEmailAddress(ServiceTestUtil.randomString());
 
 		contact.setFirstName(ServiceTestUtil.randomString());
 
