@@ -23,6 +23,7 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.UnicodeProperties;
+import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.model.Lock;
 import com.liferay.portal.service.LockLocalServiceUtil;
 import com.liferay.portlet.documentlibrary.model.DLFileEntry;
@@ -53,6 +54,7 @@ import java.util.Map;
 /**
  * @author Brian Wing Shun Chan
  * @author Alexander Chow
+ * @author Manuel de la Peña
  */
 public class DLFileEntryImpl extends DLFileEntryBaseImpl {
 
@@ -255,6 +257,21 @@ public class DLFileEntryImpl extends DLFileEntryBaseImpl {
 		try {
 			return DLFileEntryServiceUtil.isFileEntryCheckedOut(
 				getFileEntryId());
+		}
+		catch (Exception e) {
+		}
+
+		return false;
+	}
+
+	public boolean isDeleted() {
+		try {
+			DLFileVersion dlFileVersion =
+				DLFileVersionServiceUtil.getLatestFileVersion(getFileEntryId());
+
+			if (dlFileVersion.getStatus() == WorkflowConstants.STATUS_DELETED) {
+				return true;
+			}
 		}
 		catch (Exception e) {
 		}

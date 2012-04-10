@@ -670,6 +670,10 @@ public class DLFileVersionWrapper implements DLFileVersion,
 		return _dlFileVersion.getIcon();
 	}
 
+	public boolean isDeleted() {
+		return _dlFileVersion.isDeleted();
+	}
+
 	public void setExtraSettingsProperties(
 		com.liferay.portal.kernel.util.UnicodeProperties extraSettingsProperties) {
 		_dlFileVersion.setExtraSettingsProperties(extraSettingsProperties);

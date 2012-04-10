@@ -161,6 +161,8 @@ viewFolderURL.setParameter("folderId", String.valueOf(folderId));
 					</portlet:actionURL>
 
 					<liferay-ui:icon-delete
+						confirmation="are-you-sure-you-want-to-move-to-trash-the-selected-document"
+						message="move-to-trash"
 						url="<%= deleteURL %>"
 					/>
 				</c:if>
@@ -236,6 +238,8 @@ viewFolderURL.setParameter("folderId", String.valueOf(folderId));
 					</portlet:actionURL>
 
 					<liferay-ui:icon-delete
+						confirmation="are-you-sure-you-want-to-move-to-trash-the-selected-document"
+						message="move-to-trash"
 						url="<%= deleteShortcutURL %>"
 					/>
 				</c:if>

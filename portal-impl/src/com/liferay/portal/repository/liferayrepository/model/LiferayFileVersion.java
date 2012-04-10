@@ -32,6 +32,7 @@ import java.util.Map;
 
 /**
  * @author Alexander Chow
+ * @author Manuel de la Peña
  */
 public class LiferayFileVersion extends LiferayModel implements FileVersion {
 
@@ -209,6 +210,10 @@ public class LiferayFileVersion extends LiferayModel implements FileVersion {
 		else {
 			return false;
 		}
+	}
+
+	public boolean isDeleted() {
+		return _dlFileVersion.isDeleted();
 	}
 
 	public boolean isDraft() {

@@ -28,6 +28,7 @@ import java.util.Map;
 
 /**
  * @author Mika Koivisto
+ * @author Manuel de la Peña
  */
 public class FileVersionProxyBean
 	extends RepositoryModelProxyBean implements FileVersion {
@@ -189,6 +190,10 @@ public class FileVersionProxyBean
 
 	public boolean isDefaultRepository() {
 		return _fileVersion.isDefaultRepository();
+	}
+
+	public boolean isDeleted() {
+		return _fileVersion.isDeleted();
 	}
 
 	public boolean isDraft() {
