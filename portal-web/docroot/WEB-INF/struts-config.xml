@@ -1826,7 +1826,7 @@
 
 		<!-- Trash -->
 
-		<action path="/trash/edit_entry" type="com.liferay.portlet.trash.action.EditTrashEntryAction">
+		<action path="/trash/edit_entry" type="com.liferay.portlet.trash.action.EditEntryAction">
 			<forward name="portlet.trash.view" path="portlet.trash.view" />
 		</action>
 
