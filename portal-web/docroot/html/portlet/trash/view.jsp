@@ -16,10 +16,6 @@
 
 <%@ include file="/html/portlet/trash/init.jsp" %>
 
-<%
-int trashEntriesCount = TrashEntryLocalServiceUtil.getEntriesCount(themeDisplay.getScopeGroupId());
-%>
-
 <aui:layout>
 	<liferay-ui:search-container
 		emptyResultsMessage="the-recycle-bin-is-empty"
@@ -28,7 +24,7 @@ int trashEntriesCount = TrashEntryLocalServiceUtil.getEntriesCount(themeDisplay.
 	>
 		<liferay-ui:search-container-results
 			results="<%= TrashEntryLocalServiceUtil.getEntries(themeDisplay.getScopeGroupId(), searchContainer.getStart(), searchContainer.getEnd()) %>"
-			total="<%= trashEntriesCount %>"
+			total="<%= TrashEntryLocalServiceUtil.getEntriesCount(themeDisplay.getScopeGroupId()) %>"
 		/>
 
 		<liferay-ui:search-container-row
