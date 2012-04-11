@@ -38,9 +38,25 @@
 		AssetRendererFactory assetRendererFactory = AssetRendererFactoryRegistryUtil.getAssetRendererFactoryByClassName(className);
 		AssetRenderer assetRenderer = assetRendererFactory.getAssetRenderer(trashEntry.getClassPK());
 		AssetEntry assetEntry = AssetEntryLocalServiceUtil.getEntry(className, trashEntry.getClassPK());
+
+		PortletURL viewFullContentURL = renderResponse.createRenderURL();
+
+		viewFullContentURL.setParameter("struts_action", "/trash/view_content");
+		viewFullContentURL.setParameter("redirect", currentURL);
+
+		if (assetEntry != null) {
+			viewFullContentURL.setParameter("assetEntryId", String.valueOf(assetEntry.getEntryId()));
+		}
+
+		if (assetRendererFactory != null) {
+			viewFullContentURL.setParameter("type", assetRendererFactory.getType());
+		}
+
+		viewFullContentURL.setParameter("showEditURL", String.valueOf(Boolean.FALSE));
 		%>
 
 		<liferay-ui:search-container-column-text
+			href="<%= viewFullContentURL.toString() %>"
 			name="name"
 		>
 			<liferay-ui:icon label="<%= true %>" message="<%= assetEntry.getTitle(locale) %>" src="<%= assetRenderer.getIconPath(renderRequest) %>" />
