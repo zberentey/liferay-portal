@@ -1243,3 +1243,10 @@ Liferay.Service.registerClass(
 );
 
 Liferay.Service.register("Liferay.Service.Trash", "com.liferay.portlet.trash.service");
+
+Liferay.Service.registerClass(
+	Liferay.Service.Trash, "TrashEntry",
+	{
+		getEntries: true
+	}
+);
