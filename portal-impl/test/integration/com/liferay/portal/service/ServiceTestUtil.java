@@ -23,6 +23,7 @@ import com.liferay.portal.kernel.messaging.sender.MessageSender;
 import com.liferay.portal.kernel.messaging.sender.SynchronousMessageSender;
 import com.liferay.portal.kernel.scheduler.SchedulerEngineUtil;
 import com.liferay.portal.kernel.search.IndexerRegistryUtil;
+import com.liferay.portal.kernel.trash.TrashHandlerRegistryUtil;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringPool;
@@ -40,6 +41,8 @@ import com.liferay.portal.util.InitUtil;
 import com.liferay.portal.util.PortalInstances;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.portal.util.TestPropsValues;
+import com.liferay.portlet.blogs.trash.BlogsEntryTrashHandler;
+import com.liferay.portlet.blogs.workflow.BlogsEntryWorkflowHandler;
 import com.liferay.portlet.bookmarks.util.BookmarksIndexer;
 import com.liferay.portlet.directory.workflow.UserWorkflowHandler;
 import com.liferay.portlet.documentlibrary.util.DLIndexer;
@@ -225,8 +228,13 @@ public class ServiceTestUtil {
 			e.printStackTrace();
 		}
 
+		// Trash
+
+		TrashHandlerRegistryUtil.register(new BlogsEntryTrashHandler());
+
 		// Workflow
 
+		WorkflowHandlerRegistryUtil.register(new BlogsEntryWorkflowHandler());
 		WorkflowHandlerRegistryUtil.register(new DLFileEntryWorkflowHandler());
 		WorkflowHandlerRegistryUtil.register(
 			new JournalArticleWorkflowHandler());
