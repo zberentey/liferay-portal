@@ -1970,7 +1970,7 @@ create table TrashEntry (
 	classPK LONG,
 	status INTEGER,
 	trashedDate DATE null,
-	typeSettings VARCHAR(75) null
+	typeSettings TEXT null
 );
 
 create table User_ (
