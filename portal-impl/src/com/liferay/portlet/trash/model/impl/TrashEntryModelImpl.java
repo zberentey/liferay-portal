@@ -15,6 +15,7 @@
 package com.liferay.portlet.trash.model.impl;
 
 import com.liferay.portal.kernel.bean.AutoEscapeBeanHandler;
+import com.liferay.portal.kernel.json.JSON;
 import com.liferay.portal.kernel.util.DateUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ProxyUtil;
@@ -30,12 +31,15 @@ import com.liferay.portlet.expando.model.ExpandoBridge;
 import com.liferay.portlet.expando.util.ExpandoBridgeFactoryUtil;
 import com.liferay.portlet.trash.model.TrashEntry;
 import com.liferay.portlet.trash.model.TrashEntryModel;
+import com.liferay.portlet.trash.model.TrashEntrySoap;
 
 import java.io.Serializable;
 
 import java.sql.Types;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * The base model implementation for the TrashEntry service. Represents a row in the &quot;TrashEntry&quot; database table, with each column mapped to a property of this class.
@@ -50,6 +54,7 @@ import java.util.Date;
  * @see com.liferay.portlet.trash.model.TrashEntryModel
  * @generated
  */
+@JSON(strict = true)
 public class TrashEntryModelImpl extends BaseModelImpl<TrashEntry>
 	implements TrashEntryModel {
 	/*
@@ -66,9 +71,9 @@ public class TrashEntryModelImpl extends BaseModelImpl<TrashEntry>
 			{ "classPK", Types.BIGINT },
 			{ "status", Types.INTEGER },
 			{ "trashedDate", Types.TIMESTAMP },
-			{ "typeSettings", Types.VARCHAR }
+			{ "typeSettings", Types.CLOB }
 		};
-	public static final String TABLE_SQL_CREATE = "create table TrashEntry (entryId LONG not null primary key,groupId LONG,companyId LONG,classNameId LONG,classPK LONG,status INTEGER,trashedDate DATE null,typeSettings VARCHAR(75) null)";
+	public static final String TABLE_SQL_CREATE = "create table TrashEntry (entryId LONG not null primary key,groupId LONG,companyId LONG,classNameId LONG,classPK LONG,status INTEGER,trashedDate DATE null,typeSettings TEXT null)";
 	public static final String TABLE_SQL_DROP = "drop table TrashEntry";
 	public static final String ORDER_BY_JPQL = " ORDER BY trashEntry.trashedDate DESC";
 	public static final String ORDER_BY_SQL = " ORDER BY TrashEntry.trashedDate DESC";
@@ -88,6 +93,44 @@ public class TrashEntryModelImpl extends BaseModelImpl<TrashEntry>
 	public static long CLASSPK_COLUMN_BITMASK = 2L;
 	public static long COMPANYID_COLUMN_BITMASK = 4L;
 	public static long GROUPID_COLUMN_BITMASK = 8L;
+
+	/**
+	 * Converts the soap model instance into a normal model instance.
+	 *
+	 * @param soapModel the soap model instance to convert
+	 * @return the normal model instance
+	 */
+	public static TrashEntry toModel(TrashEntrySoap soapModel) {
+		TrashEntry model = new TrashEntryImpl();
+
+		model.setEntryId(soapModel.getEntryId());
+		model.setGroupId(soapModel.getGroupId());
+		model.setCompanyId(soapModel.getCompanyId());
+		model.setClassNameId(soapModel.getClassNameId());
+		model.setClassPK(soapModel.getClassPK());
+		model.setStatus(soapModel.getStatus());
+		model.setTrashedDate(soapModel.getTrashedDate());
+		model.setTypeSettings(soapModel.getTypeSettings());
+
+		return model;
+	}
+
+	/**
+	 * Converts the soap model instances into normal model instances.
+	 *
+	 * @param soapModels the soap model instances to convert
+	 * @return the normal model instances
+	 */
+	public static List<TrashEntry> toModels(TrashEntrySoap[] soapModels) {
+		List<TrashEntry> models = new ArrayList<TrashEntry>(soapModels.length);
+
+		for (TrashEntrySoap soapModel : soapModels) {
+			models.add(toModel(soapModel));
+		}
+
+		return models;
+	}
+
 	public static final long LOCK_EXPIRATION_TIME = GetterUtil.getLong(com.liferay.portal.util.PropsUtil.get(
 				"lock.expiration.time.com.liferay.portlet.trash.model.TrashEntry"));
 
@@ -118,6 +161,7 @@ public class TrashEntryModelImpl extends BaseModelImpl<TrashEntry>
 		return TrashEntry.class.getName();
 	}
 
+	@JSON
 	public long getEntryId() {
 		return _entryId;
 	}
@@ -126,6 +170,7 @@ public class TrashEntryModelImpl extends BaseModelImpl<TrashEntry>
 		_entryId = entryId;
 	}
 
+	@JSON
 	public long getGroupId() {
 		return _groupId;
 	}
@@ -146,6 +191,7 @@ public class TrashEntryModelImpl extends BaseModelImpl<TrashEntry>
 		return _originalGroupId;
 	}
 
+	@JSON
 	public long getCompanyId() {
 		return _companyId;
 	}
@@ -184,6 +230,7 @@ public class TrashEntryModelImpl extends BaseModelImpl<TrashEntry>
 		setClassNameId(classNameId);
 	}
 
+	@JSON
 	public long getClassNameId() {
 		return _classNameId;
 	}
@@ -204,6 +251,7 @@ public class TrashEntryModelImpl extends BaseModelImpl<TrashEntry>
 		return _originalClassNameId;
 	}
 
+	@JSON
 	public long getClassPK() {
 		return _classPK;
 	}
@@ -224,6 +272,7 @@ public class TrashEntryModelImpl extends BaseModelImpl<TrashEntry>
 		return _originalClassPK;
 	}
 
+	@JSON
 	public int getStatus() {
 		return _status;
 	}
@@ -232,6 +281,7 @@ public class TrashEntryModelImpl extends BaseModelImpl<TrashEntry>
 		_status = status;
 	}
 
+	@JSON
 	public Date getTrashedDate() {
 		return _trashedDate;
 	}
@@ -242,6 +292,7 @@ public class TrashEntryModelImpl extends BaseModelImpl<TrashEntry>
 		_trashedDate = trashedDate;
 	}
 
+	@JSON
 	public String getTypeSettings() {
 		if (_typeSettings == null) {
 			return StringPool.BLANK;
