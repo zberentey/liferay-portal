@@ -17,7 +17,7 @@
 <%@ include file="/html/portlet/trash/init.jsp" %>
 
 <%
-int trashEntriesCount = TrashEntryLocalServiceUtil.getEntriesCount(themeDisplay.getScopeGroupId());
+boolean aproximate = false;
 %>
 
 <aui:layout>
@@ -26,10 +26,17 @@ int trashEntriesCount = TrashEntryLocalServiceUtil.getEntriesCount(themeDisplay.
 		headerNames="name,type,removed-date"
 		rowChecker="<%= new RowChecker(renderResponse) %>"
 	>
-		<liferay-ui:search-container-results
-			results="<%= TrashEntryLocalServiceUtil.getEntries(themeDisplay.getScopeGroupId(), searchContainer.getStart(), searchContainer.getEnd()) %>"
-			total="<%= trashEntriesCount %>"
-		/>
+		<liferay-ui:search-container-results>
+
+			<%
+			Object[] entries = TrashEntryServiceUtil.getEntries(themeDisplay.getScopeGroupId(), searchContainer.getStart(), searchContainer.getEnd());
+
+			pageContext.setAttribute("results", entries[0]);
+			pageContext.setAttribute("total", entries[1]);
+			aproximate = (Boolean)entries[2];
+			%>
+
+		</liferay-ui:search-container-results>
 
 		<liferay-ui:search-container-row
 			className="com.liferay.portlet.trash.model.TrashEntry"
@@ -67,6 +74,6 @@ int trashEntriesCount = TrashEntryLocalServiceUtil.getEntriesCount(themeDisplay.
 			/>
 		</liferay-ui:search-container-row>
 
-		<liferay-ui:search-iterator paginate="<%= false %>" />
+		<liferay-ui:search-iterator type='<%= aproximate ? "more" : "regular" %>' />
 	</liferay-ui:search-container>
 </aui:layout>
