@@ -22,22 +22,37 @@ SearchContainer searchContainer = (SearchContainer)request.getAttribute("view_en
 BlogsEntry entry = (BlogsEntry)request.getAttribute("view_entry_content.jsp-entry");
 
 AssetEntry assetEntry = (AssetEntry)request.getAttribute("view_entry_content.jsp-assetEntry");
+
+Date now = new Date();
+
+String entryCssClass = "entry";
+
+if ((entry.isApproved() && entry.getDisplayDate().after(now)) || entry.isPending() || entry.isDraft()) {
+	entryCssClass = entryCssClass.concat(" invisible");
+}
 %>
 
 <c:choose>
 	<c:when test="<%= BlogsEntryPermission.contains(permissionChecker, entry, ActionKeys.VIEW) && (entry.isApproved() || (entry.getUserId() == user.getUserId()) || BlogsEntryPermission.contains(permissionChecker, entry, ActionKeys.UPDATE)) %>">
-		<div class="entry <%= entry.isApproved() ? "" : "draft" %>">
+		<div class="<%= entryCssClass %>">
 			<div class="entry-content">
 
 				<%
 				String strutsAction = ParamUtil.getString(request, "struts_action");
 				%>
 
-				<c:if test="<%= !entry.isApproved() %>">
-					<h3>
-						<liferay-ui:message key='<%= entry.isPending() ? "pending-approval" : "draft" %>' />
-					</h3>
-				</c:if>
+				<c:choose>
+					<c:when test="<%= !entry.isApproved() %>">
+						<h3>
+							<liferay-ui:message key='<%= entry.isPending() ? "pending-approval" : "draft" %>' />
+						</h3>
+					</c:when>
+					<c:when test="<%= entry.isApproved() && entry.getDisplayDate().after(now) %>">
+						<h3>
+							<liferay-ui:message key="future-entry" />
+						</h3>
+					</c:when>
+				</c:choose>
 
 				<portlet:renderURL var="viewEntryURL">
 					<portlet:param name="struts_action" value="/blogs/view_entry" />

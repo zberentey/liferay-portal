@@ -551,6 +551,12 @@ public class BlogsEntryLocalServiceUtil {
 			.updateEntryResources(entry, groupPermissions, guestPermissions);
 	}
 
+	public static void updateFutureEntries()
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		getService().updateFutureEntries();
+	}
+
 	public static com.liferay.portlet.blogs.model.BlogsEntry updateStatus(
 		long userId, long entryId, int status,
 		com.liferay.portal.service.ServiceContext serviceContext)

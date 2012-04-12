@@ -14,6 +14,8 @@
 
 package com.liferay.portlet.blogs.social;
 
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
+import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
@@ -27,6 +29,8 @@ import com.liferay.portlet.social.model.BaseSocialActivityInterpreter;
 import com.liferay.portlet.social.model.SocialActivity;
 import com.liferay.portlet.social.model.SocialActivityConstants;
 import com.liferay.portlet.social.model.SocialActivityFeedEntry;
+
+import java.util.Date;
 
 /**
  * @author Brian Wing Shun Chan
@@ -86,13 +90,28 @@ public class BlogsActivityInterpreter extends BaseSocialActivityInterpreter {
 		else if (activityType == BlogsActivityKeys.ADD_ENTRY) {
 			titlePattern = "activity-blogs-add-entry";
 		}
+		else if (activityType == BlogsActivityKeys.PUSHED_TO_FUTURE) {
+			titlePattern = "activity-blogs-pushed-entry-to-future";
+		}
 
 		if (Validator.isNotNull(groupName)) {
 			titlePattern += "-in";
 		}
 
-		String entryTitle = wrapLink(
-			link, HtmlUtil.escape(cleanContent(entry.getTitle())));
+		Date now = new Date();
+		JSONObject extraData = JSONFactoryUtil.createJSONObject(
+			activity.getExtraData());
+		Date displayDate = extraData.getDate("display-date");
+
+		String entryTitle = null;
+
+		if (displayDate == null) {
+			entryTitle = wrapLink(
+				link, HtmlUtil.escape(cleanContent(entry.getTitle())));
+		}
+		else {
+			entryTitle = HtmlUtil.escape(cleanContent(entry.getTitle()));
+		}
 
 		Object[] titleArguments = new Object[] {
 			groupName, creatorUserName, receiverUserName, entryTitle

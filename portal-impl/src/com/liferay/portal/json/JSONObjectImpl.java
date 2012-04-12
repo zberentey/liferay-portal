@@ -19,10 +19,12 @@ import com.liferay.portal.kernel.json.JSONException;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.util.DateUtil;
 import com.liferay.portal.kernel.util.StringPool;
 
 import java.io.Writer;
 
+import java.text.DateFormat;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.Map;
@@ -81,6 +83,27 @@ public class JSONObjectImpl implements JSONObject {
 
 	public boolean getBoolean(String key, boolean defaultValue) {
 		return _jsonObject.optBoolean(key, defaultValue);
+	}
+
+	public Date getDate(String key) {
+		return getDate(key, null);
+	}
+
+	public Date getDate(String key, Date defaultValue) {
+		Object dateObj = _jsonObject.opt(key);
+
+		if (dateObj == null) {
+			return defaultValue;
+		}
+
+		DateFormat dateFormat = DateUtil.getISOFormat();
+
+		try {
+			return dateFormat.parse((String)dateObj);
+		}
+		catch (Exception e) {
+			return null;
+		}
 	}
 
 	public double getDouble(String key) {

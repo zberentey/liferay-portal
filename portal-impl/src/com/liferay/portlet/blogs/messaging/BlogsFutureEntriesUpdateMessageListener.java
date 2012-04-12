@@ -12,20 +12,21 @@
  * details.
  */
 
-package com.liferay.portlet.blogs.social;
+package com.liferay.portlet.blogs.messaging;
+
+import com.liferay.portal.kernel.messaging.BaseMessageListener;
+import com.liferay.portal.kernel.messaging.Message;
+import com.liferay.portlet.blogs.service.BlogsEntryLocalServiceUtil;
 
 /**
- * @author Brian Wing Shun Chan
  * @author Mate Thurzo
  */
-public class BlogsActivityKeys {
+public class BlogsFutureEntriesUpdateMessageListener
+	extends BaseMessageListener {
 
-	public static final int ADD_COMMENT = 1;
-
-	public static final int ADD_ENTRY = 2;
-
-	public static final int PUSHED_TO_FUTURE = 4;
-
-	public static final int UPDATE_ENTRY = 3;
+	@Override
+	protected void doReceive(Message message) throws Exception {
+		BlogsEntryLocalServiceUtil.updateFutureEntries();
+	}
 
 }

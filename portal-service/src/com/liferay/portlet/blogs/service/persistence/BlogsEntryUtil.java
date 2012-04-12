@@ -2702,6 +2702,135 @@ public class BlogsEntryUtil {
 	}
 
 	/**
+	* Returns all the blogs entries where status = &#63; and displayDate &lt; &#63;.
+	*
+	* @param status the status
+	* @param displayDate the display date
+	* @return the matching blogs entries
+	* @throws SystemException if a system exception occurred
+	*/
+	public static java.util.List<com.liferay.portlet.blogs.model.BlogsEntry> findByS_LtD(
+		int status, java.util.Date displayDate)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence().findByS_LtD(status, displayDate);
+	}
+
+	/**
+	* Returns a range of all the blogs entries where status = &#63; and displayDate &lt; &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param status the status
+	* @param displayDate the display date
+	* @param start the lower bound of the range of blogs entries
+	* @param end the upper bound of the range of blogs entries (not inclusive)
+	* @return the range of matching blogs entries
+	* @throws SystemException if a system exception occurred
+	*/
+	public static java.util.List<com.liferay.portlet.blogs.model.BlogsEntry> findByS_LtD(
+		int status, java.util.Date displayDate, int start, int end)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence().findByS_LtD(status, displayDate, start, end);
+	}
+
+	/**
+	* Returns an ordered range of all the blogs entries where status = &#63; and displayDate &lt; &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param status the status
+	* @param displayDate the display date
+	* @param start the lower bound of the range of blogs entries
+	* @param end the upper bound of the range of blogs entries (not inclusive)
+	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	* @return the ordered range of matching blogs entries
+	* @throws SystemException if a system exception occurred
+	*/
+	public static java.util.List<com.liferay.portlet.blogs.model.BlogsEntry> findByS_LtD(
+		int status, java.util.Date displayDate, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .findByS_LtD(status, displayDate, start, end,
+			orderByComparator);
+	}
+
+	/**
+	* Returns the first blogs entry in the ordered set where status = &#63; and displayDate &lt; &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param status the status
+	* @param displayDate the display date
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the first matching blogs entry
+	* @throws com.liferay.portlet.blogs.NoSuchEntryException if a matching blogs entry could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.portlet.blogs.model.BlogsEntry findByS_LtD_First(
+		int status, java.util.Date displayDate,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException,
+			com.liferay.portlet.blogs.NoSuchEntryException {
+		return getPersistence()
+				   .findByS_LtD_First(status, displayDate, orderByComparator);
+	}
+
+	/**
+	* Returns the last blogs entry in the ordered set where status = &#63; and displayDate &lt; &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param status the status
+	* @param displayDate the display date
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the last matching blogs entry
+	* @throws com.liferay.portlet.blogs.NoSuchEntryException if a matching blogs entry could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.portlet.blogs.model.BlogsEntry findByS_LtD_Last(
+		int status, java.util.Date displayDate,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException,
+			com.liferay.portlet.blogs.NoSuchEntryException {
+		return getPersistence()
+				   .findByS_LtD_Last(status, displayDate, orderByComparator);
+	}
+
+	/**
+	* Returns the blogs entries before and after the current blogs entry in the ordered set where status = &#63; and displayDate &lt; &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param entryId the primary key of the current blogs entry
+	* @param status the status
+	* @param displayDate the display date
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the previous, current, and next blogs entry
+	* @throws com.liferay.portlet.blogs.NoSuchEntryException if a blogs entry with the primary key could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.portlet.blogs.model.BlogsEntry[] findByS_LtD_PrevAndNext(
+		long entryId, int status, java.util.Date displayDate,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException,
+			com.liferay.portlet.blogs.NoSuchEntryException {
+		return getPersistence()
+				   .findByS_LtD_PrevAndNext(entryId, status, displayDate,
+			orderByComparator);
+	}
+
+	/**
 	* Returns all the blogs entries.
 	*
 	* @return the blogs entries
@@ -2954,6 +3083,18 @@ public class BlogsEntryUtil {
 		java.util.Date displayDate, int status)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		getPersistence().removeByG_U_LtD_S(groupId, userId, displayDate, status);
+	}
+
+	/**
+	* Removes all the blogs entries where status = &#63; and displayDate &lt; &#63; from the database.
+	*
+	* @param status the status
+	* @param displayDate the display date
+	* @throws SystemException if a system exception occurred
+	*/
+	public static void removeByS_LtD(int status, java.util.Date displayDate)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		getPersistence().removeByS_LtD(status, displayDate);
 	}
 
 	/**
@@ -3282,6 +3423,19 @@ public class BlogsEntryUtil {
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return getPersistence()
 				   .filterCountByG_U_LtD_S(groupId, userId, displayDate, status);
+	}
+
+	/**
+	* Returns the number of blogs entries where status = &#63; and displayDate &lt; &#63;.
+	*
+	* @param status the status
+	* @param displayDate the display date
+	* @return the number of matching blogs entries
+	* @throws SystemException if a system exception occurred
+	*/
+	public static int countByS_LtD(int status, java.util.Date displayDate)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence().countByS_LtD(status, displayDate);
 	}
 
 	/**

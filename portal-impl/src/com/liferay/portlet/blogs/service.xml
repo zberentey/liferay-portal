@@ -110,6 +110,10 @@
 			<finder-column name="displayDate" comparator="&lt;" />
 			<finder-column name="status" />
 		</finder>
+		<finder name="S_LtD" return-type="Collection">
+			<finder-column name="status" />
+			<finder-column name="displayDate" comparator="&lt;" />
+		</finder>
 
 		<!-- References -->
 

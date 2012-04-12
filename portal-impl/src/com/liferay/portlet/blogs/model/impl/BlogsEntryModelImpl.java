@@ -562,7 +562,9 @@ public class BlogsEntryModelImpl extends BaseModelImpl<BlogsEntry>
 	}
 
 	public boolean isApproved() {
-		if (getStatus() == WorkflowConstants.STATUS_APPROVED) {
+		if ((getStatus() == WorkflowConstants.STATUS_APPROVED) ||
+				(getStatus() == WorkflowConstants.STATUS_APPROVED_FUTURE_ADD) ||
+				(getStatus() == WorkflowConstants.STATUS_APPROVED_FUTURE_UPDATE)) {
 			return true;
 		}
 		else {
