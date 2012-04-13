@@ -31,8 +31,7 @@ TrashEntry trashEntry = (TrashEntry)row.getObject();
 		<portlet:param name="struts_action" value="/trash/edit_entry" />
 		<portlet:param name="<%= Constants.CMD %>" value="<%= Constants.RESTORE %>" />
 		<portlet:param name="redirect" value="<%= redirect %>" />
-		<portlet:param name="className" value="<%= trashEntry.getClassName() %>" />
-		<portlet:param name="classPK" value="<%= String.valueOf(trashEntry.getClassPK()) %>" />
+		<portlet:param name="trashEntryId" value="<%= String.valueOf(trashEntry.getEntryId()) %>" />
 	</portlet:actionURL>
 
 	<liferay-ui:icon
@@ -45,8 +44,7 @@ TrashEntry trashEntry = (TrashEntry)row.getObject();
 		<portlet:param name="struts_action" value="/trash/edit_entry" />
 		<portlet:param name="<%= Constants.CMD %>" value="<%= Constants.DELETE %>" />
 		<portlet:param name="redirect" value="<%= redirect %>" />
-		<portlet:param name="className" value="<%= trashEntry.getClassName() %>" />
-		<portlet:param name="classPK" value="<%= String.valueOf(trashEntry.getClassPK()) %>" />
+		<portlet:param name="trashEntryId" value="<%= String.valueOf(trashEntry.getEntryId()) %>" />
 	</portlet:actionURL>
 
 	<liferay-ui:icon

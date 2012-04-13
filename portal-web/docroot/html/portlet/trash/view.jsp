@@ -20,7 +20,15 @@
 boolean aproximate = false;
 %>
 
-<aui:layout>
+<portlet:actionURL var="editTrashEntryURL">
+	<portlet:param name="struts_action" value="/trash/edit_entry" />
+</portlet:actionURL>
+
+<aui:form action='<%= editTrashEntryURL %>' method="post" name="fm" onSubmit="event.preventDefault();">
+	<aui:input name="<%= Constants.CMD %>" type="hidden" value="" />
+	<aui:input name="deleteEntryIds" type="hidden" />
+	<aui:input name="restoreEntryIds" type="hidden" />
+
 	<liferay-ui:search-container
 		emptyResultsMessage="the-recycle-bin-is-empty"
 		headerNames="name,type,removed-date"
@@ -90,6 +98,48 @@ boolean aproximate = false;
 			/>
 		</liferay-ui:search-container-row>
 
+		<aui:button-row>
+			<aui:button name="deleteButton" onClick='<%= renderResponse.getNamespace() + "deleteEntries();" %>' value="delete" />
+
+			<aui:button name="restoreButton" onClick='<%= renderResponse.getNamespace() + "restoreEntries();" %>' value="restore" />
+		</aui:button-row>
+
+		<div class="separator"><!-- --></div>
+
 		<liferay-ui:search-iterator type='<%= aproximate ? "more" : "regular" %>' />
 	</liferay-ui:search-container>
-</aui:layout>
+</aui:form>
+
+<aui:script use="aui-base">
+	Liferay.provide(
+		window,
+		'<portlet:namespace />deleteEntries',
+		function() {
+			var deleteEntryIds = Liferay.Util.listCheckedExcept(document.<portlet:namespace />fm, "<portlet:namespace />allRowIds");
+
+			if (confirm('<%= UnicodeLanguageUtil.get(pageContext, "are-you-sure-you-want-to-delete-the-selected-entries") %>')) {
+				document.<portlet:namespace />fm.method = "post";
+				document.<portlet:namespace />fm.<portlet:namespace /><%= Constants.CMD %>.value = "<%= Constants.DELETE %>";
+				document.<portlet:namespace />fm.<portlet:namespace />deleteEntryIds.value = Liferay.Util.listCheckedExcept(document.<portlet:namespace />fm, "<portlet:namespace />allRowIds");
+				submitForm(document.<portlet:namespace />fm);
+			}
+		},
+		['liferay-util-list-fields']
+	);
+
+	Liferay.provide(
+		window,
+		'<portlet:namespace />restoreEntries',
+		function() {
+			var restoreEntryIds = Liferay.Util.listCheckedExcept(document.<portlet:namespace />fm, "<portlet:namespace />allRowIds");
+
+			if (confirm('<%= UnicodeLanguageUtil.get(pageContext, "are-you-sure-you-want-to-restore-the-selected-entries") %>')) {
+				document.<portlet:namespace />fm.method = "post";
+				document.<portlet:namespace />fm.<portlet:namespace /><%= Constants.CMD %>.value = "<%= Constants.RESTORE %>";
+				document.<portlet:namespace />fm.<portlet:namespace />restoreEntryIds.value = Liferay.Util.listCheckedExcept(document.<portlet:namespace />fm, "<portlet:namespace />allRowIds");
+				submitForm(document.<portlet:namespace />fm);
+			}
+		},
+		['liferay-util-list-fields']
+	);
+</aui:script>
