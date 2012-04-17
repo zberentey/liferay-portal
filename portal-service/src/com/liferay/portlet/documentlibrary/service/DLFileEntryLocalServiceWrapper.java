@@ -395,16 +395,25 @@ public class DLFileEntryLocalServiceWrapper implements DLFileEntryLocalService,
 		_dlFileEntryLocalService.deleteFileEntries(groupId, folderId);
 	}
 
-	public void deleteFileEntry(long fileEntryId)
+	public com.liferay.portlet.documentlibrary.model.DLFileEntry deleteFileEntry(
+		com.liferay.portlet.documentlibrary.model.DLFileEntry dlFileEntry)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		_dlFileEntryLocalService.deleteFileEntry(fileEntryId);
+		return _dlFileEntryLocalService.deleteFileEntry(dlFileEntry);
 	}
 
-	public void deleteFileEntry(long userId, long fileEntryId)
+	public com.liferay.portlet.documentlibrary.model.DLFileEntry deleteFileEntry(
+		long fileEntryId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		_dlFileEntryLocalService.deleteFileEntry(userId, fileEntryId);
+		return _dlFileEntryLocalService.deleteFileEntry(fileEntryId);
+	}
+
+	public com.liferay.portlet.documentlibrary.model.DLFileEntry deleteFileEntry(
+		long userId, long fileEntryId)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return _dlFileEntryLocalService.deleteFileEntry(userId, fileEntryId);
 	}
 
 	public com.liferay.portlet.documentlibrary.model.DLFileEntry fetchFileEntryByAnyImageId(

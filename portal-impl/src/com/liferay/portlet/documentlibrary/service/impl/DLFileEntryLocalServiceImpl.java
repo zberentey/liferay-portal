@@ -26,6 +26,8 @@ import com.liferay.portal.kernel.increment.BufferedIncrement;
 import com.liferay.portal.kernel.increment.NumberIncrement;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.search.Indexable;
+import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.IndexerRegistryUtil;
 import com.liferay.portal.kernel.search.SearchException;
@@ -559,20 +561,90 @@ public class DLFileEntryLocalServiceImpl
 				dlAppHelperLocalService.deleteFileEntry(
 					new LiferayFileEntry(dlFileEntry));
 
-				deleteFileEntry(dlFileEntry);
+				dlFileEntryLocalService.deleteFileEntry(dlFileEntry);
 			}
 		}
 	}
 
-	public void deleteFileEntry(long fileEntryId)
+	@Indexable(type = IndexableType.DELETE)
+	public DLFileEntry deleteFileEntry(DLFileEntry dlFileEntry)
+		throws PortalException, SystemException {
+
+		// File entry
+
+		dlFileEntryPersistence.remove(dlFileEntry);
+
+		// Resources
+
+		resourceLocalService.deleteResource(
+			dlFileEntry.getCompanyId(), DLFileEntry.class.getName(),
+			ResourceConstants.SCOPE_INDIVIDUAL, dlFileEntry.getFileEntryId());
+
+		// WebDAVProps
+
+		webDAVPropsLocalService.deleteWebDAVProps(
+			DLFileEntry.class.getName(), dlFileEntry.getFileEntryId());
+
+		// File entry metadata
+
+		dlFileEntryMetadataLocalService.deleteFileEntryMetadata(
+			dlFileEntry.getFileEntryId());
+
+		// File versions
+
+		List<DLFileVersion> dlFileVersions =
+			dlFileVersionPersistence.findByFileEntryId(
+				dlFileEntry.getFileEntryId());
+
+		for (DLFileVersion dlFileVersion : dlFileVersions) {
+			dlFileVersionPersistence.remove(dlFileVersion);
+
+			expandoValueLocalService.deleteValues(
+				DLFileVersion.class.getName(),
+				dlFileVersion.getFileVersionId());
+
+			workflowInstanceLinkLocalService.deleteWorkflowInstanceLinks(
+				dlFileEntry.getCompanyId(), dlFileEntry.getGroupId(),
+				DLFileEntry.class.getName(), dlFileVersion.getFileVersionId());
+		}
+
+		// Expando
+
+		expandoValueLocalService.deleteValues(
+			DLFileEntry.class.getName(), dlFileEntry.getFileEntryId());
+
+		// Lock
+
+		lockLocalService.unlock(
+			DLFileEntry.class.getName(), dlFileEntry.getFileEntryId());
+
+		// File
+
+		try {
+			DLStoreUtil.deleteFile(
+				dlFileEntry.getCompanyId(), dlFileEntry.getDataRepositoryId(),
+				dlFileEntry.getName());
+		}
+		catch (Exception e) {
+			if (_log.isWarnEnabled()) {
+				_log.warn(e, e);
+			}
+		}
+
+		return dlFileEntry;
+	}
+
+	@Indexable(type = IndexableType.DELETE)
+	public DLFileEntry deleteFileEntry(long fileEntryId)
 		throws PortalException, SystemException {
 
 		DLFileEntry dlFileEntry = getFileEntry(fileEntryId);
 
-		deleteFileEntry(dlFileEntry);
+		return deleteFileEntry(dlFileEntry);
 	}
 
-	public void deleteFileEntry(long userId, long fileEntryId)
+	@Indexable(type = IndexableType.DELETE)
+	public DLFileEntry deleteFileEntry(long userId, long fileEntryId)
 		throws PortalException, SystemException {
 
 		if (!hasFileEntryLock(userId, fileEntryId)) {
@@ -580,7 +652,7 @@ public class DLFileEntryLocalServiceImpl
 		}
 
 		try {
-			deleteFileEntry(fileEntryId);
+			return deleteFileEntry(fileEntryId);
 		}
 		finally {
 			unlockFileEntry(fileEntryId);
@@ -890,6 +962,7 @@ public class DLFileEntryLocalServiceImpl
 			expirationTime);
 	}
 
+	@Indexable(type = IndexableType.REINDEX)
 	public DLFileEntry moveFileEntry(
 			long userId, long fileEntryId, long newFolderId,
 			ServiceContext serviceContext)
@@ -1324,78 +1397,6 @@ public class DLFileEntryLocalServiceImpl
 		}
 	}
 
-	protected void deleteFileEntry(DLFileEntry dlFileEntry)
-		throws PortalException, SystemException {
-
-		// File entry
-
-		dlFileEntryPersistence.remove(dlFileEntry);
-
-		// Resources
-
-		resourceLocalService.deleteResource(
-			dlFileEntry.getCompanyId(), DLFileEntry.class.getName(),
-			ResourceConstants.SCOPE_INDIVIDUAL, dlFileEntry.getFileEntryId());
-
-		// WebDAVProps
-
-		webDAVPropsLocalService.deleteWebDAVProps(
-			DLFileEntry.class.getName(), dlFileEntry.getFileEntryId());
-
-		// File entry metadata
-
-		dlFileEntryMetadataLocalService.deleteFileEntryMetadata(
-			dlFileEntry.getFileEntryId());
-
-		// File versions
-
-		List<DLFileVersion> dlFileVersions =
-			dlFileVersionPersistence.findByFileEntryId(
-				dlFileEntry.getFileEntryId());
-
-		for (DLFileVersion dlFileVersion : dlFileVersions) {
-			dlFileVersionPersistence.remove(dlFileVersion);
-
-			expandoValueLocalService.deleteValues(
-				DLFileVersion.class.getName(),
-				dlFileVersion.getFileVersionId());
-
-			workflowInstanceLinkLocalService.deleteWorkflowInstanceLinks(
-				dlFileEntry.getCompanyId(), dlFileEntry.getGroupId(),
-				DLFileEntry.class.getName(), dlFileVersion.getFileVersionId());
-		}
-
-		// Expando
-
-		expandoValueLocalService.deleteValues(
-			DLFileEntry.class.getName(), dlFileEntry.getFileEntryId());
-
-		// Lock
-
-		lockLocalService.unlock(
-			DLFileEntry.class.getName(), dlFileEntry.getFileEntryId());
-
-		// File
-
-		try {
-			DLStoreUtil.deleteFile(
-				dlFileEntry.getCompanyId(), dlFileEntry.getDataRepositoryId(),
-				dlFileEntry.getName());
-		}
-		catch (Exception e) {
-			if (_log.isWarnEnabled()) {
-				_log.warn(e, e);
-			}
-		}
-
-		// Index
-
-		Indexer indexer = IndexerRegistryUtil.nullSafeGetIndexer(
-			DLFileEntry.class);
-
-		indexer.delete(dlFileEntry);
-	}
-
 	protected Long getFileEntryTypeId(
 			long[] groupIds, long folderId, long fileEntryTypeId)
 		throws PortalException, SystemException {
@@ -1508,10 +1509,6 @@ public class DLFileEntryLocalServiceImpl
 		DLStoreUtil.updateFile(
 			user.getCompanyId(), oldDataRepositoryId,
 			dlFileEntry.getDataRepositoryId(), dlFileEntry.getName());
-
-		// Index
-
-		reindex(dlFileEntry);
 
 		return dlFileEntry;
 	}
