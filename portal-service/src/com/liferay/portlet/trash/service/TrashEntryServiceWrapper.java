@@ -31,6 +31,12 @@ public class TrashEntryServiceWrapper implements TrashEntryService,
 		_trashEntryService = trashEntryService;
 	}
 
+	public void deleteEntries(long groupId)
+		throws com.liferay.portal.kernel.exception.SystemException,
+			com.liferay.portal.security.auth.PrincipalException {
+		_trashEntryService.deleteEntries(groupId);
+	}
+
 	public java.lang.Object[] getEntries(long groupId)
 		throws com.liferay.portal.kernel.exception.SystemException,
 			com.liferay.portal.security.auth.PrincipalException {

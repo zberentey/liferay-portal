@@ -65,6 +65,17 @@ import java.rmi.RemoteException;
  * @generated
  */
 public class TrashEntryServiceSoap {
+	public static void deleteEntries(long groupId) throws RemoteException {
+		try {
+			TrashEntryServiceUtil.deleteEntries(groupId);
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
 	public static java.lang.Object[] getEntries(long groupId)
 		throws RemoteException {
 		try {

@@ -43,6 +43,10 @@ public interface TrashEntryService {
 	 *
 	 * Never modify or reference this interface directly. Always use {@link TrashEntryServiceUtil} to access the trash entry remote service. Add custom service methods to {@link com.liferay.portlet.trash.service.impl.TrashEntryServiceImpl} and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
+	public void deleteEntries(long groupId)
+		throws com.liferay.portal.kernel.exception.SystemException,
+			com.liferay.portal.security.auth.PrincipalException;
+
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public java.lang.Object[] getEntries(long groupId)
 		throws com.liferay.portal.kernel.exception.SystemException,

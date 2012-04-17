@@ -37,6 +37,12 @@ public class TrashEntryServiceUtil {
 	 *
 	 * Never modify this class directly. Add custom service methods to {@link com.liferay.portlet.trash.service.impl.TrashEntryServiceImpl} and rerun ServiceBuilder to regenerate this class.
 	 */
+	public static void deleteEntries(long groupId)
+		throws com.liferay.portal.kernel.exception.SystemException,
+			com.liferay.portal.security.auth.PrincipalException {
+		getService().deleteEntries(groupId);
+	}
+
 	public static java.lang.Object[] getEntries(long groupId)
 		throws com.liferay.portal.kernel.exception.SystemException,
 			com.liferay.portal.security.auth.PrincipalException {

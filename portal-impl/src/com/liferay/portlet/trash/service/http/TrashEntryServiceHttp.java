@@ -54,13 +54,44 @@ import com.liferay.portlet.trash.service.TrashEntryServiceUtil;
  * @generated
  */
 public class TrashEntryServiceHttp {
+	public static void deleteEntries(HttpPrincipal httpPrincipal, long groupId)
+		throws com.liferay.portal.kernel.exception.SystemException,
+			com.liferay.portal.security.auth.PrincipalException {
+		try {
+			MethodKey methodKey = new MethodKey(TrashEntryServiceUtil.class.getName(),
+					"deleteEntries", _deleteEntriesParameterTypes0);
+
+			MethodHandler methodHandler = new MethodHandler(methodKey, groupId);
+
+			try {
+				TunnelUtil.invoke(httpPrincipal, methodHandler);
+			}
+			catch (Exception e) {
+				if (e instanceof com.liferay.portal.kernel.exception.SystemException) {
+					throw (com.liferay.portal.kernel.exception.SystemException)e;
+				}
+
+				if (e instanceof com.liferay.portal.security.auth.PrincipalException) {
+					throw (com.liferay.portal.security.auth.PrincipalException)e;
+				}
+
+				throw new com.liferay.portal.kernel.exception.SystemException(e);
+			}
+		}
+		catch (com.liferay.portal.kernel.exception.SystemException se) {
+			_log.error(se, se);
+
+			throw se;
+		}
+	}
+
 	public static java.lang.Object[] getEntries(HttpPrincipal httpPrincipal,
 		long groupId)
 		throws com.liferay.portal.kernel.exception.SystemException,
 			com.liferay.portal.security.auth.PrincipalException {
 		try {
 			MethodKey methodKey = new MethodKey(TrashEntryServiceUtil.class.getName(),
-					"getEntries", _getEntriesParameterTypes0);
+					"getEntries", _getEntriesParameterTypes1);
 
 			MethodHandler methodHandler = new MethodHandler(methodKey, groupId);
 
@@ -96,7 +127,7 @@ public class TrashEntryServiceHttp {
 			com.liferay.portal.security.auth.PrincipalException {
 		try {
 			MethodKey methodKey = new MethodKey(TrashEntryServiceUtil.class.getName(),
-					"getEntries", _getEntriesParameterTypes1);
+					"getEntries", _getEntriesParameterTypes2);
 
 			MethodHandler methodHandler = new MethodHandler(methodKey, groupId,
 					start, end);
@@ -128,10 +159,13 @@ public class TrashEntryServiceHttp {
 	}
 
 	private static Log _log = LogFactoryUtil.getLog(TrashEntryServiceHttp.class);
-	private static final Class<?>[] _getEntriesParameterTypes0 = new Class[] {
+	private static final Class<?>[] _deleteEntriesParameterTypes0 = new Class[] {
 			long.class
 		};
 	private static final Class<?>[] _getEntriesParameterTypes1 = new Class[] {
+			long.class
+		};
+	private static final Class<?>[] _getEntriesParameterTypes2 = new Class[] {
 			long.class, int.class, int.class
 		};
 }

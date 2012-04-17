@@ -1249,6 +1249,7 @@ Liferay.Service.register("Liferay.Service.Trash", "com.liferay.portlet.trash.ser
 Liferay.Service.registerClass(
 	Liferay.Service.Trash, "TrashEntry",
 	{
+		deleteEntries: true,
 		getEntries: true
 	}
 );
