@@ -115588,790 +115588,863 @@ Due to legacy code, the names of some file entry properties are not intuitive. E
 	<javadoc>
 		<name>SocialActivityCounterLocalServiceImpl</name>
 		<type>com.liferay.portlet.social.service.impl.SocialActivityCounterLocalServiceImpl</type>
-		<comment><![CDATA[]]></comment>
+		<comment><![CDATA[The social activity counter local service. This service is responsible for creating and/or incrementing counters in response to an activity. It also provides methods for querying activity counters within a time period.
+
+<p>
+Under normal circumstances only the <i>add-</i> method with the social activity as its only parameter should be called directly and even that is usually not necessary as it is automatically called by the social activity service.
+</p>]]></comment>
 		<author><![CDATA[Zsolt Berentey]]></author>
 		<author><![CDATA[Shuyang Zhou]]></author>
 		<method>
 			<name>addActivityCounter</name>
-			<comment><![CDATA[]]></comment>
+			<comment><![CDATA[Adds an activity counter into the database.
+
+<p>
+This method uses the lock service to guard against multiple threads trying to insert the same counter because this service is called asynchronously from the social activity service, this method must , so it is using the lock service for that.
+</p>]]></comment>
 			<param>
 				<name>groupId</name>
 				<type>long</type>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[the primary key of the group]]></comment>
 			</param>
 			<param>
 				<name>classNameId</name>
 				<type>long</type>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[the primary key of the entity's class this counter belongs to]]></comment>
 			</param>
 			<param>
 				<name>classPK</name>
 				<type>long</type>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[the primary key of the entity this counter belongs to]]></comment>
 			</param>
 			<param>
 				<name>name</name>
 				<type>java.lang.String</type>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[the counter name]]></comment>
 			</param>
 			<param>
 				<name>ownerType</name>
 				<type>int</type>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[the owner type of the counter, acceptable values are TYPE_ACTOR, TYPE_ASSET and TYPE_CREATOR defined in <code>SocialActivityCounterConstants</code>]]></comment>
 			</param>
 			<param>
 				<name>currentValue</name>
 				<type>int</type>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[the current value of the counter (optionally <code>0</code>)]]></comment>
 			</param>
 			<param>
 				<name>totalValue</name>
 				<type>int</type>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[the total value of the counter (optionally <code>0</code>)]]></comment>
 			</param>
 			<param>
 				<name>startPeriod</name>
 				<type>int</type>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[the start period of the counter]]></comment>
 			</param>
 			<param>
 				<name>endPeriod</name>
 				<type>int</type>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[end period of the counter]]></comment>
 			</param>
 			<return>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[the created activity counter]]></comment>
 			</return>
 			<throws>
 				<name>PortalException</name>
 				<type>com.liferay.portal.kernel.exception.PortalException</type>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[if the group or the previous activity counter could not be found]]></comment>
 			</throws>
 			<throws>
 				<name>SystemException</name>
 				<type>com.liferay.portal.kernel.exception.SystemException</type>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[if a system exception occurred]]></comment>
 			</throws>
 		</method>
 		<method>
 			<name>addActivityCounter</name>
-			<comment><![CDATA[]]></comment>
+			<comment><![CDATA[Adds an activity counter into the database.
+
+<p>
+This method uses the lock service to guard against multiple threads trying to insert the same counter because this service is called asynchronously from the social activity service, this method must , so it is using the lock service for that.
+</p>]]></comment>
 			<param>
 				<name>groupId</name>
 				<type>long</type>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[the primary key of the group]]></comment>
 			</param>
 			<param>
 				<name>classNameId</name>
 				<type>long</type>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[the primary key of the entity's class this counter belongs to]]></comment>
 			</param>
 			<param>
 				<name>classPK</name>
 				<type>long</type>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[the primary key of the entity this counter belongs to]]></comment>
 			</param>
 			<param>
 				<name>name</name>
 				<type>java.lang.String</type>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[the counter name]]></comment>
 			</param>
 			<param>
 				<name>ownerType</name>
 				<type>int</type>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[the owner type of the counter, acceptable values are TYPE_ACTOR, TYPE_ASSET and TYPE_CREATOR defined in <code>SocialActivityCounterConstants</code>]]></comment>
 			</param>
 			<param>
 				<name>currentValue</name>
 				<type>int</type>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[the current value of the counter (optionally <code>0</code>)]]></comment>
 			</param>
 			<param>
 				<name>totalValue</name>
 				<type>int</type>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[the total value of the counter (optionally <code>0</code>)]]></comment>
 			</param>
 			<param>
 				<name>startPeriod</name>
 				<type>int</type>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[the start period of the counter]]></comment>
 			</param>
 			<param>
 				<name>endPeriod</name>
 				<type>int</type>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[end period of the counter]]></comment>
 			</param>
 			<param>
 				<name>previousActivityCounterId</name>
 				<type>long</type>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[the primary key of the activity counter for the previous time period (optionally <code>0</code>, if this is the first)]]></comment>
 			</param>
 			<param>
 				<name>periodLength</name>
 				<type>int</type>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[the period length in days, PERIOD_LENGTH_INFINITE for never ending counters or PERIOD_LENGTH_SYSTEM for the period length defined in <code>portal.properties</code>]]></comment>
 			</param>
 			<return>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[the created activity counter]]></comment>
 			</return>
 			<throws>
 				<name>PortalException</name>
 				<type>com.liferay.portal.kernel.exception.PortalException</type>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[if the group or the previous activity counter could not be found]]></comment>
 			</throws>
 			<throws>
 				<name>SystemException</name>
 				<type>com.liferay.portal.kernel.exception.SystemException</type>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[if a system exception occurred]]></comment>
 			</throws>
 		</method>
 		<method>
 			<name>addActivityCounters</name>
-			<comment><![CDATA[]]></comment>
+			<comment><![CDATA[Adds or increments activity counters related to an activity.
+
+</p>
+This method is called asynchronously from the social activity service when
+the user performs an activity defined in </code>liferay-social.xml</code>.
+</p>
+
+<p>
+This method first calls the activity processor class if there is one defined for the activity, then checks for limits and increments all the counters that belong to the activity. Afterwards it calls the achievement class if there is one and lastly increments the built-in </code>user.activities</code> and <code>asset.activities</code> counter.
+</p>]]></comment>
 			<param>
 				<name>activity</name>
 				<type>com.liferay.portlet.social.model.SocialActivity</type>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[the social activity]]></comment>
 			</param>
 			<throws>
 				<name>PortalException</name>
 				<type>com.liferay.portal.kernel.exception.PortalException</type>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[if the group or previous activity counters could not be found when they should have existed]]></comment>
 			</throws>
 			<throws>
 				<name>SystemException</name>
 				<type>com.liferay.portal.kernel.exception.SystemException</type>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[if a system exception occurred]]></comment>
 			</throws>
 		</method>
 		<method>
 			<name>createActivityCounter</name>
-			<comment><![CDATA[]]></comment>
+			<comment><![CDATA[Adds an activity counter into the database.]]></comment>
 			<param>
 				<name>groupId</name>
 				<type>long</type>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[the primary key of the group]]></comment>
 			</param>
 			<param>
 				<name>classNameId</name>
 				<type>long</type>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[the primary key of the entity's class this counter belongs to]]></comment>
 			</param>
 			<param>
 				<name>classPK</name>
 				<type>long</type>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[the primary key of the entity this counter belongs to]]></comment>
 			</param>
 			<param>
 				<name>name</name>
 				<type>java.lang.String</type>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[the counter name]]></comment>
 			</param>
 			<param>
 				<name>ownerType</name>
 				<type>int</type>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[the owner type of the counter, acceptable values are TYPE_ACTOR, TYPE_ASSET and TYPE_CREATOR defined in <code>SocialActivityCounterConstants</code>]]></comment>
 			</param>
 			<param>
 				<name>currentValue</name>
 				<type>int</type>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[the current value of the counter (optionally <code>0</code>)]]></comment>
 			</param>
 			<param>
 				<name>totalValue</name>
 				<type>int</type>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[the total value of the counter (optionally <code>0</code>)]]></comment>
 			</param>
 			<param>
 				<name>startPeriod</name>
 				<type>int</type>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[the start period of the counter]]></comment>
 			</param>
 			<param>
 				<name>endPeriod</name>
 				<type>int</type>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[end period of the counter]]></comment>
 			</param>
 			<return>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[the created activity counter]]></comment>
 			</return>
 			<throws>
 				<name>PortalException</name>
 				<type>com.liferay.portal.kernel.exception.PortalException</type>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[if the group or the previous activity counter could not be found]]></comment>
 			</throws>
 			<throws>
 				<name>SystemException</name>
 				<type>com.liferay.portal.kernel.exception.SystemException</type>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[if a system exception occurred]]></comment>
 			</throws>
 			<deprecated><![CDATA[{@link #createActivityCounter(long, long, long, String, int, int, int, int, int, long, int)}]]></deprecated>
 		</method>
 		<method>
 			<name>createActivityCounter</name>
-			<comment><![CDATA[]]></comment>
+			<comment><![CDATA[Adds an activity counter into the database.
+
+<p>
+This is the method the actually creates the counter in the database. It requires a new transaction so that other threads can find the new counter when the lock in the calling method is released.
+</p>]]></comment>
 			<param>
 				<name>groupId</name>
 				<type>long</type>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[the primary key of the group]]></comment>
 			</param>
 			<param>
 				<name>classNameId</name>
 				<type>long</type>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[the primary key of the entity's class this counter belongs to]]></comment>
 			</param>
 			<param>
 				<name>classPK</name>
 				<type>long</type>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[the primary key of the entity this counter belongs to]]></comment>
 			</param>
 			<param>
 				<name>name</name>
 				<type>java.lang.String</type>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[the counter name]]></comment>
 			</param>
 			<param>
 				<name>ownerType</name>
 				<type>int</type>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[the owner type of the counter, acceptable values are TYPE_ACTOR, TYPE_ASSET and TYPE_CREATOR defined in <code>SocialActivityCounterConstants</code>]]></comment>
 			</param>
 			<param>
 				<name>currentValue</name>
 				<type>int</type>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[the current value of the counter (optionally <code>0</code>)]]></comment>
 			</param>
 			<param>
 				<name>totalValue</name>
 				<type>int</type>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[the total value of the counter (optionally <code>0</code>)]]></comment>
 			</param>
 			<param>
 				<name>startPeriod</name>
 				<type>int</type>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[the start period of the counter]]></comment>
 			</param>
 			<param>
 				<name>endPeriod</name>
 				<type>int</type>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[end period of the counter]]></comment>
 			</param>
 			<param>
 				<name>previousActivityCounterId</name>
 				<type>long</type>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[the primary key of the activity counter for the previous time period (optionally <code>0</code>, if this is the first)]]></comment>
 			</param>
 			<param>
 				<name>periodLength</name>
 				<type>int</type>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[the period length in days, PERIOD_LENGTH_INFINITE for never ending counters or PERIOD_LENGTH_SYSTEM for the period length defined in <code>portal.properties</code>]]></comment>
 			</param>
 			<return>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[the created activity counter]]></comment>
 			</return>
 			<throws>
 				<name>PortalException</name>
 				<type>com.liferay.portal.kernel.exception.PortalException</type>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[if the group or the previous activity counter could not be found]]></comment>
 			</throws>
 			<throws>
 				<name>SystemException</name>
 				<type>com.liferay.portal.kernel.exception.SystemException</type>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[if a system exception occurred]]></comment>
 			</throws>
 		</method>
 		<method>
 			<name>deleteActivityCounters</name>
-			<comment><![CDATA[]]></comment>
+			<comment><![CDATA[Deletes all counters, limits and settings related to the asset.
+
+<p>
+This method also subtracts the asset's popularity from the owner's contribution points. It also creates a new contribution period if the latest one does not belong to the current period.
+</p>]]></comment>
 			<param>
 				<name>assetEntry</name>
 				<type>com.liferay.portlet.asset.model.AssetEntry</type>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[the asset entry]]></comment>
 			</param>
 			<throws>
 				<name>PortalException</name>
 				<type>com.liferay.portal.kernel.exception.PortalException</type>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[if the new contribution counter could not be created]]></comment>
 			</throws>
 			<throws>
 				<name>SystemException</name>
 				<type>com.liferay.portal.kernel.exception.SystemException</type>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[if a system exception occurred]]></comment>
 			</throws>
 		</method>
 		<method>
 			<name>deleteActivityCounters</name>
-			<comment><![CDATA[]]></comment>
+			<comment><![CDATA[Deletes activity counters for the entity identified by the classNameId and classPK.]]></comment>
 			<param>
 				<name>classNameId</name>
 				<type>long</type>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[the primary key of the entity's class]]></comment>
 			</param>
 			<param>
 				<name>classPK</name>
 				<type>long</type>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[the primary key of the entity]]></comment>
 			</param>
 			<throws>
 				<name>PortalException</name>
 				<type>com.liferay.portal.kernel.exception.PortalException</type>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[if the entity is an asset and its owner's contribution counter could not be updated]]></comment>
 			</throws>
 			<throws>
 				<name>SystemException</name>
 				<type>com.liferay.portal.kernel.exception.SystemException</type>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[if a system exception occurred]]></comment>
 			</throws>
 		</method>
 		<method>
 			<name>deleteActivityCounters</name>
-			<comment><![CDATA[]]></comment>
+			<comment><![CDATA[Deletes activity counters for the entity identified by the className and classPK.]]></comment>
 			<param>
 				<name>className</name>
 				<type>java.lang.String</type>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[the class name of the entity]]></comment>
 			</param>
 			<param>
 				<name>classPK</name>
 				<type>long</type>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[the primary key of the entity]]></comment>
 			</param>
 			<throws>
 				<name>PortalException</name>
 				<type>com.liferay.portal.kernel.exception.PortalException</type>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[if the entity is an asset and its owner's contribution counter could not be updated]]></comment>
 			</throws>
 			<throws>
 				<name>SystemException</name>
 				<type>com.liferay.portal.kernel.exception.SystemException</type>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[if a system exception occurred]]></comment>
 			</throws>
 		</method>
 		<method>
 			<name>disableActivityCounters</name>
-			<comment><![CDATA[]]></comment>
+			<comment><![CDATA[Disables all the counters of an asset.
+
+<p>
+This method is used by the recycle bin to disable all counters of assets put into the recycle bin. It adjusts the owner's contribution score.
+</p>]]></comment>
 			<param>
 				<name>classNameId</name>
 				<type>long</type>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[the primary key of the asset's class]]></comment>
 			</param>
 			<param>
 				<name>classPK</name>
 				<type>long</type>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[the primary key of the asset]]></comment>
 			</param>
 			<throws>
 				<name>PortalException</name>
 				<type>com.liferay.portal.kernel.exception.PortalException</type>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[if the asset owner's contribution counter could not be updated]]></comment>
 			</throws>
 			<throws>
 				<name>SystemException</name>
 				<type>com.liferay.portal.kernel.exception.SystemException</type>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[if a system exception occurred]]></comment>
 			</throws>
 		</method>
 		<method>
 			<name>disableActivityCounters</name>
-			<comment><![CDATA[]]></comment>
+			<comment><![CDATA[Disables all the counters of an asset.
+
+<p>
+This method is used by the recycle bin to disable all counters of assets put into the recycle bin. It adjusts the owner's contribution score.
+</p>]]></comment>
 			<param>
 				<name>className</name>
 				<type>java.lang.String</type>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[the class name of the asset]]></comment>
 			</param>
 			<param>
 				<name>classPK</name>
 				<type>long</type>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[the primary key of the asset]]></comment>
 			</param>
 			<throws>
 				<name>PortalException</name>
 				<type>com.liferay.portal.kernel.exception.PortalException</type>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[if the asset owner's contribution counter could not be updated]]></comment>
 			</throws>
 			<throws>
 				<name>SystemException</name>
 				<type>com.liferay.portal.kernel.exception.SystemException</type>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[if a system exception occurred]]></comment>
 			</throws>
 		</method>
 		<method>
 			<name>enableActivityCounters</name>
-			<comment><![CDATA[]]></comment>
+			<comment><![CDATA[Enables all the counters of an asset.
+
+<p>
+This method is used by the recycle bin to enable all counters of assets restored from the recycle bin. It adjusts the owner's contribution score.
+</p>]]></comment>
 			<param>
 				<name>classNameId</name>
 				<type>long</type>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[the primary key of the asset's class]]></comment>
 			</param>
 			<param>
 				<name>classPK</name>
 				<type>long</type>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[the primary key of the asset]]></comment>
 			</param>
 			<throws>
 				<name>PortalException</name>
 				<type>com.liferay.portal.kernel.exception.PortalException</type>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[if the asset owner's contribution counter could not be updated]]></comment>
 			</throws>
 			<throws>
 				<name>SystemException</name>
 				<type>com.liferay.portal.kernel.exception.SystemException</type>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[if a system exception occurred]]></comment>
 			</throws>
 		</method>
 		<method>
 			<name>enableActivityCounters</name>
-			<comment><![CDATA[]]></comment>
+			<comment><![CDATA[Enables all the counters of an asset.
+
+<p>
+This method is used by the recycle bin to enable all counters of assets restored from the recycle bin. It adjusts the owner's contribution score.
+</p>]]></comment>
 			<param>
 				<name>className</name>
 				<type>java.lang.String</type>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[the class name of the asset]]></comment>
 			</param>
 			<param>
 				<name>classPK</name>
 				<type>long</type>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[the primary key of the asset]]></comment>
 			</param>
 			<throws>
 				<name>PortalException</name>
 				<type>com.liferay.portal.kernel.exception.PortalException</type>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[if the asset owner's contribution counter could not be updated]]></comment>
 			</throws>
 			<throws>
 				<name>SystemException</name>
 				<type>com.liferay.portal.kernel.exception.SystemException</type>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[if a system exception occurred]]></comment>
 			</throws>
 		</method>
 		<method>
 			<name>fetchActivityCounterByEndPeriod</name>
-			<comment><![CDATA[]]></comment>
+			<comment><![CDATA[Returns the activity counters with the given name, owner and end period that belong to the given entity.]]></comment>
 			<param>
 				<name>groupId</name>
 				<type>long</type>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[the primary key of the group]]></comment>
 			</param>
 			<param>
 				<name>classNameId</name>
 				<type>long</type>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[the primary key of the entity's class]]></comment>
 			</param>
 			<param>
 				<name>classPK</name>
 				<type>long</type>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[the primary key of the entity]]></comment>
 			</param>
 			<param>
 				<name>name</name>
 				<type>java.lang.String</type>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[the counter name]]></comment>
 			</param>
 			<param>
 				<name>ownerType</name>
 				<type>int</type>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[the owner type]]></comment>
 			</param>
 			<param>
 				<name>endPeriod</name>
 				<type>int</type>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[the end period, -1 for the latest one]]></comment>
 			</param>
 			<return>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[Returns the activity counters]]></comment>
 			</return>
 			<throws>
 				<name>SystemException</name>
 				<type>com.liferay.portal.kernel.exception.SystemException</type>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[if a system exception occurred]]></comment>
 			</throws>
 		</method>
 		<method>
 			<name>fetchActivityCounterByStartPeriod</name>
-			<comment><![CDATA[]]></comment>
+			<comment><![CDATA[Returns the activity counters with the given name, owner and start period that belong to the given entity.]]></comment>
 			<param>
 				<name>groupId</name>
 				<type>long</type>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[the primary key of the group]]></comment>
 			</param>
 			<param>
 				<name>classNameId</name>
 				<type>long</type>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[the primary key of the entity's class]]></comment>
 			</param>
 			<param>
 				<name>classPK</name>
 				<type>long</type>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[the primary key of the entity]]></comment>
 			</param>
 			<param>
 				<name>name</name>
 				<type>java.lang.String</type>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[the counter name]]></comment>
 			</param>
 			<param>
 				<name>ownerType</name>
 				<type>int</type>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[the owner type]]></comment>
 			</param>
 			<param>
 				<name>startPeriod</name>
 				<type>int</type>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[the start period]]></comment>
 			</param>
 			<return>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[Returns the activity counters]]></comment>
 			</return>
 			<throws>
 				<name>SystemException</name>
 				<type>com.liferay.portal.kernel.exception.SystemException</type>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[if a system exception occurred]]></comment>
 			</throws>
 		</method>
 		<method>
 			<name>fetchLatestActivityCounter</name>
-			<comment><![CDATA[]]></comment>
+			<comment><![CDATA[Returns the latest activity counter with the given name and owner that belong to the given entity.]]></comment>
 			<param>
 				<name>groupId</name>
 				<type>long</type>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[the primary key of the group]]></comment>
 			</param>
 			<param>
 				<name>classNameId</name>
 				<type>long</type>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[the primary key of the entity's class]]></comment>
 			</param>
 			<param>
 				<name>classPK</name>
 				<type>long</type>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[the primary key of the entity]]></comment>
 			</param>
 			<param>
 				<name>name</name>
 				<type>java.lang.String</type>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[the counter name]]></comment>
 			</param>
 			<param>
 				<name>ownerType</name>
 				<type>int</type>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[the owner type]]></comment>
 			</param>
 			<return>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[Returns the activity counter]]></comment>
 			</return>
 			<throws>
 				<name>SystemException</name>
 				<type>com.liferay.portal.kernel.exception.SystemException</type>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[if a system exception occurred]]></comment>
 			</throws>
 		</method>
 		<method>
 			<name>getOffsetActivityCounters</name>
-			<comment><![CDATA[]]></comment>
+			<comment><![CDATA[Returns the activity counters with the given name and period offsets.
+
+<p>
+The start and end offsets can belong to different periods. This method groups the counters by name and returns the sum of their current values.
+</p>]]></comment>
 			<param>
 				<name>groupId</name>
 				<type>long</type>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[the primary key of the group]]></comment>
 			</param>
 			<param>
 				<name>name</name>
 				<type>java.lang.String</type>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[the counter name]]></comment>
 			</param>
 			<param>
 				<name>startOffset</name>
 				<type>int</type>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[the offset for the start period]]></comment>
 			</param>
 			<param>
 				<name>endOffset</name>
 				<type>int</type>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[the offset for the end period]]></comment>
 			</param>
 			<return>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[the activity counters]]></comment>
 			</return>
 			<throws>
 				<name>SystemException</name>
 				<type>com.liferay.portal.kernel.exception.SystemException</type>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[if a system exception occurred]]></comment>
 			</throws>
 		</method>
 		<method>
 			<name>getOffsetDistributionActivityCounters</name>
-			<comment><![CDATA[]]></comment>
+			<comment><![CDATA[Returns the distribution of activity counters with the given name and period offsets.
+
+<p>
+The start and end offsets can belong to different periods. This method groups the counters by their owner entity (usually some asset) and returns a counter for each entity class with the sum of counters' current values.
+</p>]]></comment>
 			<param>
 				<name>groupId</name>
 				<type>long</type>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[the primary key of the group]]></comment>
 			</param>
 			<param>
 				<name>name</name>
 				<type>java.lang.String</type>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[the counter name]]></comment>
 			</param>
 			<param>
 				<name>startOffset</name>
 				<type>int</type>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[the offset for the start period]]></comment>
 			</param>
 			<param>
 				<name>endOffset</name>
 				<type>int</type>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[the offset for the end period]]></comment>
 			</param>
 			<return>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[the activity counters]]></comment>
 			</return>
 			<throws>
 				<name>SystemException</name>
 				<type>com.liferay.portal.kernel.exception.SystemException</type>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[if a system exception occurred]]></comment>
 			</throws>
 		</method>
 		<method>
 			<name>getPeriodActivityCounters</name>
-			<comment><![CDATA[]]></comment>
+			<comment><![CDATA[Returns the activity counters with the given name and time period.
+
+<p>
+The start and end period values can belong to different periods. This method groups the counters by name and returns the sum of their current values.
+</p>]]></comment>
 			<param>
 				<name>groupId</name>
 				<type>long</type>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[the primary key of the group]]></comment>
 			</param>
 			<param>
 				<name>name</name>
 				<type>java.lang.String</type>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[the counter name]]></comment>
 			</param>
 			<param>
 				<name>startPeriod</name>
 				<type>int</type>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[the start period]]></comment>
 			</param>
 			<param>
 				<name>endPeriod</name>
 				<type>int</type>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[the end period]]></comment>
 			</param>
 			<return>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[the activity counters]]></comment>
 			</return>
 			<throws>
 				<name>SystemException</name>
 				<type>com.liferay.portal.kernel.exception.SystemException</type>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[if a system exception occurred]]></comment>
 			</throws>
 		</method>
 		<method>
 			<name>getPeriodDistributionActivityCounters</name>
-			<comment><![CDATA[]]></comment>
+			<comment><![CDATA[Returns the distribution of activity counters with the given name and time period.
+
+<p>
+The start and end period values can belong to different periods. This method groups the counters by their owner entity (usually some asset) and returns a counter for each entity class with the sum of counters' current values.
+</p>]]></comment>
 			<param>
 				<name>groupId</name>
 				<type>long</type>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[the primary key of the group]]></comment>
 			</param>
 			<param>
 				<name>name</name>
 				<type>java.lang.String</type>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[the counter name]]></comment>
 			</param>
 			<param>
 				<name>startPeriod</name>
 				<type>int</type>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[the start period]]></comment>
 			</param>
 			<param>
 				<name>endPeriod</name>
 				<type>int</type>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[the end period]]></comment>
 			</param>
 			<return>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[the activity counters]]></comment>
 			</return>
 			<throws>
 				<name>SystemException</name>
 				<type>com.liferay.portal.kernel.exception.SystemException</type>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[if a system exception occurred]]></comment>
 			</throws>
 		</method>
 		<method>
 			<name>getUserActivityCounters</name>
-			<comment><![CDATA[]]></comment>
+			<comment><![CDATA[Returns a range of tuples that contain users and a list of activity counters.
+
+<p>
+The counters returned for each user are passed to this method in the selectedNames array. The method also accepts an array of counter names that are used to rank the users.
+</p>
+
+<p>
+Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+</p>]]></comment>
 			<param>
 				<name>groupId</name>
 				<type>long</type>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[the primary key of the group]]></comment>
 			</param>
 			<param>
 				<name>rankingNames</name>
 				<type>java.lang.String[]</type>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[the ranking counter names]]></comment>
 			</param>
 			<param>
 				<name>selectedNames</name>
 				<type>java.lang.String[]</type>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[the counter names that will be returned with each user]]></comment>
 			</param>
 			<param>
 				<name>start</name>
 				<type>int</type>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[the lower bound of the range of results]]></comment>
 			</param>
 			<param>
 				<name>end</name>
 				<type>int</type>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[the upper bound of the range of results (not inclusive)]]></comment>
 			</param>
 			<return>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[the range of tuples]]></comment>
 			</return>
 			<throws>
 				<name>SystemException</name>
 				<type>com.liferay.portal.kernel.exception.SystemException</type>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[if a system exception occurred]]></comment>
 			</throws>
 		</method>
 		<method>
 			<name>getUserActivityCountersCount</name>
-			<comment><![CDATA[]]></comment>
+			<comment><![CDATA[Returns the number of users having a rank based on the given counters.]]></comment>
 			<param>
 				<name>groupId</name>
 				<type>long</type>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[the primary key of the group]]></comment>
 			</param>
 			<param>
 				<name>rankingNames</name>
 				<type>java.lang.String[]</type>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[the ranking counter names]]></comment>
 			</param>
 			<return>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[the number of users]]></comment>
 			</return>
 			<throws>
 				<name>SystemException</name>
 				<type>com.liferay.portal.kernel.exception.SystemException</type>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[if a system exception occurred]]></comment>
 			</throws>
 		</method>
 		<method>
 			<name>incrementUserAchievementCounter</name>
-			<comment><![CDATA[]]></comment>
+			<comment><![CDATA[Increments the <code>user.achievements</code> counter for a user.
+
+<p>
+This method should be used by an external achievement class when the users unlocks an achievement.
+</p>]]></comment>
 			<param>
 				<name>userId</name>
 				<type>long</type>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[the primary key of the user]]></comment>
 			</param>
 			<param>
 				<name>groupId</name>
 				<type>long</type>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[the primary key of the group]]></comment>
 			</param>
 			<throws>
 				<name>PortalException</name>
 				<type>com.liferay.portal.kernel.exception.PortalException</type>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[if the group or the previous activity counter could not be found when they should have existed]]></comment>
 			</throws>
 			<throws>
 				<name>SystemException</name>
 				<type>com.liferay.portal.kernel.exception.SystemException</type>
-				<comment><![CDATA[]]></comment>
+				<comment><![CDATA[if a system exception occurred]]></comment>
 			</throws>
 		</method>
 		<method>
