@@ -189,11 +189,11 @@ public class EditEntryAction extends PortletAction {
 			// Add entry
 
 			AnnouncementsEntryServiceUtil.addEntry(
-				themeDisplay.getPlid(), classNameId, classPK, title, content,
-				url, type, displayDateMonth, displayDateDay, displayDateYear,
-				displayDateHour, displayDateMinute, expirationDateMonth,
-				expirationDateDay, expirationDateYear, expirationDateHour,
-				expirationDateMinute, priority, alert);
+				themeDisplay.getScopeGroupId(), classNameId, classPK, title,
+				content, url, type, displayDateMonth, displayDateDay,
+				displayDateYear, displayDateHour, displayDateMinute,
+				expirationDateMonth, expirationDateDay, expirationDateYear,
+				expirationDateHour, expirationDateMinute, priority, alert);
 		}
 		else {
 

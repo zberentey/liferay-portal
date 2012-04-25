@@ -66,7 +66,7 @@ import java.rmi.RemoteException;
  */
 public class AnnouncementsEntryServiceSoap {
 	public static com.liferay.portlet.announcements.model.AnnouncementsEntrySoap addEntry(
-		long plid, long classNameId, long classPK, java.lang.String title,
+		long groupId, long classNameId, long classPK, java.lang.String title,
 		java.lang.String content, java.lang.String url, java.lang.String type,
 		int displayDateMonth, int displayDateDay, int displayDateYear,
 		int displayDateHour, int displayDateMinute, int expirationDateMonth,
@@ -75,7 +75,7 @@ public class AnnouncementsEntryServiceSoap {
 		throws RemoteException {
 		try {
 			com.liferay.portlet.announcements.model.AnnouncementsEntry returnValue =
-				AnnouncementsEntryServiceUtil.addEntry(plid, classNameId,
+				AnnouncementsEntryServiceUtil.addEntry(groupId, classNameId,
 					classPK, title, content, url, type, displayDateMonth,
 					displayDateDay, displayDateYear, displayDateHour,
 					displayDateMinute, expirationDateMonth, expirationDateDay,

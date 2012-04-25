@@ -25,14 +25,13 @@ import com.liferay.portal.security.permission.ActionKeys;
 import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portal.service.permission.GroupPermissionUtil;
 import com.liferay.portal.service.permission.OrganizationPermissionUtil;
-import com.liferay.portal.service.permission.PortletPermissionUtil;
 import com.liferay.portal.service.permission.RolePermissionUtil;
 import com.liferay.portal.service.permission.UserGroupPermissionUtil;
 import com.liferay.portal.util.PortalUtil;
-import com.liferay.portal.util.PortletKeys;
 import com.liferay.portlet.announcements.model.AnnouncementsEntry;
 import com.liferay.portlet.announcements.service.base.AnnouncementsEntryServiceBaseImpl;
 import com.liferay.portlet.announcements.service.permission.AnnouncementsEntryPermission;
+import com.liferay.portlet.announcements.service.permission.AnnouncementsPermission;
 
 /**
  * @author Brian Wing Shun Chan
@@ -41,7 +40,7 @@ public class AnnouncementsEntryServiceImpl
 	extends AnnouncementsEntryServiceBaseImpl {
 
 	public AnnouncementsEntry addEntry(
-			long plid, long classNameId, long classPK, String title,
+			long groupId, long classNameId, long classPK, String title,
 			String content, String url, String type, int displayDateMonth,
 			int displayDateDay, int displayDateYear, int displayDateHour,
 			int displayDateMinute, int expirationDateMonth,
@@ -52,9 +51,8 @@ public class AnnouncementsEntryServiceImpl
 
 		PermissionChecker permissionChecker = getPermissionChecker();
 
-		PortletPermissionUtil.check(
-			permissionChecker, plid, PortletKeys.ANNOUNCEMENTS,
-			ActionKeys.ADD_ENTRY);
+		AnnouncementsPermission.check(
+			permissionChecker, groupId, ActionKeys.ADD_ENTRY);
 
 		if (classNameId == 0) {
 			if (!permissionChecker.isOmniadmin()) {
