@@ -63,9 +63,9 @@ import java.util.Map;
  * provides methods for querying activity counters within a time period.
  *
  * <p>
- * Under normal circumstances only the <i>add-</i> method with the social
- * activity as its only parameter should be called directly and even that is
- * usually not necessary as it is automatically called by the social activity
+ * Under normal circumstances only the {@link
+ * #addActivityCounters(SocialActivity)} should be called directly and even that
+ * is usually not necessary as it is automatically called by the social activity
  * service.
  * </p>
  *
@@ -76,7 +76,7 @@ public class SocialActivityCounterLocalServiceImpl
 	extends SocialActivityCounterLocalServiceBaseImpl {
 
 	/**
-	 * Adds an activity counter into the database.
+	 * Adds an activity counter with a default period length.
 	 *
 	 * <p>
 	 * This method uses the lock service to guard against multiple threads
@@ -89,17 +89,17 @@ public class SocialActivityCounterLocalServiceImpl
 	 * @param  classNameId the primary key of the entity's class this counter
 	 *         belongs to
 	 * @param  classPK the primary key of the entity this counter belongs to
-	 * @param  name the counter name
-	 * @param  ownerType the owner type of the counter, acceptable values are
-	 *         TYPE_ACTOR, TYPE_ASSET and TYPE_CREATOR defined in
-	 *         <code>SocialActivityCounterConstants</code>
-	 * @param  currentValue the current value of the counter (optionally
+	 * @param  name the counter's name
+	 * @param  ownerType the counter's owner type. Acceptable values are
+	 *         <code>TYPE_ACTOR</code>, <code>TYPE_ASSET</code> and
+	 *         <code>TYPE_CREATOR</code> defined in {@link
+	 *         com.liferay.portlet.social.model.SocialActivityCounterConstants}.
+	 * @param  currentValue the counter's current value (optionally
 	 *         <code>0</code>)
-	 * @param  totalValue the total value of the counter (optionally
-	 *         <code>0</code>)
-	 * @param  startPeriod the start period of the counter
-	 * @param  endPeriod end period of the counter
-	 * @return the created activity counter
+	 * @param  totalValue the counter's total value (optionally <code>0</code>)
+	 * @param  startPeriod the counter's start period
+	 * @param  endPeriod the counter's end period
+	 * @return the added activity counter
 	 * @throws PortalException if the group or the previous activity counter
 	 *         could not be found
 	 * @throws SystemException if a system exception occurred
@@ -116,7 +116,8 @@ public class SocialActivityCounterLocalServiceImpl
 	}
 
 	/**
-	 * Adds an activity counter into the database.
+	 * Adds an activity counter specifying a previous activity and period
+	 * length.
 	 *
 	 * <p>
 	 * This method uses the lock service to guard against multiple threads
@@ -130,22 +131,25 @@ public class SocialActivityCounterLocalServiceImpl
 	 *         belongs to
 	 * @param  classPK the primary key of the entity this counter belongs to
 	 * @param  name the counter name
-	 * @param  ownerType the owner type of the counter, acceptable values are
-	 *         TYPE_ACTOR, TYPE_ASSET and TYPE_CREATOR defined in
-	 *         <code>SocialActivityCounterConstants</code>
+	 * @param  ownerType the counter's owner type. Acceptable values are
+	 *         <code>TYPE_ACTOR</code>, <code>TYPE_ASSET</code> and
+	 *         <code>TYPE_CREATOR</code> defined in {@link
+	 *         com.liferay.portlet.social.model.SocialActivityCounterConstants}.
 	 * @param  currentValue the current value of the counter (optionally
 	 *         <code>0</code>)
-	 * @param  totalValue the total value of the counter (optionally
-	 *         <code>0</code>)
-	 * @param  startPeriod the start period of the counter
-	 * @param  endPeriod end period of the counter
+	 * @param  totalValue the counter's total value (optionally <code>0</code>)
+	 * @param  startPeriod the counter's start period
+	 * @param  endPeriod the counter's end period
 	 * @param  previousActivityCounterId the primary key of the activity counter
 	 *         for the previous time period (optionally <code>0</code>, if this
 	 *         is the first)
-	 * @param  periodLength the period length in days, PERIOD_LENGTH_INFINITE
-	 *         for never ending counters or PERIOD_LENGTH_SYSTEM for the period
-	 *         length defined in <code>portal.properties</code>
-	 * @return the created activity counter
+	 * @param  periodLength the period length in days,
+	 *         <code>PERIOD_LENGTH_INFINITE</code> for never ending counters or
+	 *         <code>PERIOD_LENGTH_SYSTEM</code> for the period length defined
+	 *         in <code>portal-ext.properties</code>. For more information see
+	 *         {@link
+	 *         com.liferay.portlet.social.model.SocialActivityCounterConstants}.
+	 * @return the added activity counter
 	 * @throws PortalException if the group or the previous activity counter
 	 *         could not be found
 	 * @throws SystemException if a system exception occurred
@@ -256,16 +260,17 @@ public class SocialActivityCounterLocalServiceImpl
 	 * </p>
 	 *
 	 * <p>
-	 * This method first calls the activity processor class if there is one
-	 * defined for the activity, then checks for limits and increments all the
-	 * counters that belong to the activity. Afterwards it calls the achievement
-	 * class if there is one and lastly increments the built-in
-	 * </code>user.activities</code> and <code>asset.activities</code> counter.
+	 * This method first calls the activity processor class, if there is one
+	 * defined for the activity, checks for limits and increments all the
+	 * counters that belong to the activity. Afterwards, it processes the
+	 * activity with respect to achievement TODO classes, if any. Lastly it
+	 * increments the built-in <code>user.activities</code> and
+	 * <code>asset.activities</code> counters.
 	 * </p>
 	 *
 	 * @param  activity the social activity
-	 * @throws PortalException if the group or previous activity counters could
-	 *         not be found when they should have existed
+	 * @throws PortalException if an expected group or expected previous
+	 *         activity counters could not be found
 	 * @throws SystemException if a system exception occurred
 	 */
 	public void addActivityCounters(SocialActivity activity)
@@ -340,24 +345,26 @@ public class SocialActivityCounterLocalServiceImpl
 	}
 
 	/**
-	 * Adds an activity counter into the database.
+	 * Creates an activity counter with a default period length, adding it into
+	 * the database.
 	 *
 	 * @param      groupId the primary key of the group
 	 * @param      classNameId the primary key of the entity's class this
 	 *             counter belongs to
 	 * @param      classPK the primary key of the entity this counter belongs to
-	 * @param      name the counter name
-	 * @param      ownerType the owner type of the counter, acceptable values
-	 *             are TYPE_ACTOR, TYPE_ASSET and TYPE_CREATOR defined in
-	 *             <code>SocialActivityCounterConstants</code>
-	 * @param      currentValue the current value of the counter (optionally
+	 * @param      name the counter's name
+	 * @param      ownerType the counter's owner type. Acceptable values are
+	 *             <code>TYPE_ACTOR</code>, <code>TYPE_ASSET</code> and
+	 *             <code>TYPE_CREATOR</code> defined in {@link
+	 *             com.liferay.portlet.social.model.SocialActivityCounterConstants}.
+	 * @param      currentValue the counter's current value (optionally
 	 *             <code>0</code>)
-	 * @param      totalValue the total value of the counter (optionally
+	 * @param      totalValue the counter's total value (optionally
 	 *             <code>0</code>)
-	 * @param      startPeriod the start period of the counter
-	 * @param      endPeriod end period of the counter
+	 * @param      startPeriod the counter's start period
+	 * @param      endPeriod the counter's end period
 	 * @return     the created activity counter
-	 * @throws     PortalException if the group or the previous activity counter
+	 * @throws     PortalException if the group or a previous activity counter
 	 *             could not be found
 	 * @throws     SystemException if a system exception occurred
 	 * @deprecated {@link #createActivityCounter(long, long, long, String, int,
@@ -376,34 +383,37 @@ public class SocialActivityCounterLocalServiceImpl
 	}
 
 	/**
-	 * Adds an activity counter into the database.
+	 * Creates an activity counter, adding it into the database.
 	 *
 	 * <p>
-	 * This is the method the actually creates the counter in the database. It
-	 * requires a new transaction so that other threads can find the new counter
-	 * when the lock in the calling method is released.
+	 * This method actually creates the counter in the database. It requires a
+	 * new transaction so that other threads can find the new counter when the
+	 * lock in the calling method is released.
 	 * </p>
 	 *
 	 * @param  groupId the primary key of the group
 	 * @param  classNameId the primary key of the entity's class this counter
 	 *         belongs to
 	 * @param  classPK the primary key of the entity this counter belongs to
-	 * @param  name the counter name
-	 * @param  ownerType the owner type of the counter, acceptable values are
-	 *         TYPE_ACTOR, TYPE_ASSET and TYPE_CREATOR defined in
-	 *         <code>SocialActivityCounterConstants</code>
-	 * @param  currentValue the current value of the counter (optionally
+	 * @param  name the counter's name
+	 * @param  ownerType the counter's owner type. Acceptable values are
+	 *         <code>TYPE_ACTOR</code>, <code>TYPE_ASSET</code> and
+	 *         <code>TYPE_CREATOR</code> defined in {@link
+	 *         com.liferay.portlet.social.model.SocialActivityCounterConstants}.
+	 * @param  currentValue the counter's current value (optionally
 	 *         <code>0</code>)
-	 * @param  totalValue the total value of the counter (optionally
+	 * @param  totalValue the counter's total value of the counter (optionally
 	 *         <code>0</code>)
-	 * @param  startPeriod the start period of the counter
-	 * @param  endPeriod end period of the counter
+	 * @param  startPeriod the counter's start period
+	 * @param  endPeriod the counter's end period
 	 * @param  previousActivityCounterId the primary key of the activity counter
 	 *         for the previous time period (optionally <code>0</code>, if this
 	 *         is the first)
-	 * @param  periodLength the period length in days, PERIOD_LENGTH_INFINITE
-	 *         for never ending counters or PERIOD_LENGTH_SYSTEM for the period
-	 *         length defined in <code>portal.properties</code>
+	 * @param  periodLength the period length in days,
+	 *         <code>PERIOD_LENGTH_INFINITE</code> for never ending counters or
+	 *         <code>PERIOD_LENGTH_SYSTEM</code> for the period length defined
+	 *         in <code>portal-ext.properties</code>. For more information see
+	 *         {@link com.liferay.portlet.social.model.SocialActivityConstants}.
 	 * @return the created activity counter
 	 * @throws PortalException if the group or the previous activity counter
 	 *         could not be found
@@ -471,10 +481,10 @@ public class SocialActivityCounterLocalServiceImpl
 	}
 
 	/**
-	 * Deletes all counters, limits and settings related to the asset.
+	 * Deletes all activity counters, limits, and settings related to the asset.
 	 *
 	 * <p>
-	 * This method also subtracts the asset's popularity from the owner's
+	 * This method subtracts the asset's popularity from the owner's
 	 * contribution points. It also creates a new contribution period if the
 	 * latest one does not belong to the current period.
 	 * </p>
@@ -506,8 +516,8 @@ public class SocialActivityCounterLocalServiceImpl
 	}
 
 	/**
-	 * Deletes activity counters for the entity identified by the classNameId
-	 * and classPK.
+	 * Deletes all activity counters, limits, and settings related to the entity
+	 * identified by the class name ID and class primary key.
 	 *
 	 * @param  classNameId the primary key of the entity's class
 	 * @param  classPK the primary key of the entity
@@ -536,10 +546,10 @@ public class SocialActivityCounterLocalServiceImpl
 	}
 
 	/**
-	 * Deletes activity counters for the entity identified by the className and
-	 * classPK.
+	 * Deletes all activity counters for the entity identified by the class name
+	 * and class primary key.
 	 *
-	 * @param  className the class name of the entity
+	 * @param  className the entity's class name
 	 * @param  classPK the primary key of the entity
 	 * @throws PortalException if the entity is an asset and its owner's
 	 *         contribution counter could not be updated
@@ -566,7 +576,8 @@ public class SocialActivityCounterLocalServiceImpl
 	}
 
 	/**
-	 * Disables all the counters of an asset.
+	 * Disables all the counters of an asset identified by the class name ID and
+	 * class primary key.
 	 *
 	 * <p>
 	 * This method is used by the recycle bin to disable all counters of assets
@@ -588,14 +599,15 @@ public class SocialActivityCounterLocalServiceImpl
 	}
 
 	/**
-	 * Disables all the counters of an asset.
+	 * Disables all the counters of an asset identified by the class name and
+	 * class primary key.
 	 *
 	 * <p>
 	 * This method is used by the recycle bin to disable all counters of assets
 	 * put into the recycle bin. It adjusts the owner's contribution score.
 	 * </p>
 	 *
-	 * @param  className the class name of the asset
+	 * @param  className the asset's class name
 	 * @param  classPK the primary key of the asset
 	 * @throws PortalException if the asset owner's contribution counter could
 	 *         not be updated
@@ -629,7 +641,8 @@ public class SocialActivityCounterLocalServiceImpl
 	}
 
 	/**
-	 * Enables all the counters of an asset.
+	 * Enables all activity counters of an asset identified by the class name ID
+	 * and class primary key.
 	 *
 	 * <p>
 	 * This method is used by the recycle bin to enable all counters of assets
@@ -651,14 +664,15 @@ public class SocialActivityCounterLocalServiceImpl
 	}
 
 	/**
-	 * Enables all the counters of an asset.
+	 * Enables all the counters of an asset identified by the class name and
+	 * class primary key.
 	 *
 	 * <p>
 	 * This method is used by the recycle bin to enable all counters of assets
 	 * restored from the recycle bin. It adjusts the owner's contribution score.
 	 * </p>
 	 *
-	 * @param  className the class name of the asset
+	 * @param  className the asset's class name
 	 * @param  classPK the primary key of the asset
 	 * @throws PortalException if the asset owner's contribution counter could
 	 *         not be updated
@@ -692,7 +706,7 @@ public class SocialActivityCounterLocalServiceImpl
 	}
 
 	/**
-	 * Returns the activity counters with the given name, owner and end period
+	 * Returns the activity counter with the given name, owner, and end period
 	 * that belong to the given entity.
 	 *
 	 * @param  groupId the primary key of the group
@@ -700,8 +714,8 @@ public class SocialActivityCounterLocalServiceImpl
 	 * @param  classPK the primary key of the entity
 	 * @param  name the counter name
 	 * @param  ownerType the owner type
-	 * @param  endPeriod the end period, -1 for the latest one
-	 * @return Returns the activity counters
+	 * @param  endPeriod the end period, <code>-1</code> for the latest one
+	 * @return the matching activity counter
 	 * @throws SystemException if a system exception occurred
 	 */
 	public SocialActivityCounter fetchActivityCounterByEndPeriod(
@@ -714,7 +728,7 @@ public class SocialActivityCounterLocalServiceImpl
 	}
 
 	/**
-	 * Returns the activity counters with the given name, owner and start period
+	 * Returns the activity counter with the given name, owner, and start period
 	 * that belong to the given entity.
 	 *
 	 * @param  groupId the primary key of the group
@@ -723,7 +737,7 @@ public class SocialActivityCounterLocalServiceImpl
 	 * @param  name the counter name
 	 * @param  ownerType the owner type
 	 * @param  startPeriod the start period
-	 * @return Returns the activity counters
+	 * @return the matching activity counter
 	 * @throws SystemException if a system exception occurred
 	 */
 	public SocialActivityCounter fetchActivityCounterByStartPeriod(
@@ -744,7 +758,7 @@ public class SocialActivityCounterLocalServiceImpl
 	 * @param  classPK the primary key of the entity
 	 * @param  name the counter name
 	 * @param  ownerType the owner type
-	 * @return Returns the activity counter
+	 * @return the matching activity counter
 	 * @throws SystemException if a system exception occurred
 	 */
 	public SocialActivityCounter fetchLatestActivityCounter(
@@ -758,7 +772,7 @@ public class SocialActivityCounterLocalServiceImpl
 	}
 
 	/**
-	 * Returns the activity counters with the given name and period offsets.
+	 * Returns all the activity counters with the given name and period offsets.
 	 *
 	 * <p>
 	 * The start and end offsets can belong to different periods. This method
@@ -769,7 +783,7 @@ public class SocialActivityCounterLocalServiceImpl
 	 * @param  name the counter name
 	 * @param  startOffset the offset for the start period
 	 * @param  endOffset the offset for the end period
-	 * @return the activity counters
+	 * @return the matching activity counters
 	 * @throws SystemException if a system exception occurred
 	 */
 	public List<SocialActivityCounter> getOffsetActivityCounters(
@@ -783,21 +797,21 @@ public class SocialActivityCounterLocalServiceImpl
 	}
 
 	/**
-	 * Returns the distribution of activity counters with the given name and
+	 * Returns the distribution of the activity counters with the given name and
 	 * period offsets.
 	 *
 	 * <p>
 	 * The start and end offsets can belong to different periods. This method
 	 * groups the counters by their owner entity (usually some asset) and
-	 * returns a counter for each entity class with the sum of counters' current
-	 * values.
+	 * returns a counter for each entity class with the sum of the counters'
+	 * current values.
 	 * </p>
 	 *
 	 * @param  groupId the primary key of the group
 	 * @param  name the counter name
 	 * @param  startOffset the offset for the start period
 	 * @param  endOffset the offset for the end period
-	 * @return the activity counters
+	 * @return the distribution of matching activity counters
 	 * @throws SystemException if a system exception occurred
 	 */
 	public List<SocialActivityCounter> getOffsetDistributionActivityCounters(
@@ -812,7 +826,7 @@ public class SocialActivityCounterLocalServiceImpl
 	}
 
 	/**
-	 * Returns the activity counters with the given name and time period.
+	 * Returns all the activity counters with the given name and time period.
 	 *
 	 * <p>
 	 * The start and end period values can belong to different periods. This
@@ -824,7 +838,7 @@ public class SocialActivityCounterLocalServiceImpl
 	 * @param  name the counter name
 	 * @param  startPeriod the start period
 	 * @param  endPeriod the end period
-	 * @return the activity counters
+	 * @return the matching activity counters
 	 * @throws SystemException if a system exception occurred
 	 */
 	public List<SocialActivityCounter> getPeriodActivityCounters(
@@ -846,15 +860,15 @@ public class SocialActivityCounterLocalServiceImpl
 	 * <p>
 	 * The start and end period values can belong to different periods. This
 	 * method groups the counters by their owner entity (usually some asset) and
-	 * returns a counter for each entity class with the sum of counters' current
-	 * values.
+	 * returns a counter for each entity class with the sum of the counters'
+	 * current values.
 	 * </p>
 	 *
 	 * @param  groupId the primary key of the group
 	 * @param  name the counter name
 	 * @param  startPeriod the start period
 	 * @param  endPeriod the end period
-	 * @return the activity counters
+	 * @return the distribution of matching activity counters
 	 * @throws SystemException if a system exception occurred
 	 */
 	public List<SocialActivityCounter> getPeriodDistributionActivityCounters(
@@ -870,7 +884,7 @@ public class SocialActivityCounterLocalServiceImpl
 	}
 
 	/**
-	 * Returns a range of tuples that contain users and a list of activity
+	 * Returns the range of tuples that contain users and a list of activity
 	 * counters.
 	 *
 	 * <p>
@@ -895,7 +909,7 @@ public class SocialActivityCounterLocalServiceImpl
 	 *         user
 	 * @param  start the lower bound of the range of results
 	 * @param  end the upper bound of the range of results (not inclusive)
-	 * @return the range of tuples
+	 * @return the range of matching tuples
 	 * @throws SystemException if a system exception occurred
 	 */
 	public List<Tuple> getUserActivityCounters(
@@ -951,7 +965,7 @@ public class SocialActivityCounterLocalServiceImpl
 	 *
 	 * @param  groupId the primary key of the group
 	 * @param  rankingNames the ranking counter names
-	 * @return the number of users
+	 * @return the number of matching users
 	 * @throws SystemException if a system exception occurred
 	 */
 	public int getUserActivityCountersCount(long groupId, String[] rankingNames)
@@ -971,8 +985,8 @@ public class SocialActivityCounterLocalServiceImpl
 	 *
 	 * @param  userId the primary key of the user
 	 * @param  groupId the primary key of the group
-	 * @throws PortalException if the group or the previous activity counter
-	 *         could not be found when they should have existed
+	 * @throws PortalException if the group or an expected previous activity
+	 *         counter could not be found
 	 * @throws SystemException if a system exception occurred
 	 */
 	public void incrementUserAchievementCounter(long userId, long groupId)

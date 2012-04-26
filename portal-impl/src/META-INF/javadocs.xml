@@ -115591,13 +115591,13 @@ Due to legacy code, the names of some file entry properties are not intuitive. E
 		<comment><![CDATA[The social activity counter local service. This service is responsible for creating and/or incrementing counters in response to an activity. It also provides methods for querying activity counters within a time period.
 
 <p>
-Under normal circumstances only the <i>add-</i> method with the social activity as its only parameter should be called directly and even that is usually not necessary as it is automatically called by the social activity service.
+Under normal circumstances only the {@link #addActivityCounters(SocialActivity)} should be called directly and even that is usually not necessary as it is automatically called by the social activity service.
 </p>]]></comment>
 		<author><![CDATA[Zsolt Berentey]]></author>
 		<author><![CDATA[Shuyang Zhou]]></author>
 		<method>
 			<name>addActivityCounter</name>
-			<comment><![CDATA[Adds an activity counter into the database.
+			<comment><![CDATA[Adds an activity counter with a default period length.
 
 <p>
 This method uses the lock service to guard against multiple threads trying to insert the same counter because this service is called asynchronously from the social activity service, this method must , so it is using the lock service for that.
@@ -115620,35 +115620,35 @@ This method uses the lock service to guard against multiple threads trying to in
 			<param>
 				<name>name</name>
 				<type>java.lang.String</type>
-				<comment><![CDATA[the counter name]]></comment>
+				<comment><![CDATA[the counter's name]]></comment>
 			</param>
 			<param>
 				<name>ownerType</name>
 				<type>int</type>
-				<comment><![CDATA[the owner type of the counter, acceptable values are TYPE_ACTOR, TYPE_ASSET and TYPE_CREATOR defined in <code>SocialActivityCounterConstants</code>]]></comment>
+				<comment><![CDATA[the counter's owner type. Acceptable values are <code>TYPE_ACTOR</code>, <code>TYPE_ASSET</code> and <code>TYPE_CREATOR</code> defined in {@link com.liferay.portlet.social.model.SocialActivityCounterConstants}.]]></comment>
 			</param>
 			<param>
 				<name>currentValue</name>
 				<type>int</type>
-				<comment><![CDATA[the current value of the counter (optionally <code>0</code>)]]></comment>
+				<comment><![CDATA[the counter's current value (optionally <code>0</code>)]]></comment>
 			</param>
 			<param>
 				<name>totalValue</name>
 				<type>int</type>
-				<comment><![CDATA[the total value of the counter (optionally <code>0</code>)]]></comment>
+				<comment><![CDATA[the counter's total value (optionally <code>0</code>)]]></comment>
 			</param>
 			<param>
 				<name>startPeriod</name>
 				<type>int</type>
-				<comment><![CDATA[the start period of the counter]]></comment>
+				<comment><![CDATA[the counter's start period]]></comment>
 			</param>
 			<param>
 				<name>endPeriod</name>
 				<type>int</type>
-				<comment><![CDATA[end period of the counter]]></comment>
+				<comment><![CDATA[the counter's end period]]></comment>
 			</param>
 			<return>
-				<comment><![CDATA[the created activity counter]]></comment>
+				<comment><![CDATA[the added activity counter]]></comment>
 			</return>
 			<throws>
 				<name>PortalException</name>
@@ -115663,7 +115663,7 @@ This method uses the lock service to guard against multiple threads trying to in
 		</method>
 		<method>
 			<name>addActivityCounter</name>
-			<comment><![CDATA[Adds an activity counter into the database.
+			<comment><![CDATA[Adds an activity counter specifying a previous activity and period length.
 
 <p>
 This method uses the lock service to guard against multiple threads trying to insert the same counter because this service is called asynchronously from the social activity service, this method must , so it is using the lock service for that.
@@ -115691,7 +115691,7 @@ This method uses the lock service to guard against multiple threads trying to in
 			<param>
 				<name>ownerType</name>
 				<type>int</type>
-				<comment><![CDATA[the owner type of the counter, acceptable values are TYPE_ACTOR, TYPE_ASSET and TYPE_CREATOR defined in <code>SocialActivityCounterConstants</code>]]></comment>
+				<comment><![CDATA[the counter's owner type. Acceptable values are <code>TYPE_ACTOR</code>, <code>TYPE_ASSET</code> and <code>TYPE_CREATOR</code> defined in {@link com.liferay.portlet.social.model.SocialActivityCounterConstants}.]]></comment>
 			</param>
 			<param>
 				<name>currentValue</name>
@@ -115701,17 +115701,17 @@ This method uses the lock service to guard against multiple threads trying to in
 			<param>
 				<name>totalValue</name>
 				<type>int</type>
-				<comment><![CDATA[the total value of the counter (optionally <code>0</code>)]]></comment>
+				<comment><![CDATA[the counter's total value (optionally <code>0</code>)]]></comment>
 			</param>
 			<param>
 				<name>startPeriod</name>
 				<type>int</type>
-				<comment><![CDATA[the start period of the counter]]></comment>
+				<comment><![CDATA[the counter's start period]]></comment>
 			</param>
 			<param>
 				<name>endPeriod</name>
 				<type>int</type>
-				<comment><![CDATA[end period of the counter]]></comment>
+				<comment><![CDATA[the counter's end period]]></comment>
 			</param>
 			<param>
 				<name>previousActivityCounterId</name>
@@ -115721,10 +115721,10 @@ This method uses the lock service to guard against multiple threads trying to in
 			<param>
 				<name>periodLength</name>
 				<type>int</type>
-				<comment><![CDATA[the period length in days, PERIOD_LENGTH_INFINITE for never ending counters or PERIOD_LENGTH_SYSTEM for the period length defined in <code>portal.properties</code>]]></comment>
+				<comment><![CDATA[the period length in days, <code>PERIOD_LENGTH_INFINITE</code> for never ending counters or <code>PERIOD_LENGTH_SYSTEM</code> for the period length defined in <code>portal-ext.properties</code>. For more information see {@link com.liferay.portlet.social.model.SocialActivityCounterConstants}.]]></comment>
 			</param>
 			<return>
-				<comment><![CDATA[the created activity counter]]></comment>
+				<comment><![CDATA[the added activity counter]]></comment>
 			</return>
 			<throws>
 				<name>PortalException</name>
@@ -115742,12 +115742,14 @@ This method uses the lock service to guard against multiple threads trying to in
 			<comment><![CDATA[Adds or increments activity counters related to an activity.
 
 </p>
-This method is called asynchronously from the social activity service when
-the user performs an activity defined in </code>liferay-social.xml</code>.
+This method is called asynchronously from the social activity service
+when
+the user performs an activity defined in
+</code>liferay-social.xml</code>.
 </p>
 
 <p>
-This method first calls the activity processor class if there is one defined for the activity, then checks for limits and increments all the counters that belong to the activity. Afterwards it calls the achievement class if there is one and lastly increments the built-in </code>user.activities</code> and <code>asset.activities</code> counter.
+This method first calls the activity processor class, if there is one defined for the activity, checks for limits and increments all the counters that belong to the activity. Afterwards, it processes the activity with respect to achievement TODO classes, if any. Lastly it increments the built-in <code>user.activities</code> and <code>asset.activities</code> counters.
 </p>]]></comment>
 			<param>
 				<name>activity</name>
@@ -115757,7 +115759,7 @@ This method first calls the activity processor class if there is one defined for
 			<throws>
 				<name>PortalException</name>
 				<type>com.liferay.portal.kernel.exception.PortalException</type>
-				<comment><![CDATA[if the group or previous activity counters could not be found when they should have existed]]></comment>
+				<comment><![CDATA[if an expected group or expected previous activity counters could not be found]]></comment>
 			</throws>
 			<throws>
 				<name>SystemException</name>
@@ -115767,7 +115769,7 @@ This method first calls the activity processor class if there is one defined for
 		</method>
 		<method>
 			<name>createActivityCounter</name>
-			<comment><![CDATA[Adds an activity counter into the database.]]></comment>
+			<comment><![CDATA[Creates an activity counter with a default period length, adding it into the database.]]></comment>
 			<param>
 				<name>groupId</name>
 				<type>long</type>
@@ -115786,32 +115788,32 @@ This method first calls the activity processor class if there is one defined for
 			<param>
 				<name>name</name>
 				<type>java.lang.String</type>
-				<comment><![CDATA[the counter name]]></comment>
+				<comment><![CDATA[the counter's name]]></comment>
 			</param>
 			<param>
 				<name>ownerType</name>
 				<type>int</type>
-				<comment><![CDATA[the owner type of the counter, acceptable values are TYPE_ACTOR, TYPE_ASSET and TYPE_CREATOR defined in <code>SocialActivityCounterConstants</code>]]></comment>
+				<comment><![CDATA[the counter's owner type. Acceptable values are <code>TYPE_ACTOR</code>, <code>TYPE_ASSET</code> and <code>TYPE_CREATOR</code> defined in {@link com.liferay.portlet.social.model.SocialActivityCounterConstants}.]]></comment>
 			</param>
 			<param>
 				<name>currentValue</name>
 				<type>int</type>
-				<comment><![CDATA[the current value of the counter (optionally <code>0</code>)]]></comment>
+				<comment><![CDATA[the counter's current value (optionally <code>0</code>)]]></comment>
 			</param>
 			<param>
 				<name>totalValue</name>
 				<type>int</type>
-				<comment><![CDATA[the total value of the counter (optionally <code>0</code>)]]></comment>
+				<comment><![CDATA[the counter's total value (optionally <code>0</code>)]]></comment>
 			</param>
 			<param>
 				<name>startPeriod</name>
 				<type>int</type>
-				<comment><![CDATA[the start period of the counter]]></comment>
+				<comment><![CDATA[the counter's start period]]></comment>
 			</param>
 			<param>
 				<name>endPeriod</name>
 				<type>int</type>
-				<comment><![CDATA[end period of the counter]]></comment>
+				<comment><![CDATA[the counter's end period]]></comment>
 			</param>
 			<return>
 				<comment><![CDATA[the created activity counter]]></comment>
@@ -115819,7 +115821,7 @@ This method first calls the activity processor class if there is one defined for
 			<throws>
 				<name>PortalException</name>
 				<type>com.liferay.portal.kernel.exception.PortalException</type>
-				<comment><![CDATA[if the group or the previous activity counter could not be found]]></comment>
+				<comment><![CDATA[if the group or a previous activity counter could not be found]]></comment>
 			</throws>
 			<throws>
 				<name>SystemException</name>
@@ -115830,10 +115832,10 @@ This method first calls the activity processor class if there is one defined for
 		</method>
 		<method>
 			<name>createActivityCounter</name>
-			<comment><![CDATA[Adds an activity counter into the database.
+			<comment><![CDATA[Creates an activity counter, adding it into the database.
 
 <p>
-This is the method the actually creates the counter in the database. It requires a new transaction so that other threads can find the new counter when the lock in the calling method is released.
+This method actually creates the counter in the database. It requires a new transaction so that other threads can find the new counter when the lock in the calling method is released.
 </p>]]></comment>
 			<param>
 				<name>groupId</name>
@@ -115853,32 +115855,32 @@ This is the method the actually creates the counter in the database. It requires
 			<param>
 				<name>name</name>
 				<type>java.lang.String</type>
-				<comment><![CDATA[the counter name]]></comment>
+				<comment><![CDATA[the counter's name]]></comment>
 			</param>
 			<param>
 				<name>ownerType</name>
 				<type>int</type>
-				<comment><![CDATA[the owner type of the counter, acceptable values are TYPE_ACTOR, TYPE_ASSET and TYPE_CREATOR defined in <code>SocialActivityCounterConstants</code>]]></comment>
+				<comment><![CDATA[the counter's owner type. Acceptable values are <code>TYPE_ACTOR</code>, <code>TYPE_ASSET</code> and <code>TYPE_CREATOR</code> defined in {@link com.liferay.portlet.social.model.SocialActivityCounterConstants}.]]></comment>
 			</param>
 			<param>
 				<name>currentValue</name>
 				<type>int</type>
-				<comment><![CDATA[the current value of the counter (optionally <code>0</code>)]]></comment>
+				<comment><![CDATA[the counter's current value (optionally <code>0</code>)]]></comment>
 			</param>
 			<param>
 				<name>totalValue</name>
 				<type>int</type>
-				<comment><![CDATA[the total value of the counter (optionally <code>0</code>)]]></comment>
+				<comment><![CDATA[the counter's total value of the counter (optionally <code>0</code>)]]></comment>
 			</param>
 			<param>
 				<name>startPeriod</name>
 				<type>int</type>
-				<comment><![CDATA[the start period of the counter]]></comment>
+				<comment><![CDATA[the counter's start period]]></comment>
 			</param>
 			<param>
 				<name>endPeriod</name>
 				<type>int</type>
-				<comment><![CDATA[end period of the counter]]></comment>
+				<comment><![CDATA[the counter's end period]]></comment>
 			</param>
 			<param>
 				<name>previousActivityCounterId</name>
@@ -115888,7 +115890,7 @@ This is the method the actually creates the counter in the database. It requires
 			<param>
 				<name>periodLength</name>
 				<type>int</type>
-				<comment><![CDATA[the period length in days, PERIOD_LENGTH_INFINITE for never ending counters or PERIOD_LENGTH_SYSTEM for the period length defined in <code>portal.properties</code>]]></comment>
+				<comment><![CDATA[the period length in days, <code>PERIOD_LENGTH_INFINITE</code> for never ending counters or <code>PERIOD_LENGTH_SYSTEM</code> for the period length defined in <code>portal-ext.properties</code>. For more information see {@link com.liferay.portlet.social.model.SocialActivityConstants}.]]></comment>
 			</param>
 			<return>
 				<comment><![CDATA[the created activity counter]]></comment>
@@ -115906,10 +115908,10 @@ This is the method the actually creates the counter in the database. It requires
 		</method>
 		<method>
 			<name>deleteActivityCounters</name>
-			<comment><![CDATA[Deletes all counters, limits and settings related to the asset.
+			<comment><![CDATA[Deletes all activity counters, limits, and settings related to the asset.
 
 <p>
-This method also subtracts the asset's popularity from the owner's contribution points. It also creates a new contribution period if the latest one does not belong to the current period.
+This method subtracts the asset's popularity from the owner's contribution points. It also creates a new contribution period if the latest one does not belong to the current period.
 </p>]]></comment>
 			<param>
 				<name>assetEntry</name>
@@ -115929,7 +115931,7 @@ This method also subtracts the asset's popularity from the owner's contribution 
 		</method>
 		<method>
 			<name>deleteActivityCounters</name>
-			<comment><![CDATA[Deletes activity counters for the entity identified by the classNameId and classPK.]]></comment>
+			<comment><![CDATA[Deletes all activity counters, limits, and settings related to the entity identified by the class name ID and class primary key.]]></comment>
 			<param>
 				<name>classNameId</name>
 				<type>long</type>
@@ -115953,11 +115955,11 @@ This method also subtracts the asset's popularity from the owner's contribution 
 		</method>
 		<method>
 			<name>deleteActivityCounters</name>
-			<comment><![CDATA[Deletes activity counters for the entity identified by the className and classPK.]]></comment>
+			<comment><![CDATA[Deletes all activity counters for the entity identified by the class name and class primary key.]]></comment>
 			<param>
 				<name>className</name>
 				<type>java.lang.String</type>
-				<comment><![CDATA[the class name of the entity]]></comment>
+				<comment><![CDATA[the entity's class name]]></comment>
 			</param>
 			<param>
 				<name>classPK</name>
@@ -115977,7 +115979,7 @@ This method also subtracts the asset's popularity from the owner's contribution 
 		</method>
 		<method>
 			<name>disableActivityCounters</name>
-			<comment><![CDATA[Disables all the counters of an asset.
+			<comment><![CDATA[Disables all the counters of an asset identified by the class name ID and class primary key.
 
 <p>
 This method is used by the recycle bin to disable all counters of assets put into the recycle bin. It adjusts the owner's contribution score.
@@ -116005,7 +116007,7 @@ This method is used by the recycle bin to disable all counters of assets put int
 		</method>
 		<method>
 			<name>disableActivityCounters</name>
-			<comment><![CDATA[Disables all the counters of an asset.
+			<comment><![CDATA[Disables all the counters of an asset identified by the class name and class primary key.
 
 <p>
 This method is used by the recycle bin to disable all counters of assets put into the recycle bin. It adjusts the owner's contribution score.
@@ -116013,7 +116015,7 @@ This method is used by the recycle bin to disable all counters of assets put int
 			<param>
 				<name>className</name>
 				<type>java.lang.String</type>
-				<comment><![CDATA[the class name of the asset]]></comment>
+				<comment><![CDATA[the asset's class name]]></comment>
 			</param>
 			<param>
 				<name>classPK</name>
@@ -116033,7 +116035,7 @@ This method is used by the recycle bin to disable all counters of assets put int
 		</method>
 		<method>
 			<name>enableActivityCounters</name>
-			<comment><![CDATA[Enables all the counters of an asset.
+			<comment><![CDATA[Enables all activity counters of an asset identified by the class name ID and class primary key.
 
 <p>
 This method is used by the recycle bin to enable all counters of assets restored from the recycle bin. It adjusts the owner's contribution score.
@@ -116061,7 +116063,7 @@ This method is used by the recycle bin to enable all counters of assets restored
 		</method>
 		<method>
 			<name>enableActivityCounters</name>
-			<comment><![CDATA[Enables all the counters of an asset.
+			<comment><![CDATA[Enables all the counters of an asset identified by the class name and class primary key.
 
 <p>
 This method is used by the recycle bin to enable all counters of assets restored from the recycle bin. It adjusts the owner's contribution score.
@@ -116069,7 +116071,7 @@ This method is used by the recycle bin to enable all counters of assets restored
 			<param>
 				<name>className</name>
 				<type>java.lang.String</type>
-				<comment><![CDATA[the class name of the asset]]></comment>
+				<comment><![CDATA[the asset's class name]]></comment>
 			</param>
 			<param>
 				<name>classPK</name>
@@ -116089,7 +116091,7 @@ This method is used by the recycle bin to enable all counters of assets restored
 		</method>
 		<method>
 			<name>fetchActivityCounterByEndPeriod</name>
-			<comment><![CDATA[Returns the activity counters with the given name, owner and end period that belong to the given entity.]]></comment>
+			<comment><![CDATA[Returns the activity counter with the given name, owner, and end period that belong to the given entity.]]></comment>
 			<param>
 				<name>groupId</name>
 				<type>long</type>
@@ -116118,10 +116120,10 @@ This method is used by the recycle bin to enable all counters of assets restored
 			<param>
 				<name>endPeriod</name>
 				<type>int</type>
-				<comment><![CDATA[the end period, -1 for the latest one]]></comment>
+				<comment><![CDATA[the end period, <code>-1</code> for the latest one]]></comment>
 			</param>
 			<return>
-				<comment><![CDATA[Returns the activity counters]]></comment>
+				<comment><![CDATA[the matching activity counter]]></comment>
 			</return>
 			<throws>
 				<name>SystemException</name>
@@ -116131,7 +116133,7 @@ This method is used by the recycle bin to enable all counters of assets restored
 		</method>
 		<method>
 			<name>fetchActivityCounterByStartPeriod</name>
-			<comment><![CDATA[Returns the activity counters with the given name, owner and start period that belong to the given entity.]]></comment>
+			<comment><![CDATA[Returns the activity counter with the given name, owner, and start period that belong to the given entity.]]></comment>
 			<param>
 				<name>groupId</name>
 				<type>long</type>
@@ -116163,7 +116165,7 @@ This method is used by the recycle bin to enable all counters of assets restored
 				<comment><![CDATA[the start period]]></comment>
 			</param>
 			<return>
-				<comment><![CDATA[Returns the activity counters]]></comment>
+				<comment><![CDATA[the matching activity counter]]></comment>
 			</return>
 			<throws>
 				<name>SystemException</name>
@@ -116200,7 +116202,7 @@ This method is used by the recycle bin to enable all counters of assets restored
 				<comment><![CDATA[the owner type]]></comment>
 			</param>
 			<return>
-				<comment><![CDATA[Returns the activity counter]]></comment>
+				<comment><![CDATA[the matching activity counter]]></comment>
 			</return>
 			<throws>
 				<name>SystemException</name>
@@ -116210,7 +116212,7 @@ This method is used by the recycle bin to enable all counters of assets restored
 		</method>
 		<method>
 			<name>getOffsetActivityCounters</name>
-			<comment><![CDATA[Returns the activity counters with the given name and period offsets.
+			<comment><![CDATA[Returns all the activity counters with the given name and period offsets.
 
 <p>
 The start and end offsets can belong to different periods. This method groups the counters by name and returns the sum of their current values.
@@ -116236,7 +116238,7 @@ The start and end offsets can belong to different periods. This method groups th
 				<comment><![CDATA[the offset for the end period]]></comment>
 			</param>
 			<return>
-				<comment><![CDATA[the activity counters]]></comment>
+				<comment><![CDATA[the matching activity counters]]></comment>
 			</return>
 			<throws>
 				<name>SystemException</name>
@@ -116246,10 +116248,10 @@ The start and end offsets can belong to different periods. This method groups th
 		</method>
 		<method>
 			<name>getOffsetDistributionActivityCounters</name>
-			<comment><![CDATA[Returns the distribution of activity counters with the given name and period offsets.
+			<comment><![CDATA[Returns the distribution of the activity counters with the given name and period offsets.
 
 <p>
-The start and end offsets can belong to different periods. This method groups the counters by their owner entity (usually some asset) and returns a counter for each entity class with the sum of counters' current values.
+The start and end offsets can belong to different periods. This method groups the counters by their owner entity (usually some asset) and returns a counter for each entity class with the sum of the counters' current values.
 </p>]]></comment>
 			<param>
 				<name>groupId</name>
@@ -116272,7 +116274,7 @@ The start and end offsets can belong to different periods. This method groups th
 				<comment><![CDATA[the offset for the end period]]></comment>
 			</param>
 			<return>
-				<comment><![CDATA[the activity counters]]></comment>
+				<comment><![CDATA[the distribution of matching activity counters]]></comment>
 			</return>
 			<throws>
 				<name>SystemException</name>
@@ -116282,7 +116284,7 @@ The start and end offsets can belong to different periods. This method groups th
 		</method>
 		<method>
 			<name>getPeriodActivityCounters</name>
-			<comment><![CDATA[Returns the activity counters with the given name and time period.
+			<comment><![CDATA[Returns all the activity counters with the given name and time period.
 
 <p>
 The start and end period values can belong to different periods. This method groups the counters by name and returns the sum of their current values.
@@ -116308,7 +116310,7 @@ The start and end period values can belong to different periods. This method gro
 				<comment><![CDATA[the end period]]></comment>
 			</param>
 			<return>
-				<comment><![CDATA[the activity counters]]></comment>
+				<comment><![CDATA[the matching activity counters]]></comment>
 			</return>
 			<throws>
 				<name>SystemException</name>
@@ -116321,7 +116323,7 @@ The start and end period values can belong to different periods. This method gro
 			<comment><![CDATA[Returns the distribution of activity counters with the given name and time period.
 
 <p>
-The start and end period values can belong to different periods. This method groups the counters by their owner entity (usually some asset) and returns a counter for each entity class with the sum of counters' current values.
+The start and end period values can belong to different periods. This method groups the counters by their owner entity (usually some asset) and returns a counter for each entity class with the sum of the counters' current values.
 </p>]]></comment>
 			<param>
 				<name>groupId</name>
@@ -116344,7 +116346,7 @@ The start and end period values can belong to different periods. This method gro
 				<comment><![CDATA[the end period]]></comment>
 			</param>
 			<return>
-				<comment><![CDATA[the activity counters]]></comment>
+				<comment><![CDATA[the distribution of matching activity counters]]></comment>
 			</return>
 			<throws>
 				<name>SystemException</name>
@@ -116354,7 +116356,7 @@ The start and end period values can belong to different periods. This method gro
 		</method>
 		<method>
 			<name>getUserActivityCounters</name>
-			<comment><![CDATA[Returns a range of tuples that contain users and a list of activity counters.
+			<comment><![CDATA[Returns the range of tuples that contain users and a list of activity counters.
 
 <p>
 The counters returned for each user are passed to this method in the selectedNames array. The method also accepts an array of counter names that are used to rank the users.
@@ -116389,7 +116391,7 @@ Useful when paginating results. Returns a maximum of <code>end - start</code> in
 				<comment><![CDATA[the upper bound of the range of results (not inclusive)]]></comment>
 			</param>
 			<return>
-				<comment><![CDATA[the range of tuples]]></comment>
+				<comment><![CDATA[the range of matching tuples]]></comment>
 			</return>
 			<throws>
 				<name>SystemException</name>
@@ -116411,7 +116413,7 @@ Useful when paginating results. Returns a maximum of <code>end - start</code> in
 				<comment><![CDATA[the ranking counter names]]></comment>
 			</param>
 			<return>
-				<comment><![CDATA[the number of users]]></comment>
+				<comment><![CDATA[the number of matching users]]></comment>
 			</return>
 			<throws>
 				<name>SystemException</name>
@@ -116439,7 +116441,7 @@ This method should be used by an external achievement class when the users unloc
 			<throws>
 				<name>PortalException</name>
 				<type>com.liferay.portal.kernel.exception.PortalException</type>
-				<comment><![CDATA[if the group or the previous activity counter could not be found when they should have existed]]></comment>
+				<comment><![CDATA[if the group or an expected previous activity counter could not be found]]></comment>
 			</throws>
 			<throws>
 				<name>SystemException</name>
