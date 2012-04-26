@@ -38,7 +38,7 @@ public class AnnouncementsEntryServiceUtil {
 	 * Never modify this class directly. Add custom service methods to {@link com.liferay.portlet.announcements.service.impl.AnnouncementsEntryServiceImpl} and rerun ServiceBuilder to regenerate this class.
 	 */
 	public static com.liferay.portlet.announcements.model.AnnouncementsEntry addEntry(
-		long plid, long classNameId, long classPK, java.lang.String title,
+		long groupId, long classNameId, long classPK, java.lang.String title,
 		java.lang.String content, java.lang.String url, java.lang.String type,
 		int displayDateMonth, int displayDateDay, int displayDateYear,
 		int displayDateHour, int displayDateMinute, int expirationDateMonth,
@@ -47,8 +47,8 @@ public class AnnouncementsEntryServiceUtil {
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
 		return getService()
-				   .addEntry(plid, classNameId, classPK, title, content, url,
-			type, displayDateMonth, displayDateDay, displayDateYear,
+				   .addEntry(groupId, classNameId, classPK, title, content,
+			url, type, displayDateMonth, displayDateDay, displayDateYear,
 			displayDateHour, displayDateMinute, expirationDateMonth,
 			expirationDateDay, expirationDateYear, expirationDateHour,
 			expirationDateMinute, priority, alert);

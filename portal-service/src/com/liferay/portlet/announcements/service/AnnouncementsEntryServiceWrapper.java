@@ -34,7 +34,7 @@ public class AnnouncementsEntryServiceWrapper
 	}
 
 	public com.liferay.portlet.announcements.model.AnnouncementsEntry addEntry(
-		long plid, long classNameId, long classPK, java.lang.String title,
+		long groupId, long classNameId, long classPK, java.lang.String title,
 		java.lang.String content, java.lang.String url, java.lang.String type,
 		int displayDateMonth, int displayDateDay, int displayDateYear,
 		int displayDateHour, int displayDateMinute, int expirationDateMonth,
@@ -42,11 +42,12 @@ public class AnnouncementsEntryServiceWrapper
 		int expirationDateMinute, int priority, boolean alert)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		return _announcementsEntryService.addEntry(plid, classNameId, classPK,
-			title, content, url, type, displayDateMonth, displayDateDay,
-			displayDateYear, displayDateHour, displayDateMinute,
-			expirationDateMonth, expirationDateDay, expirationDateYear,
-			expirationDateHour, expirationDateMinute, priority, alert);
+		return _announcementsEntryService.addEntry(groupId, classNameId,
+			classPK, title, content, url, type, displayDateMonth,
+			displayDateDay, displayDateYear, displayDateHour,
+			displayDateMinute, expirationDateMonth, expirationDateDay,
+			expirationDateYear, expirationDateHour, expirationDateMinute,
+			priority, alert);
 	}
 
 	public void deleteEntry(long entryId)
