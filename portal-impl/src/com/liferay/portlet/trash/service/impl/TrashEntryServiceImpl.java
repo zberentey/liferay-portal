@@ -130,6 +130,7 @@ public class TrashEntryServiceImpl extends TrashEntryServiceBaseImpl {
 				}
 			}
 			catch (Exception e) {
+				e.printStackTrace();
 			}
 		}
 
