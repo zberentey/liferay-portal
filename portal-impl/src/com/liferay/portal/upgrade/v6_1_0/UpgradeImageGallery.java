@@ -531,6 +531,11 @@ public class UpgradeImageGallery extends UpgradeProcess {
 				"name = 'com.liferay.portlet.imagegallery.model.IGFolder' " +
 					"and primKey = '0'");
 
+		runSQL(
+			"delete from ResourcePermission where " +
+				"name = 'com.liferay.portlet.imagegallery.model.IGFolder' " +
+					"and primKey = companyId");
+
 		Connection con = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
@@ -677,6 +682,10 @@ public class UpgradeImageGallery extends UpgradeProcess {
 		runSQL(
 			"delete from ResourcePermission where name = '" +
 				_IG_IMAGE_CLASS_NAME + "' and primKey = '0'");
+
+		runSQL(
+			"delete from ResourcePermission where name = '" +
+				_IG_IMAGE_CLASS_NAME + "' and primKey = companyId");
 
 		runSQL(
 			"update ResourcePermission set name = '" +
