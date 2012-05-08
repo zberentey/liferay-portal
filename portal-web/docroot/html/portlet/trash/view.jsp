@@ -85,18 +85,9 @@ portletURL.setParameter("tabs1", tabs1);
 
 			TrashRenderer trashRenderer = trashHandler.getTrashRenderer(entry.getClassPK());
 
-			if (trashRenderer instanceof AssetRenderer) {
-				viewFullContentURL.setParameter("struts_action", "/trash/view_content_in_asset_publisher");
-			}
-			else {
-				viewFullContentURL.setParameter("struts_action", "/trash/view_content_in_trash");
-			}
-
+			viewFullContentURL.setParameter("struts_action", "/trash/view_content");
 			viewFullContentURL.setParameter("redirect", currentURL);
 
-			AssetEntry assetEntry = AssetEntryLocalServiceUtil.getEntry(entry.getClassName(), entry.getClassPK());
-
-			viewFullContentURL.setParameter("assetEntryId", String.valueOf(assetEntry.getEntryId()));
 			viewFullContentURL.setParameter("type", trashRenderer.getType());
 			viewFullContentURL.setParameter("showActions", String.valueOf(Boolean.FALSE));
 			viewFullContentURL.setParameter("showAssetMetadata", String.valueOf(Boolean.TRUE));
@@ -107,7 +98,7 @@ portletURL.setParameter("tabs1", tabs1);
 				href="<%= viewFullContentURL.toString() %>"
 				name="name"
 			>
-				<liferay-ui:icon label="<%= true %>" message="<%= assetEntry.getTitle(locale) %>" src="<%= trashRenderer.getIconPath(renderRequest) %>" />
+				<liferay-ui:icon label="<%= true %>" message="<%= trashRenderer.getTitle(locale) %>" src="<%= trashRenderer.getIconPath(renderRequest) %>" />
 			</liferay-ui:search-container-column-text>
 
 			<liferay-ui:search-container-column-text

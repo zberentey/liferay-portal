@@ -18,26 +18,32 @@
 
 <div class="asset-content">
 
-		<%
-		long assetEntryId = ParamUtil.getLong(request, "assetEntryId");
+	<%
+	long assetEntryId = ParamUtil.getLong(request, "assetEntryId");
 
-		AssetEntry assetEntry = AssetEntryLocalServiceUtil.getEntry(assetEntryId);
+	AssetEntry assetEntry = AssetEntryLocalServiceUtil.getEntry(assetEntryId);
 
-		TrashHandler trashHandler = TrashHandlerRegistryUtil.getTrashHandler(assetEntry.getClassName());
+	TrashHandler trashHandler = TrashHandlerRegistryUtil.getTrashHandler(assetEntry.getClassName());
 
-		TrashRenderer trashRenderer = trashHandler.getTrashRenderer(assetEntry.getClassPK());
+	TrashRenderer trashRenderer = trashHandler.getTrashRenderer(assetEntry.getClassPK());
 
-		String path = trashRenderer.render(renderRequest, renderResponse, "default");
-		String redirect = ParamUtil.getString(request, "redirect");
-		String title = trashRenderer.getTitle(locale);
-		%>
+	String path = trashRenderer.render(renderRequest, renderResponse, "default");
+	String redirect = ParamUtil.getString(request, "redirect");
+	String title = trashRenderer.getTitle(locale);
+	%>
 
-		<liferay-ui:header
-			backURL="<%= redirect %>"
-			localizeTitle="<%= false %>"
-			title="<%= title %>"
-		/>
+	<liferay-ui:header
+		backURL="<%= redirect %>"
+		localizeTitle="<%= false %>"
+		title="<%= title %>"
+	/>
 
-		<liferay-util:include page="<%= path %>" portletId="<%= trashRenderer.getPortletId() %>" />
-
+	<c:choose>
+		<c:when test="<%= Validator.isNotNull(path) %>">
+			<liferay-util:include page="<%= path %>" portletId="<%= trashRenderer.getPortletId() %>" />
+		</c:when>
+		<c:otherwise>
+			title, description....
+		</c:otherwise>
+	</c:choose>
 </div>

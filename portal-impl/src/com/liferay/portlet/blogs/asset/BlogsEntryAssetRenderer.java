@@ -71,15 +71,11 @@ public class BlogsEntryAssetRenderer extends BaseAssetRenderer
 
 	@Override
 	public String getIconPath(ThemeDisplay themeDisplay) {
-		return themeDisplay.getPathThemeImages() + "/blogs/blogs.png";
+		return getBlogsEntryAssetRendererFactory().getIconPath(themeDisplay);
 	}
 
 	public String getPortletId() {
-		AssetRendererFactory assetRendereFactory =
-			AssetRendererFactoryRegistryUtil.getAssetRendererFactoryByClassName(
-				BlogsEntryAssetRendererFactory.CLASS_NAME);
-
-		return assetRendereFactory.getPortletId();
+		return getBlogsEntryAssetRendererFactory().getPortletId();
 	}
 
 	public String getSummary(Locale locale) {
@@ -190,6 +186,18 @@ public class BlogsEntryAssetRenderer extends BaseAssetRenderer
 		}
 	}
 
+	private BlogsEntryAssetRendererFactory getBlogsEntryAssetRendererFactory() {
+		if (_factory == null) {
+			_factory = (BlogsEntryAssetRendererFactory)
+				AssetRendererFactoryRegistryUtil.
+					getAssetRendererFactoryByClassName(
+							BlogsEntryAssetRendererFactory.CLASS_NAME);
+		}
+
+		return _factory;
+	}
+
 	private BlogsEntry _entry;
+	private BlogsEntryAssetRendererFactory _factory;
 
 }
