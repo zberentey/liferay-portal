@@ -77,8 +77,10 @@ public class AssetCategoryLocalServiceImpl
 
 		validate(0, parentCategoryId, name, vocabularyId);
 
+		long parentVocabularyId = vocabularyId;
+
 		if (parentCategoryId > 0) {
-			assetCategoryPersistence.findByPrimaryKey(parentCategoryId);
+			parentVocabularyId = assetCategoryPersistence.findByPrimaryKey(parentCategoryId).getVocabularyId();
 		}
 
 		assetVocabularyPersistence.findByPrimaryKey(vocabularyId);
@@ -94,11 +96,17 @@ public class AssetCategoryLocalServiceImpl
 		category.setUserName(user.getFullName());
 		category.setCreateDate(now);
 		category.setModifiedDate(now);
-		category.setParentCategoryId(parentCategoryId);
 		category.setName(name);
 		category.setTitleMap(titleMap);
 		category.setDescriptionMap(descriptionMap);
 		category.setVocabularyId(vocabularyId);
+
+		if (vocabularyId != parentVocabularyId) {
+			category.setParentCategoryId(AssetCategoryConstants.DEFAULT_PARENT_CATEGORY_ID);
+		}
+		else {
+			category.setParentCategoryId(parentCategoryId);
+		}
 
 		assetCategoryPersistence.update(category, false);
 
