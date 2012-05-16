@@ -1,0 +1,101 @@
+<%--
+/**
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ *
+ * This library is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Lesser General Public License as published by the Free
+ * Software Foundation; either version 2.1 of the License, or (at your option)
+ * any later version.
+ *
+ * This library is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
+ * details.
+ */
+--%>
+
+<%
+if (Validator.isNotNull(searchTerms.getKeywords())) {
+	
+	SearchContext searchContext = SearchContextFactory.getInstance(request);
+	
+	searchContext.setEnd(searchContainer.getEnd());
+	searchContext.setStart(searchContainer.getStart());
+	
+	Facet assetEntriesFacet = new AssetEntriesFacet(searchContext);
+
+	assetEntriesFacet.setStatic(true);
+
+	searchContext.addFacet(assetEntriesFacet);
+
+	Facet scopeFacet = new ScopeFacet(searchContext);
+
+	scopeFacet.setStatic(true);
+
+	searchContext.addFacet(scopeFacet);
+	
+	String searchConfiguration = StringPool.BLANK;
+
+	searchConfiguration.concat("{facets: [");
+
+	searchConfiguration.concat("{className: 'com.liferay.portal.kernel.search.facet.AssetEntriesFacet', data: {frequencyThreshold: 1, values: ['com.liferay.portlet.bookmarks.model.BookmarksEntry','com.liferay.portlet.blogs.model.BlogsEntry','com.liferay.portlet.calendar.model.CalEvent','com.liferay.portlet.documentlibrary.model.DLFileEntry','com.liferay.portlet.journal.model.JournalArticle','com.liferay.portlet.messageboards.model.MBMessage','com.liferay.portlet.wiki.model.WikiPage','com.liferay.portal.model.User']}, displayStyle: 'asset_entries', fieldName: 'entryClassName', label: 'asset-type', order: 'OrderHitsDesc', static: false, weight: 1.5},");
+	
+	searchConfiguration.concat("{className: 'com.liferay.portal.kernel.search.facet.ModifiedFacet', data: {frequencyThreshold: 0, ranges: [{label:'past-hour', range:'[past-hour TO *]'}, {label:'past-24-hours', range:'[past-24-hours TO *]'}, {label:'past-week', range:'[past-week TO *]'}, {label:'past-month', range:'[past-month TO *]'}, {label:'past-year', range:'[past-year TO *]'}]}, displayStyle: 'modified', fieldName: 'modified', label: 'modified', order: 'OrderHitsDesc', static: false, weight: 1.1}");
+
+	searchConfiguration.concat("]}");
+	
+	List<FacetConfiguration> facetConfigurations = FacetConfigurationUtil.load(searchConfiguration);
+
+	for (FacetConfiguration facetConfiguration : facetConfigurations) {
+		Facet facet = FacetFactoryUtil.create(searchContext, facetConfiguration);
+
+		searchContext.addFacet(facet);
+	}
+
+	Indexer indexer = FacetedSearcher.getInstance();
+
+	Hits hits = indexer.search(searchContext);
+
+	for (int i = 0; i < hits.getDocs().length; i++) {
+		Document doc = hits.doc(i);
+
+		long classPK = GetterUtil.getLong(doc.get(Field.ENTRY_CLASS_PK));
+		String entryClassName = GetterUtil.getString((doc.get(Field.ENTRY_CLASS_NAME)));
+		
+		TrashEntry entry = null;
+
+		try {
+			entry = TrashEntryLocalServiceUtil.getEntry(entryClassName, classPK);
+		}
+		catch (Exception e) {
+			if (_log.isWarnEnabled()) {
+				_log.warn("Can't find trash entry with the given classPK: " + classPK + " and className: " + entryClassName);
+			}
+
+			continue;
+		}
+
+		results.add(entry);
+	}
+	
+	total = results.size();
+	
+	aproximate = total > PropsValues.TRASH_SEARCH_LIMIT;
+	
+	pageContext.setAttribute("results", results);
+	pageContext.setAttribute("total", total);
+}
+else {
+	
+	Object[] entries = TrashEntryServiceUtil.getEntries(groupId, searchContainer.getStart(), searchContainer.getEnd(), searchContainer.getOrderByComparator());
+
+	pageContext.setAttribute("results", entries[0]);
+	pageContext.setAttribute("total", entries[1]);
+
+	aproximate = (Boolean)entries[2];
+}
+%>
+
+<%!
+private static Log _log = LogFactoryUtil.getLog("portal-web.docroot.html.portlet.trash.trash_search_results_jspf");
+%>

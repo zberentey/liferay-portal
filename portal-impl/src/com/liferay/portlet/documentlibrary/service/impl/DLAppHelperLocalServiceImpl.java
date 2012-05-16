@@ -19,6 +19,8 @@ import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.FileVersion;
 import com.liferay.portal.kernel.repository.model.Folder;
+import com.liferay.portal.kernel.search.Indexer;
+import com.liferay.portal.kernel.search.IndexerRegistryUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.ObjectValuePair;
 import com.liferay.portal.kernel.util.StringPool;
@@ -424,6 +426,13 @@ public class DLAppHelperLocalServiceImpl
 			SocialActivityConstants.TYPE_RESTORE_FROM_TRASH, StringPool.BLANK,
 			0);
 
+		//Indexer
+		
+		Indexer indexer = IndexerRegistryUtil.nullSafeGetIndexer(
+						DLFileEntry.class);
+		
+		indexer.reindex(dlFileEntry);
+		
 		// Trash
 
 		trashEntryLocalService.deleteTrashEntry(trashEntry.getEntryId());
