@@ -14,18 +14,29 @@
  */
 --%>
 
-<%@ include file="/html/portlet/init.jsp" %>
+<%@ include file="/html/portlet/init.jsp" %><%@ 
 
-<%@ page import="com.liferay.portal.kernel.trash.TrashHandler" %><%@
+page import="com.liferay.portal.kernel.search.Document" %><%@
+page import="com.liferay.portal.kernel.search.Field"%><%@
+page import="com.liferay.portal.kernel.search.Hits" %><%@
+page import="com.liferay.portal.kernel.search.Indexer" %><%@
+page import="com.liferay.portal.kernel.search.SearchContext" %><%@
+page import="com.liferay.portal.kernel.search.SearchContextFactory" %><%@
+page import="com.liferay.portal.kernel.trash.TrashHandler" %><%@
 page import="com.liferay.portal.kernel.trash.TrashHandlerRegistryUtil" %><%@
 page import="com.liferay.portal.kernel.trash.TrashRenderer" %><%@
+page import="com.liferay.portal.kernel.workflow.WorkflowConstants"%><%@
+page import="com.liferay.portal.util.PortalUtil" %><%@
 page import="com.liferay.portlet.asset.model.AssetEntry" %><%@
 page import="com.liferay.portlet.asset.model.AssetRenderer" %><%@
+page import="com.liferay.portlet.asset.model.AssetRendererFactory" %><%@
 page import="com.liferay.portlet.asset.service.AssetEntryLocalServiceUtil" %><%@
 page import="com.liferay.portlet.documentlibrary.asset.DLFileEntryAssetRendererFactory" %><%@
 page import="com.liferay.portlet.trash.model.TrashEntry" %><%@
+page import="com.liferay.portlet.trash.search.EntryDisplayTerms" %><%@
 page import="com.liferay.portlet.trash.search.EntrySearch" %><%@
-page import="com.liferay.portlet.trash.service.TrashEntryLocalServiceUtil" %><%@
+page import="com.liferay.portlet.trash.search.EntrySearchTerms" %><%@
+page import="com.liferay.portlet.trash.service.TrashEntryLocalServiceUtil"%><%@
 page import="com.liferay.portlet.trash.service.TrashEntryServiceUtil" %>
 
 <%@ include file="/html/portlet/trash/init-ext.jsp" %>

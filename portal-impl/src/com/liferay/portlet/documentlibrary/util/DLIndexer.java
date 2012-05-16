@@ -483,7 +483,9 @@ public class DLIndexer extends BaseIndexer {
 
 		DLFileVersion dlFileVersion = dlFileEntry.getFileVersion();
 
-		if (!dlFileVersion.isApproved()) {
+		if (!dlFileVersion.isApproved() &&
+			(dlFileVersion.getStatus() != WorkflowConstants.STATUS_IN_TRASH)) {
+
 			return;
 		}
 
