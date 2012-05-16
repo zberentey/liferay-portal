@@ -1274,6 +1274,8 @@ public class PropsValues {
 
 	public static final boolean PORTLET_XML_VALIDATE = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.PORTLET_XML_VALIDATE));
 
+	public static final double RATINGS_MAXIMUM_NUMBER_OF_STARS = GetterUtil.getDouble(PropsUtil.get(PropsKeys.RATINGS_MAXIMUM_NUMBER_OF_STARS));
+
 	public static final boolean PREFERENCE_VALIDATE_ON_STARTUP = GetterUtil.getBoolean(PropsUtil.get(PropsKeys.PREFERENCE_VALIDATE_ON_STARTUP));
 
 	public static final String[] REDIRECT_URL_DOMAINS_ALLOWED = PropsUtil.getArray(PropsKeys.REDIRECT_URL_DOMAINS_ALLOWED);

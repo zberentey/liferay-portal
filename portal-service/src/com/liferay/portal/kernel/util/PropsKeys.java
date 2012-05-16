@@ -1727,6 +1727,8 @@ public interface PropsKeys {
 
 	public static final String RATINGS_DEFAULT_NUMBER_OF_STARS = "ratings.default.number.of.stars";
 
+	public static final String RATINGS_MAXIMUM_NUMBER_OF_STARS = "ratings.maximum.number.of.stars";
+
 	public static final String REDIRECT_URL_DOMAINS_ALLOWED = "redirect.url.domains.allowed";
 
 	public static final String REDIRECT_URL_IPS_ALLOWED = "redirect.url.ips.allowed";
