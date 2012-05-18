@@ -48,7 +48,7 @@ public class RateEntryAction extends JSONAction {
 		if (score == 0) {
 			RatingsEntryServiceUtil.deleteEntry(className, classPK);
 		}
-		else if (isValidScore(score)) {
+		else {
 			RatingsEntryServiceUtil.updateEntry(className, classPK, score);
 		}
 
@@ -72,16 +72,6 @@ public class RateEntryAction extends JSONAction {
 
 	protected long getClassPK(HttpServletRequest request) {
 		return ParamUtil.getLong(request, "classPK");
-	}
-
-	protected boolean isValidScore(double score) {
-		if ((score < 0) ||
-			(score > PropsValues.RATINGS_DEFAULT_NUMBER_OF_STARS)) {
-
-			return false;
-		}
-
-		return true;
 	}
 
 }
