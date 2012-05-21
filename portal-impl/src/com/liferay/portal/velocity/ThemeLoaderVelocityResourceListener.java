@@ -39,7 +39,11 @@ public class ThemeLoaderVelocityResourceListener
 			return doGetResourceStream(source);
 		}
 		catch (Exception e) {
-			throw new ResourceNotFoundException(source);
+			if (_log.isDebugEnabled()) {
+				_log.debug("Exeption while trying to retrieve the resource", e);
+			}
+
+			return null;
 		}
 	}
 
