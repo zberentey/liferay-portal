@@ -1309,7 +1309,7 @@ public class DLFileEntryLocalServiceImpl
 				Indexer indexer = IndexerRegistryUtil.nullSafeGetIndexer(
 					DLFileEntry.class);
 
-				indexer.delete(dlFileEntry);
+				indexer.reindex(dlFileEntry);
 			}
 		}
 
