@@ -400,7 +400,14 @@ public class DLAppHelperLocalServiceImpl
 				new ObjectValuePair<Long, Integer>();
 
 			fileVersionStatus.setKey(dlFileVersion.getFileVersionId());
-			fileVersionStatus.setValue(dlFileVersion.getStatus());
+
+			int status = dlFileVersion.getStatus();
+
+			if (status == WorkflowConstants.STATUS_PENDING) {
+				status = WorkflowConstants.STATUS_DRAFT;
+			}
+
+			fileVersionStatus.setValue(status);
 
 			fileVersionStatuses.add(fileVersionStatus);
 		}
@@ -885,12 +892,20 @@ public class DLAppHelperLocalServiceImpl
 			if (object instanceof DLFileEntry) {
 				DLFileEntry dlFileEntry = (DLFileEntry)object;
 
-				DLFileVersion dlFileVersion =
-					dlFileVersionLocalService.getLatestFileVersion(
-						dlFileEntry.getFileEntryId(), false);
+				List<DLFileVersion> dlFileVersions =
+					dlFileVersionLocalService.getFileVersions(
+						dlFileEntry.getFileEntryId(),
+						WorkflowConstants.STATUS_ANY);
+
+				dlFileVersions = ListUtil.copy(dlFileVersions);
+
+				Collections.sort(
+					dlFileVersions, new FileVersionVersionComparator());
+
+				DLFileVersion latestDlFileVersion = dlFileVersions.get(0);
 
 				if ((status == WorkflowConstants.STATUS_APPROVED) &&
-					(dlFileVersion.getStatus() ==
+					(latestDlFileVersion.getStatus() ==
 						WorkflowConstants.STATUS_IN_TRASH)) {
 
 					continue;
@@ -899,7 +914,7 @@ public class DLAppHelperLocalServiceImpl
 				// Asset
 
 				if (status == WorkflowConstants.STATUS_APPROVED) {
-					if (dlFileVersion.isApproved()) {
+					if (latestDlFileVersion.isApproved()) {
 						assetEntryLocalService.updateVisible(
 							DLFileEntryConstants.getClassName(),
 							dlFileEntry.getFileEntryId(), true);
@@ -948,15 +963,23 @@ public class DLAppHelperLocalServiceImpl
 
 				// Workflow
 
-				if ((status != WorkflowConstants.STATUS_APPROVED) &&
-					dlFileVersion.isPending()) {
+				if (status != WorkflowConstants.STATUS_APPROVED) {
+					for (DLFileVersion dlFileVersion : dlFileVersions) {
+						if (!dlFileVersion.isPending()) {
+							continue;
+						}
 
-					workflowInstanceLinkLocalService.
-						deleteWorkflowInstanceLink(
-							dlFileVersion.getCompanyId(),
-							dlFileVersion.getGroupId(),
-							DLFileEntryConstants.getClassName(),
-							dlFileVersion.getFileVersionId());
+						dlFileVersion.setStatus(WorkflowConstants.STATUS_DRAFT);
+
+						dlFileVersionPersistence.update(dlFileVersion, false);
+
+						workflowInstanceLinkLocalService.
+							deleteWorkflowInstanceLink(
+								dlFileVersion.getCompanyId(),
+								dlFileVersion.getGroupId(),
+								DLFileEntryConstants.getClassName(),
+								dlFileVersion.getFileVersionId());
+					}
 				}
 			}
 			else if (object instanceof DLFolder) {
