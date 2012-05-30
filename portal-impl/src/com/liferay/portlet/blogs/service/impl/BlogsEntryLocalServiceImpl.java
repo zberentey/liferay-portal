@@ -57,6 +57,7 @@ import com.liferay.portlet.blogs.EntrySmallImageNameException;
 import com.liferay.portlet.blogs.EntrySmallImageSizeException;
 import com.liferay.portlet.blogs.EntryTitleException;
 import com.liferay.portlet.blogs.model.BlogsEntry;
+import com.liferay.portlet.blogs.service.BlogsEntryLocalServiceUtil;
 import com.liferay.portlet.blogs.service.base.BlogsEntryLocalServiceBaseImpl;
 import com.liferay.portlet.blogs.social.BlogsActivityKeys;
 import com.liferay.portlet.blogs.util.BlogsUtil;
@@ -833,6 +834,15 @@ public class BlogsEntryLocalServiceImpl extends BlogsEntryLocalServiceBaseImpl {
 			entryId, SocialActivityConstants.TYPE_RESTORE_FROM_TRASH,
 			StringPool.BLANK, 0);
 
+		//Indexer
+
+		Indexer indexer = IndexerRegistryUtil.nullSafeGetIndexer(
+			BlogsEntry.class);
+
+		BlogsEntry entry = BlogsEntryLocalServiceUtil.getBlogsEntry(entryId);
+
+		indexer.reindex(entry);
+
 		// Trash
 
 		trashEntryLocalService.deleteEntry(trashEntry.getEntryId());
@@ -1098,15 +1108,17 @@ public class BlogsEntryLocalServiceImpl extends BlogsEntryLocalServiceBaseImpl {
 			if (status == WorkflowConstants.STATUS_IN_TRASH) {
 				assetEntryLocalService.moveEntryToTrash(
 					BlogsEntry.class.getName(), entryId);
+
+				indexer.reindex(entry);
 			}
 			else {
 				assetEntryLocalService.updateVisible(
 					BlogsEntry.class.getName(), entryId, false);
+
+				// Indexer
+
+				indexer.delete(entry);
 			}
-
-			// Indexer
-
-			indexer.delete(entry);
 		}
 
 		return entry;
