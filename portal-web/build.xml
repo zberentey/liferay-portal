@@ -232,14 +232,14 @@
 						<replace file="docroot/html/js/editor/ckeditor/_source/core/editor.js">
 							<replacetoken><![CDATA[throw '[CKEDITOR.editor] The instance "' + this.name + '" already exists.';]]></replacetoken>
 							<replacevalue><![CDATA[{
-								var previous = CKEDITOR.instances[ this.name ];
+									var previous = CKEDITOR.instances[ this.name ];
 
-								if ( previous.element.isOffline() || previous.container && previous.container.isOffline() ) {
-									previous.destroy( false );
-								}
-								else {
-									throw '[CKEDITOR.editor] The instance "' + previous.name + '" already exists.';
-								}
+									if ( previous.element.isOffline() || previous.container && previous.container.isOffline() ) {
+										previous.destroy( false );
+									}
+									else {
+										throw '[CKEDITOR.editor] The instance "' + previous.name + '" already exists.';
+									}
 								}
 								]]>
 							</replacevalue>
