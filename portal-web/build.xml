@@ -240,6 +240,7 @@
 								else {
 									throw '[CKEDITOR.editor] The instance "' + previous.name + '" already exists.';
 								}
+								}
 								]]>
 							</replacevalue>
 						</replace>
@@ -314,6 +315,13 @@
 								}
 							]]>
 							</replacevalue>
+						</replace>
+
+						<replace file="docroot/html/js/editor/ckeditor/_source/plugins/wysiwygarea/plugin.js">
+							<replacetoken><![CDATA[var data = fullPage]]></replacetoken>
+							<replacevalue><![CDATA[if ( !doc )
+								return null;
+								var data = fullPage]]></replacevalue>
 						</replace>
 
 						<replace file="docroot/html/js/editor/ckeditor/_source/themes/default/theme.js">
