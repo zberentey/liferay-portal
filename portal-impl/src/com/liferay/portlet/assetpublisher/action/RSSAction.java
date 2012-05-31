@@ -283,6 +283,12 @@ public class RSSAction extends PortletAction {
 			preferences.getValue("orderByType2", "ASC"));
 		boolean excludeZeroViewCount = GetterUtil.getBoolean(
 			preferences.getValue("excludeZeroViewCount", "0"));
+		boolean enablePermissions = GetterUtil.getBoolean(
+			preferences.getValue("enablePermissions", null));
+		long[] classTypeIds = GetterUtil.getLongValues(
+			preferences.getValues("classTypeIds", null));
+		boolean showOnlyLayoutAssets = GetterUtil.getBoolean(
+			preferences.getValue("showOnlyLayoutAssets", null));
 
 		int rssDelta = GetterUtil.getInteger(
 			preferences.getValue("rssDelta", "20"));
@@ -307,9 +313,15 @@ public class RSSAction extends PortletAction {
 			assetEntryQuery.setClassNameIds(classNameIds);
 		}
 
+		assetEntryQuery.setClassTypeIds(classTypeIds);
+		assetEntryQuery.setEnablePermissions(enablePermissions);
 		assetEntryQuery.setEnd(rssDelta);
 		assetEntryQuery.setExcludeZeroViewCount(excludeZeroViewCount);
 		assetEntryQuery.setGroupIds(groupIds);
+		if (showOnlyLayoutAssets) {
+			assetEntryQuery.setLayout(themeDisplay.getLayout());
+		}
+
 		assetEntryQuery.setOrderByCol1(orderByColumn1);
 		assetEntryQuery.setOrderByCol2(orderByColumn2);
 		assetEntryQuery.setOrderByType1(orderByType1);
