@@ -265,9 +265,9 @@ public class DLIndexer extends BaseIndexer {
 	protected void addReindexCriteria(
 		DynamicQuery dynamicQuery, long companyId) {
 
-		Property property = PropertyFactoryUtil.forName("companyId");
+		Property companyIdProperty = PropertyFactoryUtil.forName("companyId");
 
-		dynamicQuery.add(property.eq(companyId));
+		dynamicQuery.add(companyIdProperty.eq(companyId));
 	}
 
 	protected void addReindexCriteria(
@@ -391,8 +391,19 @@ public class DLIndexer extends BaseIndexer {
 				Field.ENTRY_CLASS_NAME, DLFileEntry.class.getName());
 			document.addKeyword(Field.ENTRY_CLASS_PK, fileEntryId);
 			document.addKeyword(Field.FOLDER_ID, dlFileEntry.getFolderId());
-			document.addKeyword(
-				Field.GROUP_ID, getParentGroupId(dlFileEntry.getGroupId()));
+
+			if (dlFileEntry.getFileVersion().getStatus() ==
+					WorkflowConstants.STATUS_IN_TRASH) {
+
+				document.addKeyword(
+					Field.GROUP_ID, getParentGroupId(
+						dlFileEntry.getGroupId() * -1));
+			}
+			else {
+				document.addKeyword(
+					Field.GROUP_ID, getParentGroupId(dlFileEntry.getGroupId()));
+			}
+
 			document.addDate(
 				Field.MODIFIED_DATE, dlFileEntry.getModifiedDate());
 			document.addKeyword(Field.PORTLET_ID, PORTLET_ID);
@@ -483,7 +494,9 @@ public class DLIndexer extends BaseIndexer {
 
 		DLFileVersion dlFileVersion = dlFileEntry.getFileVersion();
 
-		if (!dlFileVersion.isApproved()) {
+		if (!dlFileVersion.isApproved() &&
+			(dlFileVersion.getStatus() != WorkflowConstants.STATUS_IN_TRASH)) {
+
 			return;
 		}
 
@@ -602,8 +615,11 @@ public class DLIndexer extends BaseIndexer {
 
 		for (DLFileEntry dlFileEntry : dlFileEntries) {
 			Document document = getDocument(dlFileEntry);
-
-			if (document != null) {
+			
+			boolean isNotInTrash = dlFileEntry.getFileVersion().getStatus() !=
+				WorkflowConstants.STATUS_IN_TRASH;
+			
+			if (document != null && isNotInTrash) {
 				documents.add(document);
 			}
 		}
