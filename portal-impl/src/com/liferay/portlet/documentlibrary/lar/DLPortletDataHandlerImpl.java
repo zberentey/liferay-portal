@@ -304,7 +304,23 @@ public class DLPortletDataHandlerImpl extends BasePortletDataHandler {
 		if (Validator.isNull(binPath) &&
 			portletDataContext.isPerformDirectBinaryImport()) {
 
-			is = FileEntryUtil.getContentStream(fileEntry);
+			try {
+				is = FileEntryUtil.getContentStream(fileEntry);
+			}
+			catch (NoSuchFileException nsfe) {
+			}
+
+			if (is == null) {
+				if (_log.isWarnEnabled()) {
+					_log.warn(
+						"No file found for file entry " +
+							fileEntry.getFileEntryId());
+				}
+
+				fileEntryElement.detach();
+
+				return;
+			}
 		}
 		else {
 			is = portletDataContext.getZipEntryAsInputStream(binPath);
