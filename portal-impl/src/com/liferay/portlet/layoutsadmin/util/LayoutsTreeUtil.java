@@ -64,7 +64,8 @@ public class LayoutsTreeUtil {
 			WebKeys.THEME_DISPLAY);
 
 		int start = ParamUtil.getInteger(request, "start");
-		int end = start + PropsValues.LAYOUT_MANAGE_PAGES_INITIAL_CHILDREN;
+		int end = start + Math.max(
+			PropsValues.LAYOUT_MANAGE_PAGES_INITIAL_CHILDREN, 0);
 
 		JSONArray jsonArray = JSONFactoryUtil.createJSONArray();
 
