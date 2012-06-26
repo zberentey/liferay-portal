@@ -430,7 +430,8 @@ public class JournalArticleLocalServiceImpl
 					versionedArticle.setStatus(
 						WorkflowConstants.STATUS_EXPIRED);
 
-					versionedArticle.setExpirationDate(now);
+					versionedArticle.setExpirationDate(
+						article.getExpirationDate());
 
 					journalArticlePersistence.update(versionedArticle, false);
 				}
