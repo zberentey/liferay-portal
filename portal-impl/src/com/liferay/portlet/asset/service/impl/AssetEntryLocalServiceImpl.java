@@ -840,9 +840,7 @@ public class AssetEntryLocalServiceImpl extends AssetEntryLocalServiceBaseImpl {
 		AssetEntry entry = assetEntryPersistence.findByC_C(
 			classNameId, classPK);
 
-		if (expirationDate != null) {
-			entry.setExpirationDate(expirationDate);
-		}
+		entry.setExpirationDate(expirationDate);
 
 		entry.setPublishDate(publishDate);
 
