@@ -15,9 +15,12 @@
 package com.liferay.portlet.documentlibrary.action;
 
 import com.liferay.portal.DuplicateLockException;
+import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.portlet.LiferayWindowState;
 import com.liferay.portal.kernel.servlet.ServletResponseConstants;
 import com.liferay.portal.kernel.servlet.SessionErrors;
+import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.StringPool;
@@ -46,7 +49,9 @@ import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
 import javax.portlet.WindowState;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
@@ -56,6 +61,7 @@ import org.apache.struts.action.ActionMapping;
  * @author Brian Wing Shun Chan
  * @author Sergio González
  * @author Manuel de la Peña
+ * @author Levente Hudak
  */
 public class EditEntryAction extends PortletAction {
 
@@ -85,6 +91,9 @@ public class EditEntryAction extends PortletAction {
 			}
 			else if (cmd.equals(Constants.MOVE_TO_TRASH)) {
 				deleteEntries(actionRequest, true);
+			}
+			else if (cmd.equals(Constants.UNDO)) {
+				restoreEntries(actionRequest);
 			}
 
 			WindowState windowState = actionRequest.getWindowState();
@@ -255,6 +264,19 @@ public class EditEntryAction extends PortletAction {
 				DLAppServiceUtil.deleteFileEntry(deleteFileEntryId);
 			}
 		}
+
+		if (moveToTrash) {
+			HttpServletRequest request = PortalUtil
+				.getHttpServletRequest(actionRequest);
+
+			HttpSession session = request.getSession();
+			session.setAttribute("trashedFolderIds", deleteFolderIds);
+			session.setAttribute(
+				"trashedFileShortcutIds",deleteFileShortcutIds);
+
+			session.setAttribute("trashedFileEntryIds", deleteFileEntryIds);
+			SessionMessages.add(request, "delete-success");
+		}
 	}
 
 	protected void moveEntries(ActionRequest actionRequest) throws Exception {
@@ -292,6 +314,33 @@ public class EditEntryAction extends PortletAction {
 			DLAppServiceUtil.updateFileShortcut(
 				fileShortcutId, newFolderId, fileShortcut.getToFileEntryId(),
 				serviceContext);
+		}
+	}
+
+	protected void restoreEntries(ActionRequest actionRequest)
+		throws PortalException, SystemException {
+
+		long[] trashedFolderIds = StringUtil.split(
+				ParamUtil.getString(actionRequest, "trashedFolderIds"), 0L);
+
+		long[] trashedFileShortcutIds = StringUtil.split(
+				ParamUtil.getString(
+					actionRequest, "trashedFileShortcutIds"), 0L);
+
+		long[] trashedFileEntryIds = StringUtil.split(
+				ParamUtil.getString(actionRequest, "trashedFileEntryIds"), 0L);
+
+		for (long deletedFolderId : trashedFolderIds) {
+			DLAppServiceUtil.restoreFolderFromTrash(deletedFolderId);
+		}
+
+		for (long deletedFileShortcutId : trashedFileShortcutIds) {
+			DLAppServiceUtil.restoreFileShortcutFromTrash(
+				deletedFileShortcutId);
+		}
+
+		for (long deletedFileEntryId : trashedFileEntryIds) {
+			DLAppServiceUtil.restoreFileEntryFromTrash(deletedFileEntryId);
 		}
 	}
 

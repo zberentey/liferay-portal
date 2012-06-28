@@ -14,10 +14,13 @@
 
 package com.liferay.portlet.blogs.action;
 
+import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.portlet.LiferayWindowState;
 import com.liferay.portal.kernel.servlet.SessionErrors;
+import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.upload.UploadPortletRequest;
 import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.ParamUtil;
@@ -61,7 +64,9 @@ import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
 import javax.portlet.WindowState;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
@@ -73,6 +78,7 @@ import org.apache.struts.action.ActionMapping;
  * @author Thiago Moreira
  * @author Juan Fernández
  * @author Zsolt Berentey
+ * @author Levente Hudak
  */
 public class EditEntryAction extends PortletAction {
 
@@ -102,6 +108,9 @@ public class EditEntryAction extends PortletAction {
 			}
 			else if (cmd.equals(Constants.SUBSCRIBE)) {
 				subscribe(actionRequest);
+			}
+			else if (cmd.equals(Constants.UNDO)) {
+				restoreEntries(actionRequest);
 			}
 			else if (cmd.equals(Constants.UNSUBSCRIBE)) {
 				unsubscribe(actionRequest);
@@ -275,6 +284,14 @@ public class EditEntryAction extends PortletAction {
 				BlogsEntryServiceUtil.deleteEntry(deleteEntryId);
 			}
 		}
+
+		if (moveToTrash) {
+			HttpServletRequest request = PortalUtil
+				.getHttpServletRequest(actionRequest);
+			HttpSession session = request.getSession();
+			SessionMessages.add(request, "delete-success");
+			session.setAttribute("trashedIds", deleteEntryIds);
+		}
 	}
 
 	protected String getSaveAndContinueRedirect(
@@ -314,6 +331,24 @@ public class EditEntryAction extends PortletAction {
 		portletURL.setParameter("preview", String.valueOf(preview), false);
 
 		return portletURL.toString();
+	}
+
+	protected void restoreEntries(ActionRequest actionRequest)
+		throws PortalException, SystemException {
+
+		ThemeDisplay themeDislay = (ThemeDisplay)actionRequest.getAttribute(
+				WebKeys.THEME_DISPLAY);
+
+		long userId = themeDislay.getUserId();
+
+		long[] trashedEntryIds = null;
+
+		trashedEntryIds = StringUtil.split(
+			ParamUtil.getString(actionRequest, "trashedIds"), 0L);
+
+		for (long entryId : trashedEntryIds) {
+			BlogsEntryLocalServiceUtil.restoreEntryFromTrash(userId, entryId);
+		}
 	}
 
 	protected void subscribe(ActionRequest actionRequest) throws Exception {

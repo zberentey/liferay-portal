@@ -17,6 +17,47 @@
 <%@ include file="/html/portlet/document_library/init.jsp" %>
 
 <%
+String trashedFolderIds = GetterUtil.getString(StringUtil.merge((long[])session.getAttribute("trashedFolderIds")), StringPool.BLANK);
+session.removeAttribute("trashedFolderIds");
+
+String trashedFileShortcutIds = GetterUtil.getString(StringUtil.merge((long[])session.getAttribute("trashedFileShortcutIds")), StringPool.BLANK);
+session.removeAttribute("trashedFileShortcutIds");
+
+String trashedFileEntryIds = GetterUtil.getString(StringUtil.merge((long[])session.getAttribute("trashedFileEntryIds")), StringPool.BLANK);
+session.removeAttribute("trashedFileEntryIds");
+
+int count = (StringUtil.split(trashedFolderIds).length + StringUtil.split(trashedFileShortcutIds).length + StringUtil.split(trashedFileEntryIds).length);
+
+String undoText = null;
+
+if ((trashedFolderIds.length() > 0) && (undoText == null)) {
+	undoText = "folder";
+}
+
+if (trashedFileShortcutIds.length() > 0) {
+	if (undoText == null) {
+		undoText = "shortcut";
+	}
+	else {
+		undoText = "item";
+	}
+}
+
+if (trashedFileEntryIds.length() > 0) {
+	if (undoText == null) {
+		undoText = "document";
+	}
+	else {
+		undoText = "item";
+	}
+}
+
+if (count > 1) {
+	undoText = undoText + "s";
+}
+
+String undoKey = LanguageUtil.get(pageContext, undoText);
+
 String strutsAction = ParamUtil.getString(request, "struts_action");
 
 Folder folder = (com.liferay.portal.kernel.repository.model.Folder)request.getAttribute(WebKeys.DOCUMENT_LIBRARY_FOLDER);
@@ -72,6 +113,19 @@ request.setAttribute("view.jsp-folderId", String.valueOf(folderId));
 
 request.setAttribute("view.jsp-repositoryId", String.valueOf(repositoryId));
 %>
+
+<c:if test='<%= SessionMessages.contains(request, "delete-success") %>'>
+	<div class="portlet-msg-notifier">
+		<c:choose>
+			<c:when test='<%= count > 1 %>'>
+				<liferay-ui:message arguments='<%= new String[]{ undoKey.toLowerCase(), "javascript:" + renderResponse.getNamespace() + "undoEntries();" } %>' key="the-selected-x-have-been-moved-to-the-trash.-undo" translateArguments="false" />
+			</c:when>
+			<c:otherwise>
+				<liferay-ui:message arguments='<%= new String[]{ undoKey.toLowerCase(), "javascript:" + renderResponse.getNamespace() + "undoEntries();" } %>' key="the-selected-x-has-been-moved-to-the-trash.-undo" translateArguments="false" />
+			</c:otherwise>
+		</c:choose>
+	</div>
+</c:if>
 
 <div id="<portlet:namespace />documentLibraryContainer">
 	<aui:layout cssClass="lfr-app-column-view">
@@ -136,6 +190,9 @@ request.setAttribute("view.jsp-repositoryId", String.valueOf(repositoryId));
 				<aui:input name="folderIds" type="hidden" />
 				<aui:input name="fileEntryIds" type="hidden" />
 				<aui:input name="fileShortcutIds" type="hidden" />
+				<aui:input name="trashedFolderIds" type="hidden" />
+				<aui:input name="trashedFileShortcutIds" type="hidden" />
+				<aui:input name="trashedFileEntryIds" type="hidden" />
 
 				<div class="document-container" id="<portlet:namespace />documentContainer">
 					<c:choose>
@@ -185,6 +242,22 @@ if (folder != null) {
 	);
 
 	<portlet:namespace />toggleActionsButton();
+
+	Liferay.provide(
+		window,
+		'<portlet:namespace />undoEntries',
+		function() {
+			if (confirm('<%= UnicodeLanguageUtil.get(pageContext, "are-you-sure-you-want-to-undo-your-last-changes") %>')) {
+				document.<portlet:namespace />fm2.method = "post";
+				document.<portlet:namespace />fm2.<portlet:namespace /><%= Constants.CMD %>.value = "<%= Constants.UNDO %>";
+				document.<portlet:namespace />fm2.<portlet:namespace />trashedFolderIds.value = "<%= trashedFolderIds %>";
+				document.<portlet:namespace />fm2.<portlet:namespace />trashedFileShortcutIds.value = "<%= trashedFileShortcutIds %>";
+				document.<portlet:namespace />fm2.<portlet:namespace />trashedFileEntryIds.value = "<%= trashedFileEntryIds %>";
+				submitForm(document.<portlet:namespace />fm2, "<portlet:actionURL><portlet:param name="struts_action" value="/document_library/edit_entry" /></portlet:actionURL>");
+			}
+		},
+		['liferay-util-list-fields']
+	);
 </aui:script>
 
 <c:if test='<%= !strutsAction.equals("/document_library/search") %>'>
