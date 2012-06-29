@@ -3421,8 +3421,8 @@ public class JournalArticleLocalServiceImpl
 				previousApprovedArticle.getDisplayDate(),
 				previousApprovedArticle.getExpirationDate());
 
-				Date displayDate = dateInterval[0];
-				Date expirationDate = dateInterval[1];
+			Date displayDate = dateInterval[0];
+			Date expirationDate = dateInterval[1];
 
 			assetEntryLocalService.updateEntry(
 				JournalArticle.class.getName(), article.getResourcePrimKey(),
