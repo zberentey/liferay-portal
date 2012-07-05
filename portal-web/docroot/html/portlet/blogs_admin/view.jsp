@@ -20,17 +20,34 @@
 PortletURL portletURL = renderResponse.createRenderURL();
 
 portletURL.setParameter("struts_action", "/blogs_admin/view");
+
+String trashedIds = StringUtil.merge((long[])session.getAttribute("trashedIds"));
+session.removeAttribute("trashedIds");
 %>
 
 <liferay-portlet:renderURL varImpl="searchURL">
 	<portlet:param name="struts_action" value="/blogs_admin/search" />
 </liferay-portlet:renderURL>
 
+<c:if test='<%= SessionMessages.contains(request, "delete-success") %>'>
+	<div class="portlet-msg-notifier">
+		<c:choose>
+			<c:when test='<%= trashedIds.contains(StringPool.COMMA) %>'>
+				<liferay-ui:message arguments='<%= new String[]{ "blogs", "javascript:" + renderResponse.getNamespace() + "undoEntries();" } %>' key="the-selected-x-have-been-moved-to-the-trash.-undo" translateArguments="false" />
+			</c:when>
+			<c:otherwise>
+				<liferay-ui:message arguments='<%= new String[]{ "blog", "javascript:" + renderResponse.getNamespace() + "undoEntries();" } %>' key="the-selected-x-has-been-moved-to-the-trash.-undo" translateArguments="false" />
+			</c:otherwise>
+		</c:choose>
+	</div>
+</c:if>
+
 <aui:form action="<%= searchURL.toString() %>" method="get" name="fm">
 	<liferay-portlet:renderURLParams varImpl="searchURL" />
 	<aui:input name="<%= Constants.CMD %>" type="hidden" />
 	<aui:input name="redirect" type="hidden" value="<%= portletURL.toString() %>" />
 	<aui:input name="deleteEntryIds" type="hidden" />
+	<aui:input name="trashedIds" type="hidden" />
 
 	<liferay-util:include page="/html/portlet/blogs_admin/toolbar.jsp">
 		<liferay-util:param name="toolbarItem" value="view-all" />
@@ -94,6 +111,20 @@ portletURL.setParameter("struts_action", "/blogs_admin/view");
 				document.<portlet:namespace />fm.method = "post";
 				document.<portlet:namespace />fm.<portlet:namespace /><%= Constants.CMD %>.value = "<%= Constants.MOVE_TO_TRASH %>";
 				document.<portlet:namespace />fm.<portlet:namespace />deleteEntryIds.value = Liferay.Util.listCheckedExcept(document.<portlet:namespace />fm, "<portlet:namespace />allRowIds");
+				submitForm(document.<portlet:namespace />fm, "<portlet:actionURL><portlet:param name="struts_action" value="/blogs_admin/edit_entry" /></portlet:actionURL>");
+			}
+		},
+		['liferay-util-list-fields']
+	);
+
+	Liferay.provide(
+		window,
+		'<portlet:namespace />undoEntries',
+		function() {
+			if (confirm('<%= UnicodeLanguageUtil.get(pageContext, "are-you-sure-you-want-to-undo-your-last-changes") %>')) {
+				document.<portlet:namespace />fm.method = "post";
+				document.<portlet:namespace />fm.<portlet:namespace /><%= Constants.CMD %>.value = "<%= Constants.UNDO %>";
+				document.<portlet:namespace />fm.<portlet:namespace />trashedIds.value = "<%= trashedIds %>";
 				submitForm(document.<portlet:namespace />fm, "<portlet:actionURL><portlet:param name="struts_action" value="/blogs_admin/edit_entry" /></portlet:actionURL>");
 			}
 		},
