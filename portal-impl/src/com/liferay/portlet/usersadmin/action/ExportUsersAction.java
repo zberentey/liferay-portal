@@ -31,6 +31,7 @@ import com.liferay.portal.security.permission.ActionKeys;
 import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portal.service.UserLocalServiceUtil;
 import com.liferay.portal.service.permission.PortalPermissionUtil;
+import com.liferay.portal.service.permission.PortletPermissionUtil;
 import com.liferay.portal.struts.ActionConstants;
 import com.liferay.portal.struts.PortletAction;
 import com.liferay.portal.theme.ThemeDisplay;
@@ -127,7 +128,7 @@ public class ExportUsersAction extends PortletAction {
 
 	protected List<User> getUsers(
 			ActionRequest actionRequest, ActionResponse actionResponse,
-			ThemeDisplay themeDisplay)
+			ThemeDisplay themeDisplay, boolean exportAllUsers)
 		throws Exception {
 
 		PortletURL portletURL =
@@ -148,6 +149,14 @@ public class ExportUsersAction extends PortletAction {
 
 		if (organizationId > 0) {
 			params.put("usersOrgs", new Long(organizationId));
+		}
+		else if (!exportAllUsers) {
+			User currentUser = themeDisplay.getUser();
+			long organizationIds[] = currentUser.getOrganizationIds();
+
+			if (organizationIds.length > 0) {
+				params.put("usersOrgs", organizationIds);
+			}
 		}
 
 		long roleId = searchTerms.getRoleId();
@@ -188,10 +197,20 @@ public class ExportUsersAction extends PortletAction {
 		PermissionChecker permissionChecker =
 			themeDisplay.getPermissionChecker();
 
+		boolean exportAllUsers = false;
+
 		if (!PortalPermissionUtil.contains(
 				permissionChecker, ActionKeys.EXPORT_USER)) {
 
-			return StringPool.BLANK;
+			if (!PortletPermissionUtil.contains(
+					permissionChecker, PortletKeys.USERS_ADMIN,
+					ActionKeys.EXPORT_USER)) {
+
+				return StringPool.BLANK;
+			}
+		}
+		else {
+			exportAllUsers = true;
 		}
 
 		String exportProgressId = ParamUtil.getString(
@@ -203,7 +222,7 @@ public class ExportUsersAction extends PortletAction {
 		progressTracker.start();
 
 		List<User> users = getUsers(
-			actionRequest, actionResponse, themeDisplay);
+			actionRequest, actionResponse, themeDisplay, exportAllUsers);
 
 		int percentage = 10;
 		int total = users.size();
