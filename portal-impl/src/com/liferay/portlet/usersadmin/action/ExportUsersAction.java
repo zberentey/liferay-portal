@@ -31,6 +31,7 @@ import com.liferay.portal.security.permission.ActionKeys;
 import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portal.service.UserLocalServiceUtil;
 import com.liferay.portal.service.permission.PortalPermissionUtil;
+import com.liferay.portal.service.permission.PortletPermissionUtil;
 import com.liferay.portal.struts.ActionConstants;
 import com.liferay.portal.struts.PortletAction;
 import com.liferay.portal.theme.ThemeDisplay;
@@ -127,7 +128,7 @@ public class ExportUsersAction extends PortletAction {
 
 	protected List<User> getUsers(
 			ActionRequest actionRequest, ActionResponse actionResponse,
-			ThemeDisplay themeDisplay)
+			ThemeDisplay themeDisplay, boolean porltetExportPermissionGranted)
 		throws Exception {
 
 		PortletURL portletURL =
@@ -145,9 +146,17 @@ public class ExportUsersAction extends PortletAction {
 			new LinkedHashMap<String, Object>();
 
 		long organizationId = searchTerms.getOrganizationId();
+		long organizationIds[] = ParamUtil.getLongValues(
+									actionRequest,
+									"organizationsSearchContainerPrimaryKeys");
 
 		if (organizationId > 0) {
 			params.put("usersOrgs", new Long(organizationId));
+		}
+		else if (porltetExportPermissionGranted && (organizationIds != null) &&
+					(organizationIds.length > 0)) {
+
+			params.put("usersOrgs", organizationIds);
 		}
 
 		long roleId = searchTerms.getRoleId();
@@ -188,8 +197,18 @@ public class ExportUsersAction extends PortletAction {
 		PermissionChecker permissionChecker =
 			themeDisplay.getPermissionChecker();
 
+		boolean porltetExportPermissionGranted = false;
+
+		if (PortletPermissionUtil.contains(
+				permissionChecker, PortletKeys.USERS_ADMIN,
+				ActionKeys.EXPORT_USER)) {
+
+			porltetExportPermissionGranted = true;
+		}
+
 		if (!PortalPermissionUtil.contains(
-				permissionChecker, ActionKeys.EXPORT_USER)) {
+				permissionChecker, ActionKeys.EXPORT_USER) &&
+					!porltetExportPermissionGranted) {
 
 			return StringPool.BLANK;
 		}
@@ -203,7 +222,8 @@ public class ExportUsersAction extends PortletAction {
 		progressTracker.start();
 
 		List<User> users = getUsers(
-			actionRequest, actionResponse, themeDisplay);
+			actionRequest, actionResponse, themeDisplay,
+			porltetExportPermissionGranted);
 
 		int percentage = 10;
 		int total = users.size();
