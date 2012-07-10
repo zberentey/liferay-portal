@@ -128,7 +128,7 @@ public class ExportUsersAction extends PortletAction {
 
 	protected List<User> getUsers(
 			ActionRequest actionRequest, ActionResponse actionResponse,
-			ThemeDisplay themeDisplay, boolean porltetExportPermissionGranted)
+			ThemeDisplay themeDisplay, boolean exportAllUsers)
 		throws Exception {
 
 		PortletURL portletURL =
@@ -146,17 +146,17 @@ public class ExportUsersAction extends PortletAction {
 			new LinkedHashMap<String, Object>();
 
 		long organizationId = searchTerms.getOrganizationId();
-		long organizationIds[] = ParamUtil.getLongValues(
-									actionRequest,
-									"organizationsSearchContainerPrimaryKeys");
 
 		if (organizationId > 0) {
 			params.put("usersOrgs", new Long(organizationId));
 		}
-		else if (porltetExportPermissionGranted && (organizationIds != null) &&
-					(organizationIds.length > 0)) {
+		else if (!exportAllUsers) {
+			User currentUser = themeDisplay.getUser();
+			long organizationIds[] = currentUser.getOrganizationIds();
 
-			params.put("usersOrgs", organizationIds);
+			if (organizationIds.length > 0) {
+				params.put("usersOrgs", organizationIds);
+			}
 		}
 
 		long roleId = searchTerms.getRoleId();
@@ -197,20 +197,20 @@ public class ExportUsersAction extends PortletAction {
 		PermissionChecker permissionChecker =
 			themeDisplay.getPermissionChecker();
 
-		boolean porltetExportPermissionGranted = false;
-
-		if (PortletPermissionUtil.contains(
-				permissionChecker, PortletKeys.USERS_ADMIN,
-				ActionKeys.EXPORT_USER)) {
-
-			porltetExportPermissionGranted = true;
-		}
+		boolean exportAllUsers = false;
 
 		if (!PortalPermissionUtil.contains(
-				permissionChecker, ActionKeys.EXPORT_USER) &&
-					!porltetExportPermissionGranted) {
+				permissionChecker, ActionKeys.EXPORT_USER)) {
 
-			return StringPool.BLANK;
+			if (!PortletPermissionUtil.contains(
+					permissionChecker, PortletKeys.USERS_ADMIN,
+					ActionKeys.EXPORT_USER)) {
+
+				return StringPool.BLANK;
+			}
+		}
+		else {
+			exportAllUsers = true;
 		}
 
 		String exportProgressId = ParamUtil.getString(
@@ -222,8 +222,7 @@ public class ExportUsersAction extends PortletAction {
 		progressTracker.start();
 
 		List<User> users = getUsers(
-			actionRequest, actionResponse, themeDisplay,
-			porltetExportPermissionGranted);
+			actionRequest, actionResponse, themeDisplay, exportAllUsers);
 
 		int percentage = 10;
 		int total = users.size();
