@@ -1460,6 +1460,382 @@ public class BookmarksEntryUtil {
 	}
 
 	/**
+	* Returns all the bookmarks entries where groupId = &#63; and folderId = &#63; and status = &#63;.
+	*
+	* @param groupId the group ID
+	* @param folderId the folder ID
+	* @param status the status
+	* @return the matching bookmarks entries
+	* @throws SystemException if a system exception occurred
+	*/
+	public static java.util.List<com.liferay.portlet.bookmarks.model.BookmarksEntry> findByG_F_S(
+		long groupId, long folderId, int status)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence().findByG_F_S(groupId, folderId, status);
+	}
+
+	/**
+	* Returns a range of all the bookmarks entries where groupId = &#63; and folderId = &#63; and status = &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param groupId the group ID
+	* @param folderId the folder ID
+	* @param status the status
+	* @param start the lower bound of the range of bookmarks entries
+	* @param end the upper bound of the range of bookmarks entries (not inclusive)
+	* @return the range of matching bookmarks entries
+	* @throws SystemException if a system exception occurred
+	*/
+	public static java.util.List<com.liferay.portlet.bookmarks.model.BookmarksEntry> findByG_F_S(
+		long groupId, long folderId, int status, int start, int end)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .findByG_F_S(groupId, folderId, status, start, end);
+	}
+
+	/**
+	* Returns an ordered range of all the bookmarks entries where groupId = &#63; and folderId = &#63; and status = &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param groupId the group ID
+	* @param folderId the folder ID
+	* @param status the status
+	* @param start the lower bound of the range of bookmarks entries
+	* @param end the upper bound of the range of bookmarks entries (not inclusive)
+	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	* @return the ordered range of matching bookmarks entries
+	* @throws SystemException if a system exception occurred
+	*/
+	public static java.util.List<com.liferay.portlet.bookmarks.model.BookmarksEntry> findByG_F_S(
+		long groupId, long folderId, int status, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .findByG_F_S(groupId, folderId, status, start, end,
+			orderByComparator);
+	}
+
+	/**
+	* Returns the first bookmarks entry in the ordered set where groupId = &#63; and folderId = &#63; and status = &#63;.
+	*
+	* @param groupId the group ID
+	* @param folderId the folder ID
+	* @param status the status
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the first matching bookmarks entry
+	* @throws com.liferay.portlet.bookmarks.NoSuchEntryException if a matching bookmarks entry could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.portlet.bookmarks.model.BookmarksEntry findByG_F_S_First(
+		long groupId, long folderId, int status,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException,
+			com.liferay.portlet.bookmarks.NoSuchEntryException {
+		return getPersistence()
+				   .findByG_F_S_First(groupId, folderId, status,
+			orderByComparator);
+	}
+
+	/**
+	* Returns the first bookmarks entry in the ordered set where groupId = &#63; and folderId = &#63; and status = &#63;.
+	*
+	* @param groupId the group ID
+	* @param folderId the folder ID
+	* @param status the status
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the first matching bookmarks entry, or <code>null</code> if a matching bookmarks entry could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.portlet.bookmarks.model.BookmarksEntry fetchByG_F_S_First(
+		long groupId, long folderId, int status,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .fetchByG_F_S_First(groupId, folderId, status,
+			orderByComparator);
+	}
+
+	/**
+	* Returns the last bookmarks entry in the ordered set where groupId = &#63; and folderId = &#63; and status = &#63;.
+	*
+	* @param groupId the group ID
+	* @param folderId the folder ID
+	* @param status the status
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the last matching bookmarks entry
+	* @throws com.liferay.portlet.bookmarks.NoSuchEntryException if a matching bookmarks entry could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.portlet.bookmarks.model.BookmarksEntry findByG_F_S_Last(
+		long groupId, long folderId, int status,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException,
+			com.liferay.portlet.bookmarks.NoSuchEntryException {
+		return getPersistence()
+				   .findByG_F_S_Last(groupId, folderId, status,
+			orderByComparator);
+	}
+
+	/**
+	* Returns the last bookmarks entry in the ordered set where groupId = &#63; and folderId = &#63; and status = &#63;.
+	*
+	* @param groupId the group ID
+	* @param folderId the folder ID
+	* @param status the status
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the last matching bookmarks entry, or <code>null</code> if a matching bookmarks entry could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.portlet.bookmarks.model.BookmarksEntry fetchByG_F_S_Last(
+		long groupId, long folderId, int status,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .fetchByG_F_S_Last(groupId, folderId, status,
+			orderByComparator);
+	}
+
+	/**
+	* Returns the bookmarks entries before and after the current bookmarks entry in the ordered set where groupId = &#63; and folderId = &#63; and status = &#63;.
+	*
+	* @param entryId the primary key of the current bookmarks entry
+	* @param groupId the group ID
+	* @param folderId the folder ID
+	* @param status the status
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the previous, current, and next bookmarks entry
+	* @throws com.liferay.portlet.bookmarks.NoSuchEntryException if a bookmarks entry with the primary key could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.portlet.bookmarks.model.BookmarksEntry[] findByG_F_S_PrevAndNext(
+		long entryId, long groupId, long folderId, int status,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException,
+			com.liferay.portlet.bookmarks.NoSuchEntryException {
+		return getPersistence()
+				   .findByG_F_S_PrevAndNext(entryId, groupId, folderId, status,
+			orderByComparator);
+	}
+
+	/**
+	* Returns all the bookmarks entries where groupId = &#63; and folderId = any &#63; and status = &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param groupId the group ID
+	* @param folderIds the folder IDs
+	* @param status the status
+	* @return the matching bookmarks entries
+	* @throws SystemException if a system exception occurred
+	*/
+	public static java.util.List<com.liferay.portlet.bookmarks.model.BookmarksEntry> findByG_F_S(
+		long groupId, long[] folderIds, int status)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence().findByG_F_S(groupId, folderIds, status);
+	}
+
+	/**
+	* Returns a range of all the bookmarks entries where groupId = &#63; and folderId = any &#63; and status = &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param groupId the group ID
+	* @param folderIds the folder IDs
+	* @param status the status
+	* @param start the lower bound of the range of bookmarks entries
+	* @param end the upper bound of the range of bookmarks entries (not inclusive)
+	* @return the range of matching bookmarks entries
+	* @throws SystemException if a system exception occurred
+	*/
+	public static java.util.List<com.liferay.portlet.bookmarks.model.BookmarksEntry> findByG_F_S(
+		long groupId, long[] folderIds, int status, int start, int end)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .findByG_F_S(groupId, folderIds, status, start, end);
+	}
+
+	/**
+	* Returns an ordered range of all the bookmarks entries where groupId = &#63; and folderId = any &#63; and status = &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param groupId the group ID
+	* @param folderIds the folder IDs
+	* @param status the status
+	* @param start the lower bound of the range of bookmarks entries
+	* @param end the upper bound of the range of bookmarks entries (not inclusive)
+	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	* @return the ordered range of matching bookmarks entries
+	* @throws SystemException if a system exception occurred
+	*/
+	public static java.util.List<com.liferay.portlet.bookmarks.model.BookmarksEntry> findByG_F_S(
+		long groupId, long[] folderIds, int status, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .findByG_F_S(groupId, folderIds, status, start, end,
+			orderByComparator);
+	}
+
+	/**
+	* Returns all the bookmarks entries that the user has permission to view where groupId = &#63; and folderId = &#63; and status = &#63;.
+	*
+	* @param groupId the group ID
+	* @param folderId the folder ID
+	* @param status the status
+	* @return the matching bookmarks entries that the user has permission to view
+	* @throws SystemException if a system exception occurred
+	*/
+	public static java.util.List<com.liferay.portlet.bookmarks.model.BookmarksEntry> filterFindByG_F_S(
+		long groupId, long folderId, int status)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence().filterFindByG_F_S(groupId, folderId, status);
+	}
+
+	/**
+	* Returns a range of all the bookmarks entries that the user has permission to view where groupId = &#63; and folderId = &#63; and status = &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param groupId the group ID
+	* @param folderId the folder ID
+	* @param status the status
+	* @param start the lower bound of the range of bookmarks entries
+	* @param end the upper bound of the range of bookmarks entries (not inclusive)
+	* @return the range of matching bookmarks entries that the user has permission to view
+	* @throws SystemException if a system exception occurred
+	*/
+	public static java.util.List<com.liferay.portlet.bookmarks.model.BookmarksEntry> filterFindByG_F_S(
+		long groupId, long folderId, int status, int start, int end)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .filterFindByG_F_S(groupId, folderId, status, start, end);
+	}
+
+	/**
+	* Returns an ordered range of all the bookmarks entries that the user has permissions to view where groupId = &#63; and folderId = &#63; and status = &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param groupId the group ID
+	* @param folderId the folder ID
+	* @param status the status
+	* @param start the lower bound of the range of bookmarks entries
+	* @param end the upper bound of the range of bookmarks entries (not inclusive)
+	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	* @return the ordered range of matching bookmarks entries that the user has permission to view
+	* @throws SystemException if a system exception occurred
+	*/
+	public static java.util.List<com.liferay.portlet.bookmarks.model.BookmarksEntry> filterFindByG_F_S(
+		long groupId, long folderId, int status, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .filterFindByG_F_S(groupId, folderId, status, start, end,
+			orderByComparator);
+	}
+
+	/**
+	* Returns the bookmarks entries before and after the current bookmarks entry in the ordered set of bookmarks entries that the user has permission to view where groupId = &#63; and folderId = &#63; and status = &#63;.
+	*
+	* @param entryId the primary key of the current bookmarks entry
+	* @param groupId the group ID
+	* @param folderId the folder ID
+	* @param status the status
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the previous, current, and next bookmarks entry
+	* @throws com.liferay.portlet.bookmarks.NoSuchEntryException if a bookmarks entry with the primary key could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.portlet.bookmarks.model.BookmarksEntry[] filterFindByG_F_S_PrevAndNext(
+		long entryId, long groupId, long folderId, int status,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException,
+			com.liferay.portlet.bookmarks.NoSuchEntryException {
+		return getPersistence()
+				   .filterFindByG_F_S_PrevAndNext(entryId, groupId, folderId,
+			status, orderByComparator);
+	}
+
+	/**
+	* Returns all the bookmarks entries that the user has permission to view where groupId = &#63; and folderId = any &#63; and status = &#63;.
+	*
+	* @param groupId the group ID
+	* @param folderIds the folder IDs
+	* @param status the status
+	* @return the matching bookmarks entries that the user has permission to view
+	* @throws SystemException if a system exception occurred
+	*/
+	public static java.util.List<com.liferay.portlet.bookmarks.model.BookmarksEntry> filterFindByG_F_S(
+		long groupId, long[] folderIds, int status)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence().filterFindByG_F_S(groupId, folderIds, status);
+	}
+
+	/**
+	* Returns a range of all the bookmarks entries that the user has permission to view where groupId = &#63; and folderId = any &#63; and status = &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param groupId the group ID
+	* @param folderIds the folder IDs
+	* @param status the status
+	* @param start the lower bound of the range of bookmarks entries
+	* @param end the upper bound of the range of bookmarks entries (not inclusive)
+	* @return the range of matching bookmarks entries that the user has permission to view
+	* @throws SystemException if a system exception occurred
+	*/
+	public static java.util.List<com.liferay.portlet.bookmarks.model.BookmarksEntry> filterFindByG_F_S(
+		long groupId, long[] folderIds, int status, int start, int end)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .filterFindByG_F_S(groupId, folderIds, status, start, end);
+	}
+
+	/**
+	* Returns an ordered range of all the bookmarks entries that the user has permission to view where groupId = &#63; and folderId = any &#63; and status = &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param groupId the group ID
+	* @param folderIds the folder IDs
+	* @param status the status
+	* @param start the lower bound of the range of bookmarks entries
+	* @param end the upper bound of the range of bookmarks entries (not inclusive)
+	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	* @return the ordered range of matching bookmarks entries that the user has permission to view
+	* @throws SystemException if a system exception occurred
+	*/
+	public static java.util.List<com.liferay.portlet.bookmarks.model.BookmarksEntry> filterFindByG_F_S(
+		long groupId, long[] folderIds, int status, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .filterFindByG_F_S(groupId, folderIds, status, start, end,
+			orderByComparator);
+	}
+
+	/**
 	* Returns all the bookmarks entries.
 	*
 	* @return the bookmarks entries
@@ -1590,6 +1966,19 @@ public class BookmarksEntryUtil {
 	public static void removeByG_F(long groupId, long folderId)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		getPersistence().removeByG_F(groupId, folderId);
+	}
+
+	/**
+	* Removes all the bookmarks entries where groupId = &#63; and folderId = &#63; and status = &#63; from the database.
+	*
+	* @param groupId the group ID
+	* @param folderId the folder ID
+	* @param status the status
+	* @throws SystemException if a system exception occurred
+	*/
+	public static void removeByG_F_S(long groupId, long folderId, int status)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		getPersistence().removeByG_F_S(groupId, folderId, status);
 	}
 
 	/**
@@ -1752,6 +2141,62 @@ public class BookmarksEntryUtil {
 	public static int filterCountByG_F(long groupId, long[] folderIds)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return getPersistence().filterCountByG_F(groupId, folderIds);
+	}
+
+	/**
+	* Returns the number of bookmarks entries where groupId = &#63; and folderId = &#63; and status = &#63;.
+	*
+	* @param groupId the group ID
+	* @param folderId the folder ID
+	* @param status the status
+	* @return the number of matching bookmarks entries
+	* @throws SystemException if a system exception occurred
+	*/
+	public static int countByG_F_S(long groupId, long folderId, int status)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence().countByG_F_S(groupId, folderId, status);
+	}
+
+	/**
+	* Returns the number of bookmarks entries where groupId = &#63; and folderId = any &#63; and status = &#63;.
+	*
+	* @param groupId the group ID
+	* @param folderIds the folder IDs
+	* @param status the status
+	* @return the number of matching bookmarks entries
+	* @throws SystemException if a system exception occurred
+	*/
+	public static int countByG_F_S(long groupId, long[] folderIds, int status)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence().countByG_F_S(groupId, folderIds, status);
+	}
+
+	/**
+	* Returns the number of bookmarks entries that the user has permission to view where groupId = &#63; and folderId = &#63; and status = &#63;.
+	*
+	* @param groupId the group ID
+	* @param folderId the folder ID
+	* @param status the status
+	* @return the number of matching bookmarks entries that the user has permission to view
+	* @throws SystemException if a system exception occurred
+	*/
+	public static int filterCountByG_F_S(long groupId, long folderId, int status)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence().filterCountByG_F_S(groupId, folderId, status);
+	}
+
+	/**
+	* Returns the number of bookmarks entries that the user has permission to view where groupId = &#63; and folderId = any &#63; and status = &#63;.
+	*
+	* @param groupId the group ID
+	* @param folderIds the folder IDs
+	* @param status the status
+	* @return the number of matching bookmarks entries that the user has permission to view
+	* @throws SystemException if a system exception occurred
+	*/
+	public static int filterCountByG_F_S(long groupId, long[] folderIds,
+		int status) throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence().filterCountByG_F_S(groupId, folderIds, status);
 	}
 
 	/**

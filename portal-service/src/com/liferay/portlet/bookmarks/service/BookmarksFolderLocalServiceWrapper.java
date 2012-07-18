@@ -355,11 +355,44 @@ public class BookmarksFolderLocalServiceWrapper
 			parentFolderId);
 	}
 
+	public int getFoldersCount(long groupId, long parentFolderId, int status)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _bookmarksFolderLocalService.getFoldersCount(groupId,
+			parentFolderId, status);
+	}
+
 	public void getSubfolderIds(java.util.List<java.lang.Long> folderIds,
 		long groupId, long folderId)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		_bookmarksFolderLocalService.getSubfolderIds(folderIds, groupId,
 			folderId);
+	}
+
+	public boolean isBookmarksFolderRestorable(long folderId, boolean isEntry)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return _bookmarksFolderLocalService.isBookmarksFolderRestorable(folderId,
+			isEntry);
+	}
+
+	public com.liferay.portlet.bookmarks.model.BookmarksFolder moveFolderToTrash(
+		long userId, com.liferay.portlet.bookmarks.model.BookmarksFolder folder)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return _bookmarksFolderLocalService.moveFolderToTrash(userId, folder);
+	}
+
+	public com.liferay.portlet.bookmarks.model.BookmarksFolder moveFolderToTrash(
+		long userId, long folderId)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return _bookmarksFolderLocalService.moveFolderToTrash(userId, folderId);
+	}
+
+	public void restoreFolderFromTrash(long userId, long folderId)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		_bookmarksFolderLocalService.restoreFolderFromTrash(userId, folderId);
 	}
 
 	public com.liferay.portlet.bookmarks.model.BookmarksFolder updateFolder(
