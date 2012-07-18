@@ -20,10 +20,15 @@ import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.search.Indexable;
 import com.liferay.portal.kernel.search.IndexableType;
+import com.liferay.portal.kernel.search.Indexer;
+import com.liferay.portal.kernel.search.IndexerRegistryUtil;
+import com.liferay.portal.kernel.trash.RestoreException;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.OrderByComparator;
+import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.model.ResourceConstants;
 import com.liferay.portal.model.User;
 import com.liferay.portal.service.ServiceContext;
@@ -36,6 +41,8 @@ import com.liferay.portlet.bookmarks.model.BookmarksFolderConstants;
 import com.liferay.portlet.bookmarks.service.base.BookmarksEntryLocalServiceBaseImpl;
 import com.liferay.portlet.bookmarks.social.BookmarksActivityKeys;
 import com.liferay.portlet.bookmarks.util.comparator.EntryModifiedDateComparator;
+import com.liferay.portlet.social.model.SocialActivityConstants;
+import com.liferay.portlet.trash.model.TrashEntry;
 
 import java.util.Date;
 import java.util.List;
@@ -43,6 +50,7 @@ import java.util.List;
 /**
  * @author Brian Wing Shun Chan
  * @author Raymond Augé
+ * @author Levente Hudák
  */
 public class BookmarksEntryLocalServiceImpl
 	extends BookmarksEntryLocalServiceBaseImpl {
@@ -81,6 +89,10 @@ public class BookmarksEntryLocalServiceImpl
 		entry.setUrl(url);
 		entry.setDescription(description);
 		entry.setExpandoBridgeAttributes(serviceContext);
+		entry.setStatus(WorkflowConstants.STATUS_APPROVED);
+		entry.setStatusByUserId(userId);
+		entry.setStatusByUserName(user.getScreenName());
+		entry.setStatusDate(now);
 
 		bookmarksEntryPersistence.update(entry, false);
 
@@ -140,6 +152,11 @@ public class BookmarksEntryLocalServiceImpl
 		// Expando
 
 		expandoValueLocalService.deleteValues(
+			BookmarksEntry.class.getName(), entry.getEntryId());
+
+		// Trash
+
+		trashEntryLocalService.deleteEntry(
 			BookmarksEntry.class.getName(), entry.getEntryId());
 
 		return entry;
@@ -235,6 +252,72 @@ public class BookmarksEntryLocalServiceImpl
 		return bookmarksEntryFinder.findByNoAssets();
 	}
 
+	public boolean isBookmarksEntryRestorable(long entryId)
+		throws PortalException, SystemException {
+
+		BookmarksEntry entry = getEntry(entryId);
+
+		return bookmarksFolderLocalService.isBookmarksFolderRestorable(
+			entry.getFolderId(), true);
+	}
+
+	public void moveEntriesToTrash(long groupId, long userId)
+		throws PortalException, SystemException {
+
+		List<BookmarksEntry> entries = bookmarksEntryPersistence.findByGroupId(
+			groupId);
+
+		for (BookmarksEntry entry : entries) {
+			moveEntryToTrash(userId, entry, true);
+		}
+	}
+
+	public BookmarksEntry moveEntryToTrash(
+			long userId, BookmarksEntry entry, boolean updateSocialActivity)
+		throws PortalException, SystemException {
+
+		User user = userPersistence.findByPrimaryKey(userId);
+
+		Date now = new Date();
+
+		entry.setStatus(WorkflowConstants.STATUS_IN_TRASH);
+		entry.setStatusByUserId(userId);
+		entry.setStatusByUserName(user.getScreenName());
+		entry.setStatusDate(now);
+
+		updateBookmarksEntry(entry);
+
+		// Asset
+
+		assetEntryLocalService.updateVisible(
+			BookmarksEntry.class.getName(), entry.getEntryId(), false);
+
+		// Social
+
+		if (updateSocialActivity) {
+			socialActivityLocalService.addActivity(
+				userId, entry.getGroupId(), BookmarksEntry.class.getName(),
+				entry.getEntryId(), SocialActivityConstants.TYPE_MOVE_TO_TRASH,
+				StringPool.BLANK, 0);
+		}
+
+		// Trash
+
+		trashEntryLocalService.addTrashEntry(
+			userId, entry.getGroupId(), BookmarksEntry.class.getName(),
+			entry.getEntryId(), entry.getStatus(), null, null);
+
+		return entry;
+	}
+
+	public BookmarksEntry moveEntryToTrash(long userId, long entryId)
+		throws PortalException, SystemException {
+
+		BookmarksEntry entry = getEntry(entryId);
+
+		return moveEntryToTrash(userId, entry, true);
+	}
+
 	public BookmarksEntry openEntry(long userId, long entryId)
 		throws PortalException, SystemException {
 
@@ -249,6 +332,58 @@ public class BookmarksEntryLocalServiceImpl
 			userId, BookmarksEntry.class.getName(), entryId, 1);
 
 		return entry;
+	}
+
+	public void restoreEntryFromTrash(long userId, long entryId)
+		throws PortalException, SystemException {
+
+		if (!isBookmarksEntryRestorable(entryId)) {
+			throw new RestoreException();
+		}
+
+		User user = userPersistence.findByPrimaryKey(userId);
+
+		Date now = new Date();
+
+		TrashEntry trashEntry = trashEntryLocalService.getEntry(
+			BookmarksEntry.class.getName(), entryId);
+
+		// Entry
+
+		BookmarksEntry entry = getEntry(entryId);
+
+		entry.setStatus(WorkflowConstants.STATUS_APPROVED);
+		entry.setStatusByUserId(userId);
+		entry.setStatusByUserName(user.getScreenName());
+		entry.setStatusDate(now);
+
+		updateBookmarksEntry(entry);
+
+		// Asset
+
+		assetEntryLocalService.updateVisible(
+			BookmarksEntry.class.getName(), entry.getEntryId(), true);
+
+		// Social
+
+		socialActivityCounterLocalService.enableActivityCounters(
+			BookmarksEntry.class.getName(), entryId);
+
+		socialActivityLocalService.addActivity(
+			userId, entry.getGroupId(), BookmarksEntry.class.getName(), entryId,
+			SocialActivityConstants.TYPE_RESTORE_FROM_TRASH, StringPool.BLANK,
+			0);
+
+		// Indexer
+
+		Indexer indexer = IndexerRegistryUtil.nullSafeGetIndexer(
+			BookmarksEntry.class.getName());
+
+		indexer.reindex(entry);
+
+		// Trash
+
+		trashEntryLocalService.deleteEntry(trashEntry.getEntryId());
 	}
 
 	public void updateAsset(
