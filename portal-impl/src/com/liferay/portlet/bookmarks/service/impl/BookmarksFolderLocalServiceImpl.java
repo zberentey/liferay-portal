@@ -18,7 +18,10 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.IndexerRegistryUtil;
+import com.liferay.portal.kernel.trash.RestoreException;
+import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.model.ResourceConstants;
 import com.liferay.portal.model.User;
 import com.liferay.portal.service.ServiceContext;
@@ -27,6 +30,8 @@ import com.liferay.portlet.bookmarks.model.BookmarksEntry;
 import com.liferay.portlet.bookmarks.model.BookmarksFolder;
 import com.liferay.portlet.bookmarks.model.BookmarksFolderConstants;
 import com.liferay.portlet.bookmarks.service.base.BookmarksFolderLocalServiceBaseImpl;
+import com.liferay.portlet.social.model.SocialActivityConstants;
+import com.liferay.portlet.trash.model.TrashEntry;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -35,6 +40,7 @@ import java.util.List;
 /**
  * @author Brian Wing Shun Chan
  * @author Wesley Gong
+ * @author Levente Hudák
  */
 public class BookmarksFolderLocalServiceImpl
 	extends BookmarksFolderLocalServiceBaseImpl {
@@ -68,6 +74,10 @@ public class BookmarksFolderLocalServiceImpl
 		folder.setName(name);
 		folder.setDescription(description);
 		folder.setExpandoBridgeAttributes(serviceContext);
+		folder.setStatus(WorkflowConstants.STATUS_APPROVED);
+		folder.setStatusByUserId(userId);
+		folder.setStatusByUserName(user.getScreenName());
+		folder.setStatusDate(now);
 
 		bookmarksFolderPersistence.update(folder, false);
 
@@ -174,6 +184,13 @@ public class BookmarksFolderLocalServiceImpl
 		return bookmarksFolderPersistence.countByG_P(groupId, parentFolderId);
 	}
 
+	public int getFoldersCount(long groupId, long parentFolderId, int status)
+		throws SystemException {
+
+		return bookmarksFolderPersistence.countByG_P_S(
+			groupId, parentFolderId, status);
+	}
+
 	public void getSubfolderIds(
 			List<Long> folderIds, long groupId, long folderId)
 		throws SystemException {
@@ -187,6 +204,114 @@ public class BookmarksFolderLocalServiceImpl
 			getSubfolderIds(
 				folderIds, folder.getGroupId(), folder.getFolderId());
 		}
+	}
+
+	public boolean isBookmarksFolderRestorable(long folderId, boolean isEntry)
+		throws PortalException, SystemException {
+
+		if (folderId == BookmarksFolderConstants.DEFAULT_PARENT_FOLDER_ID) {
+			return true;
+		}
+
+		BookmarksFolder folder = getFolder(folderId);
+
+		if (folder.isInTrash() && isEntry) {
+			return false;
+		}
+
+		if (folder.isRoot()) {
+			return true;
+		}
+
+		BookmarksFolder parentFolder = folder.getParentFolder();
+
+		if (parentFolder.isInTrash()) {
+			return false;
+		}
+
+		return isBookmarksFolderRestorable(parentFolder.getFolderId(), isEntry);
+	}
+
+	public BookmarksFolder moveFolderToTrash(
+		long userId, BookmarksFolder folder)
+			throws PortalException, SystemException {
+
+		User user = userPersistence.findByPrimaryKey(userId);
+
+		Date now = new Date();
+
+		// Bookmarks folder
+
+		folder.setStatus(WorkflowConstants.STATUS_IN_TRASH);
+		folder.setStatusByUserId(userId);
+		folder.setStatusByUserName(user.getScreenName());
+		folder.setStatusDate(now);
+
+		bookmarksFolderPersistence.update(folder, false);
+
+		// Social
+
+		socialActivityLocalService.addActivity(
+			userId, folder.getGroupId(), BookmarksFolder.class.getName(),
+			folder.getFolderId(), SocialActivityConstants.TYPE_MOVE_TO_TRASH,
+			StringPool.BLANK, 0);
+
+		// Trash
+
+		trashEntryLocalService.addTrashEntry(
+			userId, folder.getGroupId(), BookmarksFolder.class.getName(),
+			folder.getFolderId(), folder.getStatus(), null, null);
+
+		return folder;
+	}
+
+	public BookmarksFolder moveFolderToTrash(long userId, long folderId)
+		throws PortalException, SystemException {
+
+		BookmarksFolder folder = getFolder(folderId);
+
+		return moveFolderToTrash(userId, folder);
+	}
+
+	public void restoreFolderFromTrash(long userId, long folderId)
+		throws PortalException, SystemException {
+
+		if (!isBookmarksFolderRestorable(folderId, false)) {
+			throw new RestoreException();
+		}
+
+		User user = userPersistence.findByPrimaryKey(userId);
+
+		Date now = new Date();
+
+		TrashEntry trashEntry = trashEntryLocalService.getEntry(
+			BookmarksFolder.class.getName(), folderId);
+
+		// Bookmarks folder
+
+		BookmarksFolder folder = getFolder(folderId);
+
+		folder.setStatus(WorkflowConstants.STATUS_APPROVED);
+		folder.setStatusByUserId(userId);
+		folder.setStatusByUserName(user.getScreenName());
+		folder.setStatusDate(now);
+
+		bookmarksFolderPersistence.update(folder, false);
+
+		// Social
+
+		socialActivityCounterLocalService.enableActivityCounters(
+			BookmarksFolder.class.getName(), folder.getFolderId());
+
+		socialActivityLocalService.addActivity(
+			userId, folder.getGroupId(), BookmarksFolder.class.getName(),
+			folder.getFolderId(),
+			SocialActivityConstants.TYPE_RESTORE_FROM_TRASH, StringPool.BLANK,
+			0);
+
+		// Trash
+
+		trashEntryLocalService.deleteEntry(trashEntry.getEntryId());
 	}
 
 	public BookmarksFolder updateFolder(

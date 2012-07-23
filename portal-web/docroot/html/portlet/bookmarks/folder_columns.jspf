@@ -22,7 +22,7 @@ subfolderIds.add(new Long(curFolder.getFolderId()));
 BookmarksFolderServiceUtil.getSubfolderIds(subfolderIds, scopeGroupId, curFolder.getFolderId());
 
 int curFoldersCount = subfolderIds.size() - 1;
-int curEntriesCount = BookmarksEntryServiceUtil.getFoldersEntriesCount(scopeGroupId, subfolderIds);
+int curEntriesCount = BookmarksEntryServiceUtil.getFoldersEntriesCount(scopeGroupId, subfolderIds, WorkflowConstants.STATUS_APPROVED);
 
 for (int j = 0; j < folderColumns.length; j++) {
 	String folderColumn = folderColumns[j];
@@ -70,11 +70,11 @@ for (int j = 0; j < folderColumns.length; j++) {
 
 				buffer.append("</a>");
 
-				List subfolders = BookmarksFolderServiceUtil.getFolders(scopeGroupId, curFolder.getFolderId(), 0, 5);
+				List subfolders = BookmarksFolderServiceUtil.getFolders(scopeGroupId, curFolder.getFolderId(), WorkflowConstants.STATUS_APPROVED, 0, 5);
 
 				if (showSubfolders) {
 					if (!subfolders.isEmpty()) {
-						int subfoldersCount = BookmarksFolderServiceUtil.getFoldersCount(scopeGroupId, curFolder.getFolderId());
+						int subfoldersCount = BookmarksFolderServiceUtil.getFoldersCount(scopeGroupId, curFolder.getFolderId(), WorkflowConstants.STATUS_APPROVED);
 
 						buffer.append("<br /><u>");
 						buffer.append(LanguageUtil.get(pageContext, "subfolders"));

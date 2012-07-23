@@ -35,6 +35,10 @@
 		<column name="priority" type="int" />
 
 		<!-- Order -->
+        <column name="status" type="int" />
+        <column name="statusByUserId" type="long" />
+        <column name="statusByUserName" type="String" />
+        <column name="statusDate" type="Date" />
 
 		<order by="asc">
 			<order-column name="folderId" />
@@ -56,12 +60,19 @@
 		</finder>
 
 		<!-- References -->
+        <finder name="G_F_S" return-type="Collection">
+            <finder-column name="groupId" />
+            <finder-column name="folderId" arrayable-operator="OR" />
+            <finder-column name="status" />
+        </finder>
 
 		<reference package-path="com.liferay.portlet.asset" entity="AssetEntry" />
 		<reference package-path="com.liferay.portlet.asset" entity="AssetLink" />
 		<reference package-path="com.liferay.portlet.asset" entity="AssetTag" />
 		<reference package-path="com.liferay.portlet.expando" entity="ExpandoValue" />
 		<reference package-path="com.liferay.portlet.social" entity="SocialActivity" />
+		<reference package-path="com.liferay.portlet.social" entity="SocialActivityCounter" />
+        <reference package-path="com.liferay.portlet.trash" entity="TrashEntry" />
 	</entity>
 	<entity name="BookmarksFolder" uuid="true" local-service="true" remote-service="true">
 
@@ -92,6 +103,10 @@
 		<column name="description" type="String" />
 
 		<!-- Order -->
+        <column name="status" type="int"></column>
+        <column name="statusByUserId" type="long"></column>
+        <column name="statusByUserName" type="String"></column>
+        <column name="statusDate" type="Date"></column>
 
 		<order by="asc">
 			<order-column name="parentFolderId" />
@@ -112,9 +127,18 @@
 		</finder>
 
 		<!-- References -->
+        <finder name="G_P_S" return-type="Collection">
+            <finder-column name="groupId" />
+            <finder-column name="parentFolderId" arrayable-operator="OR" />
+            <finder-column name="status" />
+        </finder>
 
+		<reference package-path="com.liferay.portlet.asset" entity="AssetEntry" />
 		<reference package-path="com.liferay.portal" entity="Group" />
 		<reference package-path="com.liferay.portlet.expando" entity="ExpandoValue" />
+		<reference package-path="com.liferay.portlet.social" entity="SocialActivity" />
+		<reference package-path="com.liferay.portlet.social" entity="SocialActivityCounter" />
+        <reference package-path="com.liferay.portlet.trash" entity="TrashEntry" />
 	</entity>
 	<exceptions>
 		<exception>EntryURL</exception>

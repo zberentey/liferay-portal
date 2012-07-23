@@ -33,6 +33,8 @@ portletURL.setParameter("struts_action", "/trash/view");
 portletURL.setParameter("tabs1", tabs1);
 %>
 
+<liferay-ui:error key="restore-failed" message="the-selected-item(s)-could-not-be-restored" />
+
 <c:if test="<%= group.isStagingGroup() %>">
 	<liferay-ui:tabs
 		names="staging,live"
