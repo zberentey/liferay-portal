@@ -14,12 +14,15 @@
 
 package com.liferay.portlet.asset.service.persistence;
 
+import com.liferay.portal.kernel.dao.orm.EntityCacheUtil;
 import com.liferay.portal.kernel.dao.orm.QueryPos;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.dao.orm.SQLQuery;
 import com.liferay.portal.kernel.dao.orm.Session;
 import com.liferay.portal.kernel.dao.orm.Type;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.CalendarUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
@@ -30,19 +33,24 @@ import com.liferay.portal.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.portlet.asset.model.AssetEntry;
 import com.liferay.portlet.asset.model.impl.AssetEntryImpl;
+import com.liferay.portlet.asset.model.impl.AssetEntryModelImpl;
 import com.liferay.util.dao.orm.CustomSQLUtil;
 
 import java.sql.Timestamp;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+
+import org.apache.commons.lang.ArrayUtils;
 
 /**
  * @author Brian Wing Shun Chan
  * @author Jorge Ferrer
  * @author Shuyang Zhou
+ * @author Laszlo Csontos
  */
 public class AssetEntryFinderImpl
 	extends BasePersistenceImpl<AssetEntry> implements AssetEntryFinder {
@@ -53,13 +61,33 @@ public class AssetEntryFinderImpl
 	public static final String FIND_BY_AND_TAG_IDS =
 		AssetEntryFinder.class.getName() + ".findByAndTagIds";
 
-	public int countEntries(AssetEntryQuery entryQuery) throws SystemException {
+	public List<AssetEntry> findEntries(AssetEntryQuery entryQuery)
+		throws SystemException {
+
+		List<AssetEntry> assetEntries = null;
+
+		if (!PropsValues.ASSET_ENTRY_NESTEDLOOP_JOIN_ENABLED) {
+			assetEntries = queryData(entryQuery, false);
+		}
+
+		if (Validator.isNull(assetEntries)) {
+			List<Long> assetEntyIds = queryData(entryQuery, true);
+			assetEntries = getAssetEntriesFromCache(assetEntyIds);
+		}
+		
+		return assetEntries;
+
+	}
+
+	public int countEntries(AssetEntryQuery entryQuery)
+			throws SystemException {
+
 		Session session = null;
 
 		try {
 			session = openSession();
 
-			SQLQuery q = buildAssetQuerySQL(entryQuery, true, session);
+			SQLQuery q = buildAssetQuerySQL(entryQuery, true, false, session);
 
 			Iterator<Long> itr = q.iterate();
 
@@ -81,18 +109,26 @@ public class AssetEntryFinderImpl
 		}
 	}
 
-	public List<AssetEntry> findEntries(AssetEntryQuery entryQuery)
-		throws SystemException {
+	public <T> List<T> queryData(
+		AssetEntryQuery entryQuery,
+		Boolean queryIdsOnly)
+			throws SystemException {
 
 		Session session = null;
 
 		try {
 			session = openSession();
 
-			SQLQuery q = buildAssetQuerySQL(entryQuery, false, session);
+			SQLQuery q =
+				buildAssetQuerySQL(entryQuery, false, queryIdsOnly, session);
 
-			return (List<AssetEntry>)QueryUtil.list(
-				q, getDialect(), entryQuery.getStart(), entryQuery.getEnd());
+			List<T> result =
+				(List<T>) QueryUtil.list(
+					q, getDialect(), entryQuery.getStart(),
+					entryQuery.getEnd(), true);
+
+			return result;
+
 		}
 		catch (Exception e) {
 			throw new SystemException(e);
@@ -115,18 +151,26 @@ public class AssetEntryFinderImpl
 					categoryIds[i]);
 
 				if (treeCategoryIds.size() > 1) {
-					sb.append(
-						StringUtil.replace(
-							sql, "[$CATEGORY_ID$]",
-							StringUtil.merge(treeCategoryIds)));
+					String categoryIdsString =
+						createCategoryIdsList(treeCategoryIds);
+
+					String tempSQL = StringUtil.replace(
+							sql, "[$CATEGORY_IDS$]", categoryIdsString);
+
+					sb.append(tempSQL);
 
 					continue;
 				}
 			}
 
-			sb.append(
+			String tempSQL =
 				StringUtil.replace(
-					sql, " IN ([$CATEGORY_ID$])", " = " + categoryIds[i]));
+					sql,
+					"[$CATEGORY_IDS$]",
+					"AssetEntries_AssetCategories.categoryId = "
+					.concat(String.valueOf(categoryIds[i])));
+
+			sb.append(tempSQL);
 
 			if ((i + 1) < categoryIds.length) {
 				sb.append(" AND ");
@@ -164,8 +208,6 @@ public class AssetEntryFinderImpl
 	protected void buildAnyCategoriesSQL(long[] categoryIds, StringBundler sb)
 		throws SystemException {
 
-		sb.append(" AND (");
-
 		String sql = CustomSQLUtil.get(FIND_BY_AND_CATEGORY_IDS);
 
 		String categoryIdsString = null;
@@ -178,19 +220,21 @@ public class AssetEntryFinderImpl
 					AssetCategoryFinderUtil.findByG_L(categoryId));
 			}
 
-			categoryIdsString = StringUtil.merge(categoryIdsList);
+			categoryIdsString = createCategoryIdsList(categoryIdsList);
 		}
 		else {
-			categoryIdsString = StringUtil.merge(categoryIds);
+			categoryIdsString = createCategoryIdsList(categoryIds);
 		}
 
-		sb.append(
-			StringUtil.replace(sql, "[$CATEGORY_ID$]", categoryIdsString));
+		sb.append(" AND (");
+		sql = StringUtil.replace(sql, "[$CATEGORY_IDS$]", categoryIdsString);
+		sb.append(sql);
 		sb.append(StringPool.CLOSE_PARENTHESIS);
 	}
 
 	protected SQLQuery buildAssetQuerySQL(
-			AssetEntryQuery entryQuery, boolean count, Session session)
+		AssetEntryQuery entryQuery, boolean count, boolean queryIdsOnly,
+		Session session)
 		throws SystemException {
 
 		StringBundler sb = new StringBundler();
@@ -200,15 +244,21 @@ public class AssetEntryFinderImpl
 				"SELECT COUNT(DISTINCT AssetEntry.entryId) AS COUNT_VALUE ");
 		}
 		else {
-			sb.append("SELECT DISTINCT {AssetEntry.*} ");
 
-			String orderByCol1 = entryQuery.getOrderByCol1();
-			String orderByCol2 = entryQuery.getOrderByCol2();
+			if (queryIdsOnly) {
+				sb.append("SELECT DISTINCT AssetEntry.entryId ");
+			}
+			else {
+				sb.append("SELECT DISTINCT {AssetEntry.*} ");
 
-			if (orderByCol1.equals("ratings") ||
-				orderByCol2.equals("ratings")) {
+				String orderByCol1 = entryQuery.getOrderByCol1();
+				String orderByCol2 = entryQuery.getOrderByCol2();
 
-				sb.append(", RatingsStats.averageScore ");
+				if (orderByCol1.equals("ratings") ||
+					orderByCol2.equals("ratings")) {
+
+					sb.append(", RatingsStats.averageScore ");
+				}
 			}
 		}
 
@@ -362,6 +412,9 @@ public class AssetEntryFinderImpl
 		}
 
 		String sql = sb.toString();
+		if (_log.isDebugEnabled()) {
+			_log.debug("SQL: " + sql);
+		}
 
 		SQLQuery q = session.createSQLQuery(sql);
 
@@ -369,7 +422,12 @@ public class AssetEntryFinderImpl
 			q.addScalar(COUNT_COLUMN_NAME, Type.LONG);
 		}
 		else {
-			q.addEntity("AssetEntry", AssetEntryImpl.class);
+			if (queryIdsOnly) {
+				q.addScalar("entryId", Type.LONG);
+			}
+			else {
+				q.addEntity("AssetEntry", AssetEntryImpl.class);
+			}
 		}
 
 		QueryPos qPos = QueryPos.getInstance(q);
@@ -434,18 +492,27 @@ public class AssetEntryFinderImpl
 					categoryIds[i]);
 
 				if (treeCategoryIds.size() > 1) {
-					sb.append(
+					String categoryIdsString =
+						createCategoryIdsList(treeCategoryIds);
+
+					String tempSQL =
 						StringUtil.replace(
-							sql, "[$CATEGORY_ID$]",
-							StringUtil.merge(treeCategoryIds)));
+							sql, "[$CATEGORY_IDS$]", categoryIdsString);
+
+					sb.append(tempSQL);
 
 					continue;
 				}
 			}
 
-			sb.append(
+			String tempSQL =
 				StringUtil.replace(
-					sql, " IN ([$CATEGORY_ID$])", " = " + categoryIds[i]));
+					sql,
+					"[$CATEGORY_IDS$]",
+					"AssetEntries_AssetCategories.categoryId = "
+					.concat(String.valueOf(categoryIds[i])));
+
+			sb.append(tempSQL);
 
 			if ((i + 1) < categoryIds.length) {
 				sb.append(" OR ");
@@ -477,14 +544,14 @@ public class AssetEntryFinderImpl
 					AssetCategoryFinderUtil.findByG_L(notCategoryId));
 			}
 
-			notCategoryIdsString = StringUtil.merge(notCategoryIdsList);
+			notCategoryIdsString = createCategoryIdsList(notCategoryIdsList);
 		}
 		else {
-			notCategoryIdsString = StringUtil.merge(notCategoryIds);
+			notCategoryIdsString = createCategoryIdsList(notCategoryIds);
 		}
 
 		sb.append(
-			StringUtil.replace(sql, "[$CATEGORY_ID$]", notCategoryIdsString));
+			StringUtil.replace(sql, "[$CATEGORY_IDS$]", notCategoryIdsString));
 		sb.append(StringPool.CLOSE_PARENTHESIS);
 	}
 
@@ -632,4 +699,105 @@ public class AssetEntryFinderImpl
 		}
 	}
 
+	private List<AssetEntry> getAssetEntriesFromCache(
+		List<Long> assetEntryIds)
+			throws SystemException {
+
+		List<AssetEntry> assetEntries =
+			new ArrayList<AssetEntry>(assetEntryIds.size());
+		double cacheHitRatio = 0d;
+		int cacheHitNumber = 0;
+
+		for (Long entryId : assetEntryIds) {
+			long _entryId = entryId.longValue();
+			AssetEntry assetEntry = null;
+
+			if (_log.isDebugEnabled()) {
+
+				assetEntry =
+					(AssetEntry) EntityCacheUtil.getResult(
+						AssetEntryModelImpl.ENTITY_CACHE_ENABLED,
+						AssetEntryImpl.class, _entryId);
+
+				if (Validator.isNotNull(assetEntry)) {
+					cacheHitRatio *= cacheHitNumber++;
+					cacheHitRatio++;
+					cacheHitRatio /= cacheHitNumber;
+				}
+				else {
+					cacheHitNumber++;
+				}
+
+			}
+
+			if (Validator.isNull(assetEntry)) {
+				assetEntry = AssetEntryUtil.fetchByPrimaryKey(_entryId);
+			}
+
+			assetEntries.add(assetEntry);
+
+		}
+
+		if (_log.isDebugEnabled()) {
+			_log.debug("Cache hit ratio: ".concat(String.valueOf(cacheHitRatio)));
+		}
+
+		return assetEntries;
+	}
+	
+	// Avoid ORA-01795: maximum number of expressions in a list is 1000
+	private String createIdsList(
+		String columnName, long[] allCategoryIds) {
+
+		StringBundler sb = new StringBundler();
+
+		int chunkNum = (allCategoryIds.length / MAX_NUMBER_OF_VALUES_IN) + 1;
+		for (int chunkIndex = 0; chunkIndex < chunkNum; chunkIndex++) {
+
+			sb.append(columnName);
+			sb.append(" IN ");
+			sb.append(StringPool.OPEN_PARENTHESIS);
+
+			int firstIndex = chunkIndex * MAX_NUMBER_OF_VALUES_IN;
+			int lastIndex = (chunkIndex + 1) * MAX_NUMBER_OF_VALUES_IN;
+
+			if (lastIndex > allCategoryIds.length) {
+				lastIndex = allCategoryIds.length;
+			}
+
+			long[] subCategoryIds =
+				Arrays.copyOfRange(allCategoryIds, firstIndex, lastIndex);
+			sb.append(StringUtil.merge(subCategoryIds));
+
+			sb.append(StringPool.CLOSE_PARENTHESIS);
+
+			if ((chunkIndex + 1) < chunkNum) {
+				sb.append(" OR ");
+			}
+
+		}
+
+		return sb.toString();
+
+	}
+
+	private String createCategoryIdsList(List<Long> allCategoryIds) {
+		
+		long[] _allCategoryIds =
+			ArrayUtils.toPrimitive(
+				allCategoryIds.toArray(new Long[] {}));
+		
+		return createIdsList(
+			"AssetEntries_AssetCategories.categoryId", _allCategoryIds);
+	}
+
+	private String createCategoryIdsList(long[] allCategoryIds) {
+		return createIdsList(
+			"AssetEntries_AssetCategories.categoryId", allCategoryIds);
+	}
+	
+	private static Log _log = LogFactoryUtil.getLog(AssetEntryFinderImpl.class);
+	
+	private static final int MAX_NUMBER_OF_VALUES_IN = 1000;
+	
 }

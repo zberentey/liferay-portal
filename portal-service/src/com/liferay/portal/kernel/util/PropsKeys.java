@@ -95,8 +95,10 @@ public interface PropsKeys {
 
 	public static final String ASSET_ENTRY_INCREMENT_VIEW_COUNTER_ENABLED = "asset.entry.increment.view.counter.enabled";
 
-	public static final String ASSET_ENTRY_VALIDATOR = "asset.entry.validator";
+	public static final String ASSET_ENTRY_NESTEDLOOP_JOIN_ENABLED = "asset.entry.nestedloop.join.enabled";
 
+	public static final String ASSET_ENTRY_VALIDATOR = "asset.entry.validator";
+	
 	public static final String ASSET_FILTER_SEARCH_LIMIT = "asset.filter.search.limit";
 
 	public static final String ASSET_PUBLISHER_DISPLAY_STYLES = "asset.publisher.display.styles";

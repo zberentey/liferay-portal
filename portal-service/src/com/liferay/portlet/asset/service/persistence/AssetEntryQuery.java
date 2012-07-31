@@ -529,6 +529,32 @@ public class AssetEntryQuery {
 		return _toString;
 	}
 
+	@Override
+	public int hashCode() {
+		return toString().hashCode();
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+
+		if (obj == null) {
+			return false;
+		}
+
+		if (!(obj instanceof AssetEntryQuery)) {
+			return false;
+		}
+
+
+		String _this = this.toString();
+		String _other = obj.toString();
+
+		return _this.equals(_other);
+	}
+
 	private long[] _flattenTagIds(long[][] tagIdsArray) {
 		List<Long> tagIdsList = new ArrayList<Long>();
 
