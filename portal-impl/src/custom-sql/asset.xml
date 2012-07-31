@@ -162,7 +162,7 @@
 						AssetEntries_AssetCategories
 					WHERE
 						(AssetEntries_AssetCategories.entryId = AssetEntry.entryId) AND
-						(AssetEntries_AssetCategories.categoryId IN ([$CATEGORY_ID$]))
+						([$CATEGORY_IDS$])
 				)
 		]]>
 	</sql>
