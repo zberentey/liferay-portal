@@ -1520,8 +1520,13 @@ public class UserServiceImpl extends UserServiceBaseImpl {
 			ServiceContext serviceContext)
 		throws PortalException, SystemException {
 
+		PermissionChecker permissionChecker = getPermissionChecker();
+
 		UserPermissionUtil.check(
-			getPermissionChecker(), userId, organizationIds, ActionKeys.UPDATE);
+			permissionChecker, userId, organizationIds, ActionKeys.UPDATE);
+
+		serviceContext.setAttribute(
+			"remoteUserId", permissionChecker.getUserId());
 
 		User user = userPersistence.findByPrimaryKey(userId);
 
