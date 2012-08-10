@@ -148,6 +148,16 @@ public class Entity {
 				}
 			}
 		}
+
+		if ((_columnList != null) && !_columnList.isEmpty()) {
+			for (EntityColumn col : _columnList) {
+				if (col.isContainerId() || col.isParentContainerId()) {
+					_containerModel = true;
+
+					break;
+				}
+			}
+		}
 	}
 
 	@Override
@@ -536,6 +546,10 @@ public class Entity {
 		return _cacheEnabled;
 	}
 
+	public boolean isContainerModel() {
+		return _containerModel;
+	}
+
 	public boolean isDefaultDataSource() {
 		if (_dataSource.equals(DEFAULT_DATA_SOURCE)) {
 			return true;
@@ -556,6 +570,18 @@ public class Entity {
 
 	public boolean isDefaultTXManager() {
 		if (_txManager.equals(DEFAULT_TX_MANAGER)) {
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+
+	public boolean isFolderModel() {
+		if (hasColumn("folderId") &&
+			(hasColumn("parentFolderId") ||
+				getColumn("folderId").isContainerId())) {
+
 			return true;
 		}
 		else {
@@ -700,6 +726,7 @@ public class Entity {
 	private boolean _cacheEnabled;
 	private List<EntityColumn> _collectionList;
 	private List<EntityColumn> _columnList;
+	private boolean _containerModel;
 	private String _dataSource;
 	private String _finderClass;
 	private List<EntityColumn> _finderColumnsList;

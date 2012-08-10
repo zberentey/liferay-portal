@@ -626,6 +626,77 @@ public class ${entity.name}ModelImpl extends BaseModelImpl<${entity.name}> imple
 		}
 	</#list>
 
+	<#if entity.isFolderModel()>
+		<#if !entity.hasColumn("containerId")>
+			public long getContainerId() {
+				return getFolderId();
+			}
+
+			public void setContainerId(long containerId) {
+				setFolderId(containerId);
+			}
+		</#if>
+
+		<#if !entity.hasColumn("parentContainerId")>
+			public long getParentContainerId() {
+				<#if entity.hasColumn("parentFolderId")>
+					return getParentFolderId();
+				<#else>
+					return 0;
+				</#if>
+			}
+
+			public void setParentContainerId(long parentContainerId) {
+				<#if entity.hasColumn("parentFolderId")>
+					setParentFolderId(parentContainerId);
+				</#if>
+			}
+		</#if>
+	<#else>
+		<#if entity.isContainerModel()>
+			<#assign hasParentContainerId = entity.hasColumn("parentContainerId")>
+
+			<#list entity.columnList as column>
+				<#if column.containerId && (column.name != "containerId")>
+					public long getContainerId() {
+						return get${column.methodName}();
+					}
+
+					public void setContainerId(long containerId) {
+						_${column.name} = containerId;
+					}
+				</#if>
+
+				<#if column.parentContainerId && (column.name != "parentContainerId")>
+					<#assign hasParentContainerId = true>
+
+					public long getParentContainerId() {
+						return get${column.methodName}();
+					}
+
+					public void setParentContainerId(long parentContainerId) {
+						_${column.name} = containerId;
+					}
+				</#if>
+			</#list>
+
+			<#if !hasParentContainerId>
+				public long getParentContainerId() {
+					return 0;
+				}
+
+				public void setParentContainerId(long parentContainerId) {
+				}
+			</#if>
+		</#if>
+	</#if>
+
+	<#if (entity.isContainerModel() || entity.isFolderModel()) && !entity.hasColumn("name")>
+		public String getName() {
+			return String.valueOf(getContainerId());
+		}
+	</#if>
+
 	<#if entity.isWorkflowEnabled()>
 		/**
 		 * @deprecated {@link #isApproved}
