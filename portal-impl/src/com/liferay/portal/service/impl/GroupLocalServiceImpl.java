@@ -606,15 +606,6 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 		catch (NoSuchLayoutSetException nslse) {
 		}
 
-		boolean resetGroup = !group.isStagingGroup() &&
-			group.isOrganization() && group.isSite();
-
-		if (resetGroup) {
-			layoutSetLocalService.addLayoutSet(group.getGroupId(), true);
-
-			layoutSetLocalService.addLayoutSet(group.getGroupId(), false);
-		}
-
 		// Group roles
 
 		userGroupRoleLocalService.deleteUserGroupRolesByGroupId(
@@ -759,7 +750,7 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 
 		// Group
 
-		if (resetGroup) {
+		if (group.isOrganization() && group.isSite()) {
 			group.setSite(false);
 
 			groupPersistence.update(group, false);
