@@ -4329,6 +4329,27 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 	}
 
 	/**
+	 * Updates the user's password without tracking or validation of the change.
+	 *
+	 * @param  userId the primary key of the user
+	 * @param  password1 the user's new password
+	 * @param  password2 the user's new password confirmation
+	 * @param  passwordReset whether the user should be asked to reset their
+	 *         password the next time they log in
+	 * @return the user
+	 * @throws PortalException if a user with the primary key could not be found
+	 * @throws SystemException if a system exception occurred
+	 */
+	public User updatePassword(
+			long userId, String password1, String password2,
+			boolean passwordReset, boolean silentUpdate)
+		throws PortalException, SystemException {
+
+		return updatePassword(
+			userId, password1, password2, passwordReset, silentUpdate, null);
+	}
+
+	/**
 	 * Updates the user's password, optionally with tracking and validation of
 	 * the change.
 	 *
@@ -4339,19 +4360,26 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 	 *         password the next time they login
 	 * @param  silentUpdate whether the password should be updated without being
 	 *         tracked, or validated. Primarily used for password imports.
+	 * @param  serviceContext the user's service context (optionally
+	 *         <code>null</code>). Can set the universally unique identifier
+	 *         (with the <code>uuid</code> attribute), asset category IDs, asset
+	 *         tag names, and expando bridge attributes for the user.
 	 * @return the user
 	 * @throws PortalException if a user with the primary key could not be found
 	 * @throws SystemException if a system exception occurred
 	 */
 	public User updatePassword(
 			long userId, String password1, String password2,
-			boolean passwordReset, boolean silentUpdate)
+			boolean passwordReset, boolean silentUpdate,
+			ServiceContext serviceContext)
 		throws PortalException, SystemException {
 
 		User user = userPersistence.findByPrimaryKey(userId);
 
 		if (!silentUpdate) {
-			validatePassword(user.getCompanyId(), userId, password1, password2);
+			validatePassword(
+				user.getCompanyId(), userId, password1, password2,
+				serviceContext);
 		}
 
 		String oldEncPwd = user.getPassword();
@@ -5755,7 +5783,8 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 	}
 
 	protected void validatePassword(
-			long companyId, long userId, String password1, String password2)
+			long companyId, long userId, String password1, String password2,
+			ServiceContext serviceContext)
 		throws PortalException, SystemException {
 
 		if (Validator.isNull(password1) || Validator.isNull(password2)) {
@@ -5771,8 +5800,16 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 		PasswordPolicy passwordPolicy =
 			passwordPolicyLocalService.getPasswordPolicyByUserId(userId);
 
+		long remoteUserId = 0;
+
+		if (serviceContext != null) {
+			remoteUserId = GetterUtil.getLong(
+				serviceContext.getAttribute("remoteUserId"));
+		}
+
 		PwdToolkitUtil.validate(
-			companyId, userId, password1, password2, passwordPolicy);
+			companyId, userId, remoteUserId, password1, password2,
+			passwordPolicy);
 	}
 
 	protected void validateReminderQuery(String question, String answer)

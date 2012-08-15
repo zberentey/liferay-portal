@@ -26,6 +26,7 @@ import com.liferay.portal.service.PasswordTrackerLocalServiceUtil;
 import com.liferay.portal.service.UserLocalServiceUtil;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.portal.words.WordsUtil;
+import com.liferay.portlet.admin.util.OmniadminUtil;
 import com.liferay.util.PwdGenerator;
 
 import java.util.Arrays;
@@ -77,6 +78,21 @@ public class PasswordPolicyToolkit extends BasicToolkit {
 		}
 	}
 
+	public void validate(
+			long userId, long remoteUserId, String password1, String password2,
+			PasswordPolicy passwordPolicy)
+		throws PortalException, SystemException {
+
+		if (!passwordPolicy.isChangeable() &&
+				!OmniadminUtil.isOmniadmin(remoteUserId)) {
+
+			throw new UserPasswordException(
+				UserPasswordException.PASSWORD_NOT_CHANGEABLE);
+		}
+
+		validate(userId, password1, password2, passwordPolicy);
+	}
+
 	@Override
 	public void validate(
 			long userId, String password1, String password2,
@@ -110,11 +126,6 @@ public class PasswordPolicyToolkit extends BasicToolkit {
 				throw new UserPasswordException(
 					UserPasswordException.PASSWORD_TOO_TRIVIAL);
 			}
-		}
-
-		if (!passwordPolicy.isChangeable()) {
-			throw new UserPasswordException(
-				UserPasswordException.PASSWORD_NOT_CHANGEABLE);
 		}
 
 		if (userId != 0) {

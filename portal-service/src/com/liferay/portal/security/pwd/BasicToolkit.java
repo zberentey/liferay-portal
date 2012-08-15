@@ -31,6 +31,14 @@ public abstract class BasicToolkit implements Toolkit {
 		throws PortalException, SystemException;
 
 	public void validate(
+			long userId, long remoteUserId, String password1, String password2,
+			PasswordPolicy passwordPolicy)
+		throws PortalException, SystemException {
+
+		validate(userId, remoteUserId, password1, password2, passwordPolicy);
+	}
+
+	public void validate(
 			String password1, String password2, PasswordPolicy passwordPolicy)
 		throws PortalException, SystemException {
 

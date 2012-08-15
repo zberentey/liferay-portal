@@ -34,8 +34,8 @@ public class PwdToolkitUtil {
 	}
 
 	public static void validate(
-			long companyId, long userId, String password1, String password2,
-			PasswordPolicy passwordPolicy)
+			long companyId, long userId, long remoteUserId, String password1,
+			String password2, PasswordPolicy passwordPolicy)
 		throws PortalException, SystemException {
 
 		if (!password1.equals(password2)) {
@@ -48,6 +48,14 @@ public class PwdToolkitUtil {
 
 			_toolkit.validate(userId, password1, password2, passwordPolicy);
 		}
+	}
+
+	public static void validate(
+			long companyId, long userId, String password1, String password2,
+			PasswordPolicy passwordPolicy)
+		throws PortalException, SystemException {
+
+		validate(companyId, userId, 0, password1, password2, passwordPolicy);
 	}
 
 	public void setToolkit(Toolkit toolkit) {

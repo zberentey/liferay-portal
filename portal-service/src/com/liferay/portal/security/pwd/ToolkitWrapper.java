@@ -42,6 +42,15 @@ public class ToolkitWrapper implements Toolkit {
 	}
 
 	public void validate(
+			long userId, long remoteUserId, String password1, String password2,
+			PasswordPolicy passwordPolicy)
+		throws PortalException, SystemException {
+
+		_toolkit.validate(
+			userId, remoteUserId, password1, password2, passwordPolicy);
+	}
+
+	public void validate(
 			long userId, String password1, String password2,
 			PasswordPolicy passwordPolicy)
 		throws PortalException, SystemException {

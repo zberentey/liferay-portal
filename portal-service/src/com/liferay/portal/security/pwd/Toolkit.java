@@ -26,6 +26,11 @@ public interface Toolkit {
 	public String generate(PasswordPolicy passwordPolicy);
 
 	public void validate(
+			long userId, long remoteUserId, String password1, String password2,
+			PasswordPolicy passwordPolicy)
+		throws PortalException, SystemException;
+
+	public void validate(
 			long userId, String password1, String password2,
 			PasswordPolicy passwordPolicy)
 		throws PortalException, SystemException;
