@@ -155,10 +155,10 @@ public class LayoutSetLocalServiceImpl extends LayoutSetLocalServiceBaseImpl {
 
 		layoutSetPersistence.removeByG_P(groupId, privateLayout);
 
-		if (group.isOrganization() && group.isSite()) {
-			addLayoutSet(group.getGroupId(), true);
+		if (!group.isStagingGroup() && group.isOrganization() &&
+			group.isSite()) {
 
-			addLayoutSet(group.getGroupId(), false);
+			addLayoutSet(group.getGroupId(), privateLayout);
 		}
 
 		// Counter

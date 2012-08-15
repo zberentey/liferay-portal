@@ -640,7 +640,7 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 
 		if (group.hasStagingGroup()) {
 			try {
-				StagingUtil.disableStaging(group, group, serviceContext);
+				StagingUtil.disableStaging(group, serviceContext);
 			}
 			catch (Exception e) {
 				if (_log.isErrorEnabled()) {
@@ -750,7 +750,9 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 
 		// Group
 
-		if (group.isOrganization() && group.isSite()) {
+		if (!group.isStagingGroup() && group.isOrganization() &&
+			group.isSite()) {
+
 			group.setSite(false);
 
 			groupPersistence.update(group, false);
