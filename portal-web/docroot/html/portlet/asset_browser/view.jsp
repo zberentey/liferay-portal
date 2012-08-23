@@ -112,7 +112,8 @@ portletURL.setParameter("callback", callback);
 
 			// Description
 
-			row.addText(HtmlUtil.stripHtml(assetEntry.getDescription(locale)), rowHREF);
+			row.addText(HtmlUtil.stripHtml(HtmlUtil.unescape(
+					assetEntry.getDescription(locale))), rowHREF);
 
 			// User name
 
