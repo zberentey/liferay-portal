@@ -211,9 +211,9 @@ public class LuceneHelperImpl implements LuceneHelper {
 
 			try {
 				if (like) {
-					
+
 					// LUCENE-89
-					
+
 					value=value.toLowerCase(queryParser.getLocale());
 				}
 
