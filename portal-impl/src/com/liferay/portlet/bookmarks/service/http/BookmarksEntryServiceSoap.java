@@ -112,6 +112,41 @@ public class BookmarksEntryServiceSoap {
 	}
 
 	public static com.liferay.portlet.bookmarks.model.BookmarksEntrySoap[] getEntries(
+		long groupId, long folderId, int status, int start, int end)
+		throws RemoteException {
+		try {
+			java.util.List<com.liferay.portlet.bookmarks.model.BookmarksEntry> returnValue =
+				BookmarksEntryServiceUtil.getEntries(groupId, folderId, status,
+					start, end);
+
+			return com.liferay.portlet.bookmarks.model.BookmarksEntrySoap.toSoapModels(returnValue);
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
+	public static com.liferay.portlet.bookmarks.model.BookmarksEntrySoap[] getEntries(
+		long groupId, long folderId, int status, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws RemoteException {
+		try {
+			java.util.List<com.liferay.portlet.bookmarks.model.BookmarksEntry> returnValue =
+				BookmarksEntryServiceUtil.getEntries(groupId, folderId, status,
+					start, end, orderByComparator);
+
+			return com.liferay.portlet.bookmarks.model.BookmarksEntrySoap.toSoapModels(returnValue);
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
+	public static com.liferay.portlet.bookmarks.model.BookmarksEntrySoap[] getEntries(
 		long groupId, long folderId, int start, int end,
 		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
 		throws RemoteException {
@@ -144,6 +179,21 @@ public class BookmarksEntryServiceSoap {
 		}
 	}
 
+	public static int getEntriesCount(long groupId, long folderId, int status)
+		throws RemoteException {
+		try {
+			int returnValue = BookmarksEntryServiceUtil.getEntriesCount(groupId,
+					folderId, status);
+
+			return returnValue;
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
 	public static com.liferay.portlet.bookmarks.model.BookmarksEntrySoap getEntry(
 		long entryId) throws RemoteException {
 		try {
@@ -163,6 +213,21 @@ public class BookmarksEntryServiceSoap {
 		try {
 			int returnValue = BookmarksEntryServiceUtil.getFoldersEntriesCount(groupId,
 					ListUtil.toList(folderIds));
+
+			return returnValue;
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
+	public static int getFoldersEntriesCount(long groupId, Long[] folderIds,
+		int status) throws RemoteException {
+		try {
+			int returnValue = BookmarksEntryServiceUtil.getFoldersEntriesCount(groupId,
+					ListUtil.toList(folderIds), status);
 
 			return returnValue;
 		}
@@ -234,6 +299,32 @@ public class BookmarksEntryServiceSoap {
 		}
 	}
 
+	public static com.liferay.portlet.bookmarks.model.BookmarksEntrySoap moveEntryFromTrash(
+		long entryId, long parentFolderId) throws RemoteException {
+		try {
+			com.liferay.portlet.bookmarks.model.BookmarksEntry returnValue = BookmarksEntryServiceUtil.moveEntryFromTrash(entryId,
+					parentFolderId);
+
+			return com.liferay.portlet.bookmarks.model.BookmarksEntrySoap.toSoapModel(returnValue);
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
+	public static void moveEntryToTrash(long entryId) throws RemoteException {
+		try {
+			BookmarksEntryServiceUtil.moveEntryToTrash(entryId);
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
 	public static com.liferay.portlet.bookmarks.model.BookmarksEntrySoap openEntry(
 		long entryId) throws RemoteException {
 		try {
@@ -262,6 +353,18 @@ public class BookmarksEntryServiceSoap {
 	public static void unsubscribeEntry(long entryId) throws RemoteException {
 		try {
 			BookmarksEntryServiceUtil.unsubscribeEntry(entryId);
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
+	public static void restoreEntryFromTrash(long entryId)
+		throws RemoteException {
+		try {
+			BookmarksEntryServiceUtil.restoreEntryFromTrash(entryId);
 		}
 		catch (Exception e) {
 			_log.error(e, e);

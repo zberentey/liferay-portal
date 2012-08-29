@@ -35,7 +35,7 @@ public class BookmarksFolderCacheModel implements CacheModel<BookmarksFolder>,
 	Serializable {
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(25);
+		StringBundler sb = new StringBundler(33);
 
 		sb.append("{uuid=");
 		sb.append(uuid);
@@ -61,6 +61,14 @@ public class BookmarksFolderCacheModel implements CacheModel<BookmarksFolder>,
 		sb.append(name);
 		sb.append(", description=");
 		sb.append(description);
+		sb.append(", status=");
+		sb.append(status);
+		sb.append(", statusByUserId=");
+		sb.append(statusByUserId);
+		sb.append(", statusByUserName=");
+		sb.append(statusByUserName);
+		sb.append(", statusDate=");
+		sb.append(statusDate);
 		sb.append("}");
 
 		return sb.toString();
@@ -119,6 +127,23 @@ public class BookmarksFolderCacheModel implements CacheModel<BookmarksFolder>,
 			bookmarksFolderImpl.setDescription(description);
 		}
 
+		bookmarksFolderImpl.setStatus(status);
+		bookmarksFolderImpl.setStatusByUserId(statusByUserId);
+
+		if (statusByUserName == null) {
+			bookmarksFolderImpl.setStatusByUserName(StringPool.BLANK);
+		}
+		else {
+			bookmarksFolderImpl.setStatusByUserName(statusByUserName);
+		}
+
+		if (statusDate == Long.MIN_VALUE) {
+			bookmarksFolderImpl.setStatusDate(null);
+		}
+		else {
+			bookmarksFolderImpl.setStatusDate(new Date(statusDate));
+		}
+
 		bookmarksFolderImpl.resetOriginalValues();
 
 		return bookmarksFolderImpl;
@@ -136,4 +161,8 @@ public class BookmarksFolderCacheModel implements CacheModel<BookmarksFolder>,
 	public long parentFolderId;
 	public String name;
 	public String description;
+	public int status;
+	public long statusByUserId;
+	public String statusByUserName;
+	public long statusDate;
 }
