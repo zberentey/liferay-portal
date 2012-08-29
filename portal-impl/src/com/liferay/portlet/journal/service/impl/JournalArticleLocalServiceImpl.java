@@ -101,6 +101,7 @@ import com.liferay.portlet.journal.model.JournalArticleResource;
 import com.liferay.portlet.journal.model.JournalStructure;
 import com.liferay.portlet.journal.model.JournalTemplate;
 import com.liferay.portlet.journal.model.impl.JournalArticleDisplayImpl;
+import com.liferay.portlet.journal.service.JournalArticleServiceUtil;
 import com.liferay.portlet.journal.service.base.JournalArticleLocalServiceBaseImpl;
 import com.liferay.portlet.journal.util.JournalUtil;
 import com.liferay.portlet.journal.util.comparator.ArticleIDComparator;
@@ -2071,28 +2072,46 @@ public class JournalArticleLocalServiceImpl
 		}
 
 		JournalArticle oldArticle = null;
-		double oldVersion = 0;
 
 		boolean incrementVersion = false;
 
+		double newVersion = -1;
+		double oldVersion = 0;
+
 		boolean imported = ParamUtil.getBoolean(serviceContext, "imported");
 
-		if (imported) {
-			oldArticle = getArticle(groupId, articleId, version);
-			oldVersion = version;
+		oldArticle = getLatestArticle(
+			groupId, articleId, WorkflowConstants.STATUS_ANY);
 
-			if (expired) {
-				return expireArticle(
-					userId, groupId, articleId, version, articleURL,
-					serviceContext);
+		oldVersion = oldArticle.getVersion();
+
+		if (imported) {
+			newVersion = version;
+
+			if (oldVersion > version) {
+				JournalArticle sameRevision = null;
+
+				try {
+					sameRevision = JournalArticleServiceUtil.getArticle(
+							groupId, articleId, version);
+
+				}
+
+				catch(NoSuchArticleException nsae) {
+				}
+
+				if (sameRevision != null) {
+					oldArticle = sameRevision;
+				}
+				else {
+					incrementVersion = true;
+				}
+			}
+			else if (oldVersion < version) {
+				incrementVersion = true;
 			}
 		}
 		else {
-			oldArticle = getLatestArticle(
-				groupId, articleId, WorkflowConstants.STATUS_ANY);
-
-			oldVersion = oldArticle.getVersion();
-
 			if ((version > 0) && (version != oldVersion)) {
 				throw new ArticleVersionException();
 			}
@@ -2113,7 +2132,9 @@ public class JournalArticleLocalServiceImpl
 		JournalArticle article = null;
 
 		if (incrementVersion) {
-			double newVersion = MathUtil.format(oldVersion + 0.1, 1, 1);
+			if (newVersion < 0) {
+				newVersion = MathUtil.format(oldVersion + 0.1, 1, 1);
+			}
 
 			long id = counterLocalService.increment();
 
