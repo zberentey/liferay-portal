@@ -70,6 +70,12 @@ public class TrashEntryServiceImpl extends TrashEntryServiceBaseImpl {
 				TrashHandler trashHandler =
 					TrashHandlerRegistryUtil.getTrashHandler(className);
 
+				if (trashEntryPersistence.fetchByPrimaryKey(
+					entry.getEntryId()) == null) {
+
+					continue;
+				}
+
 				TrashRenderer trashRenderer = trashHandler.getTrashRenderer(
 					classPK);
 

@@ -16,6 +16,7 @@ package com.liferay.portlet.bookmarks.service.impl;
 
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.security.auth.PrincipalException;
 import com.liferay.portal.security.permission.ActionKeys;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portlet.bookmarks.model.BookmarksFolder;
@@ -26,6 +27,7 @@ import java.util.List;
 
 /**
  * @author Brian Wing Shun Chan
+ * @author Levente Hudák
  */
 public class BookmarksFolderServiceImpl extends BookmarksFolderServiceBaseImpl {
 
@@ -87,11 +89,26 @@ public class BookmarksFolderServiceImpl extends BookmarksFolderServiceBaseImpl {
 			groupId, parentFolderId, start, end);
 	}
 
+	public List<BookmarksFolder> getFolders(
+		long groupId, long parentFolderId, int status, int start, int end)
+	throws SystemException {
+
+	return bookmarksFolderPersistence.filterFindByG_P_S(
+		groupId, parentFolderId, status, start, end);
+}
+
 	public int getFoldersCount(long groupId, long parentFolderId)
 		throws SystemException {
 
 		return bookmarksFolderPersistence.filterCountByG_P(
 			groupId, parentFolderId);
+	}
+
+	public int getFoldersCount(long groupId, long parentFolderId, int status)
+		throws SystemException {
+
+		return bookmarksFolderPersistence.filterCountByG_P_S(
+			groupId, parentFolderId, status);
 	}
 
 	public void getSubfolderIds(
@@ -107,6 +124,52 @@ public class BookmarksFolderServiceImpl extends BookmarksFolderServiceBaseImpl {
 			getSubfolderIds(
 				folderIds, folder.getGroupId(), folder.getFolderId());
 		}
+	}
+
+	/**
+	 * Moves the BookmarksFolder with the primary key from the trash portlet to the new
+	 * parent folder with the primary key.
+	 *
+	 * @param  folderId the primary key of the folder
+	 * @param  parentFolderId the primary key of the new parent folder
+	 * @return the BookmarksFolder
+	 * @throws PortalException if the folder could not be found
+	 * @throws SystemException if a system exception occurred
+	 */
+	public BookmarksFolder moveFolderFromTrash(
+			long folderId, long parentFolderId)
+		throws PortalException, SystemException {
+
+		BookmarksFolder folder = getFolder(folderId);
+
+		BookmarksFolderPermission.check(
+			getPermissionChecker(), folder, ActionKeys.UPDATE);
+
+		return bookmarksFolderLocalService.moveFolderFromTrash(
+			getUserId(), folder, parentFolderId);
+	}
+
+	public void moveFolderToTrash(long folderId)
+		throws PortalException, PrincipalException, SystemException {
+
+		BookmarksFolder folder = getFolder(folderId);
+
+		BookmarksFolderPermission.check(
+			getPermissionChecker(), folder, ActionKeys.DELETE);
+
+		bookmarksFolderLocalService.moveFolderToTrash(getUserId(), folderId);
+	}
+
+	public void restoreFolderFromTrash(long folderId)
+		throws PortalException, PrincipalException, SystemException {
+
+		BookmarksFolder folder = getFolder(folderId);
+
+		BookmarksFolderPermission.check(
+			getPermissionChecker(), folder, ActionKeys.UPDATE);
+
+		bookmarksFolderLocalService.restoreFolderFromTrash(
+			getUserId(), folderId);
 	}
 
 	public void subscribeFolder(long groupId, long folderId)

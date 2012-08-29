@@ -30,6 +30,7 @@ import java.util.List;
 
 /**
  * @author Brian Wing Shun Chan
+ * @author Levente Hudák
  */
 public class BookmarksEntryServiceImpl extends BookmarksEntryServiceBaseImpl {
 
@@ -64,6 +65,23 @@ public class BookmarksEntryServiceImpl extends BookmarksEntryServiceBaseImpl {
 	}
 
 	public List<BookmarksEntry> getEntries(
+			long groupId, long folderId, int status, int start, int end)
+		throws SystemException {
+
+		return bookmarksEntryPersistence.filterFindByG_F_S(
+			groupId, folderId, status, start, end);
+	}
+
+	public List<BookmarksEntry> getEntries(
+			long groupId, long folderId, int status, int start, int end,
+			OrderByComparator orderByComparator)
+		throws SystemException {
+
+		return bookmarksEntryPersistence.filterFindByG_F_S(
+			groupId, folderId, status, start, end, orderByComparator);
+	}
+
+	public List<BookmarksEntry> getEntries(
 			long groupId, long folderId, int start, int end,
 			OrderByComparator orderByComparator)
 		throws SystemException {
@@ -76,6 +94,13 @@ public class BookmarksEntryServiceImpl extends BookmarksEntryServiceBaseImpl {
 		throws SystemException {
 
 		return bookmarksEntryPersistence.filterCountByG_F(groupId, folderId);
+	}
+
+	public int getEntriesCount(long groupId, long folderId, int status)
+		throws SystemException {
+
+		return bookmarksEntryPersistence.filterCountByG_F_S(
+			groupId, folderId, status);
 	}
 
 	public BookmarksEntry getEntry(long entryId)
@@ -93,6 +118,16 @@ public class BookmarksEntryServiceImpl extends BookmarksEntryServiceBaseImpl {
 		return bookmarksEntryPersistence.filterCountByG_F(
 			groupId,
 			ArrayUtil.toArray(folderIds.toArray(new Long[folderIds.size()])));
+	}
+
+	public int getFoldersEntriesCount(
+			long groupId, List<Long> folderIds, int status)
+		throws SystemException {
+
+		return bookmarksEntryPersistence.filterCountByG_F_S(
+			groupId,
+			ArrayUtil.toArray(folderIds.toArray(new Long[folderIds.size()])),
+			status);
 	}
 
 	public List<BookmarksEntry> getGroupEntries(
@@ -134,6 +169,27 @@ public class BookmarksEntryServiceImpl extends BookmarksEntryServiceBaseImpl {
 		}
 	}
 
+	public BookmarksEntry moveEntryFromTrash(long entryId, long parentFolderId)
+		throws PortalException, SystemException {
+
+		BookmarksEntry entry = getEntry(entryId);
+
+		BookmarksEntryPermission.check(
+			getPermissionChecker(), entry, ActionKeys.UPDATE);
+
+		return bookmarksEntryLocalService.moveEntryFromTrash(
+			getUserId(), entry, parentFolderId);
+	}
+
+	public void moveEntryToTrash(long entryId)
+		throws PortalException, SystemException {
+
+		BookmarksEntryPermission.check(
+			getPermissionChecker(), entryId, ActionKeys.DELETE);
+
+		bookmarksEntryLocalService.moveEntryToTrash(getUserId(), entryId);
+	}
+
 	public BookmarksEntry openEntry(long entryId)
 		throws PortalException, SystemException {
 
@@ -142,6 +198,15 @@ public class BookmarksEntryServiceImpl extends BookmarksEntryServiceBaseImpl {
 
 		return bookmarksEntryLocalService.openEntry(
 			getGuestOrUserId(), entryId);
+	}
+
+	public void restoreEntryFromTrash(long entryId)
+		throws PortalException, SystemException {
+
+		BookmarksEntryPermission.check(
+			getPermissionChecker(), entryId, ActionKeys.UPDATE);
+
+		bookmarksEntryLocalService.restoreEntryFromTrash(getUserId(), entryId);
 	}
 
 	public void subscribeEntry(long entryId)
