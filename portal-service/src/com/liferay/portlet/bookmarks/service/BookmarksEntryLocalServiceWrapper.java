@@ -373,6 +373,43 @@ public class BookmarksEntryLocalServiceWrapper
 		return _bookmarksEntryLocalService.getNoAssetEntries();
 	}
 
+	public boolean isBookmarksEntryRestorable(long entryId)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return _bookmarksEntryLocalService.isBookmarksEntryRestorable(entryId);
+	}
+
+	public void moveEntriesToTrash(long groupId, long userId)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		_bookmarksEntryLocalService.moveEntriesToTrash(groupId, userId);
+	}
+
+	public com.liferay.portlet.bookmarks.model.BookmarksEntry moveEntryFromTrash(
+		long userId, com.liferay.portlet.bookmarks.model.BookmarksEntry entry,
+		long parentFolderId)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return _bookmarksEntryLocalService.moveEntryFromTrash(userId, entry,
+			parentFolderId);
+	}
+
+	public com.liferay.portlet.bookmarks.model.BookmarksEntry moveEntryToTrash(
+		long userId, com.liferay.portlet.bookmarks.model.BookmarksEntry entry,
+		boolean updateSocialActivity)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return _bookmarksEntryLocalService.moveEntryToTrash(userId, entry,
+			updateSocialActivity);
+	}
+
+	public com.liferay.portlet.bookmarks.model.BookmarksEntry moveEntryToTrash(
+		long userId, long entryId)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return _bookmarksEntryLocalService.moveEntryToTrash(userId, entryId);
+	}
+
 	public com.liferay.portlet.bookmarks.model.BookmarksEntry openEntry(
 		long userId, long entryId)
 		throws com.liferay.portal.kernel.exception.PortalException,
@@ -390,6 +427,12 @@ public class BookmarksEntryLocalServiceWrapper
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
 		_bookmarksEntryLocalService.unsubscribeEntry(userId, entryId);
+	}
+
+	public void restoreEntryFromTrash(long userId, long entryId)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		_bookmarksEntryLocalService.restoreEntryFromTrash(userId, entryId);
 	}
 
 	public void updateAsset(long userId,

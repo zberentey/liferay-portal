@@ -34,8 +34,8 @@ if ((folder == null) && (defaultFolderId != BookmarksFolderConstants.DEFAULT_PAR
 	}
 }
 
-int foldersCount = BookmarksFolderServiceUtil.getFoldersCount(scopeGroupId, folderId);
-int entriesCount = BookmarksEntryServiceUtil.getEntriesCount(scopeGroupId, folderId);
+int foldersCount = BookmarksFolderServiceUtil.getFoldersCount(scopeGroupId, folderId, WorkflowConstants.STATUS_APPROVED);
+int entriesCount = BookmarksEntryServiceUtil.getEntriesCount(scopeGroupId, folderId, WorkflowConstants.STATUS_APPROVED);
 
 long assetCategoryId = ParamUtil.getLong(request, "categoryId");
 String assetTagName = ParamUtil.getString(request, "tag");
@@ -56,6 +56,13 @@ request.setAttribute("view.jsp-viewFolder", Boolean.TRUE.toString());
 
 request.setAttribute("view.jsp-useAssetEntryQuery", String.valueOf(useAssetEntryQuery));
 %>
+
+<portlet:actionURL var="undoTrashURL">
+	<portlet:param name="struts_action" value="/bookmarks/edit_entry" />
+	<portlet:param name="<%= Constants.CMD %>" value="<%= Constants.RESTORE %>" />
+</portlet:actionURL>
+
+<liferay-ui:trash-undo portletURL="<%= undoTrashURL %>" />
 
 <liferay-util:include page="/html/portlet/bookmarks/top_links.jsp" />
 
@@ -119,8 +126,8 @@ request.setAttribute("view.jsp-useAssetEntryQuery", String.valueOf(useAssetEntry
 								iteratorURL="<%= portletURL %>"
 							>
 								<liferay-ui:search-container-results
-									results="<%= BookmarksFolderServiceUtil.getFolders(scopeGroupId, folderId, searchContainer.getStart(), searchContainer.getEnd()) %>"
-									total="<%= BookmarksFolderServiceUtil.getFoldersCount(scopeGroupId, folderId) %>"
+									results="<%= BookmarksFolderServiceUtil.getFolders(scopeGroupId, folderId, WorkflowConstants.STATUS_APPROVED, searchContainer.getStart(), searchContainer.getEnd()) %>"
+									total="<%= BookmarksFolderServiceUtil.getFoldersCount(scopeGroupId, folderId, WorkflowConstants.STATUS_APPROVED) %>"
 								/>
 
 								<liferay-ui:search-container-row

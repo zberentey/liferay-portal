@@ -35,7 +35,7 @@ public class BookmarksEntryCacheModel implements CacheModel<BookmarksEntry>,
 	Serializable {
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(31);
+		StringBundler sb = new StringBundler(39);
 
 		sb.append("{uuid=");
 		sb.append(uuid);
@@ -67,6 +67,14 @@ public class BookmarksEntryCacheModel implements CacheModel<BookmarksEntry>,
 		sb.append(visits);
 		sb.append(", priority=");
 		sb.append(priority);
+		sb.append(", status=");
+		sb.append(status);
+		sb.append(", statusByUserId=");
+		sb.append(statusByUserId);
+		sb.append(", statusByUserName=");
+		sb.append(statusByUserName);
+		sb.append(", statusDate=");
+		sb.append(statusDate);
 		sb.append("}");
 
 		return sb.toString();
@@ -134,6 +142,22 @@ public class BookmarksEntryCacheModel implements CacheModel<BookmarksEntry>,
 
 		bookmarksEntryImpl.setVisits(visits);
 		bookmarksEntryImpl.setPriority(priority);
+		bookmarksEntryImpl.setStatus(status);
+		bookmarksEntryImpl.setStatusByUserId(statusByUserId);
+
+		if (statusByUserName == null) {
+			bookmarksEntryImpl.setStatusByUserName(StringPool.BLANK);
+		}
+		else {
+			bookmarksEntryImpl.setStatusByUserName(statusByUserName);
+		}
+
+		if (statusDate == Long.MIN_VALUE) {
+			bookmarksEntryImpl.setStatusDate(null);
+		}
+		else {
+			bookmarksEntryImpl.setStatusDate(new Date(statusDate));
+		}
 
 		bookmarksEntryImpl.resetOriginalValues();
 
@@ -155,4 +179,8 @@ public class BookmarksEntryCacheModel implements CacheModel<BookmarksEntry>,
 	public String description;
 	public int visits;
 	public int priority;
+	public int status;
+	public long statusByUserId;
+	public String statusByUserName;
+	public long statusDate;
 }

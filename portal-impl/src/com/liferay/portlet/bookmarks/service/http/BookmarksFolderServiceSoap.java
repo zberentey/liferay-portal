@@ -155,11 +155,43 @@ public class BookmarksFolderServiceSoap {
 		}
 	}
 
+	public static com.liferay.portlet.bookmarks.model.BookmarksFolderSoap[] getFolders(
+		long groupId, long parentFolderId, int status, int start, int end)
+		throws RemoteException {
+		try {
+			java.util.List<com.liferay.portlet.bookmarks.model.BookmarksFolder> returnValue =
+				BookmarksFolderServiceUtil.getFolders(groupId, parentFolderId,
+					status, start, end);
+
+			return com.liferay.portlet.bookmarks.model.BookmarksFolderSoap.toSoapModels(returnValue);
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
 	public static int getFoldersCount(long groupId, long parentFolderId)
 		throws RemoteException {
 		try {
 			int returnValue = BookmarksFolderServiceUtil.getFoldersCount(groupId,
 					parentFolderId);
+
+			return returnValue;
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
+	public static int getFoldersCount(long groupId, long parentFolderId,
+		int status) throws RemoteException {
+		try {
+			int returnValue = BookmarksFolderServiceUtil.getFoldersCount(groupId,
+					parentFolderId, status);
 
 			return returnValue;
 		}
@@ -199,6 +231,55 @@ public class BookmarksFolderServiceSoap {
 		throws RemoteException {
 		try {
 			BookmarksFolderServiceUtil.unsubscribeFolder(groupId, folderId);
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
+	/**
+	* Moves the BookmarksFolder with the primary key from the trash portlet to the new
+	* parent folder with the primary key.
+	*
+	* @param folderId the primary key of the folder
+	* @param parentFolderId the primary key of the new parent folder
+	* @return the BookmarksFolder
+	* @throws PortalException if the folder could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.portlet.bookmarks.model.BookmarksFolderSoap moveFolderFromTrash(
+		long folderId, long parentFolderId) throws RemoteException {
+		try {
+			com.liferay.portlet.bookmarks.model.BookmarksFolder returnValue = BookmarksFolderServiceUtil.moveFolderFromTrash(folderId,
+					parentFolderId);
+
+			return com.liferay.portlet.bookmarks.model.BookmarksFolderSoap.toSoapModel(returnValue);
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
+	public static void moveFolderToTrash(long folderId)
+		throws RemoteException {
+		try {
+			BookmarksFolderServiceUtil.moveFolderToTrash(folderId);
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
+	public static void restoreFolderFromTrash(long folderId)
+		throws RemoteException {
+		try {
+			BookmarksFolderServiceUtil.restoreFolderFromTrash(folderId);
 		}
 		catch (Exception e) {
 			_log.error(e, e);

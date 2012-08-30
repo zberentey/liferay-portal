@@ -79,6 +79,21 @@ public class BookmarksEntryServiceUtil {
 	}
 
 	public static java.util.List<com.liferay.portlet.bookmarks.model.BookmarksEntry> getEntries(
+		long groupId, long folderId, int status, int start, int end)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getService().getEntries(groupId, folderId, status, start, end);
+	}
+
+	public static java.util.List<com.liferay.portlet.bookmarks.model.BookmarksEntry> getEntries(
+		long groupId, long folderId, int status, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getService()
+				   .getEntries(groupId, folderId, status, start, end,
+			orderByComparator);
+	}
+
+	public static java.util.List<com.liferay.portlet.bookmarks.model.BookmarksEntry> getEntries(
 		long groupId, long folderId, int start, int end,
 		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
 		throws com.liferay.portal.kernel.exception.SystemException {
@@ -89,6 +104,11 @@ public class BookmarksEntryServiceUtil {
 	public static int getEntriesCount(long groupId, long folderId)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return getService().getEntriesCount(groupId, folderId);
+	}
+
+	public static int getEntriesCount(long groupId, long folderId, int status)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getService().getEntriesCount(groupId, folderId, status);
 	}
 
 	public static com.liferay.portlet.bookmarks.model.BookmarksEntry getEntry(
@@ -102,6 +122,12 @@ public class BookmarksEntryServiceUtil {
 		java.util.List<java.lang.Long> folderIds)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return getService().getFoldersEntriesCount(groupId, folderIds);
+	}
+
+	public static int getFoldersEntriesCount(long groupId,
+		java.util.List<java.lang.Long> folderIds, int status)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getService().getFoldersEntriesCount(groupId, folderIds, status);
 	}
 
 	public static java.util.List<com.liferay.portlet.bookmarks.model.BookmarksEntry> getGroupEntries(
@@ -126,6 +152,19 @@ public class BookmarksEntryServiceUtil {
 		return getService().getGroupEntriesCount(groupId, userId);
 	}
 
+	public static com.liferay.portlet.bookmarks.model.BookmarksEntry moveEntryFromTrash(
+		long entryId, long parentFolderId)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getService().moveEntryFromTrash(entryId, parentFolderId);
+	}
+
+	public static void moveEntryToTrash(long entryId)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		getService().moveEntryToTrash(entryId);
+	}
+
 	public static com.liferay.portlet.bookmarks.model.BookmarksEntry openEntry(
 		long entryId)
 		throws com.liferay.portal.kernel.exception.PortalException,
@@ -143,6 +182,12 @@ public class BookmarksEntryServiceUtil {
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
 		getService().unsubscribeEntry(entryId);
+	}
+
+	public static void restoreEntryFromTrash(long entryId)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		getService().restoreEntryFromTrash(entryId);
 	}
 
 	public static com.liferay.portlet.bookmarks.model.BookmarksEntry updateEntry(

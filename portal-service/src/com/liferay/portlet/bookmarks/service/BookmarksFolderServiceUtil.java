@@ -96,9 +96,21 @@ public class BookmarksFolderServiceUtil {
 		return getService().getFolders(groupId, parentFolderId, start, end);
 	}
 
+	public static java.util.List<com.liferay.portlet.bookmarks.model.BookmarksFolder> getFolders(
+		long groupId, long parentFolderId, int status, int start, int end)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getService()
+				   .getFolders(groupId, parentFolderId, status, start, end);
+	}
+
 	public static int getFoldersCount(long groupId, long parentFolderId)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return getService().getFoldersCount(groupId, parentFolderId);
+	}
+
+	public static int getFoldersCount(long groupId, long parentFolderId,
+		int status) throws com.liferay.portal.kernel.exception.SystemException {
+		return getService().getFoldersCount(groupId, parentFolderId, status);
 	}
 
 	public static void getSubfolderIds(
@@ -117,6 +129,37 @@ public class BookmarksFolderServiceUtil {
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
 		getService().unsubscribeFolder(groupId, folderId);
+	}
+
+	/**
+	* Moves the BookmarksFolder with the primary key from the trash portlet to the new
+	* parent folder with the primary key.
+	*
+	* @param folderId the primary key of the folder
+	* @param parentFolderId the primary key of the new parent folder
+	* @return the BookmarksFolder
+	* @throws PortalException if the folder could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.portlet.bookmarks.model.BookmarksFolder moveFolderFromTrash(
+		long folderId, long parentFolderId)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getService().moveFolderFromTrash(folderId, parentFolderId);
+	}
+
+	public static void moveFolderToTrash(long folderId)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException,
+			com.liferay.portal.security.auth.PrincipalException {
+		getService().moveFolderToTrash(folderId);
+	}
+
+	public static void restoreFolderFromTrash(long folderId)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException,
+			com.liferay.portal.security.auth.PrincipalException {
+		getService().restoreFolderFromTrash(folderId);
 	}
 
 	public static com.liferay.portlet.bookmarks.model.BookmarksFolder updateFolder(
