@@ -32,7 +32,11 @@ for (String[] categorySection : categorySections) {
 	allSections = ArrayUtil.append(allSections, categorySection);
 }
 
-String curSection = categorySections[0][0];
+String curSection = null;
+
+if (categorySections[0].length > 0){
+	curSection = categorySections[0][0];
+}
 
 String historyKey = ParamUtil.getString(request, "historyKey");
 
@@ -52,7 +56,7 @@ if (Validator.isNotNull(historyKey)) {
 
 			<!-- Begin fragment <%= namespace + sectionId %> -->
 
-			<div class="form-section <%= (curSection.equals(section) || curSection.equals(sectionId)) ? "selected" : "aui-helper-hidden-accessible" %>" id="<%= namespace + sectionId %>">
+			<div class="form-section <%= (curSection != null && ((curSection.equals(section) || curSection.equals(sectionId)))) ? "selected" : "aui-helper-hidden-accessible" %>" id="<%= namespace + sectionId %>">
 				<liferay-util:include page="<%= sectionJsp %>" portletId="<%= portletDisplay.getRootPortletId() %>" />
 			</div>
 
@@ -108,7 +112,7 @@ if (Validator.isNotNull(historyKey)) {
 
 								String cssClass = StringPool.BLANK;
 
-								if (curSection.equals(section) || curSection.equals(sectionId)) {
+								if ((curSection != null) && (curSection.equals(section) || curSection.equals(sectionId))) {
 									cssClass += "selected";
 								}
 
