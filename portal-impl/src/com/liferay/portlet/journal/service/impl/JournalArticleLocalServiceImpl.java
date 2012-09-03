@@ -2066,87 +2066,68 @@ public class JournalArticleLocalServiceImpl
 		catch (IOException ioe) {
 		}
 
-		JournalArticle oldArticle = null;
-
-		boolean incrementVersion = false;
-
-		double newVersion = -1;
-		double oldVersion = 0;
-
+		boolean addNewVersion = false;
 		boolean imported = ParamUtil.getBoolean(serviceContext, "imported");
 
-		oldArticle = getLatestArticle(
+		JournalArticle latestArticle = getLatestArticle(
 			groupId, articleId, WorkflowConstants.STATUS_ANY);
 
-		oldVersion = oldArticle.getVersion();
+		double latestVersion = latestArticle.getVersion();
+
+		JournalArticle article = null;
 
 		if (imported) {
-			newVersion = version;
+			if (latestVersion > version) {
+				article = journalArticlePersistence.fetchByG_A_V(
+					groupId, articleId, version);
 
-			if (oldVersion > version) {
-				JournalArticle sameRevision = null;
-
-				try {
-					sameRevision = getArticle(groupId, articleId, version);
-				}
-
-				catch(NoSuchArticleException nsae) {
-				}
-
-				if (sameRevision != null) {
-					oldArticle = sameRevision;
-				}
-				else {
-					incrementVersion = true;
+				if (article == null) {
+					addNewVersion = true;
 				}
 			}
-			else if (oldVersion < version) {
-				incrementVersion = true;
+			else if (latestVersion < version) {
+				addNewVersion = true;
 			}
 		}
 		else {
-			if ((version > 0) && (version != oldVersion)) {
+			if ((version > 0) && (version != latestVersion)) {
 				throw new ArticleVersionException();
 			}
 
 			serviceContext.validateModifiedDate(
-				oldArticle, ArticleVersionException.class);
+				latestArticle, ArticleVersionException.class);
 
-			if (oldArticle.isApproved() || oldArticle.isExpired()) {
-				incrementVersion = true;
+			if (latestArticle.isApproved() || latestArticle.isExpired()) {
+				addNewVersion = true;
+
+				version = MathUtil.format(latestVersion + 0.1, 1, 1);
+			}
+			else {
+				article = latestArticle;
 			}
 		}
 
 		validate(
-			user.getCompanyId(), groupId, oldArticle.getClassNameId(), titleMap,
-			content, type, structureId, templateId, smallImage, smallImageURL,
-			smallImageFile, smallImageBytes);
+			user.getCompanyId(), groupId, latestArticle.getClassNameId(),
+			titleMap, content, type, structureId, templateId, smallImage,
+			smallImageURL, smallImageFile, smallImageBytes);
 
-		JournalArticle article = null;
-
-		if (incrementVersion) {
-			if (newVersion < 0) {
-				newVersion = MathUtil.format(oldVersion + 0.1, 1, 1);
-			}
-
+		if (addNewVersion) {
 			long id = counterLocalService.increment();
 
 			article = journalArticlePersistence.create(id);
 
-			article.setResourcePrimKey(oldArticle.getResourcePrimKey());
-			article.setGroupId(oldArticle.getGroupId());
-			article.setCompanyId(oldArticle.getCompanyId());
+			article.setResourcePrimKey(latestArticle.getResourcePrimKey());
+			article.setGroupId(latestArticle.getGroupId());
+			article.setCompanyId(latestArticle.getCompanyId());
 			article.setUserId(user.getUserId());
 			article.setUserName(user.getFullName());
 			article.setCreateDate(serviceContext.getModifiedDate(now));
-			article.setClassNameId(oldArticle.getClassNameId());
-			article.setClassPK(oldArticle.getClassPK());
+			article.setClassNameId(latestArticle.getClassNameId());
+			article.setClassPK(latestArticle.getClassPK());
 			article.setArticleId(articleId);
-			article.setVersion(newVersion);
-			article.setSmallImageId(oldArticle.getSmallImageId());
-		}
-		else {
-			article = oldArticle;
+			article.setVersion(version);
+			article.setSmallImageId(latestArticle.getSmallImageId());
 		}
 
 		Locale locale = LocaleUtil.getDefault();
@@ -2165,7 +2146,7 @@ public class JournalArticleLocalServiceImpl
 		String title = titleMap.get(locale);
 
 		content = format(
-			user, groupId, articleId, article.getVersion(), incrementVersion,
+			user, groupId, articleId, article.getVersion(), addNewVersion,
 			content, structureId, images);
 
 		article.setModifiedDate(serviceContext.getModifiedDate(now));
@@ -2174,7 +2155,7 @@ public class JournalArticleLocalServiceImpl
 		article.setUrlTitle(
 			getUniqueUrlTitle(
 				article.getId(), article.getArticleId(), title,
-				oldArticle.getUrlTitle(), serviceContext));
+				latestArticle.getUrlTitle(), serviceContext));
 		article.setDescriptionMap(descriptionMap, locale);
 		article.setContent(content);
 		article.setType(type);
@@ -2193,8 +2174,8 @@ public class JournalArticleLocalServiceImpl
 
 		article.setSmallImageURL(smallImageURL);
 
-		if (oldArticle.isPending()) {
-			article.setStatus(oldArticle.getStatus());
+		if (latestArticle.isPending()) {
+			article.setStatus(latestArticle.getStatus());
 		}
 		else if (!expired) {
 			article.setStatus(WorkflowConstants.STATUS_DRAFT);
@@ -2229,13 +2210,13 @@ public class JournalArticleLocalServiceImpl
 		PortletPreferences preferences =
 			ServiceContextUtil.getPortletPreferences(serviceContext);
 
-		//Update status
+		// Workflow
 
 		if (expired && imported) {
-			updateStatus(userId, article, article.getStatus(), articleURL, serviceContext);
+			updateStatus(
+				userId, article, article.getStatus(), articleURL,
+				serviceContext);
 		}
-
-		// Workflow
 
 		if (serviceContext.getWorkflowAction() ==
 				WorkflowConstants.ACTION_PUBLISH) {
