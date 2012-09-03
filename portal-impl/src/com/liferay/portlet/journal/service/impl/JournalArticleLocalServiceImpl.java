@@ -2088,6 +2088,9 @@ public class JournalArticleLocalServiceImpl
 			else if (latestVersion < version) {
 				addNewVersion = true;
 			}
+			else {
+				article = latestArticle;
+			}
 		}
 		else {
 			if ((version > 0) && (version != latestVersion)) {
