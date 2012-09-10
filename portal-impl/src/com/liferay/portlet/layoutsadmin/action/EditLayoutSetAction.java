@@ -162,7 +162,7 @@ public class EditLayoutSetAction extends EditLayoutsAction {
 	@Override
 	protected void setThemeSettingProperties(
 		ActionRequest actionRequest, UnicodeProperties typeSettingsProperties,
-		String device,
+		String device, String oldThemeId, String themeId,
 		Map<String, ThemeSetting> themeSettings) {
 
 		for (String key : themeSettings.keySet()) {
@@ -177,7 +177,12 @@ public class EditLayoutSetAction extends EditLayoutsAction {
 			String value = ParamUtil.getString(actionRequest, property);
 
 			if (type.equals("checkbox")) {
-				value = String.valueOf(GetterUtil.getBoolean(value));
+				if (oldThemeId.equals(themeId)) {
+					value = String.valueOf(GetterUtil.getBoolean(value));
+				}
+				else {
+					value = themeSetting.getValue();
+				}
 			}
 
 			if (!value.equals(themeSetting.getValue())) {
@@ -285,7 +290,7 @@ public class EditLayoutSetAction extends EditLayoutsAction {
 
 				updateThemeSettingsProperties(
 					actionRequest, companyId, typeSettingsProperties, device,
-					themeId, wapTheme);
+					oldThemeId, themeId, wapTheme);
 			}
 
 			long groupId = liveGroupId;
