@@ -694,6 +694,7 @@ public class EditLayoutsAction extends PortletAction {
 	protected void setThemeSettingProperties(
 			ActionRequest actionRequest,
 			UnicodeProperties typeSettingsProperties, String device,
+			String oldThemeId, String themeId,
 			Map<String, ThemeSetting> themeSettings)
 		throws PortalException, SystemException {
 
@@ -719,7 +720,12 @@ public class EditLayoutsAction extends PortletAction {
 			String value = ParamUtil.getString(actionRequest, property);
 
 			if (type.equals("checkbox")) {
-				value = String.valueOf(GetterUtil.getBoolean(value));
+				if (oldThemeId.equals(themeId)) {
+					value = String.valueOf(GetterUtil.getBoolean(value));
+				}
+				else {
+					value = themeSetting.getValue();
+				}
 			}
 
 			if (!value.equals(layoutSet.getThemeSetting(key, device))) {
@@ -973,7 +979,7 @@ public class EditLayoutsAction extends PortletAction {
 		updateLookAndFeel(
 			actionRequest, themeDisplay.getCompanyId(), liveGroupId,
 			stagingGroupId, privateLayout, layout.getLayoutId(),
-			layoutTypeSettingsProperties);
+			layout.getThemeId(), layoutTypeSettingsProperties);
 
 		return new Object[] {layout, oldFriendlyURL};
 	}
@@ -1044,7 +1050,7 @@ public class EditLayoutsAction extends PortletAction {
 	protected void updateLookAndFeel(
 			ActionRequest actionRequest, long companyId, long liveGroupId,
 			long stagingGroupId, boolean privateLayout, long layoutId,
-			UnicodeProperties typeSettingsProperties)
+			String oldThemeId, UnicodeProperties typeSettingsProperties)
 		throws Exception {
 
 		String[] devices = StringUtil.split(
@@ -1073,7 +1079,7 @@ public class EditLayoutsAction extends PortletAction {
 
 				updateThemeSettingsProperties(
 					actionRequest, companyId, typeSettingsProperties, device,
-					themeId, wapTheme);
+					oldThemeId, themeId, wapTheme);
 			}
 
 			long groupId = liveGroupId;
@@ -1095,7 +1101,7 @@ public class EditLayoutsAction extends PortletAction {
 	protected UnicodeProperties updateThemeSettingsProperties(
 			ActionRequest actionRequest, long companyId,
 			UnicodeProperties typeSettingsProperties, String device,
-			String themeId, boolean wapTheme)
+			String oldThemeId, String themeId, boolean wapTheme)
 		throws Exception {
 
 		Theme theme = ThemeLocalServiceUtil.getTheme(
@@ -1111,7 +1117,8 @@ public class EditLayoutsAction extends PortletAction {
 		}
 
 		setThemeSettingProperties(
-			actionRequest, typeSettingsProperties, device, themeSettings);
+			actionRequest, typeSettingsProperties, device, oldThemeId, themeId,
+			themeSettings);
 
 		return typeSettingsProperties;
 	}
