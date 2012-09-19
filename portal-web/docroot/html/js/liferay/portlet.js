@@ -6,6 +6,8 @@
 	var TPL_NOT_AJAXABLE = '<div class="portlet-msg-info">{0}</div>';
 
 	var Portlet = {
+		ignored: [],
+
 		list: [],
 
 		isStatic: function(portletId) {
@@ -347,6 +349,24 @@
 
 	Liferay.provide(
 		Portlet,
+		'ignore',
+		function(portlet) {
+			var instance = this;
+
+			var list = instance.list;
+
+			var index = arrayIndexOf(list, portlet);
+
+			if (index > -1) {
+				list.splice(index, 1);
+
+				instance.ignored.push(portlet);
+			}
+		}
+	);
+
+	Liferay.provide(
+		Portlet,
 		'minimize',
 		function(portlet, el, options) {
 			var instance = this;
@@ -473,6 +493,8 @@
 				instance.registerStatic(portletId);
 			}
 
+			var list = null;
+
 			var portlet = A.one('#' + namespacedId);
 
 			if (portlet && !portlet.portletProcessed) {
@@ -510,14 +532,19 @@
 					}
 				);
 
-				var list = instance.list;
+				list = instance.list;
+			}
+			else {
+				list = instance.ignored;
+			}
 
+			if (list && list.length) {
 				var index = arrayIndexOf(list, portletId);
 
 				if (index > -1) {
 					list.splice(index, 1);
 
-					if (!list.length) {
+					if (!instance.list.length && !instance.ignored.length) {
 						Liferay.fire(
 							'allPortletsReady',
 							{
