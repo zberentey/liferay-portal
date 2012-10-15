@@ -28,11 +28,8 @@ import java.util.List;
 import javax.portlet.PortletRequest;
 
 /**
- * Represents the interface to manage the basic operations of the Recycle Bin.
- *
- * <p>
- * The basic operations are:
- * </p>
+ * The base model interface for the Trash service. Manages the basic operations
+ * of the Recycle Bin, which include:
  *
  * <ul>
  * <li>
@@ -47,7 +44,7 @@ import javax.portlet.PortletRequest;
  * </ul>
  *
  * <p>
- * The entities that support these operations are:
+ * The entities that support these operations include:
  * </p>
  *
  * <ul>
@@ -93,8 +90,10 @@ public interface TrashHandler {
 	 * Checks if an entry already exists in the destination container with the
 	 * given name.
 	 *
-	 * This method is used to check for duplicates when an entry is
-	 * being restored or moved out of the Recycle Bin.
+	 * <p>
+	 * This method is used to check for duplicates when an entry is being
+	 * restored, or moved out of the Recycle Bin.
+	 * </p>
 	 *
 	 * @param  trashEntry the entry to check
 	 * @param  containerModelId the primary key of the destination (e.g. folder)
@@ -133,7 +132,7 @@ public interface TrashHandler {
 	/**
 	 * Deletes all entities with the primary keys.
 	 *
-	 * @param  classPKs the primary keys of the entities to deletes
+	 * @param  classPKs the primary keys of the entities to delete
 	 * @param  checkPermission whether to check permission before deleting each
 	 *         entry
 	 * @throws PortalException if an entity with the primary key could not be
@@ -190,7 +189,7 @@ public interface TrashHandler {
 	/**
 	 * Returns the name of the container model (e.g. folder).
 	 *
-	 * @return Returns the name of the container model
+	 * @return the name of the container model
 	 */
 	public String getContainerModelName();
 
@@ -199,15 +198,17 @@ public interface TrashHandler {
 	 * container model ID. These container models must be able to contain the
 	 * entry identified by entry ID.
 	 *
-	 * This method should check for view permission when retrieving the
-	 * container models.
+	 * <p>
+	 * This method checks for the view permission when retrieving the container
+	 * models. Also, this method is useful when paginating results.
+	 * </p>
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end -
-	 * start</code> instances. <code>start</code> and <code>end</code> are not
-	 * primary keys, they are indexes in the result set. Thus, <code>0</code>
-	 * refers to the first result in the set. Setting both <code>start</code>
-	 * and <code>end</code> to {@link
+	 * Returns a maximum of <code>end - start</code> instances. The
+	 * <code>start</code> and <code>end</code> values are not primary keys but,
+	 * rather, indexes in the result set. Thus, <code>0</code> refers to the
+	 * first result in the set. Setting both <code>start</code> and
+	 * <code>end</code> to {@link
 	 * com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full
 	 * result set.
 	 * </p>
@@ -228,10 +229,12 @@ public interface TrashHandler {
 	/**
 	 * Returns the number of container models with the parent identified by the
 	 * container model ID. These container models must be able to contain the
-	 * entry identified by trash entry ID.
+	 * entry identified by the trash entry ID.
 	 *
-	 * This method should check for view permission when determining the
-	 * container model count.
+	 * <p>
+	 * This method checks for the view permission when determining the container
+	 * model count.
+	 * </p>
 	 *
 	 * @param  trashEntryId the primary key of the entry
 	 * @param  containerModelId the primary key of the parent container model
@@ -244,10 +247,10 @@ public interface TrashHandler {
 		throws PortalException, SystemException;
 
 	/**
-	 * Returns the message to indicate that a search hit was found in a deleted
-	 * container (e.g. folder)
+	 * Returns the message indicating that a search hit was found in a deleted
+	 * container (e.g. folder).
 	 *
-	 * @return Returns the message
+	 * @return the message
 	 */
 	public String getDeleteMessage();
 
@@ -256,7 +259,7 @@ public interface TrashHandler {
 	 *
 	 * @param  portletRequest the portlet request
 	 * @param  classPK the primary key of the restored entity
-	 * @return Returns the restore link
+	 * @return the restore link
 	 * @throws PortalException if the entity with the primary key could not be
 	 *         found
 	 * @throws SystemException if a system exception occurred
@@ -270,7 +273,7 @@ public interface TrashHandler {
 	 *
 	 * @param  portletRequest the portlet request
 	 * @param  classPK the primary key of the restored entity
-	 * @return Returns the restore message
+	 * @return the restore message
 	 * @throws PortalException if the entry with the primary key could not be
 	 *         found
 	 * @throws SystemException if a system exception occurred
@@ -281,14 +284,14 @@ public interface TrashHandler {
 	/**
 	 * Returns the name of the root container (e.g. home).
 	 *
-	 * @return Returns the root container name
+	 * @return the root container name
 	 */
 	public String getRootContainerModelName();
 
 	/**
 	 * Returns the name of the sub container model (e.g. subfolder).
 	 *
-	 * @return Returns the name of the sub container model
+	 * @return the name of the sub container model
 	 */
 	public String getSubcontainerModelName();
 
@@ -308,9 +311,11 @@ public interface TrashHandler {
 	 * Returns <code>true</code> if the user has the required permission on the
 	 * entity with the primary key.
 	 *
-	 * This method is intended to be a mapper for special Recycle Bin operations
-	 * that are not real permissions. The implementations of this method should
-	 * translate these virtual permissions to real permission checks.
+	 * <p>
+	 * This method is a mapper for special Recycle Bin operations that are not
+	 * real permissions. The implementations of this method should translate
+	 * these virtual permissions to real permission checks.
+	 * </p>
 	 *
 	 * @param  permissionChecker the permission checker
 	 * @param  groupId the primary key of the group
@@ -345,9 +350,11 @@ public interface TrashHandler {
 	 * Returns <code>true</code> if the entity is restorable to its original
 	 * place.
 	 *
+	 * <p>
 	 * This method usually returns <code>false</code> if the container (e.g.
 	 * folder) of the entity is no longer available (e.g. moved to the Recycle
 	 * Bin or deleted).
+	 * </p>
 	 *
 	 * @param  classPK the primary key of the entity
 	 * @return <code>true</code> if the entity is restorable; <code>false</code>
@@ -361,7 +368,7 @@ public interface TrashHandler {
 
 	/**
 	 * Moves the entity with the primary key out of the Recycle Bin to a new
-	 * destination identified by container model ID.
+	 * destination identified by a container model ID.
 	 *
 	 * @param  classPK the primary key of the entity
 	 * @param  containerModelId the primary key of the destination container
