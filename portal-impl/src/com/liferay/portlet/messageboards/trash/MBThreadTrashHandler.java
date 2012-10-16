@@ -32,7 +32,7 @@ import com.liferay.portlet.trash.util.TrashUtil;
 import java.util.Date;
 
 /**
- * Represents the trash handler for message boards threads.
+ * Implements trash handling for message boards thread entity.
  *
  * @author Zsolt Berentey
  */
@@ -41,12 +41,13 @@ public class MBThreadTrashHandler extends BaseTrashHandler {
 	public static final String CLASS_NAME = MBThread.class.getName();
 
 	/**
-	 * Deletes trash attachments from all the message boards messages from a
-	 * group that were deleted after a given date.
+	 * Deletes the group's message board thread attachments that were trashed
+	 * before the given date.
 	 *
 	 * @param  group the group
 	 * @param  date the date from which attachments will be deleted
-	 * @throws PortalException if a portal exception occurred
+	 * @throws PortalException if any one of the attachment file paths were
+	 *         invalid
 	 * @throws SystemException if a system exception occurred
 	 */
 	@Override

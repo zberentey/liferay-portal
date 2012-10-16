@@ -24,7 +24,7 @@ import com.liferay.portlet.blogs.service.BlogsEntryServiceUtil;
 import com.liferay.portlet.blogs.service.permission.BlogsEntryPermission;
 
 /**
- * Represents the trash handler for blogs entries entity.
+ * Implements trash handling for the blogs entry entity.
  *
  * @author Zsolt Berentey
  */
@@ -37,7 +37,7 @@ public class BlogsEntryTrashHandler extends BaseTrashHandler {
 	 *
 	 * @param  classPKs the primary keys of the blogs entries to be deleted
 	 * @param  checkPermission whether to check permission before deleting each
-	 *         blog entry
+	 *         blogs entry
 	 * @throws PortalException if any one of the blogs entries could not be
 	 *         found
 	 * @throws SystemException if a system exception occurred
@@ -75,7 +75,7 @@ public class BlogsEntryTrashHandler extends BaseTrashHandler {
 	/**
 	 * Restores all blogs entries with the matching primary keys.
 	 *
-	 * @param  classPKs the primary key of the blogs entry to be restored
+	 * @param  classPKs the primary keys of the blogs entries to be restored
 	 * @throws PortalException if any one of the blogs entries could not be
 	 *         found
 	 * @throws SystemException if a system exception occurred

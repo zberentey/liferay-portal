@@ -30,6 +30,8 @@ import com.liferay.portlet.wiki.service.WikiNodeServiceUtil;
 import com.liferay.portlet.wiki.service.permission.WikiNodePermission;
 
 /**
+ * Implements trash handling for the wiki node entity.
+ *
  * @author Eudaldo Alonso
  */
 public class WikiNodeTrashHandler extends BaseTrashHandler {
@@ -71,7 +73,7 @@ public class WikiNodeTrashHandler extends BaseTrashHandler {
 	 *
 	 * @param  classPKs the primary keys of the wiki nodes to be deleted
 	 * @param  checkPermission whether to check permission before deleting each
-	 *         folder
+	 *         wiki node
 	 * @throws PortalException if any one of the wiki nodes could not be found
 	 * @throws SystemException if a system exception occurred
 	 */
@@ -98,11 +100,13 @@ public class WikiNodeTrashHandler extends BaseTrashHandler {
 	}
 
 	/**
-	 * Returns the trash renderer associated to the trash entry.
+	 * Returns the trash renderer associated to the wiki node with the primary
+	 * key.
 	 *
 	 * @param  classPK the primary key of the wiki node
 	 * @return the trash renderer associated to the wiki node
-	 * @throws PortalException if the wiki node could not be found
+	 * @throws PortalException if a wiki node with the primary key could not be
+	 *         found
 	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
@@ -125,7 +129,7 @@ public class WikiNodeTrashHandler extends BaseTrashHandler {
 	/**
 	 * Restores all wiki nodes with the matching primary keys.
 	 *
-	 * @param  classPKs the primary keys of the wiki nodes to be deleted
+	 * @param  classPKs the primary keys of the wiki nodes to be restored
 	 * @throws PortalException if any one of the wiki nodes could not be found
 	 * @throws SystemException if a system exception occurred
 	 */

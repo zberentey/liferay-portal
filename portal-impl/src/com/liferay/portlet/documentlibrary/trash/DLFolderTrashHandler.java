@@ -42,7 +42,7 @@ import com.liferay.portlet.trash.util.TrashUtil;
 import javax.portlet.PortletRequest;
 
 /**
- * Represents the trash handler for the folder entity.
+ * Implements trash handling for the folder entity.
  *
  * @author Alexander Chow
  * @author Zsolt Berentey
@@ -141,11 +141,12 @@ public class DLFolderTrashHandler extends BaseTrashHandler {
 	}
 
 	/**
-	 * Returns the trash renderer associated to the trash entry.
+	 * Returns the trash renderer associated to the folder with the primary key.
 	 *
 	 * @param  classPK the primary key of the folder
 	 * @return the trash renderer associated to the folder
-	 * @throws PortalException if the folder could not be found
+	 * @throws PortalException if a folder with the primary key could not be
+	 *         found
 	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
@@ -187,7 +188,7 @@ public class DLFolderTrashHandler extends BaseTrashHandler {
 	/**
 	 * Restores all folders with the matching primary keys.
 	 *
-	 * @param  classPKs the primary keys of the folders to be deleted
+	 * @param  classPKs the primary keys of the folders to be restored
 	 * @throws PortalException if any one of the folders could not be found
 	 * @throws SystemException if a system exception occurred
 	 */

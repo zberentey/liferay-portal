@@ -45,7 +45,7 @@ import com.liferay.portlet.trash.util.TrashUtil;
 import javax.portlet.PortletRequest;
 
 /**
- * Represents the trash handler for the file entry entity.
+ * Implements trash handling for the file entry entity.
  *
  * @author Alexander Chow
  * @author Manuel de la Peña
@@ -122,7 +122,7 @@ public class DLFileEntryTrashHandler extends BaseTrashHandler {
 
 	@Override
 	public String getDeleteMessage() {
-		return "found-in-deleted-folder-x";
+		return "found-in-deleted-file-entry-x";
 	}
 
 	@Override
@@ -178,7 +178,7 @@ public class DLFileEntryTrashHandler extends BaseTrashHandler {
 	/**
 	 * Restores all file entries with the matching primary keys.
 	 *
-	 * @param  classPKs the primary keys of the file entries to be deleted
+	 * @param  classPKs the primary keys of the file entries to be restored
 	 * @throws PortalException if any one of the file entries could not be found
 	 * @throws SystemException if a system exception occurred
 	 */

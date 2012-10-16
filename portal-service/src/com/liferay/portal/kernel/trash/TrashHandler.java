@@ -28,55 +28,56 @@ import java.util.List;
 import javax.portlet.PortletRequest;
 
 /**
- * The base model interface for the Trash service. Manages the basic operations
- * of the Recycle Bin, which include:
+ * The interface for managing the basic trash operations of the Recycle Bin,
+ * which include:
  *
  * <ul>
  * <li>
- * Delete entries
+ * Deleting entries
  * </li>
  * <li>
- * Move entries out of the Recycle Bin to a new destination
+ * Moving entries out of the Recycle Bin to new destinations
  * </li>
  * <li>
- * Restore entries to their original destination
+ * Restoring entries to their original locations
  * </li>
  * </ul>
  *
  * <p>
- * The entities that support these operations include:
+ * These operations are supported for the following entities via their
+ * respective trash handlers:
  * </p>
  *
  * <ul>
  * <li>
- * BlogsEntry {@link com.liferay.portlet.blogs.trash.BlogsEntryTrashHandler}
+ * BlogsEntry via {@link com.liferay.portlet.blogs.trash.BlogsEntryTrashHandler}
  * </li>
  * <li>
- * BookmarksEntry {@link
+ * BookmarksEntry via {@link
  * com.liferay.portlet.bookmarks.trash.BookmarksEntryTrashHandler}
  * </li>
  * <li>
- * DLFileEntry {@link
+ * DLFileEntry via {@link
  * com.liferay.portlet.documentlibrary.trash.DLFileEntryTrashHandler}
  * </li>
  * <li>
- * DLFileShortcut {@link
+ * DLFileShortcut via {@link
  * com.liferay.portlet.documentlibrary.trash.DLFileShortcutTrashHandler}
  * </li>
  * <li>
- * DLFolder {@link
+ * DLFolder via {@link
  * com.liferay.portlet.documentlibrary.trash.DLFolderTrashHandler}
  * </li>
  * <li>
- * MBThread {@link
+ * MBThread via {@link
  * com.liferay.portlet.messageboards.trash.MBThreadTrashHandler}
  * </li>
  * <li>
- * WikiNode {@link
+ * WikiNode via {@link
  * com.liferay.portlet.wiki.trash.WikiNodeTrashHandler}
  * </li>
  * <li>
- * WikiPage {@link
+ * WikiPage via {@link
  * com.liferay.portlet.wiki.trash.WikiPageTrashHandler}
  * </li>
  * </ul>
@@ -87,19 +88,19 @@ import javax.portlet.PortletRequest;
 public interface TrashHandler {
 
 	/**
-	 * Checks if an entry already exists in the destination container with the
-	 * given name.
+	 * Checks if a duplicate entry already exists in the destination container.
 	 *
 	 * <p>
 	 * This method is used to check for duplicates when an entry is being
-	 * restored, or moved out of the Recycle Bin.
+	 * restored or moved out of the Recycle Bin.
 	 * </p>
 	 *
 	 * @param  trashEntry the entry to check
 	 * @param  containerModelId the primary key of the destination (e.g. folder)
-	 * @param  newName the new name to be assigned if the check is successful
-	 *         (optionally <code>null</code> if there is no rename)
-	 * @throws PortalException if the entry could not be found
+	 * @param  newName the new name to be assigned to the entry (optionally
+	 *         <code>null</code> to forego renaming the entry)
+	 * @throws PortalException if a duplicate entry already existed in the
+	 *         destination container
 	 * @throws SystemException if a system exception occurred
 	 */
 	public void checkDuplicateTrashEntry(
@@ -107,46 +108,45 @@ public interface TrashHandler {
 		throws PortalException, SystemException;
 
 	/**
-	 * Deletes all trash attachments from a group that were deleted after a
-	 * given date.
+	 * Deletes the group's attachments that were trashed before the given date.
 	 *
 	 * @param  group ID the primary key of the group
 	 * @param  date the date from which attachments will be deleted
-	 * @throws PortalException if the attachment file names were invalid
+	 * @throws PortalException if any one of the attachment file paths were
+	 *         invalid
 	 * @throws SystemException if a system exception occurred
 	 */
 	public void deleteTrashAttachments(Group group, Date date)
 		throws PortalException, SystemException;
 
 	/**
-	 * Deletes all entities with the primary keys.
+	 * Deletes all the entries with the primary keys.
 	 *
-	 * @param  classPKs the primary keys of the entities to delete
-	 * @throws PortalException if an entity with the primary key could not be
-	 *         found
+	 * @param  classPKs the primary keys of the entries to delete
+	 * @throws PortalException if any one of the entries could not be found
 	 * @throws SystemException if a system exception occurred
 	 */
 	public void deleteTrashEntries(long[] classPKs)
 		throws PortalException, SystemException;
 
 	/**
-	 * Deletes all entities with the primary keys.
+	 * Deletes all the entries with the primary keys, optionally checking
+	 * permission before deleting each entry
 	 *
-	 * @param  classPKs the primary keys of the entities to delete
+	 * @param  classPKs the primary keys of the entries to delete
 	 * @param  checkPermission whether to check permission before deleting each
 	 *         entry
-	 * @throws PortalException if an entity with the primary key could not be
-	 *         found
+	 * @throws PortalException if any one of the entries could not be found
 	 * @throws SystemException if a system exception occurred
 	 */
 	public void deleteTrashEntries(long[] classPKs, boolean checkPermission)
 		throws PortalException, SystemException;
 
 	/**
-	 * Deletes the entity with the primary key.
+	 * Deletes the entry with the primary key.
 	 *
-	 * @param  classPK the primary key of the entity to delete
-	 * @throws PortalException if an entity with the primary key could not be
+	 * @param  classPK the primary key of the entry to delete
+	 * @throws PortalException if an entry with the primary key could not be
 	 *         found
 	 * @throws SystemException if a system exception occurred
 	 */
@@ -154,12 +154,12 @@ public interface TrashHandler {
 		throws PortalException, SystemException;
 
 	/**
-	 * Deletes the entity with the primary key.
+	 * Deletes the entry with the primary key.
 	 *
-	 * @param  classPK the primary key of the entity to delete
+	 * @param  classPK the primary key of the entry to delete
 	 * @param  checkPermission whether to check permission before deleting the
-	 *         entity
-	 * @throws PortalException if an entity with the primary key could not be
+	 *         entry
+	 * @throws PortalException if an entry with the primary key could not be
 	 *         found
 	 * @throws SystemException if a system exception occurred
 	 */
@@ -169,17 +169,16 @@ public interface TrashHandler {
 	/**
 	 * Returns the class name handled by this trash handler.
 	 *
-	 * @return Returns the class name
+	 * @return the class name handled by this trash handler
 	 */
 	public String getClassName();
 
 	/**
-	 * Returns the container model with the primary key that can contain this
-	 * item.
+	 * Returns the container model with the primary key.
 	 *
 	 * @param  containerModelId the primary key of the container model
-	 * @return Returns the container model
-	 * @throws PortalException if the container model with the primary key could
+	 * @return the container model with the primary key
+	 * @throws PortalException if a container model with the primary key could
 	 *         not be found
 	 * @throws SystemException if a system exception occurred
 	 */
@@ -187,28 +186,29 @@ public interface TrashHandler {
 		throws PortalException, SystemException;
 
 	/**
-	 * Returns the name of the container model (e.g. folder).
+	 * Returns the name of the container model (e.g. folder name).
 	 *
 	 * @return the name of the container model
 	 */
 	public String getContainerModelName();
 
 	/**
-	 * Returns a range of all container models with the parent identified by the
-	 * container model ID. These container models must be able to contain the
-	 * entry identified by entry ID.
+	 * Returns a range of all the container models that are children of the
+	 * parent containter model identified by the container model ID. These
+	 * container models must be able to contain the entry identified by trash
+	 * entry ID.
 	 *
 	 * <p>
 	 * This method checks for the view permission when retrieving the container
-	 * models. Also, this method is useful when paginating results.
+	 * models.
 	 * </p>
 	 *
 	 * <p>
-	 * Returns a maximum of <code>end - start</code> instances. The
-	 * <code>start</code> and <code>end</code> values are not primary keys but,
-	 * rather, indexes in the result set. Thus, <code>0</code> refers to the
-	 * first result in the set. Setting both <code>start</code> and
-	 * <code>end</code> to {@link
+	 * Useful when paginating results. Returns a maximum of <code>end -
+	 * start</code> instances. The <code>start</code> and <code>end</code>
+	 * values are not primary keys but, rather, indexes in the result set. Thus,
+	 * <code>0</code> refers to the first result in the set. Setting both
+	 * <code>start</code> and <code>end</code> to {@link
 	 * com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full
 	 * result set.
 	 * </p>
@@ -217,8 +217,8 @@ public interface TrashHandler {
 	 * @param  containerModelId the primary key of the parent container model
 	 * @param  start the lower bound of the range of results
 	 * @param  end the upper bound of the range of results (not inclusive)
-	 * @return the range of container models
-	 * @throws PortalException if the trash entry with the primary key could not
+	 * @return the range of matching container models
+	 * @throws PortalException if a trash entry with the primary key could not
 	 *         be found
 	 * @throws SystemException if a system exception occurred
 	 */
@@ -227,19 +227,20 @@ public interface TrashHandler {
 		throws PortalException, SystemException;
 
 	/**
-	 * Returns the number of container models with the parent identified by the
-	 * container model ID. These container models must be able to contain the
-	 * entry identified by the trash entry ID.
+	 * Returns the number of container models that are children of the parent
+	 * container model identified by the container model ID. These container
+	 * models must be able to contain the entry identified by the trash entry
+	 * ID.
 	 *
 	 * <p>
-	 * This method checks for the view permission when determining the container
-	 * model count.
+	 * This method checks for the view permission when counting the container
+	 * models.
 	 * </p>
 	 *
 	 * @param  trashEntryId the primary key of the entry
 	 * @param  containerModelId the primary key of the parent container model
-	 * @return the number of container models
-	 * @throws PortalException if the trash entry with the primary key could not
+	 * @return the number of matching container models
+	 * @throws PortalException if a trash entry with the primary key could not
 	 *         be found
 	 * @throws SystemException if a system exception occurred
 	 */
@@ -248,19 +249,19 @@ public interface TrashHandler {
 
 	/**
 	 * Returns the message indicating that a search hit was found in a deleted
-	 * container (e.g. folder).
+	 * entity (e.g. file or folder).
 	 *
 	 * @return the message
 	 */
 	public String getDeleteMessage();
 
 	/**
-	 * Returns the link to the destination the entity was restored to.
+	 * Returns the link to the location to which the entity was restored.
 	 *
 	 * @param  portletRequest the portlet request
 	 * @param  classPK the primary key of the restored entity
 	 * @return the restore link
-	 * @throws PortalException if the entity with the primary key could not be
+	 * @throws PortalException if an entity with the primary key could not be
 	 *         found
 	 * @throws SystemException if a system exception occurred
 	 */
@@ -268,13 +269,13 @@ public interface TrashHandler {
 		throws PortalException, SystemException;
 
 	/**
-	 * Returns the message describing the destination the entity was restored
-	 * to.
+	 * Returns the message describing the location to which the entity was
+	 * restored.
 	 *
 	 * @param  portletRequest the portlet request
 	 * @param  classPK the primary key of the restored entity
 	 * @return the restore message
-	 * @throws PortalException if the entry with the primary key could not be
+	 * @throws PortalException if an entity with the primary key could not be
 	 *         found
 	 * @throws SystemException if a system exception occurred
 	 */
@@ -284,14 +285,14 @@ public interface TrashHandler {
 	/**
 	 * Returns the name of the root container (e.g. home).
 	 *
-	 * @return the root container name
+	 * @return the name of the root container
 	 */
 	public String getRootContainerModelName();
 
 	/**
-	 * Returns the name of the sub container model (e.g. subfolder).
+	 * Returns the name of the sub-container model (e.g. subfolder).
 	 *
-	 * @return the name of the sub container model
+	 * @return the name of the sub-container model
 	 */
 	public String getSubcontainerModelName();
 
@@ -300,7 +301,7 @@ public interface TrashHandler {
 	 *
 	 * @param  classPK the primary key of the entity
 	 * @return the trash renderer associated to the entity
-	 * @throws PortalException if an entry with the primary key could not be
+	 * @throws PortalException if an entity with the primary key could not be
 	 *         found
 	 * @throws SystemException if a system exception occurred
 	 */
@@ -308,8 +309,8 @@ public interface TrashHandler {
 		throws PortalException, SystemException;
 
 	/**
-	 * Returns <code>true</code> if the user has the required permission on the
-	 * entity with the primary key.
+	 * Returns <code>true</code> if the user has the required permission to
+	 * perform the trash action on the entity with the primary key.
 	 *
 	 * <p>
 	 * This method is a mapper for special Recycle Bin operations that are not
@@ -320,10 +321,10 @@ public interface TrashHandler {
 	 * @param  permissionChecker the permission checker
 	 * @param  groupId the primary key of the group
 	 * @param  classPK the primary key of the entity
-	 * @param  trashActionId the permission to check for
+	 * @param  trashActionId the trash action permission to check
 	 * @return <code>true</code> if the user has the required permission;
 	 *         <code>false</code> otherwise
-	 * @throws PortalException if the entity with the primary key could not be
+	 * @throws PortalException if an entity with the primary key could not be
 	 *         found
 	 * @throws SystemException if a system exception occurred
 	 */
@@ -339,16 +340,16 @@ public interface TrashHandler {
 	 * @param  classPK the primary key of the entity
 	 * @return <code>true</code> if the entity is in the Recycle Bin;
 	 *         <code>false</code> otherwise
-	 * @throws PortalException if the entry with the primary key could not be
-	 *         found
+	 * @throws PortalException if an entity with the primary key could not be
+	 *         found in the portal
 	 * @throws SystemException if a system exception occurred
 	 */
 	public boolean isInTrash(long classPK)
 		throws PortalException, SystemException;
 
 	/**
-	 * Returns <code>true</code> if the entity is restorable to its original
-	 * place.
+	 * Returns <code>true</code> if the entity can be restored to its original
+	 * location.
 	 *
 	 * <p>
 	 * This method usually returns <code>false</code> if the container (e.g.
@@ -357,9 +358,9 @@ public interface TrashHandler {
 	 * </p>
 	 *
 	 * @param  classPK the primary key of the entity
-	 * @return <code>true</code> if the entity is restorable; <code>false</code>
-	 *         otherwise
-	 * @throws PortalException if the entity with the primary key could not be
+	 * @return <code>true</code> if the entity can be restored to its original
+	 *         location; <code>false</code> otherwise
+	 * @throws PortalException if an entity with the primary key could not be
 	 *         found
 	 * @throws SystemException if a system exception occurred
 	 */
@@ -367,15 +368,16 @@ public interface TrashHandler {
 		throws PortalException, SystemException;
 
 	/**
-	 * Moves the entity with the primary key out of the Recycle Bin to a new
-	 * destination identified by a container model ID.
+	 * Moves the entry with the primary key out of the Recycle Bin to a new
+	 * destination identified by the container model ID.
 	 *
-	 * @param  classPK the primary key of the entity
+	 * @param  classPK the primary key of the entry
 	 * @param  containerModelId the primary key of the destination container
 	 *         model
 	 * @param  serviceContext the service context
-	 * @throws PortalException if the entity with the primary key or the
-	 *         destination container model could not be found
+	 * @throws PortalException if an entry with the primary key or the
+	 *         destination container model with the primary key could not be
+	 *         found
 	 * @throws SystemException if a system exception occurred
 	 */
 	public void moveTrashEntry(
@@ -383,21 +385,20 @@ public interface TrashHandler {
 		throws PortalException, SystemException;
 
 	/**
-	 * Restores all entities with the primary keys.
+	 * Restores all the entries with the primary keys.
 	 *
-	 * @param  classPKs the primary keys of the entities to restore
-	 * @throws PortalException if an entity with the primary key could not be
-	 *         found
+	 * @param  classPKs the primary keys of the entries to restore
+	 * @throws PortalException if any one of the entries could not be found
 	 * @throws SystemException if a system exception occurred
 	 */
 	public void restoreTrashEntries(long[] classPKs)
 		throws PortalException, SystemException;
 
 	/**
-	 * Restores the entity with the primary key.
+	 * Restores the entry with the primary key.
 	 *
 	 * @param  classPK the primary key of the entry to restore
-	 * @throws PortalException if the entity with the primary key could not be
+	 * @throws PortalException if an entry with the primary key could not be
 	 *         found
 	 * @throws SystemException if a system exception occurred
 	 */
@@ -405,11 +406,13 @@ public interface TrashHandler {
 		throws PortalException, SystemException;
 
 	/**
-	 * Updates the title of the entity with the primary key before restore.
+	 * Updates the title of the entry with the primary key. This method is
+	 * called by {@link com.liferay.portlet.trash.action.EditEntryAction} before
+	 * restoring the entry via its restore rename action.
 	 *
-	 * @param  classPK the primary key of the entity
+	 * @param  classPK the primary key of the entry
 	 * @param  title the title to be assigned
-	 * @throws PortalException if the entry with the primary key could not be
+	 * @throws PortalException if an entry with the primary key could not be
 	 *         found
 	 * @throws SystemException if a system exception occurred
 	 */

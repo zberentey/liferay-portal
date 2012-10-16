@@ -48,7 +48,10 @@ import java.util.Date;
 
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletURL;
-/*
+
+/**
+ * Implements trash handling for the wiki page entity.
+ *
  * @author Eudaldo Alonso
  */
 public class WikiPageTrashHandler extends BaseTrashHandler {
@@ -90,11 +93,13 @@ public class WikiPageTrashHandler extends BaseTrashHandler {
 	}
 
 	/**
-	 * Deletes trash attachments from all the wiki pages from a group that were
-	 * deleted after a given date.
+	 * Deletes the group's wiki page attachments that were trashed before the
+	 * given date.
 	 *
 	 * @param  group the group
 	 * @param  date the date from which attachments will be deleted
+	 * @throws PortalException if any one of the attachment file paths were
+	 *         invalid
 	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
@@ -130,11 +135,11 @@ public class WikiPageTrashHandler extends BaseTrashHandler {
 	}
 
 	/**
-	 * Deletes all wiki page with the matching primary keys.
+	 * Deletes all wiki pages with the matching primary keys.
 	 *
 	 * @param  classPKs the primary keys of the wiki pages to be deleted
 	 * @param  checkPermission whether to check permission before deleting each
-	 *         folder
+	 *         wiki page
 	 * @throws PortalException if any one of the wiki pages could not be found
 	 * @throws SystemException if a system exception occurred
 	 */
@@ -198,11 +203,13 @@ public class WikiPageTrashHandler extends BaseTrashHandler {
 	}
 
 	/**
-	 * Returns the trash renderer associated to the trash entry.
+	 * Returns the trash renderer associated to the wiki page with the primary
+	 * key.
 	 *
 	 * @param  classPK the primary key of the wiki page
 	 * @return the trash renderer associated to the wiki page
-	 * @throws PortalException if the wiki page could not be found
+	 * @throws PortalException if a wiki page with the primary key could not be
+	 *         found
 	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
@@ -229,7 +236,7 @@ public class WikiPageTrashHandler extends BaseTrashHandler {
 	/**
 	 * Restores all wiki pages with the matching primary keys.
 	 *
-	 * @param  classPKs the primary keys of the wiki pages to be deleted
+	 * @param  classPKs the primary keys of the wiki pages to be restored
 	 * @throws PortalException if any one of the wiki pages could not be found
 	 * @throws SystemException if a system exception occurred
 	 */

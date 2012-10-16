@@ -35,12 +35,11 @@ import java.util.List;
 import javax.portlet.PortletRequest;
 
 /**
- * Represents the base class for basic operations with the Trash.
- *
- * See {@link com.liferay.portal.kernel.trash.TrashHandler}
+ * The base implementation of {@link TrashHandler}.
  *
  * @author Alexander Chow
  * @author Zsolt Berentey
+ * @see    {@link TrashHandler}
  */
 public abstract class BaseTrashHandler implements TrashHandler {
 
