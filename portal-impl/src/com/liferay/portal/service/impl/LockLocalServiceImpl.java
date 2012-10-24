@@ -18,10 +18,14 @@ import com.liferay.portal.DuplicateLockException;
 import com.liferay.portal.ExpiredLockException;
 import com.liferay.portal.NoSuchLockException;
 import com.liferay.portal.kernel.dao.orm.LockMode;
+import com.liferay.portal.kernel.dao.orm.ORMException;
+import com.liferay.portal.kernel.dao.orm.ObjectNotFoundException;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.lock.LockListener;
 import com.liferay.portal.kernel.lock.LockListenerRegistryUtil;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.transaction.Transactional;
 import com.liferay.portal.kernel.util.Validator;
@@ -31,6 +35,10 @@ import com.liferay.portal.service.base.LockLocalServiceBaseImpl;
 
 import java.util.Date;
 import java.util.List;
+
+import org.hibernate.HibernateException;
+import org.hibernate.exception.ConstraintViolationException;
+import org.hibernate.exception.LockAcquisitionException;
 
 /**
  * @author Brian Wing Shun Chan
@@ -165,7 +173,7 @@ public class LockLocalServiceImpl extends LockLocalServiceBaseImpl {
 			lock.setExpirationDate(new Date(now.getTime() + expirationTime));
 		}
 
-		lockPersistence.update(lock);
+		persistLock(lock);
 
 		return lock;
 	}
@@ -197,11 +205,9 @@ public class LockLocalServiceImpl extends LockLocalServiceBaseImpl {
 			lock.setKey(key);
 			lock.setOwner(updatedOwner);
 
-			lockPersistence.update(lock);
+			persistLock(lock);
 
 			lock.setNew(true);
-
-			lockPersistence.flush();
 		}
 		else if (Validator.equals(lock.getOwner(), expectedOwner)) {
 			lock.setCreateDate(new Date());
@@ -209,11 +215,9 @@ public class LockLocalServiceImpl extends LockLocalServiceBaseImpl {
 			lock.setKey(key);
 			lock.setOwner(updatedOwner);
 
-			lockPersistence.update(lock);
+			persistLock(lock);
 
 			lock.setNew(true);
-
-			lockPersistence.flush();
 		}
 
 		return lock;
@@ -252,7 +256,7 @@ public class LockLocalServiceImpl extends LockLocalServiceBaseImpl {
 					new Date(now.getTime() + expirationTime));
 			}
 
-			lockPersistence.update(lock);
+			persistLock(lock);
 
 			return lock;
 		}
@@ -268,11 +272,7 @@ public class LockLocalServiceImpl extends LockLocalServiceBaseImpl {
 	}
 
 	public void unlock(String className, String key) throws SystemException {
-		try {
-			lockPersistence.removeByC_K(className, key);
-		}
-		catch (NoSuchLockException nsle) {
-		}
+		removeLock(className, key);
 	}
 
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -288,8 +288,7 @@ public class LockLocalServiceImpl extends LockLocalServiceBaseImpl {
 		}
 
 		if (Validator.equals(lock.getOwner(), owner)) {
-			lockPersistence.remove(lock);
-			lockPersistence.flush();
+			removeLock(lock);
 		}
 	}
 
@@ -304,7 +303,7 @@ public class LockLocalServiceImpl extends LockLocalServiceBaseImpl {
 		}
 
 		try {
-			lockPersistence.remove(lock);
+			removeLock(lock);
 		}
 		finally {
 			if (lockListener != null) {
@@ -328,5 +327,69 @@ public class LockLocalServiceImpl extends LockLocalServiceBaseImpl {
 
 		return lock;
 	}
+
+	protected void persistLock(Lock lock) throws SystemException {
+
+		try {
+			lockPersistence.update(lock);
+			lockPersistence.flush();
+		}
+		catch (SystemException se) {
+			Throwable cause = se.getCause();
+
+			if (!(cause instanceof ORMException)) {
+				throw se;
+			}
+
+			_log.warn(cause.getMessage());
+
+			HibernateException hibernateException =
+				(HibernateException) cause.getCause();
+
+			if (hibernateException instanceof ConstraintViolationException ||
+				hibernateException instanceof LockAcquisitionException) {
+
+				return;
+			}
+
+			throw se;
+
+		}
+
+	}
+
+	protected void removeLock(Lock lock) throws SystemException {
+
+		try {
+			lockPersistence.remove(lock);
+			lockPersistence.flush();
+		}
+		catch (SystemException se) {
+			Throwable cause = se.getCause();
+
+			if (!(cause instanceof ObjectNotFoundException)) {
+				throw se;
+			}
+
+			_log.warn(cause.getMessage());
+
+			return;
+		}
+
+	}
+
+	protected void removeLock(String className, String key)
+		throws SystemException {
+
+		Lock lock = lockFinder.fetchByC_K(className, key, LockMode.UPGRADE);
+
+		if (lock == null) {
+			return;
+		}
+
+		removeLock(lock);
+	}
+
+	private static Log _log = LogFactoryUtil.getLog(LockLocalServiceImpl.class);
 
 }
