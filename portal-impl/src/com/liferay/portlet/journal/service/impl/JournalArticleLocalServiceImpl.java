@@ -42,6 +42,7 @@ import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.LocalizationUtil;
 import com.liferay.portal.kernel.util.MathUtil;
+import com.liferay.portal.kernel.util.ObjectValuePair;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
@@ -106,11 +107,15 @@ import com.liferay.portlet.journal.util.JournalUtil;
 import com.liferay.portlet.journal.util.comparator.ArticleIDComparator;
 import com.liferay.portlet.journal.util.comparator.ArticleVersionComparator;
 import com.liferay.portlet.journalcontent.util.JournalContentUtil;
+import com.liferay.portlet.social.model.SocialActivityConstants;
+import com.liferay.portlet.trash.model.TrashEntry;
+import com.liferay.portlet.trash.model.TrashVersion;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -128,6 +133,7 @@ import javax.portlet.PortletPreferences;
  * @author Raymond Augé
  * @author Bruno Farache
  * @author Juan FernÃ¡ndez
+ * @author Levente Hudák
  */
 public class JournalArticleLocalServiceImpl
 	extends JournalArticleLocalServiceBaseImpl {
@@ -261,7 +267,7 @@ public class JournalArticleLocalServiceImpl
 			article.setStatus(WorkflowConstants.STATUS_EXPIRED);
 		}
 
-		journalArticlePersistence.update(article, false);
+		journalArticlePersistence.update(article);
 
 		// Resources
 
@@ -424,7 +430,7 @@ public class JournalArticleLocalServiceImpl
 
 		article.setResourcePrimKey(resourcePrimKey);
 
-		journalArticlePersistence.update(article, false);
+		journalArticlePersistence.update(article);
 
 		return article;
 	}
@@ -456,13 +462,13 @@ public class JournalArticleLocalServiceImpl
 						article.getExpirationDate());
 					currentArticle.setStatus(WorkflowConstants.STATUS_EXPIRED);
 
-					journalArticlePersistence.update(currentArticle, false);
+					journalArticlePersistence.update(currentArticle);
 				}
 			}
 			else {
 				article.setStatus(WorkflowConstants.STATUS_EXPIRED);
 
-				journalArticlePersistence.update(article, false);
+				journalArticlePersistence.update(article);
 			}
 
 			updatePreviousApprovedArticle(article);
@@ -521,7 +527,7 @@ public class JournalArticleLocalServiceImpl
 
 			article.setContent(content);
 
-			journalArticlePersistence.update(article, false);
+			journalArticlePersistence.update(article);
 		}
 	}
 
@@ -562,7 +568,13 @@ public class JournalArticleLocalServiceImpl
 			newArticleId = String.valueOf(counterLocalService.increment());
 		}
 		else {
-			validate(groupId, newArticleId);
+			validate(newArticleId);
+
+			if (journalArticlePersistence.countByG_A(
+					groupId, newArticleId) > 0) {
+
+				throw new DuplicateArticleIdException();
+			}
 		}
 
 		long id = counterLocalService.increment();
@@ -605,7 +617,7 @@ public class JournalArticleLocalServiceImpl
 		newArticle.setSmallImageURL(oldArticle.getSmallImageURL());
 		newArticle.setStatus(oldArticle.getStatus());
 
-		journalArticlePersistence.update(newArticle, false);
+		journalArticlePersistence.update(newArticle);
 
 		// Resources
 
@@ -740,9 +752,15 @@ public class JournalArticleLocalServiceImpl
 			}
 		}
 
+		// Trash
+
+		trashEntryLocalService.deleteEntry(
+			JournalArticle.class.getName(), article.getResourcePrimKey());
+
 		// Article
 
 		journalArticlePersistence.remove(article);
+
 	}
 
 	public void deleteArticle(
@@ -798,7 +816,7 @@ public class JournalArticleLocalServiceImpl
 		for (JournalArticle article : articles) {
 			article.setLayoutUuid(StringPool.BLANK);
 
-			journalArticlePersistence.update(article, false);
+			journalArticlePersistence.update(article);
 		}
 	}
 
@@ -1663,8 +1681,51 @@ public class JournalArticleLocalServiceImpl
 		for (JournalArticle article : articles) {
 			article.setFolderId(newFolderId);
 
-			journalArticlePersistence.update(article, false);
+			journalArticlePersistence.update(article);
 		}
+	}
+
+	public JournalArticle moveArticleToTrash(
+			long userId, long groupId, String articleId)
+		throws PortalException, SystemException {
+
+		List<JournalArticle> articleVersions = new ArrayList(
+			getArticles(groupId, articleId));
+
+		JournalArticle latestVersion = articleVersions.remove(0);
+
+		ServiceContext serviceContext = new ServiceContext();
+
+		serviceContext.setAttribute(
+			"journalArticleVersions", (Serializable)articleVersions);
+
+		int oldStatus = latestVersion.getStatus();
+
+		// Article versions
+
+		updateStatus(
+			userId, latestVersion.getId(), WorkflowConstants.STATUS_IN_TRASH,
+			serviceContext);
+
+		// Social
+
+		socialActivityCounterLocalService.disableActivityCounters(
+				JournalArticle.class.getName(), latestVersion.getId());
+
+		socialActivityLocalService.addActivity(
+			userId, latestVersion.getGroupId(), JournalArticle.class.getName(),
+			latestVersion.getId(), SocialActivityConstants.TYPE_MOVE_TO_TRASH,
+			StringPool.BLANK, 0);
+
+		// Workflow
+
+		if (oldStatus == WorkflowConstants.STATUS_PENDING) {
+			workflowInstanceLinkLocalService.deleteWorkflowInstanceLink(
+				latestVersion.getCompanyId(), latestVersion.getGroupId(),
+				JournalArticle.class.getName(), latestVersion.getId());
+		}
+
+		return latestVersion;
 	}
 
 	public JournalArticle removeArticleLocale(
@@ -1700,9 +1761,39 @@ public class JournalArticleLocalServiceImpl
 
 		article.setContent(content);
 
-		journalArticlePersistence.update(article, false);
+		journalArticlePersistence.update(article);
 
 		return article;
+	}
+
+	public void restoreArticleFromTrash(long userId, JournalArticle article)
+		throws PortalException, SystemException {
+
+		TrashEntry trashEntry = trashEntryLocalService.getEntry(
+			JournalArticle.class.getName(), article.getResourcePrimKey());
+
+		List<TrashVersion> trashVersions = trashEntryLocalService.getVersions(
+			trashEntry.getEntryId());
+
+		ServiceContext serviceContext = new ServiceContext();
+
+		serviceContext.setScopeGroupId(article.getGroupId());
+
+		serviceContext.setAttribute(
+			"trashVersions", (Serializable)trashVersions);
+
+		updateStatus(
+			userId, article.getId(), WorkflowConstants.STATUS_APPROVED,
+			serviceContext);
+
+		socialActivityCounterLocalService.enableActivityCounters(
+				JournalArticle.class.getName(), article.getResourcePrimKey());
+
+		socialActivityLocalService.addActivity(
+			userId, article.getGroupId(), JournalArticle.class.getName(),
+			article.getResourcePrimKey(),
+			SocialActivityConstants.TYPE_RESTORE_FROM_TRASH, StringPool.BLANK,
+			0);
 	}
 
 	public List<JournalArticle> search(
@@ -2189,7 +2280,7 @@ public class JournalArticleLocalServiceImpl
 			article.setStatus(WorkflowConstants.STATUS_EXPIRED);
 		}
 
-		journalArticlePersistence.update(article, false);
+		journalArticlePersistence.update(article);
 
 		// Asset
 
@@ -2376,7 +2467,7 @@ public class JournalArticleLocalServiceImpl
 
 		article.setContent(content);
 
-		journalArticlePersistence.update(article, false);
+		journalArticlePersistence.update(article);
 
 		return article;
 	}
@@ -2448,7 +2539,7 @@ public class JournalArticleLocalServiceImpl
 
 		article.setContent(content);
 
-		journalArticlePersistence.update(article, false);
+		journalArticlePersistence.update(article);
 
 		return article;
 	}
@@ -2488,11 +2579,12 @@ public class JournalArticleLocalServiceImpl
 		article.setStatusByUserName(user.getFullName());
 		article.setStatusDate(serviceContext.getModifiedDate(now));
 
-		journalArticlePersistence.update(article, false);
+		journalArticlePersistence.update(article);
 
 		if (hasModifiedLatestApprovedVersion(
 				article.getGroupId(), article.getArticleId(),
-				article.getVersion())) {
+				article.getVersion()) &&
+				(status != WorkflowConstants.STATUS_IN_TRASH)) {
 
 			if (status == WorkflowConstants.STATUS_APPROVED) {
 				updateUrlTitles(
@@ -2583,6 +2675,78 @@ public class JournalArticleLocalServiceImpl
 			else if (oldStatus == WorkflowConstants.STATUS_APPROVED) {
 				updatePreviousApprovedArticle(article);
 			}
+
+			if (((status == WorkflowConstants.STATUS_APPROVED) ||
+				(status == WorkflowConstants.STATUS_IN_TRASH) ||
+				(oldStatus == WorkflowConstants.STATUS_IN_TRASH)) &&
+				((serviceContext == null) ||
+				serviceContext.isIndexingEnabled())) {
+
+				Indexer indexer = IndexerRegistryUtil.nullSafeGetIndexer(
+					JournalArticle.class.getName());
+
+				indexer.reindex(article);
+			}
+		}
+
+		// Trash
+
+		if (oldStatus == WorkflowConstants.STATUS_IN_TRASH) {
+
+			List<TrashVersion> trashVersions =
+				(List<TrashVersion>)serviceContext.getAttribute(
+				"trashVersions");
+
+			for (TrashVersion trashVersion : trashVersions) {
+				JournalArticle journalArticleVersion =
+					journalArticlePersistence.findByPrimaryKey(
+					trashVersion.getClassPK());
+
+				journalArticleVersion.setStatus(trashVersion.getStatus());
+
+				journalArticlePersistence.update(journalArticleVersion, false);
+			}
+
+			trashEntryLocalService.deleteEntry(
+				JournalArticle.class.getName(), article.getResourcePrimKey());
+		}
+		else if (status == WorkflowConstants.STATUS_IN_TRASH) {
+
+			List<JournalArticle> articleVersions =
+				(List<JournalArticle>)serviceContext.getAttribute(
+				"journalArticleVersions");
+
+			List<ObjectValuePair<Long, Integer>> journalArticleVersionStatuses =
+				new ArrayList<ObjectValuePair<Long, Integer>>(
+						articleVersions.size());
+
+			for (JournalArticle curJournalArticleVersion : articleVersions) {
+				int journalArticleVersionStatus =
+					curJournalArticleVersion.getStatus();
+
+				if (journalArticleVersionStatus ==
+					WorkflowConstants.STATUS_PENDING) {
+
+					journalArticleVersionStatus =
+						WorkflowConstants.STATUS_DRAFT;
+				}
+
+				journalArticleVersionStatuses.add(
+					new ObjectValuePair<Long, Integer>(
+						curJournalArticleVersion.getId(),
+						journalArticleVersionStatus));
+
+				curJournalArticleVersion.setStatus(
+					WorkflowConstants.STATUS_IN_TRASH);
+
+				journalArticlePersistence.update(
+					curJournalArticleVersion, false);
+			}
+
+			trashEntryLocalService.addTrashEntry(
+				userId, article.getGroupId(), JournalArticle.class.getName(),
+				article.getResourcePrimKey(), oldStatus,
+				journalArticleVersionStatuses, null);
 		}
 
 		if (article.getClassNameId() == 0) {
@@ -2656,7 +2820,7 @@ public class JournalArticleLocalServiceImpl
 		for (JournalArticle article : articles) {
 			article.setTemplateId(newTemplateId);
 
-			journalArticlePersistence.update(article, false);
+			journalArticlePersistence.update(article);
 		}
 	}
 
@@ -3472,7 +3636,7 @@ public class JournalArticleLocalServiceImpl
 			assetEntry.setModifiedDate(
 				previousApprovedArticle.getModifiedDate());
 
-			assetEntryPersistence.update(assetEntry, false);
+			assetEntryPersistence.update(assetEntry);
 
 			if (article.isIndexable()) {
 				Indexer indexer = IndexerRegistryUtil.nullSafeGetIndexer(
@@ -3494,7 +3658,7 @@ public class JournalArticleLocalServiceImpl
 			if (!article.getUrlTitle().equals(urlTitle)) {
 				article.setUrlTitle(urlTitle);
 
-				journalArticlePersistence.update(article, false);
+				journalArticlePersistence.update(article);
 			}
 		}
 	}
@@ -3618,7 +3782,14 @@ public class JournalArticleLocalServiceImpl
 		throws PortalException, SystemException {
 
 		if (!autoArticleId) {
-			validate(groupId, articleId);
+			validate(articleId);
+		}
+
+		JournalArticle article = journalArticlePersistence.fetchByG_A_V(
+			groupId, articleId, version);
+
+		if (article != null) {
+			throw new DuplicateArticleIdException();
 		}
 
 		validate(
@@ -3627,17 +3798,11 @@ public class JournalArticleLocalServiceImpl
 			smallImageFile, smallImageBytes);
 	}
 
-	protected void validate(long groupId, String articleId)
-		throws PortalException, SystemException {
-
+	protected void validate(String articleId) throws PortalException {
 		if (Validator.isNull(articleId) ||
 			(articleId.indexOf(CharPool.SPACE) != -1)) {
 
 			throw new ArticleIdException();
-		}
-
-		if (journalArticlePersistence.countByG_A(groupId, articleId) > 0) {
-			throw new DuplicateArticleIdException();
 		}
 	}
 

@@ -171,13 +171,14 @@ public class OrganizationLocalServiceImpl
 		organization.setComments(comments);
 		organization.setExpandoBridgeAttributes(serviceContext);
 
-		organizationPersistence.update(organization, false);
+		organizationPersistence.update(organization);
 
 		// Group
 
 		Group group = groupLocalService.addGroup(
 			userId, GroupConstants.DEFAULT_PARENT_GROUP_ID,
-			Organization.class.getName(), organizationId, name, null,
+			Organization.class.getName(), organizationId,
+			GroupConstants.DEFAULT_LIVE_GROUP_ID, name, null,
 			GroupConstants.TYPE_SITE_PRIVATE, null, site, true, null);
 
 		// Role
@@ -272,7 +273,7 @@ public class OrganizationLocalServiceImpl
 			publicLayoutSet.setLogo(false);
 			publicLayoutSet.setLogoId(0);
 
-			layoutSetPersistence.update(publicLayoutSet, false);
+			layoutSetPersistence.update(publicLayoutSet);
 
 			imageLocalService.deleteImage(logoId);
 		}
@@ -286,7 +287,7 @@ public class OrganizationLocalServiceImpl
 			privateLayoutSet.setLogo(false);
 			privateLayoutSet.setLogoId(0);
 
-			layoutSetPersistence.update(privateLayoutSet, false);
+			layoutSetPersistence.update(privateLayoutSet);
 
 			if (imageLocalService.getImage(logoId) != null) {
 				imageLocalService.deleteImage(logoId);
@@ -385,7 +386,7 @@ public class OrganizationLocalServiceImpl
 		if (group.isSite()) {
 			group.setSite(false);
 
-			groupPersistence.update(group, false);
+			groupPersistence.update(group);
 		}
 
 		groupLocalService.deleteGroup(group);
@@ -911,7 +912,7 @@ public class OrganizationLocalServiceImpl
 
 			organization.setTreePath(treePath);
 
-			organizationPersistence.update(organization, false);
+			organizationPersistence.update(organization);
 		}
 	}
 
@@ -1606,7 +1607,7 @@ public class OrganizationLocalServiceImpl
 		organization.setComments(comments);
 		organization.setExpandoBridgeAttributes(serviceContext);
 
-		organizationPersistence.update(organization, false);
+		organizationPersistence.update(organization);
 
 		// Group
 
@@ -1746,7 +1747,7 @@ public class OrganizationLocalServiceImpl
 
 			curOrganization.setTreePath(treePath.toString());
 
-			organizationPersistence.update(curOrganization, false);
+			organizationPersistence.update(curOrganization);
 
 			organizationIds[i] = curOrganization.getOrganizationId();
 		}

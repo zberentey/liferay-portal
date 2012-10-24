@@ -73,6 +73,8 @@ public class SourceFormatter {
 				GetterUtil.getString(
 					System.getProperty("source.formatter.excludes")));
 
+			_portalSource = _isPortalSource();
+
 			_sourceFormatterHelper = new SourceFormatterHelper(false);
 
 			_sourceFormatterHelper.init();
@@ -87,6 +89,7 @@ public class SourceFormatter {
 						_formatDDLStructuresXML();
 						_formatFriendlyURLRoutesXML();
 						_formatFTL();
+						_formatPortalProperties();
 						_formatPortletXML();
 						_formatServiceXML();
 						_formatSH();
@@ -1158,8 +1161,6 @@ public class SourceFormatter {
 	}
 
 	private static void _formatJava() throws IOException {
-		String basedir = "./";
-
 		String copyright = _getCopyright();
 		String oldCopyright = _getOldCopyright();
 
@@ -1167,7 +1168,7 @@ public class SourceFormatter {
 
 		Collection<String> fileNames = null;
 
-		if (_fileUtil.exists(basedir + "portal-impl")) {
+		if (_portalSource) {
 			fileNames = _getPortalJavaFiles();
 
 			_javaTermAlphabetizeExclusionsProperties =
@@ -1758,7 +1759,8 @@ public class SourceFormatter {
 								"line break: " + fileName + " " + lineCount);
 						}
 
-						if (((previousLine.endsWith(StringPool.COLON) &&
+						if (Validator.isNotNull(trimmedLine) &&
+							((previousLine.endsWith(StringPool.COLON) &&
 							  previousLine.contains(StringPool.TAB + "for ")) ||
 							 (previousLine.endsWith(
 								 StringPool.OPEN_PARENTHESIS) &&
@@ -2344,12 +2346,101 @@ public class SourceFormatter {
 		return content;
 	}
 
+	private static void _formatPortalProperties() throws IOException {
+		String basedir = "./";
+
+		String portalPortalProperties = null;
+
+		if (_portalSource) {
+			File portalPortalPropertiesFile = new File(
+				basedir + "portal-impl/src/portal.properties");
+
+			portalPortalProperties = _fileUtil.read(portalPortalPropertiesFile);
+		}
+		else {
+			portalPortalProperties = ContentUtil.get("portal.properties");
+		}
+
+		DirectoryScanner directoryScanner = new DirectoryScanner();
+
+		directoryScanner.setBasedir(basedir);
+
+		if (_portalSource) {
+			directoryScanner.setIncludes(
+				new String[] {
+					"**\\portal-ext.properties",
+					"**\\portal-legacy-*.properties",
+				}
+			);
+		}
+		else {
+			directoryScanner.setIncludes(
+				new String[] {
+					"**\\portal.properties", "**\\portal-ext.properties"
+				}
+			);
+		}
+
+		List<String> fileNames = _sourceFormatterHelper.scanForFiles(
+			directoryScanner);
+
+		for (String fileName : fileNames) {
+			File file = new File(basedir + fileName);
+
+			String content = _fileUtil.read(file);
+
+			_formatPortalProperties(fileName, content, portalPortalProperties);
+		}
+	}
+
+	private static void _formatPortalProperties(
+			String fileName, String content, String portalPortalProperties)
+		throws IOException {
+
+		UnsyncBufferedReader unsyncBufferedReader = new UnsyncBufferedReader(
+			new UnsyncStringReader(content));
+
+		int lineCount = 0;
+
+		String line = null;
+
+		int previousPos = -1;
+
+		while ((line = unsyncBufferedReader.readLine()) != null) {
+			lineCount++;
+
+			int pos = line.indexOf(StringPool.EQUAL);
+
+			if (pos == -1) {
+				continue;
+			}
+
+			String property = line.substring(0, pos + 1);
+
+			property = property.trim();
+
+			pos = portalPortalProperties.indexOf(
+				StringPool.FOUR_SPACES + property);
+
+			if (pos == -1) {
+				continue;
+			}
+
+			if (pos < previousPos) {
+				_sourceFormatterHelper.printError(
+					fileName, "sort " + fileName + " " + lineCount);
+			}
+
+			previousPos = pos;
+		}
+	}
+
 	private static void _formatPortletXML()
 		throws DocumentException, IOException {
 
 		String basedir = "./";
 
-		if (_fileUtil.exists(basedir + "portal-impl")) {
+		if (_portalSource) {
 			File file = new File(
 				basedir + "portal-web/docroot/WEB-INF/portlet-custom.xml");
 
@@ -2627,7 +2718,7 @@ public class SourceFormatter {
 
 		String basedir = "./";
 
-		if (!_fileUtil.exists(basedir + "portal-impl")) {
+		if (!_portalSource) {
 			return;
 		}
 
@@ -2737,7 +2828,7 @@ public class SourceFormatter {
 
 		String basedir = "./";
 
-		if (!_fileUtil.exists(basedir + "portal-impl")) {
+		if (!_portalSource) {
 			return;
 		}
 
@@ -2782,7 +2873,7 @@ public class SourceFormatter {
 	private static void _formatWebXML() throws IOException {
 		String basedir = "./";
 
-		if (_fileUtil.exists(basedir + "portal-impl")) {
+		if (_portalSource) {
 			Properties properties = new Properties();
 
 			String propertiesContent = _fileUtil.read(
@@ -3787,6 +3878,17 @@ public class SourceFormatter {
 		return false;
 	}
 
+	private static boolean _isPortalSource() {
+		String basedir = "./";
+
+		if (_fileUtil.exists(basedir + "portal-impl")) {
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+
 	private static boolean _isValidJavaParameter(String javaParameter) {
 		int quoteCount = StringUtil.count(javaParameter, StringPool.QUOTE);
 
@@ -4308,6 +4410,7 @@ public class SourceFormatter {
 	private static Pattern _jspIncludeFilePattern = Pattern.compile(
 		"/.*[.]jsp[f]?");
 	private static Properties _lineLengthExclusionsProperties;
+	private static boolean _portalSource;
 	private static SAXReaderImpl _saxReaderUtil = SAXReaderImpl.getInstance();
 	private static SourceFormatterHelper _sourceFormatterHelper;
 	private static Pattern _xssPattern = Pattern.compile(

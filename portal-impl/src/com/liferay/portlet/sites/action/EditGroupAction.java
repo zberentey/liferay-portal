@@ -67,7 +67,6 @@ import com.liferay.portal.service.TeamLocalServiceUtil;
 import com.liferay.portal.struts.PortletAction;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortalUtil;
-import com.liferay.portal.util.PropsValues;
 import com.liferay.portal.util.WebKeys;
 import com.liferay.portlet.asset.AssetCategoryException;
 import com.liferay.portlet.asset.AssetTagException;
@@ -133,7 +132,7 @@ public class EditGroupAction extends PortletAction {
 				updateActive(actionRequest, cmd);
 			}
 			else if (cmd.equals(Constants.DELETE)) {
-				deleteGroup(actionRequest);
+				deleteGroups(actionRequest);
 			}
 
 			if (Validator.isNotNull(closeRedirect)) {
@@ -212,15 +211,27 @@ public class EditGroupAction extends PortletAction {
 			getForward(renderRequest, "portlet.sites_admin.edit_site"));
 	}
 
-	protected void deleteGroup(ActionRequest actionRequest) throws Exception {
+	protected void deleteGroups(ActionRequest actionRequest) throws Exception {
 		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 
+		long[] deleteGroupIds = null;
+
 		long groupId = ParamUtil.getLong(actionRequest, "groupId");
 
-		GroupServiceUtil.deleteGroup(groupId);
+		if (groupId > 0) {
+			deleteGroupIds = new long[] {groupId};
+		}
+		else {
+			deleteGroupIds = StringUtil.split(
+				ParamUtil.getString(actionRequest, "deleteGroupIds"), 0L);
+		}
 
-		LiveUsers.deleteGroup(themeDisplay.getCompanyId(), groupId);
+		for (long deleteGroupId : deleteGroupIds) {
+			GroupServiceUtil.deleteGroup(deleteGroupId);
+
+			LiveUsers.deleteGroup(themeDisplay.getCompanyId(), deleteGroupId);
+		}
 	}
 
 	protected long getRefererGroupId(ThemeDisplay themeDisplay)
@@ -405,8 +416,8 @@ public class EditGroupAction extends PortletAction {
 			active = ParamUtil.getBoolean(actionRequest, "active");
 
 			liveGroup = GroupServiceUtil.addGroup(
-				parentGroupId, name, description, type, friendlyURL, true,
-				active, serviceContext);
+				parentGroupId, GroupConstants.DEFAULT_LIVE_GROUP_ID, name,
+				description, type, friendlyURL, true, active, serviceContext);
 
 			LiveUsers.joinGroup(
 				themeDisplay.getCompanyId(), liveGroup.getGroupId(), userId);
@@ -479,7 +490,11 @@ public class EditGroupAction extends PortletAction {
 				getTeams(actionRequest), Team.TEAM_ID_ACCESSOR,
 				StringPool.COMMA));
 
-		for (String analyticsType : PropsValues.SITES_FORM_ANALYTICS) {
+		String[] analyticsTypes = PrefsPropsUtil.getStringArray(
+			themeDisplay.getCompanyId(), PropsKeys.ADMIN_ANALYTICS_TYPES,
+			StringPool.NEW_LINE);
+
+		for (String analyticsType : analyticsTypes) {
 			if (analyticsType.equals("google")) {
 				String googleAnalyticsId = ParamUtil.getString(
 					actionRequest, "googleAnalyticsId",

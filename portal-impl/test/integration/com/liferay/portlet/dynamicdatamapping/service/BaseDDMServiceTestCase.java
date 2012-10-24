@@ -44,7 +44,7 @@ public class BaseDDMServiceTestCase {
 
 		return addTemplate(
 			PortalUtil.getClassNameId(DDMStructure.class), classPK, name,
-			DDMTemplateConstants.TEMPLATE_TYPE_DETAIL,
+			DDMTemplateConstants.TEMPLATE_TYPE_FORM,
 			DDMTemplateConstants.TEMPLATE_MODE_CREATE, language,
 			getTestTemplateScript(language));
 	}
@@ -56,8 +56,9 @@ public class BaseDDMServiceTestCase {
 		String language = DDMTemplateConstants.LANG_TYPE_VM;
 
 		return addTemplate(
-			classNameId, classPK, name, DDMTemplateConstants.TEMPLATE_TYPE_LIST,
-			StringPool.BLANK, language, getTestTemplateScript(language));
+			classNameId, classPK, name,
+			DDMTemplateConstants.TEMPLATE_TYPE_DISPLAY, StringPool.BLANK,
+			language, getTestTemplateScript(language));
 	}
 
 	protected DDMTemplate addListTemplate(long classPK, String name)
@@ -103,10 +104,22 @@ public class BaseDDMServiceTestCase {
 			String type, String mode, String language, String script)
 		throws Exception {
 
+		return addTemplate(
+			classNameId, classPK, templateKey, name, type, mode, language,
+			script, false);
+	}
+
+	protected DDMTemplate addTemplate(
+			long classNameId, long classPK, String templateKey, String name,
+			String type, String mode, String language, String script,
+			boolean cacheable)
+		throws Exception {
+
 		return DDMTemplateLocalServiceUtil.addTemplate(
 			TestPropsValues.getUserId(), TestPropsValues.getGroupId(),
 			classNameId, classPK, templateKey, getDefaultLocaleMap(name), null,
-			type, mode, language, script, ServiceTestUtil.getServiceContext());
+			type, mode, language, script, cacheable,
+			ServiceTestUtil.getServiceContext());
 	}
 
 	protected Map<Locale, String> getDefaultLocaleMap(String defaultValue) {

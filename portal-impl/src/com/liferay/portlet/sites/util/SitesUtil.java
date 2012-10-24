@@ -16,6 +16,7 @@ package com.liferay.portlet.sites.util;
 
 import com.liferay.portal.RequiredLayoutException;
 import com.liferay.portal.events.EventsProcessorUtil;
+import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.language.LanguageUtil;
@@ -41,10 +42,13 @@ import com.liferay.portal.model.LayoutSet;
 import com.liferay.portal.model.LayoutSetPrototype;
 import com.liferay.portal.model.LayoutTypePortlet;
 import com.liferay.portal.model.Lock;
+import com.liferay.portal.model.Organization;
+import com.liferay.portal.model.OrganizationConstants;
 import com.liferay.portal.model.PortletConstants;
 import com.liferay.portal.model.ResourceConstants;
 import com.liferay.portal.model.Role;
 import com.liferay.portal.model.RoleConstants;
+import com.liferay.portal.model.User;
 import com.liferay.portal.model.UserGroup;
 import com.liferay.portal.model.impl.VirtualLayout;
 import com.liferay.portal.security.auth.PrincipalException;
@@ -61,6 +65,7 @@ import com.liferay.portal.service.LayoutSetLocalServiceUtil;
 import com.liferay.portal.service.LayoutSetPrototypeLocalServiceUtil;
 import com.liferay.portal.service.LayoutSetServiceUtil;
 import com.liferay.portal.service.LockLocalServiceUtil;
+import com.liferay.portal.service.OrganizationLocalServiceUtil;
 import com.liferay.portal.service.PortletPreferencesLocalServiceUtil;
 import com.liferay.portal.service.ResourcePermissionLocalServiceUtil;
 import com.liferay.portal.service.RoleLocalServiceUtil;
@@ -85,6 +90,7 @@ import com.liferay.portal.util.PropsValues;
 import com.liferay.portal.util.WebKeys;
 import com.liferay.portlet.PortletPreferencesFactoryUtil;
 import com.liferay.portlet.PortletPreferencesImpl;
+import com.liferay.portlet.usersadmin.search.GroupSearchTerms;
 
 import java.io.File;
 import java.io.InputStream;
@@ -197,14 +203,14 @@ public class SitesUtil {
 			"last-merge-time",
 			String.valueOf(targetLayout.getModifiedDate().getTime()));
 
-		LayoutLocalServiceUtil.updateLayout(targetLayout, false);
+		LayoutLocalServiceUtil.updateLayout(targetLayout);
 
 		UnicodeProperties prototypeTypeSettingsProperties =
 			layoutPrototypeLayout.getTypeSettingsProperties();
 
 		prototypeTypeSettingsProperties.setProperty("merge-fail-count", "0");
 
-		LayoutLocalServiceUtil.updateLayout(layoutPrototypeLayout, false);
+		LayoutLocalServiceUtil.updateLayout(layoutPrototypeLayout);
 	}
 
 	public static void copyLayout(
@@ -732,6 +738,38 @@ public class SitesUtil {
 		return true;
 	}
 
+	public static boolean isOrganizationUser(
+			long companyId, Group group, User user,
+			GroupSearchTerms searchTerms, List<String> organizationNames)
+		throws Exception {
+
+		boolean organizationUser = false;
+
+		LinkedHashMap<String, Object> organizationParams =
+			new LinkedHashMap<String, Object>();
+
+		organizationParams.put(
+			"organizationsGroups", new Long(group.getGroupId()));
+
+		List<Organization> organizationsGroups =
+			OrganizationLocalServiceUtil.search(
+				companyId, OrganizationConstants.ANY_PARENT_ORGANIZATION_ID,
+				searchTerms.getKeywords(), null, null, null, organizationParams,
+				QueryUtil.ALL_POS, QueryUtil.ALL_POS);
+
+		for (Organization organization : organizationsGroups) {
+			for (long userOrganizationId : user.getOrganizationIds()) {
+				if (userOrganizationId == organization.getOrganizationId()) {
+					organizationNames.add(organization.getName());
+
+					organizationUser = true;
+				}
+			}
+		}
+
+		return organizationUser;
+	}
+
 	public static boolean isUserGroupLayoutSetViewable(
 			PermissionChecker permissionChecker, Group userGroupGroup)
 		throws PortalException, SystemException {
@@ -758,6 +796,34 @@ public class SitesUtil {
 		else {
 			return false;
 		}
+	}
+
+	public static boolean isUserGroupUser(
+			long companyId, Group group, User user, List<String> userGroupNames)
+		throws Exception {
+
+		boolean userGroupUser = false;
+
+		LinkedHashMap<String, Object> userGroupParams =
+			new LinkedHashMap<String, Object>();
+
+		userGroupParams.put("userGroupsGroups", new Long(group.getGroupId()));
+
+		List<UserGroup> userGroupsGroups = UserGroupLocalServiceUtil.search(
+			companyId, null, null, userGroupParams, QueryUtil.ALL_POS,
+			QueryUtil.ALL_POS, null);
+
+		for (UserGroup userGroup : userGroupsGroups) {
+			for (long userGroupId : user.getUserGroupIds()) {
+				if (userGroupId == userGroup.getUserGroupId()) {
+					userGroupNames.add(userGroup.getName());
+
+					userGroupUser = true;
+				}
+			}
+		}
+
+		return userGroupUser;
 	}
 
 	public static void mergeLayoutProtypeLayout(Group group, Layout layout)
@@ -862,7 +928,7 @@ public class SitesUtil {
 
 			// Invoke updateImpl so that we do not trigger the listeners
 
-			LayoutUtil.updateImpl(layoutPrototypeLayout, false);
+			LayoutUtil.updateImpl(layoutPrototypeLayout);
 		}
 		finally {
 			LockLocalServiceUtil.unlock(
@@ -991,7 +1057,7 @@ public class SitesUtil {
 			settingsProperties.setProperty(
 				"last-merge-time", String.valueOf(System.currentTimeMillis()));
 
-			LayoutSetLocalServiceUtil.updateLayoutSet(layoutSet, false);
+			LayoutSetLocalServiceUtil.updateLayoutSet(layoutSet);
 		}
 		catch (Exception e) {
 			_log.error(e, e);
@@ -1001,7 +1067,7 @@ public class SitesUtil {
 
 			// Invoke updateImpl so that we do not trigger the listeners
 
-			LayoutSetUtil.updateImpl(layoutSetPrototypeLayoutSet, false);
+			LayoutSetUtil.updateImpl(layoutSetPrototypeLayoutSet);
 		}
 		finally {
 			LockLocalServiceUtil.unlock(
@@ -1015,7 +1081,7 @@ public class SitesUtil {
 
 		layout.setModifiedDate(null);
 
-		LayoutLocalServiceUtil.updateLayout(layout, false);
+		LayoutLocalServiceUtil.updateLayout(layout);
 
 		LayoutSet layoutSet = layout.getLayoutSet();
 		UnicodeProperties settingsProperties =
@@ -1026,7 +1092,7 @@ public class SitesUtil {
 		settingsProperties.setProperty(
 			"last-reset-time", String.valueOf(System.currentTimeMillis()));
 
-		LayoutSetLocalServiceUtil.updateLayoutSet(layoutSet, false);
+		LayoutSetLocalServiceUtil.updateLayoutSet(layoutSet);
 	}
 
 	public static void updateLayoutScopes(
@@ -1051,6 +1117,7 @@ public class SitesUtil {
 			GroupLocalServiceUtil.addGroup(
 				userId, GroupConstants.DEFAULT_PARENT_GROUP_ID,
 				Layout.class.getName(), targetLayout.getPlid(),
+				GroupConstants.DEFAULT_LIVE_GROUP_ID,
 				targetLayout.getName(languageId), null, 0, null, false, true,
 				null);
 		}

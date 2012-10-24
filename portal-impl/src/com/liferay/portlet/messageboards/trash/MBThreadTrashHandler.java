@@ -17,6 +17,7 @@ package com.liferay.portlet.messageboards.trash;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.trash.BaseTrashHandler;
+import com.liferay.portal.kernel.trash.TrashRenderer;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.model.CompanyConstants;
@@ -26,10 +27,14 @@ import com.liferay.portlet.documentlibrary.NoSuchDirectoryException;
 import com.liferay.portlet.documentlibrary.store.DLStoreUtil;
 import com.liferay.portlet.messageboards.model.MBThread;
 import com.liferay.portlet.messageboards.service.MBThreadLocalServiceUtil;
+import com.liferay.portlet.messageboards.service.MBThreadServiceUtil;
 import com.liferay.portlet.messageboards.service.permission.MBMessagePermission;
+import com.liferay.portlet.messageboards.util.MBUtil;
 import com.liferay.portlet.trash.util.TrashUtil;
 
 import java.util.Date;
+
+import javax.portlet.PortletRequest;
 
 /**
  * Represents the trash handler for message boards threads.
@@ -40,15 +45,6 @@ public class MBThreadTrashHandler extends BaseTrashHandler {
 
 	public static final String CLASS_NAME = MBThread.class.getName();
 
-	/**
-	 * Deletes trash attachments from all the message boards messages from a
-	 * group that were deleted after a given date.
-	 *
-	 * @param  group the group
-	 * @param  date the date from which attachments will be deleted
-	 * @throws PortalException if a portal exception occurred
-	 * @throws SystemException if a system exception occurred
-	 */
 	@Override
 	public void deleteTrashAttachments(Group group, Date date)
 		throws PortalException, SystemException {
@@ -93,18 +89,61 @@ public class MBThreadTrashHandler extends BaseTrashHandler {
 		}
 	}
 
-	public void deleteTrashEntries(long[] classPKs, boolean checkPermission) {
+	public void deleteTrashEntries(long[] classPKs, boolean checkPermission)
+		throws PortalException, SystemException {
+
+		for (long classPK : classPKs) {
+			if (checkPermission) {
+				MBThreadServiceUtil.deleteThread(classPK);
+			}
+			else {
+				MBThreadLocalServiceUtil.deleteThread(classPK);
+			}
+		}
 	}
 
 	public String getClassName() {
 		return CLASS_NAME;
 	}
 
+	@Override
+	public String getRestoreLink(PortletRequest portletRequest, long classPK)
+		throws PortalException, SystemException {
+
+		MBThread thread = MBThreadLocalServiceUtil.getThread(classPK);
+
+		return MBUtil.getMBControlPanelLink(
+			portletRequest, thread.getCategoryId());
+	}
+
+	@Override
+	public String getRestoreMessage(PortletRequest portletRequest, long classPK)
+		throws PortalException, SystemException {
+
+		MBThread thread = MBThreadLocalServiceUtil.getThread(classPK);
+
+		return MBUtil.getAbsolutePath(portletRequest, thread.getCategoryId());
+	}
+
+	@Override
+	public TrashRenderer getTrashRenderer(long classPK)
+		throws PortalException, SystemException {
+
+		MBThread thread = MBThreadLocalServiceUtil.getThread(classPK);
+
+		return new MBThreadTrashRenderer(thread);
+	}
+
 	public boolean isInTrash(long classPK) {
 		return false;
 	}
 
-	public void restoreTrashEntries(long[] classPKs) {
+	public void restoreTrashEntries(long[] classPKs)
+		throws PortalException, SystemException {
+
+		for (long classPK : classPKs) {
+			MBThreadServiceUtil.restoreThreadFromTrash(classPK);
+		}
 	}
 
 	@Override

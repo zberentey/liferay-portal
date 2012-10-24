@@ -117,8 +117,9 @@ public class AssetEntryModelImpl extends BaseModelImpl<AssetEntry>
 	public static long COMPANYID_COLUMN_BITMASK = 8L;
 	public static long EXPIRATIONDATE_COLUMN_BITMASK = 16L;
 	public static long GROUPID_COLUMN_BITMASK = 32L;
-	public static long PUBLISHDATE_COLUMN_BITMASK = 64L;
-	public static long VISIBLE_COLUMN_BITMASK = 128L;
+	public static long LAYOUTUUID_COLUMN_BITMASK = 64L;
+	public static long PUBLISHDATE_COLUMN_BITMASK = 128L;
+	public static long VISIBLE_COLUMN_BITMASK = 256L;
 
 	/**
 	 * Converts the soap model instance into a normal model instance.
@@ -1000,7 +1001,17 @@ public class AssetEntryModelImpl extends BaseModelImpl<AssetEntry>
 	}
 
 	public void setLayoutUuid(String layoutUuid) {
+		_columnBitmask |= LAYOUTUUID_COLUMN_BITMASK;
+
+		if (_originalLayoutUuid == null) {
+			_originalLayoutUuid = _layoutUuid;
+		}
+
 		_layoutUuid = layoutUuid;
+	}
+
+	public String getOriginalLayoutUuid() {
+		return GetterUtil.getString(_originalLayoutUuid);
 	}
 
 	@JSON
@@ -1187,6 +1198,8 @@ public class AssetEntryModelImpl extends BaseModelImpl<AssetEntry>
 		assetEntryModelImpl._originalPublishDate = assetEntryModelImpl._publishDate;
 
 		assetEntryModelImpl._originalExpirationDate = assetEntryModelImpl._expirationDate;
+
+		assetEntryModelImpl._originalLayoutUuid = assetEntryModelImpl._layoutUuid;
 
 		assetEntryModelImpl._columnBitmask = 0;
 	}
@@ -1561,6 +1574,7 @@ public class AssetEntryModelImpl extends BaseModelImpl<AssetEntry>
 	private String _summaryCurrentLanguageId;
 	private String _url;
 	private String _layoutUuid;
+	private String _originalLayoutUuid;
 	private int _height;
 	private int _width;
 	private double _priority;

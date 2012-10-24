@@ -234,6 +234,11 @@ update Country set name = 'zimbabwe' where name = 'Zimbabwe';
 
 alter table DDMStructure add parentStructureId LONG;
 
+alter table DDMTemplate add cacheable BOOLEAN;
+
+update DDMTemplate set type_ = 'display' where type_ = 'list';
+update DDMTemplate set type_ = 'form' where type_ = 'detail';
+
 alter table DLFileEntry add manualCheckInRequired BOOLEAN;
 
 alter table DLFileRank add active_ BOOLEAN;

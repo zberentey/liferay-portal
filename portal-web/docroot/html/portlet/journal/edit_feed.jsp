@@ -263,10 +263,10 @@ if (feed != null) {
 						<c:if test="<%= (structure != null) && (templates.size() > 1) %>">
 
 							<%
-							for (JournalTemplate currTemplate : templates) {
+							for (JournalTemplate curTemplate : templates) {
 							%>
 
-								<aui:option data-contentField="<%= JournalFeedConstants.RENDERED_WEB_CONTENT %>"  label='<%= LanguageUtil.format(pageContext, "use-template-x", HtmlUtil.escape(currTemplate.getName(locale))) %>' selected="<%= rendererTemplateId.equals(currTemplate.getTemplateId()) %>" value="<%= currTemplate.getTemplateId() %>" />
+								<aui:option data-contentField="<%= JournalFeedConstants.RENDERED_WEB_CONTENT %>"  label='<%= LanguageUtil.format(pageContext, "use-template-x", HtmlUtil.escape(curTemplate.getName(locale))) %>' selected="<%= rendererTemplateId.equals(curTemplate.getTemplateId()) %>" value="<%= curTemplate.getTemplateId() %>" />
 
 							<%
 							}

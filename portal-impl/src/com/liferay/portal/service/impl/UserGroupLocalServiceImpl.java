@@ -122,14 +122,15 @@ public class UserGroupLocalServiceImpl extends UserGroupLocalServiceBaseImpl {
 		userGroup.setAddedByLDAPImport(
 			LDAPUserGroupTransactionThreadLocal.isOriginatesFromLDAP());
 
-		userGroupPersistence.update(userGroup, false);
+		userGroupPersistence.update(userGroup);
 
 		// Group
 
 		groupLocalService.addGroup(
 			userId, GroupConstants.DEFAULT_PARENT_GROUP_ID,
 			UserGroup.class.getName(), userGroup.getUserGroupId(),
-			String.valueOf(userGroupId), null, 0, null, false, true, null);
+			GroupConstants.DEFAULT_LIVE_GROUP_ID, String.valueOf(userGroupId),
+			null, 0, null, false, true, null);
 
 		// Resources
 
@@ -618,7 +619,7 @@ public class UserGroupLocalServiceImpl extends UserGroupLocalServiceBaseImpl {
 		userGroup.setName(name);
 		userGroup.setDescription(description);
 
-		userGroupPersistence.update(userGroup, false);
+		userGroupPersistence.update(userGroup);
 
 		return userGroup;
 	}

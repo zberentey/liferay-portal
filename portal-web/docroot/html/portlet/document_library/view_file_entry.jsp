@@ -539,22 +539,22 @@ request.setAttribute("view_file_entry.jsp-fileEntry", fileEntry);
 					<liferay-ui:panel-container extended="<%= false %>" id="documentLibraryAssetPanelContainer" persistState="<%= true %>">
 
 						<%
-							if (fileEntryTypeId > 0) {
-											try {
-												DLFileEntryType fileEntryType = DLFileEntryTypeServiceUtil.getFileEntryType(fileEntryTypeId);
+						if (fileEntryTypeId > 0) {
+							try {
+								DLFileEntryType fileEntryType = DLFileEntryTypeServiceUtil.getFileEntryType(fileEntryTypeId);
 
-												List<DDMStructure> ddmStructures = fileEntryType.getDDMStructures();
+								List<DDMStructure> ddmStructures = fileEntryType.getDDMStructures();
 
-												for (DDMStructure ddmStructure : ddmStructures) {
-													Fields fields = null;
+								for (DDMStructure ddmStructure : ddmStructures) {
+									Fields fields = null;
 
-													try {
-														DLFileEntryMetadata fileEntryMetadata = DLFileEntryMetadataLocalServiceUtil.getFileEntryMetadata(ddmStructure.getStructureId(), fileVersionId);
+									try {
+										DLFileEntryMetadata fileEntryMetadata = DLFileEntryMetadataLocalServiceUtil.getFileEntryMetadata(ddmStructure.getStructureId(), fileVersionId);
 
-														fields = StorageEngineUtil.getFields(fileEntryMetadata.getDDMStorageId());
-													}
-													catch (Exception e) {
-													}
+										fields = StorageEngineUtil.getFields(fileEntryMetadata.getDDMStorageId());
+									}
+									catch (Exception e) {
+									}
 						%>
 
 									<liferay-ui:panel collapsible="<%= true %>" cssClass="metadata" extended="<%= true %>" id="documentLibraryMetadataPanel" persistState="<%= true %>" title="<%= HtmlUtil.escape(ddmStructure.getName(LocaleUtil.getDefault())) %>">
@@ -564,11 +564,11 @@ request.setAttribute("view_file_entry.jsp-fileEntry", fileEntry);
 									</liferay-ui:panel>
 
 						<%
+								}
 							}
-											}
-											catch (Exception e) {
-											}
-										}
+							catch (Exception e) {
+							}
+						}
 						%>
 
 						<liferay-ui:custom-attributes-available className="<%= DLFileEntryConstants.getClassName() %>" classPK="<%= fileVersionId %>" editable="<%= false %>">
@@ -583,22 +583,22 @@ request.setAttribute("view_file_entry.jsp-fileEntry", fileEntry);
 						</liferay-ui:custom-attributes-available>
 
 						<%
-							try {
-											List<DDMStructure> ddmStructures = DDMStructureLocalServiceUtil.getClassStructures(PortalUtil.getClassNameId(DLFileEntry.class), new StructureStructureKeyComparator(true));
+						try {
+							List<DDMStructure> ddmStructures = DDMStructureLocalServiceUtil.getClassStructures(company.getCompanyId(), PortalUtil.getClassNameId(DLFileEntry.class), new StructureStructureKeyComparator(true));
 
-											for (DDMStructure ddmStructure : ddmStructures) {
-												Fields fields = null;
+							for (DDMStructure ddmStructure : ddmStructures) {
+								Fields fields = null;
 
-												try {
-													DLFileEntryMetadata fileEntryMetadata = DLFileEntryMetadataLocalServiceUtil.getFileEntryMetadata(ddmStructure.getStructureId(), fileVersionId);
+								try {
+									DLFileEntryMetadata fileEntryMetadata = DLFileEntryMetadataLocalServiceUtil.getFileEntryMetadata(ddmStructure.getStructureId(), fileVersionId);
 
-													fields = StorageEngineUtil.getFields(fileEntryMetadata.getDDMStorageId());
-												}
-												catch (Exception e) {
-												}
+									fields = StorageEngineUtil.getFields(fileEntryMetadata.getDDMStorageId());
+								}
+								catch (Exception e) {
+								}
 
-												if (fields != null) {
-													String name = "metadata." + ddmStructure.getName(LocaleUtil.getDefault(), true);
+								if (fields != null) {
+									String name = "metadata." + ddmStructure.getName(LocaleUtil.getDefault(), true);
 						%>
 
 									<liferay-ui:panel collapsible="<%= true %>" cssClass="lfr-asset-metadata" id="documentLibraryAssetMetadataPanel" persistState="<%= true %>" title="<%= name %>">
@@ -608,11 +608,11 @@ request.setAttribute("view_file_entry.jsp-fileEntry", fileEntry);
 									</liferay-ui:panel>
 
 						<%
+								}
 							}
-											}
-										}
-										catch (Exception e) {
-										}
+						}
+						catch (Exception e) {
+						}
 						%>
 
 						<c:if test="<%= showAssetMetadata %>">

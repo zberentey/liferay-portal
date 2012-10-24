@@ -113,7 +113,7 @@ public class DDMStructureLocalServiceImpl
 		structure.setStorageType(storageType);
 		structure.setType(type);
 
-		ddmStructurePersistence.update(structure, false);
+		ddmStructurePersistence.update(structure);
 
 		// Resources
 
@@ -242,12 +242,18 @@ public class DDMStructureLocalServiceImpl
 		return ddmStructurePersistence.fetchByG_S(groupId, structureKey);
 	}
 
+	/**
+	 * @deprecated {@link #getClassStructures(long, long)}
+	 */
 	public List<DDMStructure> getClassStructures(long classNameId)
 		throws SystemException {
 
 		return ddmStructurePersistence.findByClassNameId(classNameId);
 	}
 
+	/**
+	 * @deprecated {@link #getClassStructures(long, long, int, int)}
+	 */
 	public List<DDMStructure> getClassStructures(
 			long classNameId, int start, int end)
 		throws SystemException {
@@ -256,6 +262,34 @@ public class DDMStructureLocalServiceImpl
 			classNameId, start, end);
 	}
 
+	public List<DDMStructure> getClassStructures(
+			long companyId, long classNameId)
+		throws SystemException {
+
+		return ddmStructurePersistence.findByC_C(companyId, classNameId);
+	}
+
+	public List<DDMStructure> getClassStructures(
+			long companyId, long classNameId, int start, int end)
+		throws SystemException {
+
+		return ddmStructurePersistence.findByC_C(
+			companyId, classNameId, start, end);
+	}
+
+	public List<DDMStructure> getClassStructures(
+			long companyId, long classNameId,
+			OrderByComparator orderByComparator)
+		throws SystemException {
+
+		return ddmStructurePersistence.findByC_C(
+			companyId, classNameId, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
+			orderByComparator);
+	}
+
+	/**
+	 * @deprecated {@link #getClassStructures(long, long, OrderByComparator)}
+	 */
 	public List<DDMStructure> getClassStructures(
 			long classNameId, OrderByComparator orderByComparator)
 		throws SystemException {
@@ -477,7 +511,7 @@ public class DDMStructureLocalServiceImpl
 		structure.setDescriptionMap(descriptionMap);
 		structure.setXsd(xsd);
 
-		ddmStructurePersistence.update(structure, false);
+		ddmStructurePersistence.update(structure);
 
 		syncStructureTemplatesFields(structure);
 
@@ -491,7 +525,7 @@ public class DDMStructureLocalServiceImpl
 
 		List<DDMTemplate> templates = ddmTemplateLocalService.getTemplates(
 			classNameId, structure.getStructureId(),
-			DDMTemplateConstants.TEMPLATE_TYPE_DETAIL);
+			DDMTemplateConstants.TEMPLATE_TYPE_FORM);
 
 		for (DDMTemplate template : templates) {
 			String script = template.getScript();
@@ -524,7 +558,7 @@ public class DDMStructureLocalServiceImpl
 
 			template.setScript(script);
 
-			ddmTemplatePersistence.update(template, false);
+			ddmTemplatePersistence.update(template);
 		}
 	}
 

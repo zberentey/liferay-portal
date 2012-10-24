@@ -247,22 +247,6 @@ public class JournalArticleLocalServiceWrapper
 	}
 
 	/**
-	* Updates the journal article in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
-	*
-	* @param journalArticle the journal article
-	* @param merge whether to merge the journal article with the current session. See {@link com.liferay.portal.service.persistence.BatchSession#update(com.liferay.portal.kernel.dao.orm.Session, com.liferay.portal.model.BaseModel, boolean)} for an explanation.
-	* @return the journal article that was updated
-	* @throws SystemException if a system exception occurred
-	*/
-	public com.liferay.portlet.journal.model.JournalArticle updateJournalArticle(
-		com.liferay.portlet.journal.model.JournalArticle journalArticle,
-		boolean merge)
-		throws com.liferay.portal.kernel.exception.SystemException {
-		return _journalArticleLocalService.updateJournalArticle(journalArticle,
-			merge);
-	}
-
-	/**
 	* Returns the Spring bean ID for this bean.
 	*
 	* @return the Spring bean ID for this bean
@@ -882,6 +866,14 @@ public class JournalArticleLocalServiceWrapper
 		_journalArticleLocalService.moveArticle(groupId, articleId, newFolderId);
 	}
 
+	public com.liferay.portlet.journal.model.JournalArticle moveArticleToTrash(
+		long userId, long groupId, java.lang.String articleId)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return _journalArticleLocalService.moveArticleToTrash(userId, groupId,
+			articleId);
+	}
+
 	public com.liferay.portlet.journal.model.JournalArticle removeArticleLocale(
 		long groupId, java.lang.String articleId, double version,
 		java.lang.String languageId)
@@ -889,6 +881,13 @@ public class JournalArticleLocalServiceWrapper
 			com.liferay.portal.kernel.exception.SystemException {
 		return _journalArticleLocalService.removeArticleLocale(groupId,
 			articleId, version, languageId);
+	}
+
+	public void restoreArticleFromTrash(long userId,
+		com.liferay.portlet.journal.model.JournalArticle article)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		_journalArticleLocalService.restoreArticleFromTrash(userId, article);
 	}
 
 	public java.util.List<com.liferay.portlet.journal.model.JournalArticle> search(

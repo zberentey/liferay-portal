@@ -19,6 +19,8 @@ package com.liferay.portal.kernel.util;
  */
 public interface PropsKeys {
 
+	public static final String ADMIN_ANALYTICS_TYPES = "admin.analytics.types";
+
 	public static final String ADMIN_DEFAULT_GROUP_NAMES = "admin.default.group.names";
 
 	public static final String ADMIN_DEFAULT_ORGANIZATION_GROUP_NAMES = "admin.default.organization.group.names";
@@ -102,6 +104,8 @@ public interface PropsKeys {
 	public static final String ASSET_ENTRY_VALIDATOR = "asset.entry.validator";
 
 	public static final String ASSET_FILTER_SEARCH_LIMIT = "asset.filter.search.limit";
+
+	public static final String ASSET_PUBLISHER_DISPLAY_STYLE_DEFAULT = "asset.publisher.display.style.default";
 
 	public static final String ASSET_PUBLISHER_DISPLAY_STYLES = "asset.publisher.display.styles";
 
@@ -1559,6 +1563,8 @@ public interface PropsKeys {
 
 	public static final String MY_SITES_SHOW_USER_PUBLIC_SITES_WITH_NO_LAYOUTS = "my.sites.show.user.public.sites.with.no.layouts";
 
+	public static final String NAVIGATION_DISPLAY_STYLE_DEFAULT = "navigation.display.style.default";
+
 	public static final String NAVIGATION_DISPLAY_STYLE_OPTIONS = "navigation.display.style.options";
 
 	public static final String NESTED_PORTLETS_LAYOUT_TEMPLATE_DEFAULT = "nested.portlets.layout.template.default";
@@ -2051,6 +2057,8 @@ public interface PropsKeys {
 
 	public static final String SITES_CONTROL_PANEL_MEMBERS_VISIBLE = "sites.control.panel.members.visible";
 
+	public static final String SITES_DIRECTORY_DISPLAY_STYLE_DEFAULT = "sites.directory.display.style.default";
+
 	public static final String SITES_DIRECTORY_DISPLAY_STYLE_OPTIONS = "sites.directory.display.style.options";
 
 	public static final String SITES_EMAIL_FROM_ADDRESS = "sites.email.from.address";
@@ -2072,8 +2080,6 @@ public interface PropsKeys {
 	public static final String SITES_FORM_ADD_MISCELLANEOUS = "sites.form.add.miscellaneous";
 
 	public static final String SITES_FORM_ADD_SEO = "sites.form.add.seo";
-
-	public static final String SITES_FORM_ANALYTICS = "sites.form.analytics";
 
 	public static final String SITES_FORM_UPDATE_ADVANCED = "sites.form.update.advanced";
 
