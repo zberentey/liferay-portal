@@ -59,7 +59,7 @@ public class DLFileShortcutTrashHandler extends BaseTrashHandler {
 
 	@Override
 	public String getDeleteMessage() {
-		return "found-in-deleted-file-shortcut-x";
+		return "found-in-deleted-folder-x";
 	}
 
 	@Override

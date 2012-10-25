@@ -108,7 +108,7 @@ public class DLFileEntryTrashHandler extends BaseTrashHandler {
 
 	@Override
 	public String getDeleteMessage() {
-		return "found-in-deleted-file-entry-x";
+		return "found-in-deleted-folder-x";
 	}
 
 	@Override
