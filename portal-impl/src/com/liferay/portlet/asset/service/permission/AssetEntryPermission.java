@@ -71,7 +71,7 @@ public class AssetEntryPermission {
 
 		try {
 			return assetRendererFactory.hasPermission(
-				permissionChecker, entry.getClassPK(), actionId);
+				permissionChecker, entry, actionId);
 		}
 		catch (Exception e) {
 			throw new PrincipalException(e);
