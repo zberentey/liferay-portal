@@ -15,6 +15,7 @@
 package com.liferay.portlet.social.service;
 
 import com.liferay.portal.kernel.test.ExecutionTestListeners;
+import com.liferay.portal.kernel.transaction.Transactional;
 import com.liferay.portal.test.EnvironmentExecutionTestListener;
 import com.liferay.portal.test.LiferayIntegrationJUnitTestRunner;
 import com.liferay.portal.test.TransactionalExecutionTestListener;
@@ -25,15 +26,14 @@ import com.liferay.portlet.social.util.SocialCounterPeriodUtil;
 
 import java.util.List;
 
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
  * @author Zsolt Berentey
+ * @author Manuel de la Peña
  */
 @ExecutionTestListeners(
 	listeners = {
@@ -41,21 +41,14 @@ import org.junit.runner.RunWith;
 		TransactionalExecutionTestListener.class
 	})
 @RunWith(LiferayIntegrationJUnitTestRunner.class)
+@Transactional
 public class SocialActivityCounterLocalServiceTest
 	extends BaseSocialActivityTestCase {
 
-	@BeforeClass
-	public static void setUp() throws Exception {
-		BaseSocialActivityTestCase.setUp();
-	}
-
-	@After
-	public void afterTest() throws Exception {
-		BaseSocialActivityTestCase.tearDown();
-	}
-
 	@Before
-	public void beforeTest() throws Exception {
+	public void setUp() throws Exception {
+		super.setUp();
+
 		addGroup();
 
 		addUsers();
