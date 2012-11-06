@@ -94,6 +94,14 @@ public abstract class BaseAssetRendererFactory implements AssetRendererFactory {
 	}
 
 	public boolean hasPermission(
+			PermissionChecker permissionChecker, AssetEntry assetEntry,
+			String actionId)
+		throws Exception {
+
+		return _PERMISSION;
+	}
+
+	public boolean hasPermission(
 			PermissionChecker permissionChecker, long classPK, String actionId)
 		throws Exception {
 

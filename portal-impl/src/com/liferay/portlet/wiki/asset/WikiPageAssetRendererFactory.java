@@ -18,6 +18,7 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portal.theme.ThemeDisplay;
+import com.liferay.portlet.asset.model.AssetEntry;
 import com.liferay.portlet.asset.model.AssetRenderer;
 import com.liferay.portlet.asset.model.BaseAssetRendererFactory;
 import com.liferay.portlet.wiki.NoSuchPageException;
@@ -70,6 +71,27 @@ public class WikiPageAssetRendererFactory extends BaseAssetRendererFactory {
 
 	public String getType() {
 		return TYPE;
+	}
+
+	@Override
+	public boolean hasPermission(
+			PermissionChecker permissionChecker, AssetEntry assetEntry,
+			String actionId)
+		throws Exception {
+
+		WikiPage wikiPage = null;
+
+		try {
+			wikiPage = WikiPageLocalServiceUtil.getWikiPage(
+				assetEntry.getClassPK());
+		}
+		catch (NoSuchPageException nspe) {
+			return WikiPagePermission.contains(
+				permissionChecker, assetEntry.getClassPK(), actionId);
+		}
+
+		return WikiPagePermission.contains(
+			permissionChecker, wikiPage, actionId);
 	}
 
 	@Override

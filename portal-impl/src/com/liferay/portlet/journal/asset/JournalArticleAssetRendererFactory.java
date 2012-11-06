@@ -26,6 +26,7 @@ import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortletKeys;
 import com.liferay.portal.util.WebKeys;
 import com.liferay.portlet.PortletURLFactoryUtil;
+import com.liferay.portlet.asset.model.AssetEntry;
 import com.liferay.portlet.asset.model.AssetRenderer;
 import com.liferay.portlet.asset.model.BaseAssetRendererFactory;
 import com.liferay.portlet.journal.NoSuchArticleException;
@@ -175,6 +176,28 @@ public class JournalArticleAssetRendererFactory
 		portletURL.setParameter("struts_action", "/journal/edit_article");
 
 		return portletURL;
+	}
+
+	@Override
+	public boolean hasPermission(
+			PermissionChecker permissionChecker, AssetEntry assetEntry,
+			String actionId)
+		throws Exception {
+
+		JournalArticle journalArticle = null;
+
+		try {
+			journalArticle =
+				JournalArticleLocalServiceUtil.getArticle(
+					assetEntry.getClassPK());
+		}
+		catch (NoSuchArticleException nsae) {
+			return JournalArticlePermission.contains(
+				permissionChecker, assetEntry.getClassPK(), actionId);
+		}
+
+		return JournalArticlePermission.contains(
+			permissionChecker, journalArticle, actionId);
 	}
 
 	@Override

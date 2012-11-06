@@ -72,6 +72,11 @@ public interface AssetRendererFactory {
 		throws PortalException, SystemException;
 
 	public boolean hasPermission(
+		PermissionChecker permissionChecker, AssetEntry assetEntry,
+		String actionId)
+	throws Exception;
+
+	public boolean hasPermission(
 			PermissionChecker permissionChecker, long entryClassPK,
 			String actionId)
 		throws Exception;
