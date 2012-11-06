@@ -25,14 +25,14 @@ import com.liferay.portlet.social.util.SocialConfigurationUtil;
 
 import java.util.List;
 
-import org.junit.AfterClass;
 import org.junit.Assert;
-import org.junit.BeforeClass;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
  * @author Zsolt Berentey
+ * @author Manuel de la Peña
  */
 @ExecutionTestListeners(
 	listeners = {
@@ -40,23 +40,19 @@ import org.junit.runner.RunWith;
 		TransactionalExecutionTestListener.class
 	})
 @RunWith(LiferayIntegrationJUnitTestRunner.class)
+@Transactional
 public class SocialActivitySettingLocalServiceTest
 	extends BaseSocialActivityTestCase {
 
-	@BeforeClass
-	public static void setUp() throws Exception {
-		BaseSocialActivityTestCase.setUp();
+	@Before
+	public void setUp() throws Exception {
+		super.setUp();
 
 		addGroup();
 
 		addUsers();
 
 		addAsset();
-	}
-
-	@AfterClass
-	public static void tearDown() throws Exception {
-		BaseSocialActivityTestCase.tearDown();
 	}
 
 	@Test
@@ -92,7 +88,6 @@ public class SocialActivitySettingLocalServiceTest
 	}
 
 	@Test
-	@Transactional
 	public void testUpdateActivitySettings() throws Exception {
 		SocialActivitySettingLocalServiceUtil.updateActivitySetting(
 			_group.getGroupId(), TEST_MODEL, true);
