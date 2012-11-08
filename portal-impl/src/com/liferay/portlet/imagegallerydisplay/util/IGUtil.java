@@ -16,6 +16,7 @@ package com.liferay.portlet.imagegallerydisplay.util;
 
 import com.liferay.portal.kernel.portlet.LiferayWindowState;
 import com.liferay.portal.kernel.repository.model.Folder;
+import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortalUtil;
@@ -81,8 +82,15 @@ public class IGUtil {
 				"groupId", String.valueOf(folder.getGroupId()));
 		}
 
-		PortalUtil.addPortletBreadcrumbEntry(
-			request, folder.getName(), portletURL.toString());
+		if(folder.isEscapedModel()) {
+			PortalUtil.addPortletBreadcrumbEntry(
+				request, HtmlUtil.unescape(folder.getName()),
+				portletURL.toString());
+		}
+		else {
+			PortalUtil.addPortletBreadcrumbEntry(
+				request, folder.getName(), portletURL.toString());
+		}
 	}
 
 	public static void addPortletBreadcrumbEntries(
