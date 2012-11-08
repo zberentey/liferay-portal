@@ -112,8 +112,16 @@ public class DLUtil {
 		portletURL.setParameter(
 			"fileEntryId", String.valueOf(dlFileShortcut.getToFileEntryId()));
 
-		PortalUtil.addPortletBreadcrumbEntry(
-			request, dlFileShortcut.getToTitle(), portletURL.toString());
+		if(dlFileShortcut.isEscapedModel()) {
+			PortalUtil.addPortletBreadcrumbEntry(
+				request, HtmlUtil.unescape(dlFileShortcut.getToTitle()),
+				portletURL.toString());
+		}
+		else {
+			PortalUtil.addPortletBreadcrumbEntry(
+				request, dlFileShortcut.getToTitle(), portletURL.toString());
+		}
+		
 	}
 
 	public static void addPortletBreadcrumbEntries(

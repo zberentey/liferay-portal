@@ -26,6 +26,7 @@ import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.IndexerRegistryUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ParamUtil;
@@ -129,11 +130,19 @@ public class UsersAdminImpl implements UsersAdmin {
 				request, ancestorOrganization.getName(), portletURL.toString());
 		}
 
+
 		portletURL.setParameter(
 			"organizationId", String.valueOf(organization.getOrganizationId()));
 
-		PortalUtil.addPortletBreadcrumbEntry(
-			request, organization.getName(), portletURL.toString());
+		if(organization.isEscapedModel()) {
+			PortalUtil.addPortletBreadcrumbEntry(
+				request, HtmlUtil.unescape(organization.getName()),
+				portletURL.toString());
+		}
+		else {
+			PortalUtil.addPortletBreadcrumbEntry(
+				request, organization.getName(), portletURL.toString());
+		}
 	}
 
 	public long[] addRequiredRoles(long userId, long[] roleIds)

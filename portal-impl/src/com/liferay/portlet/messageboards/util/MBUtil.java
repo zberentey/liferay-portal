@@ -21,6 +21,7 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.LiferayWindowState;
 import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.LocalizationUtil;
@@ -152,8 +153,15 @@ public class MBUtil {
 		portletURL.setParameter(
 			"mbCategoryId", String.valueOf(category.getCategoryId()));
 
-		PortalUtil.addPortletBreadcrumbEntry(
-			request, category.getName(), portletURL.toString());
+		if(category.isEscapedModel()) {
+			PortalUtil.addPortletBreadcrumbEntry(
+				request, HtmlUtil.unescape(category.getName()),
+				portletURL.toString());
+		}
+		else {
+			PortalUtil.addPortletBreadcrumbEntry(
+				request, category.getName(), portletURL.toString());
+		}
 	}
 
 	public static void addPortletBreadcrumbEntries(
