@@ -54,6 +54,7 @@ import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.UserLocalServiceUtil;
 import com.liferay.portal.service.persistence.ImageUtil;
 import com.liferay.portal.service.persistence.LayoutUtil;
+import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.PortletKeys;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.portlet.documentlibrary.lar.DLPortletDataHandlerImpl;
@@ -1781,6 +1782,17 @@ public class JournalPortletDataHandlerImpl extends BasePortletDataHandler {
 		String friendlyURLPublicPath =
 			PropsValues.LAYOUT_FRIENDLY_URL_PUBLIC_SERVLET_MAPPING;
 
+		String portalContextPath = PortalUtil.getPathContext();
+
+		if (Validator.isNotNull(portalContextPath)) {
+			friendlyURLPrivateGroupPath = portalContextPath.concat(
+				friendlyURLPrivateGroupPath);
+			friendlyURLPrivateUserPath = portalContextPath.concat(
+				friendlyURLPrivateUserPath);
+			friendlyURLPublicPath = portalContextPath.concat(
+				friendlyURLPublicPath);
+		}
+
 		String href = "href=";
 
 		int beginPos = content.length();
@@ -1866,6 +1878,11 @@ public class JournalPortletDataHandlerImpl extends BasePortletDataHandler {
 
 			int beginGroupPos = content.indexOf(
 				CharPool.SLASH, beginPos + hrefLength + 1);
+
+			if (Validator.isNotNull(portalContextPath)) {
+				beginGroupPos = content.indexOf(
+					CharPool.SLASH, beginGroupPos + 1);
+			}
 
 			if (beginGroupPos == -1) {
 				beginPos--;
