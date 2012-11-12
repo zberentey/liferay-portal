@@ -16,6 +16,7 @@ package com.liferay.portal.security.pacl.checker;
 
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.util.StringPool;
 
 import java.security.Permission;
 
@@ -24,6 +25,9 @@ import java.sql.DriverManager;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.Stack;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 import com.liferay.apache.derby.iapi.error.StandardException;
 import com.liferay.apache.derby.iapi.services.context.ContextManager;
@@ -108,15 +112,33 @@ public class SQLChecker extends BaseChecker {
 			return false;
 		}
 
-		Set<String> allowedTableNames = _tableNames[checkPermission];
+		for (TableNameWrapper wrapper : _allTableNames) {
+			if (wrapper.equals(tableName)) {
+				return true;
+			}
+		}
 
-		if (_allTableNames.contains(tableName) ||
-			allowedTableNames.contains(tableName)) {
+		Set<TableNameWrapper> allowedTableNames = _tableNames[checkPermission];
 
-			return true;
+		if (allowedTableNames != null) {
+			for (TableNameWrapper wrapper : allowedTableNames) {
+				if (wrapper.equals(tableName)) {
+					return true;
+				}
+			}
 		}
 
 		return false;
+	}
+
+	protected Set<TableNameWrapper> getWrappedPropertySet(String key) {
+		Set<TableNameWrapper> propertySet = new HashSet<TableNameWrapper>();
+
+		for (String property : getPropertyArray(key)) {
+			propertySet.add(new TableNameWrapper(property));
+		}
+
+		return propertySet;
 	}
 
 	protected void initParser() {
@@ -154,20 +176,23 @@ public class SQLChecker extends BaseChecker {
 	protected void initTableNames() {
 		_tableNames = new Set[9];
 
-		_allTableNames = getPropertySet("security-manager-sql-tables-all");
-		_tableNames[StatementVisitor.ST_CREATE] = getPropertySet(
+		_allTableNames = getWrappedPropertySet(
+			"security-manager-sql-tables-all");
+		_tableNames[StatementVisitor.ST_ALTER] = getWrappedPropertySet(
+			"security-manager-sql-tables-alter");
+		_tableNames[StatementVisitor.ST_CREATE] = getWrappedPropertySet(
 			"security-manager-sql-tables-create");
-		_tableNames[StatementVisitor.ST_DELETE] = getPropertySet(
+		_tableNames[StatementVisitor.ST_DELETE] = getWrappedPropertySet(
 			"security-manager-sql-tables-delete");
-		_tableNames[StatementVisitor.ST_DROP] = getPropertySet(
+		_tableNames[StatementVisitor.ST_DROP] = getWrappedPropertySet(
 			"security-manager-sql-tables-drop");
-		_tableNames[StatementVisitor.ST_INSERT] = getPropertySet(
+		_tableNames[StatementVisitor.ST_INSERT] = getWrappedPropertySet(
 			"security-manager-sql-tables-insert");
-		_tableNames[StatementVisitor.ST_SELECT] = getPropertySet(
+		_tableNames[StatementVisitor.ST_SELECT] = getWrappedPropertySet(
 			"security-manager-sql-tables-select");
-		_tableNames[StatementVisitor.ST_TRUNCATE] = getPropertySet(
+		_tableNames[StatementVisitor.ST_TRUNCATE] = getWrappedPropertySet(
 			"security-manager-sql-tables-truncate");
-		_tableNames[StatementVisitor.ST_UPDATE] = getPropertySet(
+		_tableNames[StatementVisitor.ST_UPDATE] = getWrappedPropertySet(
 			"security-manager-sql-tables-update");
 	}
 
@@ -179,8 +204,8 @@ public class SQLChecker extends BaseChecker {
 	private static Log _log = LogFactoryUtil.getLog(SQLChecker.class);
 	private static Parser _parser = null;
 
-	private Set<String> _allTableNames;
-	private Set<String>[] _tableNames;
+	private Set<TableNameWrapper> _allTableNames;
+	private Set<TableNameWrapper>[] _tableNames;
 
 	private class StatementVisitor implements Visitor {
 
@@ -345,6 +370,48 @@ public class SQLChecker extends BaseChecker {
 		private Stack<Integer> currentState = new Stack<Integer>();
 		private SQLChecker _sqlChecker;
 		private Set<Visitable> _visitedNodes = new HashSet<Visitable>();
+
+	}
+
+	private class TableNameWrapper {
+
+		public TableNameWrapper(String tableName) {
+			if (tableName.contains(StringPool.STAR)) {
+				_wildCardCheck = true;
+
+				try {
+					_tableNamePattern = Pattern.compile(
+						tableName.replaceAll("\\*", ".*?"),
+						Pattern.CASE_INSENSITIVE);
+				}
+				catch (PatternSyntaxException pse) {
+					_wildCardCheck = false;
+				}
+			}
+
+			_tableName = tableName;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (!(obj instanceof String)) {
+				return false;
+			}
+
+			String tableName = (String)obj;
+
+			if (_wildCardCheck) {
+				Matcher m = _tableNamePattern.matcher(tableName);
+
+				return m.matches();
+			}
+
+			return _tableName.equalsIgnoreCase(tableName);
+		}
+
+		private String _tableName = null;
+		private Pattern _tableNamePattern = null;
+		private boolean _wildCardCheck = false;
 
 	}
 
