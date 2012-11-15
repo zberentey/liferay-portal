@@ -18,10 +18,12 @@ import com.liferay.portal.jndi.pacl.PACLInitialContextFactoryBuilder;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.security.pacl.PACLConstants;
+import com.liferay.portal.kernel.security.pacl.permission.CheckMemberAccessPermission;
 import com.liferay.portal.kernel.security.pacl.permission.PortalHookPermission;
 import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
 import com.liferay.portal.kernel.servlet.taglib.FileAvailabilityUtil;
 import com.liferay.portal.kernel.util.JavaDetector;
+import com.liferay.portal.security.pacl.PACLClassLoaderUtil;
 import com.liferay.portal.security.pacl.PACLClassUtil;
 import com.liferay.portal.security.pacl.PACLPolicy;
 import com.liferay.portal.security.pacl.PACLPolicyManager;
@@ -33,6 +35,8 @@ import java.security.Permission;
 
 import javax.naming.spi.InitialContextFactoryBuilder;
 import javax.naming.spi.NamingManager;
+
+import sun.reflect.Reflection;
 
 /**
  * This is the portal's implementation of a security manager. The goal is to
@@ -67,6 +71,18 @@ public class PortalSecurityManager extends SecurityManager {
 				_log.warn(e, e);
 			}
 		}
+	}
+
+	@Override
+	public void checkMemberAccess(Class<?> clazz, int which) {
+		Class<?> caller = Reflection.getCallerClass(4);
+
+		Permission permission = new CheckMemberAccessPermission(
+			PACLConstants.RUNTIME_PERMISSION_ACCESS_DECLARED_MEMBERS,
+			PACLClassLoaderUtil.getClassLoader(caller), clazz,
+			PACLClassLoaderUtil.getClassLoader(clazz), which);
+
+		checkPermission(permission);
 	}
 
 	@Override
