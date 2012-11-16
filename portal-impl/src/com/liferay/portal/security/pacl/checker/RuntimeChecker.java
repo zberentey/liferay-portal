@@ -17,6 +17,7 @@ package com.liferay.portal.security.pacl.checker;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.messaging.BaseAsyncDestination;
+import com.liferay.portal.kernel.security.pacl.permission.CheckMemberAccessPermission;
 import com.liferay.portal.kernel.servlet.PortalClassLoaderFilter;
 import com.liferay.portal.kernel.servlet.PortalClassLoaderServlet;
 import com.liferay.portal.kernel.util.JavaDetector;
@@ -67,7 +68,12 @@ public class RuntimeChecker extends BaseReflectChecker {
 			}
 		}
 		else if (name.equals(RUNTIME_PERMISSION_ACCESS_DECLARED_MEMBERS)) {
-			if (!hasReflect(permission.getName(), permission.getActions())) {
+			CheckMemberAccessPermission checkMemberAccessPermission =
+				(CheckMemberAccessPermission)permission;
+
+			if (!checkMemberAccessPermission.canAccess() &&
+				!hasReflect(permission.getName(), permission.getActions())) {
+
 				throwSecurityException(
 					_log, "Attempted to access declared members");
 			}
