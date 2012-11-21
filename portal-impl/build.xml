@@ -112,16 +112,37 @@ public class Creole10Parser]]></replacevalue>
 	</target>
 
 	<target name="build-derby">
+		<get
+			dest="db-derby-10.9.1.0-lib.zip"
+			src="http://archive.apache.org/dist/db/derby/db-derby-10.9.1.0/db-derby-10.9.1.0-lib.zip"
+		/>
+
+		<unzip
+			dest="."
+			src="db-derby-10.9.1.0-lib.zip"
+		>
+			<patternset
+				includes="**/derby.jar"
+			/>
+			<flattenmapper />
+		</unzip>
+
+		<delete file="db-derby-10.9.1.0-lib.zip" />
+
+		<jarjar jarfile="${project.dir}/lib/portal/liferay-derby.jar.new">
+			<rule pattern="org.apache.derby.**" result="com.liferay.apache.derby.@1" />
+			<zipfileset src="derby.jar" />
+		</jarjar>
+
+		<delete file="derby.jar" />
+
 		<tstamp>
 			<format property="tstamp.value" pattern="yyyyMMddkkmmssSSS" />
 		</tstamp>
 
-		<jarjar jarfile="${tstamp.value}/liferay-derby.jar">
-			<rule pattern="org.apache.derby.**" result="com.liferay.apache.derby.@1" />
-			<zipfileset src="${project.dir}/tools/derby-10.9.1.jar" />
-		</jarjar>
+		<mkdir dir="${tstamp.value}" />
 
-		<unzip src="${tstamp.value}/liferay-derby.jar" dest="${tstamp.value}">
+		<unzip dest="${tstamp.value}" src="${project.dir}/lib/portal/liferay-derby.jar.new">
 			<patternset>
 			    <include name="**/modules.properties"/>
 		    </patternset>
@@ -132,14 +153,10 @@ public class Creole10Parser]]></replacevalue>
 			<replacefilter token="org/apache/derby" value="com/liferay/apache/derby" />
 		</replace>
 
-		<jar destfile="${tstamp.value}/liferay-derby.jar"
+		<jar destfile="${project.dir}/lib/portal/liferay-derby.jar.new"
 		    basedir="${tstamp.value}"
-		    includes="**/*.properties"
-		    excludes="liferay-derby.jar"
 			update="true"
 		/>
-
-		<move file="${tstamp.value}/liferay-derby.jar" tofile="${project.dir}/lib/portal/liferay-derby.jar" />
 
 		<delete dir="${tstamp.value}" />
 	</target>

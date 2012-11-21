@@ -2399,6 +2399,20 @@
 		</comments>
 	</library>
 	<library>
+		<file-name>portal/liferay-derby.jar</file-name>
+		<version>10.9.1.0</version>
+		<project-name>Derby</project-name>
+		<project-url>http://http://db.apache.org/derby</project-url>
+		<licenses>
+			<license>
+				<license-name>Apache License 2.0</license-name>
+			</license>
+		</licenses>
+		<comments>
+			See the Ant target "build-derby" in portal-impl/build.xml.
+		</comments>
+	</library>
+	<library>
 		<file-name>portal/liferay-icu4j.jar</file-name>
 		<version>4.0.1</version>
 		<project-name>ICU4J</project-name>
