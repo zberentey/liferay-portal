@@ -61,7 +61,6 @@ import java.util.Set;
 import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.regex.PatternSyntaxException;
 
 /**
  * @author Brian Wing Shun Chan
@@ -79,10 +78,10 @@ public class SQLChecker extends BaseChecker {
 	}
 
 	public boolean hasSQL(String sql) {
-		Visitable statement = null;
+		Visitable visitable = null;
 
 		try {
-			statement = _parser.parseStatement(sql);
+			visitable = _parser.parseStatement(sql);
 		}
 		catch (Exception e) {
 			_log.error("Unable to parse SQL " + sql);
@@ -90,10 +89,10 @@ public class SQLChecker extends BaseChecker {
 			return false;
 		}
 
-		StatementVisitor visitor = new StatementVisitor(this);
+		StatementVisitor statementVisitor = new StatementVisitor(this);
 
 		try {
-			visitor.visit(statement);
+			statementVisitor.visit(visitable);
 		}
 		catch (StandardException se) {
 			_log.error("Unable to determine access for SQL " + sql);
@@ -101,27 +100,28 @@ public class SQLChecker extends BaseChecker {
 			return false;
 		}
 
-		return visitor.isAllowed();
+		return statementVisitor.isAllowed();
 	}
 
 	public boolean isAllowed(int checkPermission, String tableName) {
-		if ((_allTableNames == null) || (_tableNames == null)) {
-			_log.error("SQL checker not correctly initialized.");
+		if ((_allTableNameHandlers == null) || (_tableNameHandlers == null)) {
+			_log.error("SQL checker is not correctly initialized");
 
 			return false;
 		}
 
-		for (TableNameWrapper wrapper : _allTableNames) {
-			if (wrapper.equals(tableName)) {
+		for (TableNameHandler tableNameHandler : _allTableNameHandlers) {
+			if (tableNameHandler.matches(tableName)) {
 				return true;
 			}
 		}
 
-		Set<TableNameWrapper> allowedTableNames = _tableNames[checkPermission];
+		Set<TableNameHandler> tableNameHandlers =
+			_tableNameHandlers[checkPermission];
 
-		if (allowedTableNames != null) {
-			for (TableNameWrapper wrapper : allowedTableNames) {
-				if (wrapper.equals(tableName)) {
+		if (tableNameHandlers != null) {
+			for (TableNameHandler tableNameHandler : tableNameHandlers) {
+				if (tableNameHandler.matches(tableName)) {
 					return true;
 				}
 			}
@@ -130,14 +130,17 @@ public class SQLChecker extends BaseChecker {
 		return false;
 	}
 
-	protected Set<TableNameWrapper> getWrappedPropertySet(String key) {
-		Set<TableNameWrapper> propertySet = new HashSet<TableNameWrapper>();
+	protected Set<TableNameHandler> getTableNameHandlers(String key) {
+		Set<TableNameHandler> tableNameHandlers =
+			new HashSet<TableNameHandler>();
 
-		for (String property : getPropertyArray(key)) {
-			propertySet.add(new TableNameWrapper(property));
+		for (String tableName : getPropertyArray(key)) {
+			TableNameHandler tableNameHandler = new TableNameHandler(tableName);
+
+			tableNameHandlers.add(tableNameHandler);
 		}
 
-		return propertySet;
+		return tableNameHandlers;
 	}
 
 	protected void initParser() {
@@ -148,14 +151,15 @@ public class SQLChecker extends BaseChecker {
 		try {
 			new EmbeddedDriver();
 
-			EmbedConnection conn = (EmbedConnection)DriverManager.getConnection(
-				_CONNECTION_URL);
+			EmbedConnection embedConnection =
+				(EmbedConnection)DriverManager.getConnection(
+					"jdbc:derby:memory:dummy;create=true");
 
-			ContextManager contextManager = conn.getContextManager();
+			ContextManager contextManager = embedConnection.getContextManager();
 
 			LanguageConnectionContext languageConnectionContext =
 				(LanguageConnectionContext)contextManager.getContext(
-					_LANGUAGE_CONNECTION_CONTEXT);
+					"LanguageConnectionContext");
 
 			ContextService contextService = ContextService.getFactory();
 
@@ -168,61 +172,62 @@ public class SQLChecker extends BaseChecker {
 			_parser = new ParserImpl(compilerContext);
 		}
 		catch (Exception e) {
-
-			// This is initialization with no external dependencies. Nothing
-			// should ever go wrong, so fail loudly.
-
 			throw new IllegalStateException(e);
 		}
 	}
 
 	@SuppressWarnings("unchecked")
 	protected void initTableNames() {
-		_tableNames = new Set[9];
+		_tableNameHandlers = new Set[9];
 
-		_allTableNames = getWrappedPropertySet(
+		_allTableNameHandlers = getTableNameHandlers(
 			"security-manager-sql-tables-all");
-		_tableNames[StatementVisitor.ST_ALTER] = getWrappedPropertySet(
+		_tableNameHandlers[StatementVisitor.ALTER] = getTableNameHandlers(
 			"security-manager-sql-tables-alter");
-		_tableNames[StatementVisitor.ST_CREATE] = getWrappedPropertySet(
+		_tableNameHandlers[StatementVisitor.CREATE] = getTableNameHandlers(
 			"security-manager-sql-tables-create");
-		_tableNames[StatementVisitor.ST_DELETE] = getWrappedPropertySet(
+		_tableNameHandlers[StatementVisitor.DELETE] = getTableNameHandlers(
 			"security-manager-sql-tables-delete");
-		_tableNames[StatementVisitor.ST_DROP] = getWrappedPropertySet(
+		_tableNameHandlers[StatementVisitor.DROP] = getTableNameHandlers(
 			"security-manager-sql-tables-drop");
-		_tableNames[StatementVisitor.ST_INSERT] = getWrappedPropertySet(
+		_tableNameHandlers[StatementVisitor.INSERT] = getTableNameHandlers(
 			"security-manager-sql-tables-insert");
-		_tableNames[StatementVisitor.ST_SELECT] = getWrappedPropertySet(
+		_tableNameHandlers[StatementVisitor.SELECT] = getTableNameHandlers(
 			"security-manager-sql-tables-select");
-		_tableNames[StatementVisitor.ST_TRUNCATE] = getWrappedPropertySet(
+		_tableNameHandlers[StatementVisitor.TRUNCATE] = getTableNameHandlers(
 			"security-manager-sql-tables-truncate");
-		_tableNames[StatementVisitor.ST_UPDATE] = getWrappedPropertySet(
+		_tableNameHandlers[StatementVisitor.UPDATE] = getTableNameHandlers(
 			"security-manager-sql-tables-update");
 	}
 
-	private static final String _CONNECTION_URL =
-		"jdbc:derby:memory:dummy;create=true";
-	private static final String _LANGUAGE_CONNECTION_CONTEXT =
-		"LanguageConnectionContext";
-
 	private static Log _log = LogFactoryUtil.getLog(SQLChecker.class);
-	private static Parser _parser = null;
 
-	private Set<TableNameWrapper> _allTableNames;
-	private Set<TableNameWrapper>[] _tableNames;
+	private static Parser _parser;
+
+	private Set<TableNameHandler> _allTableNameHandlers;
+	private Set<TableNameHandler>[] _tableNameHandlers;
 
 	private class StatementVisitor implements Visitor {
 
-		public static final int ST_ALTER = 0;
-		public static final int ST_CREATE = 1;
-		public static final int ST_DELETE = 2;
-		public static final int ST_DROP = 3;
-		public static final int ST_GRANT = 4;
-		public static final int ST_INSERT = 5;
-		public static final int ST_NONE = -1;
-		public static final int ST_SELECT = 6;
-		public static final int ST_TRUNCATE = 7;
-		public static final int ST_UPDATE = 8;
+		public static final int ALTER = 0;
+
+		public static final int CREATE = 1;
+
+		public static final int DELETE = 2;
+
+		public static final int DROP = 3;
+
+		public static final int GRANT = 4;
+
+		public static final int INSERT = 5;
+
+		public static final int NONE = -1;
+
+		public static final int SELECT = 6;
+
+		public static final int TRUNCATE = 7;
+
+		public static final int UPDATE = 8;
 
 		public StatementVisitor(SQLChecker sqlChecker) {
 			_sqlChecker = sqlChecker;
@@ -236,7 +241,7 @@ public class SQLChecker extends BaseChecker {
 			return _allowed;
 		}
 
-		public boolean skipChildren(Visitable node) throws StandardException {
+		public boolean skipChildren(Visitable visitable) {
 			return false;
 		}
 
@@ -244,99 +249,103 @@ public class SQLChecker extends BaseChecker {
 			return false;
 		}
 
-		public Visitable visit(Visitable node) throws StandardException {
-			if (!_visitedNodes.contains(node)) {
-				_visitedNodes.add(node);
+		public Visitable visit(Visitable visitable) throws StandardException {
+			if (_visitables.contains(visitable)) {
+				return visitable;
+			}
 
-				boolean changeState = changeState(node);
+			_visitables.add(visitable);
 
-				String tableName = getTableName(node);
+			boolean changeState = changeState(visitable);
 
-				if (tableName != null) {
-					if (currentState.isEmpty()) {
-						_allowed = false;
-					}
-					else {
-						boolean allowed = _sqlChecker.isAllowed(
-							currentState.peek(), tableName);
+			String tableName = getTableName(visitable);
 
-						if (!allowed || (allowed && (_allowed == null))) {
-							_allowed = allowed;
-						}
-					}
+			if (tableName != null) {
+				if (_states.isEmpty()) {
+					_allowed = false;
+				}
+				else {
+					boolean allowed = _sqlChecker.isAllowed(
+						_states.peek(), tableName);
 
-					if ((_allowed != null) && !_allowed) {
-						return node;
+					if (!allowed || (allowed && (_allowed == null))) {
+						_allowed = allowed;
 					}
 				}
 
-				node.accept( this );
-
-				if (changeState) {
-					currentState.pop();
+				if ((_allowed != null) && !_allowed) {
+					return visitable;
 				}
 			}
 
-			return node;
+			visitable.accept(this);
+
+			if (changeState) {
+				_states.pop();
+			}
+
+			return visitable;
 		}
 
-		public boolean visitChildrenFirst(Visitable node) {
+		public boolean visitChildrenFirst(Visitable visitable) {
 			return false;
 		}
 
-		protected boolean changeState(Visitable node) {
-			int state = ST_NONE;
+		protected boolean changeState(Visitable visitable) {
+			int state = NONE;
 
-			if (node instanceof AlterTableNode) {
-				String statementString =
-					((AlterTableNode) node).statementToString();
+			if (visitable instanceof AlterTableNode) {
+				AlterTableNode alterTableNode = (AlterTableNode)visitable;
 
-				if (statementString.startsWith("TRUNCATE")) {
-					state = ST_TRUNCATE;
+				String alterTableNodeString =
+					alterTableNode.statementToString();
+
+				if (alterTableNodeString.startsWith("TRUNCATE")) {
+					state = TRUNCATE;
 				}
 				else {
-					state = ST_ALTER;
+					state = ALTER;
 				}
 			}
-			else if ((node instanceof CreateTableNode) ||
-					 (node instanceof CreateIndexNode) ||
-					 (node instanceof CreateViewNode) ||
-					 (node instanceof CreateTriggerNode) ||
-					 (node instanceof CreateAliasNode)) {
+			else if ((visitable instanceof CreateAliasNode) ||
+					 (visitable instanceof CreateIndexNode) ||
+					 (visitable instanceof CreateTableNode) ||
+					 (visitable instanceof CreateTriggerNode) ||
+					 (visitable instanceof CreateViewNode)) {
 
-				state = ST_CREATE;
+				state = CREATE;
 			}
-			else if (node instanceof DeleteNode) {
-				state = ST_DELETE;
+			else if (visitable instanceof DeleteNode) {
+				state = DELETE;
 			}
-			else if ((node instanceof DropTableNode) ||
-					 (node instanceof DropIndexNode) ||
-					 (node instanceof DropViewNode) ||
-					 (node instanceof DropTriggerNode) ||
-					 (node instanceof DropAliasNode)) {
+			else if ((visitable instanceof DropAliasNode) ||
+					 (visitable instanceof DropIndexNode) ||
+					 (visitable instanceof DropTableNode) ||
+					 (visitable instanceof DropTriggerNode) ||
+					 (visitable instanceof DropViewNode)) {
 
-				state = ST_DROP;
+				state = DROP;
 			}
-			else if ((node instanceof GrantNode) ||
-					 (node instanceof GrantRoleNode)) {
+			else if ((visitable instanceof GrantNode) ||
+					 (visitable instanceof GrantRoleNode)) {
 
-				state = ST_GRANT;
+				state = GRANT;
 			}
-			else if (node instanceof InsertNode) {
-				state = ST_INSERT;
+			else if (visitable instanceof InsertNode) {
+				state = INSERT;
 			}
-			else if ((node instanceof CursorNode) ||
-					 (node instanceof SubqueryNode) ||
-					 (node instanceof FromSubquery)) {
+			else if ((visitable instanceof CursorNode) ||
+					 (visitable instanceof SubqueryNode) ||
+					 (visitable instanceof FromSubquery)) {
 
-				state = ST_SELECT;
+				state = SELECT;
 			}
-			else if (node instanceof UpdateNode) {
-				state = ST_UPDATE;
+			else if (visitable instanceof UpdateNode) {
+				state = UPDATE;
 			}
 
-			if (state != ST_NONE) {
-				currentState.push(state);
+			if (state != NONE) {
+				_states.push(state);
 
 				return true;
 			}
@@ -344,78 +353,81 @@ public class SQLChecker extends BaseChecker {
 			return false;
 		}
 
-		protected String getTableName(Visitable node) {
-			if (node instanceof AlterTableNode) {
-				return ((AlterTableNode)node).getRelativeName();
+		protected String getTableName(Visitable visitable) {
+			if (visitable instanceof AlterTableNode) {
+				AlterTableNode alterTableNode = (AlterTableNode)visitable;
+
+				return alterTableNode.getRelativeName();
 			}
-			else if (node instanceof CreateTableNode) {
-				return ((CreateTableNode)node).getRelativeName();
+			else if (visitable instanceof CreateTableNode) {
+				CreateTableNode createTableNode = (CreateTableNode)visitable;
+
+				return createTableNode.getRelativeName();
 			}
-			else if (node instanceof CreateIndexNode) {
-				TableName tableName =
-					((CreateIndexNode)node).getIndexTableName();
+			else if (visitable instanceof CreateIndexNode) {
+				CreateIndexNode createIndexNode = (CreateIndexNode)visitable;
+
+				TableName tableName = createIndexNode.getIndexTableName();
 
 				return tableName.getTableName();
 			}
-			else if (node instanceof DropTableNode) {
-				return ((DropTableNode)node).getRelativeName();
+			else if (visitable instanceof DropTableNode) {
+				DropTableNode dropTableNode = (DropTableNode)visitable;
+
+				return dropTableNode.getRelativeName();
 			}
-			else if (node instanceof FromBaseTable) {
-				return ((FromBaseTable)node).getBaseTableName();
+			else if (visitable instanceof FromBaseTable) {
+				FromBaseTable fromBaseTable = (FromBaseTable)visitable;
+
+				return fromBaseTable.getBaseTableName();
 			}
-			else if (node instanceof TableName) {
-				return ((TableName)node).getTableName();
+			else if (visitable instanceof TableName) {
+				TableName tableName = (TableName)visitable;
+
+				return tableName.getTableName();
 			}
 
 			return null;
 		}
 
-		private Boolean _allowed = null;
-		private Stack<Integer> currentState = new Stack<Integer>();
+		private Boolean _allowed;
 		private SQLChecker _sqlChecker;
-		private Set<Visitable> _visitedNodes = new HashSet<Visitable>();
+		private Stack<Integer> _states = new Stack<Integer>();
+		private Set<Visitable> _visitables = new HashSet<Visitable>();
 
 	}
 
-	private class TableNameWrapper {
+	private class TableNameHandler {
 
-		public TableNameWrapper(String tableName) {
+		public TableNameHandler(String tableName) {
 			if (tableName.contains(StringPool.STAR)) {
-				_wildCardCheck = true;
-
 				try {
-					_tableNamePattern = Pattern.compile(
+					_pattern = Pattern.compile(
 						tableName.replaceAll("\\*", ".*?"),
 						Pattern.CASE_INSENSITIVE);
 				}
-				catch (PatternSyntaxException pse) {
-					_wildCardCheck = false;
+				catch (Exception e) {
+					if (_log.isWarnEnabled()) {
+						_log.warn("Unable to compile pattern " + tableName);
+					}
 				}
 			}
 
 			_tableName = tableName;
 		}
 
-		@Override
-		public boolean equals(Object obj) {
-			if (!(obj instanceof String)) {
-				return false;
-			}
+		public boolean matches(String tableName) {
+			if (_pattern != null) {
+				Matcher matcher = _pattern.matcher(tableName);
 
-			String tableName = (String)obj;
-
-			if (_wildCardCheck) {
-				Matcher m = _tableNamePattern.matcher(tableName);
-
-				return m.matches();
+				return matcher.matches();
 			}
 
 			return _tableName.equalsIgnoreCase(tableName);
 		}
 
-		private String _tableName = null;
-		private Pattern _tableNamePattern = null;
-		private boolean _wildCardCheck = false;
+		private Pattern _pattern;
+		private String _tableName;
 
 	}
 
