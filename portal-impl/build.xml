@@ -142,7 +142,10 @@ public class Creole10Parser]]></replacevalue>
 
 		<mkdir dir="${tstamp.value}" />
 
-		<unzip dest="${tstamp.value}" src="${project.dir}/lib/portal/liferay-derby.jar.new">
+		<unzip
+			dest="${tstamp.value}"
+			src="${project.dir}/lib/portal/liferay-derby.jar.new"
+		>
 			<patternset>
 			    <include name="**/modules.properties"/>
 		    </patternset>
