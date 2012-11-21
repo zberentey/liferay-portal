@@ -37,7 +37,6 @@ import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.TempFileUtil;
-import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.model.Lock;
 import com.liferay.portal.repository.liferayrepository.LiferayRepository;
@@ -2697,10 +2696,6 @@ public class DLAppServiceImpl extends DLAppServiceBaseImpl {
 			boolean majorVersion, InputStream is, long size,
 			ServiceContext serviceContext)
 		throws PortalException, SystemException {
-
-		if (Validator.isNotNull(sourceFileName) && (is == null)) {
-			is = new UnsyncByteArrayInputStream(new byte[0]);
-		}
 
 		mimeType = DLAppUtil.getMimeType(
 			sourceFileName, mimeType, title, null, is);
