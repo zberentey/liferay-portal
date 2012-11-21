@@ -14,40 +14,62 @@
 
 package com.liferay.portal.security.pacl.checker;
 
+import com.liferay.apache.derby.iapi.error.StandardException;
+import com.liferay.apache.derby.iapi.services.context.ContextManager;
+import com.liferay.apache.derby.iapi.services.context.ContextService;
+import com.liferay.apache.derby.iapi.sql.compile.CompilerContext;
+import com.liferay.apache.derby.iapi.sql.compile.Parser;
+import com.liferay.apache.derby.iapi.sql.compile.Visitable;
+import com.liferay.apache.derby.iapi.sql.compile.Visitor;
+import com.liferay.apache.derby.iapi.sql.conn.LanguageConnectionContext;
+import com.liferay.apache.derby.impl.jdbc.EmbedConnection;
+import com.liferay.apache.derby.impl.sql.compile.AlterTableNode;
+import com.liferay.apache.derby.impl.sql.compile.CompilerContextImpl;
+import com.liferay.apache.derby.impl.sql.compile.CreateAliasNode;
+import com.liferay.apache.derby.impl.sql.compile.CreateIndexNode;
+import com.liferay.apache.derby.impl.sql.compile.CreateTableNode;
+import com.liferay.apache.derby.impl.sql.compile.CreateTriggerNode;
+import com.liferay.apache.derby.impl.sql.compile.CreateViewNode;
+import com.liferay.apache.derby.impl.sql.compile.CursorNode;
+import com.liferay.apache.derby.impl.sql.compile.DeleteNode;
+import com.liferay.apache.derby.impl.sql.compile.DropAliasNode;
+import com.liferay.apache.derby.impl.sql.compile.DropIndexNode;
+import com.liferay.apache.derby.impl.sql.compile.DropTableNode;
+import com.liferay.apache.derby.impl.sql.compile.DropTriggerNode;
+import com.liferay.apache.derby.impl.sql.compile.DropViewNode;
+import com.liferay.apache.derby.impl.sql.compile.FromBaseTable;
+import com.liferay.apache.derby.impl.sql.compile.FromSubquery;
+import com.liferay.apache.derby.impl.sql.compile.GrantNode;
+import com.liferay.apache.derby.impl.sql.compile.GrantRoleNode;
+import com.liferay.apache.derby.impl.sql.compile.InsertNode;
+import com.liferay.apache.derby.impl.sql.compile.ParserImpl;
+import com.liferay.apache.derby.impl.sql.compile.SubqueryNode;
+import com.liferay.apache.derby.impl.sql.compile.TableName;
+import com.liferay.apache.derby.impl.sql.compile.TypeCompilerFactoryImpl;
+import com.liferay.apache.derby.impl.sql.compile.UpdateNode;
+import com.liferay.apache.derby.jdbc.EmbeddedDriver;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-
-import java.io.StringReader;
+import com.liferay.portal.kernel.util.StringPool;
 
 import java.security.Permission;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.sql.DriverManager;
 
-import net.sf.jsqlparser.expression.Expression;
-import net.sf.jsqlparser.expression.operators.relational.ItemsList;
-import net.sf.jsqlparser.parser.CCJSqlParserManager;
-import net.sf.jsqlparser.parser.JSqlParser;
-import net.sf.jsqlparser.schema.Table;
-import net.sf.jsqlparser.statement.Statement;
-import net.sf.jsqlparser.statement.create.table.CreateTable;
-import net.sf.jsqlparser.statement.delete.Delete;
-import net.sf.jsqlparser.statement.drop.Drop;
-import net.sf.jsqlparser.statement.insert.Insert;
-import net.sf.jsqlparser.statement.replace.Replace;
-import net.sf.jsqlparser.statement.select.Select;
-import net.sf.jsqlparser.statement.select.SelectBody;
-import net.sf.jsqlparser.statement.truncate.Truncate;
-import net.sf.jsqlparser.statement.update.Update;
-import net.sf.jsqlparser.test.tablesfinder.TablesNamesFinder;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.Stack;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @author Brian Wing Shun Chan
+ * @author Zsolt Berentey
  */
 public class SQLChecker extends BaseChecker {
 
 	public void afterPropertiesSet() {
+		initParser();
 		initTableNames();
 	}
 
@@ -56,10 +78,10 @@ public class SQLChecker extends BaseChecker {
 	}
 
 	public boolean hasSQL(String sql) {
-		Statement statement = null;
+		Visitable visitable = null;
 
 		try {
-			statement = _jSqlParser.parse(new StringReader(sql));
+			visitable = _parser.parseStatement(sql);
 		}
 		catch (Exception e) {
 			_log.error("Unable to parse SQL " + sql);
@@ -67,232 +89,345 @@ public class SQLChecker extends BaseChecker {
 			return false;
 		}
 
-		if (statement instanceof CreateTable) {
-			CreateTable createTable = (CreateTable)statement;
+		StatementVisitor statementVisitor = new StatementVisitor(this);
 
-			return hasSQL(createTable);
+		try {
+			statementVisitor.visit(visitable);
 		}
-		else if (statement instanceof Select) {
-			Select select = (Select)statement;
+		catch (StandardException se) {
+			_log.error("Unable to determine access for SQL " + sql);
 
-			return hasSQL(select);
-		}
-		else if (statement instanceof Delete) {
-			Delete delete = (Delete)statement;
-
-			return hasSQL(delete);
-		}
-		else if (statement instanceof Drop) {
-			Drop drop = (Drop)statement;
-
-			return hasSQL(drop);
-		}
-		else if (statement instanceof Insert) {
-			Insert insert = (Insert)statement;
-
-			return hasSQL(insert);
-		}
-		else if (statement instanceof Replace) {
-			Replace replace = (Replace)statement;
-
-			return hasSQL(replace);
-		}
-		else if (statement instanceof Select) {
-			Select select = (Select)statement;
-
-			return hasSQL(select);
-		}
-		else if (statement instanceof Truncate) {
-			Truncate truncate = (Truncate)statement;
-
-			return hasSQL(truncate);
-		}
-		else if (statement instanceof Update) {
-			Update update = (Update)statement;
-
-			return hasSQL(update);
+			return false;
 		}
 
-		return false;
+		return statementVisitor.isAllowed();
 	}
 
-	protected boolean hasSQL(CreateTable createTable) {
-		return isAllowedTable(createTable.getTable(), _createTableNames);
-	}
+	public boolean isAllowed(int checkPermission, String tableName) {
+		if ((_allTableNameHandlers == null) || (_tableNameHandlers == null)) {
+			_log.error("SQL checker is not correctly initialized");
 
-	protected boolean hasSQL(Delete delete) {
-		TableNamesFinder tableNamesFinder = new TableNamesFinder();
-
-		List<String> tableNames = tableNamesFinder.getTableNames(delete);
-
-		return isAllowedTables(tableNames, _deleteTableNames);
-	}
-
-	protected boolean hasSQL(Drop drop) {
-		return isAllowedTable(drop.getName(), _dropTableNames);
-	}
-
-	protected boolean hasSQL(Insert insert) {
-		TableNamesFinder tableNamesFinder = new TableNamesFinder();
-
-		List<String> tableNames = tableNamesFinder.getTableNames(insert);
-
-		return isAllowedTables(tableNames, _insertTableNames);
-	}
-
-	protected boolean hasSQL(Replace replace) {
-		TableNamesFinder tableNamesFinder = new TableNamesFinder();
-
-		List<String> tableNames = tableNamesFinder.getTableNames(replace);
-
-		return isAllowedTables(tableNames, _replaceTableNames);
-	}
-
-	protected boolean hasSQL(Select select) {
-		TableNamesFinder tableNamesFinder = new TableNamesFinder();
-
-		List<String> tableNames = tableNamesFinder.getTableNames(select);
-
-		return isAllowedTables(tableNames, _selectTableNames);
-	}
-
-	protected boolean hasSQL(Truncate truncate) {
-		return isAllowedTable(truncate.getTable(), _truncateTableNames);
-	}
-
-	protected boolean hasSQL(Update update) {
-		TableNamesFinder tableNamesFinder = new TableNamesFinder();
-
-		List<String> tableNames = tableNamesFinder.getTableNames(update);
-
-		return isAllowedTables(tableNames, _updateTableNames);
-	}
-
-	protected void initTableNames() {
-		_allTableNames = getPropertySet("security-manager-sql-tables-all");
-		_createTableNames = getPropertySet(
-			"security-manager-sql-tables-create");
-		_deleteTableNames = getPropertySet(
-			"security-manager-sql-tables-delete");
-		_dropTableNames = getPropertySet("security-manager-sql-tables-drop");
-		_insertTableNames = getPropertySet(
-			"security-manager-sql-tables-insert");
-		_replaceTableNames = getPropertySet(
-			"security-manager-sql-tables-replace");
-		_selectTableNames = getPropertySet(
-			"security-manager-sql-tables-select");
-		_truncateTableNames = getPropertySet(
-			"security-manager-sql-tables-truncate");
-		_updateTableNames = getPropertySet(
-			"security-manager-sql-tables-update");
-	}
-
-	protected boolean isAllowedTable(
-		String tableName, Set<String> allowedTableNames) {
-
-		if (_allTableNames.contains(tableName) ||
-			allowedTableNames.contains(tableName)) {
-
-			return true;
+			return false;
 		}
 
-		return false;
-	}
-
-	protected boolean isAllowedTable(
-		Table table, Set<String> allowedTableNames) {
-
-		String tableName = table.getName();
-
-		return isAllowedTable(tableName, allowedTableNames);
-	}
-
-	protected boolean isAllowedTables(
-		List<String> tableNames, Set<String> allowedTableNames) {
-
-		for (String tableName : tableNames) {
-			if (!isAllowedTable(tableName, allowedTableNames)) {
-				return false;
+		for (TableNameHandler tableNameHandler : _allTableNameHandlers) {
+			if (tableNameHandler.matches(tableName)) {
+				return true;
 			}
 		}
 
-		return true;
+		Set<TableNameHandler> tableNameHandlers =
+			_tableNameHandlers[checkPermission];
+
+		if (tableNameHandlers != null) {
+			for (TableNameHandler tableNameHandler : tableNameHandlers) {
+				if (tableNameHandler.matches(tableName)) {
+					return true;
+				}
+			}
+		}
+
+		return false;
+	}
+
+	protected Set<TableNameHandler> getTableNameHandlers(String key) {
+		Set<TableNameHandler> tableNameHandlers =
+			new HashSet<TableNameHandler>();
+
+		for (String tableName : getPropertyArray(key)) {
+			TableNameHandler tableNameHandler = new TableNameHandler(tableName);
+
+			tableNameHandlers.add(tableNameHandler);
+		}
+
+		return tableNameHandlers;
+	}
+
+	protected void initParser() {
+		if (_parser != null) {
+			return;
+		}
+
+		try {
+			new EmbeddedDriver();
+
+			EmbedConnection embedConnection =
+				(EmbedConnection)DriverManager.getConnection(
+					"jdbc:derby:memory:dummy;create=true");
+
+			ContextManager contextManager = embedConnection.getContextManager();
+
+			LanguageConnectionContext languageConnectionContext =
+				(LanguageConnectionContext)contextManager.getContext(
+					"LanguageConnectionContext");
+
+			ContextService contextService = ContextService.getFactory();
+
+			contextService.setCurrentContextManager(contextManager);
+
+			CompilerContext compilerContext = new CompilerContextImpl(
+				contextManager, languageConnectionContext,
+				new TypeCompilerFactoryImpl());
+
+			_parser = new ParserImpl(compilerContext);
+		}
+		catch (Exception e) {
+			throw new IllegalStateException(e);
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	protected void initTableNames() {
+		_tableNameHandlers = new Set[9];
+
+		_allTableNameHandlers = getTableNameHandlers(
+			"security-manager-sql-tables-all");
+		_tableNameHandlers[StatementVisitor.ALTER] = getTableNameHandlers(
+			"security-manager-sql-tables-alter");
+		_tableNameHandlers[StatementVisitor.CREATE] = getTableNameHandlers(
+			"security-manager-sql-tables-create");
+		_tableNameHandlers[StatementVisitor.DELETE] = getTableNameHandlers(
+			"security-manager-sql-tables-delete");
+		_tableNameHandlers[StatementVisitor.DROP] = getTableNameHandlers(
+			"security-manager-sql-tables-drop");
+		_tableNameHandlers[StatementVisitor.INSERT] = getTableNameHandlers(
+			"security-manager-sql-tables-insert");
+		_tableNameHandlers[StatementVisitor.SELECT] = getTableNameHandlers(
+			"security-manager-sql-tables-select");
+		_tableNameHandlers[StatementVisitor.TRUNCATE] = getTableNameHandlers(
+			"security-manager-sql-tables-truncate");
+		_tableNameHandlers[StatementVisitor.UPDATE] = getTableNameHandlers(
+			"security-manager-sql-tables-update");
 	}
 
 	private static Log _log = LogFactoryUtil.getLog(SQLChecker.class);
 
-	private Set<String> _allTableNames;
-	private Set<String> _createTableNames;
-	private Set<String> _deleteTableNames;
-	private Set<String> _dropTableNames;
-	private Set<String> _insertTableNames;
-	private JSqlParser _jSqlParser = new CCJSqlParserManager();
-	private Set<String> _replaceTableNames;
-	private Set<String> _selectTableNames;
-	private Set<String> _truncateTableNames;
-	private Set<String> _updateTableNames;
+	private static Parser _parser;
 
-	private class TableNamesFinder extends TablesNamesFinder {
+	private Set<TableNameHandler> _allTableNameHandlers;
+	private Set<TableNameHandler>[] _tableNameHandlers;
 
-		public TableNamesFinder() {
-			tables = new ArrayList<String>();
+	private class StatementVisitor implements Visitor {
+
+		public static final int ALTER = 0;
+
+		public static final int CREATE = 1;
+
+		public static final int DELETE = 2;
+
+		public static final int DROP = 3;
+
+		public static final int GRANT = 4;
+
+		public static final int INSERT = 5;
+
+		public static final int NONE = -1;
+
+		public static final int SELECT = 6;
+
+		public static final int TRUNCATE = 7;
+
+		public static final int UPDATE = 8;
+
+		public StatementVisitor(SQLChecker sqlChecker) {
+			_sqlChecker = sqlChecker;
 		}
 
-		public List<String> getTableNames(Delete delete) {
-			Table table = delete.getTable();
+		public boolean isAllowed() {
+			if (_allowed == null) {
+				return false;
+			}
 
-			tables.add(table.getName());
-
-			Expression where = delete.getWhere();
-
-			where.accept(this);
-
-			return tables;
+			return _allowed;
 		}
 
-		public List<String> getTableNames(Insert insert) {
-			Table table = insert.getTable();
-
-			tables.add(table.getName());
-
-			ItemsList itemsList = insert.getItemsList();
-
-			itemsList.accept(this);
-
-			return tables;
+		public boolean skipChildren(Visitable visitable) {
+			return false;
 		}
 
-		public List<String> getTableNames(Replace replace) {
-			Table table = replace.getTable();
-
-			tables.add(table.getName());
-
-			ItemsList itemsList = replace.getItemsList();
-
-			itemsList.accept(this);
-
-			return tables;
+		public boolean stopTraversal() {
+			return false;
 		}
 
-		public List<String> getTableNames(Select select) {
-			SelectBody selectBody = select.getSelectBody();
+		public Visitable visit(Visitable visitable) throws StandardException {
+			if (_visitables.contains(visitable)) {
+				return visitable;
+			}
 
-			selectBody.accept(this);
+			_visitables.add(visitable);
 
-			return tables;
+			boolean changeState = changeState(visitable);
+
+			String tableName = getTableName(visitable);
+
+			if (tableName != null) {
+				if (_states.isEmpty()) {
+					_allowed = false;
+				}
+				else {
+					boolean allowed = _sqlChecker.isAllowed(
+						_states.peek(), tableName);
+
+					if (!allowed || (allowed && (_allowed == null))) {
+						_allowed = allowed;
+					}
+				}
+
+				if ((_allowed != null) && !_allowed) {
+					return visitable;
+				}
+			}
+
+			visitable.accept(this);
+
+			if (changeState) {
+				_states.pop();
+			}
+
+			return visitable;
 		}
 
-		public List<String> getTableNames(Update update) {
-			Table table = update.getTable();
-
-			tables.add(table.getName());
-
-			Expression where = update.getWhere();
-
-			where.accept(this);
-
-			return tables;
+		public boolean visitChildrenFirst(Visitable visitable) {
+			return false;
 		}
+
+		protected boolean changeState(Visitable visitable) {
+			int state = NONE;
+
+			if (visitable instanceof AlterTableNode) {
+				AlterTableNode alterTableNode = (AlterTableNode)visitable;
+
+				String alterTableNodeString =
+					alterTableNode.statementToString();
+
+				if (alterTableNodeString.startsWith("TRUNCATE")) {
+					state = TRUNCATE;
+				}
+				else {
+					state = ALTER;
+				}
+			}
+			else if ((visitable instanceof CreateAliasNode) ||
+					 (visitable instanceof CreateIndexNode) ||
+					 (visitable instanceof CreateTableNode) ||
+					 (visitable instanceof CreateTriggerNode) ||
+					 (visitable instanceof CreateViewNode)) {
+
+				state = CREATE;
+			}
+			else if (visitable instanceof DeleteNode) {
+				state = DELETE;
+			}
+			else if ((visitable instanceof DropAliasNode) ||
+					 (visitable instanceof DropIndexNode) ||
+					 (visitable instanceof DropTableNode) ||
+					 (visitable instanceof DropTriggerNode) ||
+					 (visitable instanceof DropViewNode)) {
+
+				state = DROP;
+			}
+			else if ((visitable instanceof GrantNode) ||
+					 (visitable instanceof GrantRoleNode)) {
+
+				state = GRANT;
+			}
+			else if (visitable instanceof InsertNode) {
+				state = INSERT;
+			}
+			else if ((visitable instanceof CursorNode) ||
+					 (visitable instanceof SubqueryNode) ||
+					 (visitable instanceof FromSubquery)) {
+
+				state = SELECT;
+			}
+			else if (visitable instanceof UpdateNode) {
+				state = UPDATE;
+			}
+
+			if (state != NONE) {
+				_states.push(state);
+
+				return true;
+			}
+
+			return false;
+		}
+
+		protected String getTableName(Visitable visitable) {
+			if (visitable instanceof AlterTableNode) {
+				AlterTableNode alterTableNode = (AlterTableNode)visitable;
+
+				return alterTableNode.getRelativeName();
+			}
+			else if (visitable instanceof CreateTableNode) {
+				CreateTableNode createTableNode = (CreateTableNode)visitable;
+
+				return createTableNode.getRelativeName();
+			}
+			else if (visitable instanceof CreateIndexNode) {
+				CreateIndexNode createIndexNode = (CreateIndexNode)visitable;
+
+				TableName tableName = createIndexNode.getIndexTableName();
+
+				return tableName.getTableName();
+			}
+			else if (visitable instanceof DropTableNode) {
+				DropTableNode dropTableNode = (DropTableNode)visitable;
+
+				return dropTableNode.getRelativeName();
+			}
+			else if (visitable instanceof FromBaseTable) {
+				FromBaseTable fromBaseTable = (FromBaseTable)visitable;
+
+				return fromBaseTable.getBaseTableName();
+			}
+			else if (visitable instanceof TableName) {
+				TableName tableName = (TableName)visitable;
+
+				return tableName.getTableName();
+			}
+
+			return null;
+		}
+
+		private Boolean _allowed;
+		private SQLChecker _sqlChecker;
+		private Stack<Integer> _states = new Stack<Integer>();
+		private Set<Visitable> _visitables = new HashSet<Visitable>();
+
+	}
+
+	private class TableNameHandler {
+
+		public TableNameHandler(String tableName) {
+			if (tableName.contains(StringPool.STAR)) {
+				try {
+					_pattern = Pattern.compile(
+						tableName.replaceAll("\\*", ".*?"),
+						Pattern.CASE_INSENSITIVE);
+				}
+				catch (Exception e) {
+					if (_log.isWarnEnabled()) {
+						_log.warn("Unable to compile pattern " + tableName);
+					}
+				}
+			}
+
+			_tableName = tableName;
+		}
+
+		public boolean matches(String tableName) {
+			if (_pattern != null) {
+				Matcher matcher = _pattern.matcher(tableName);
+
+				return matcher.matches();
+			}
+
+			return _tableName.equalsIgnoreCase(tableName);
+		}
+
+		private Pattern _pattern;
+		private String _tableName;
 
 	}
 

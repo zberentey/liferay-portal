@@ -330,22 +330,26 @@ public class BrowserSnifferImpl implements BrowserSniffer {
 	protected String getAccept(HttpServletRequest request) {
 		String accept = StringPool.BLANK;
 
-		if (request != null) {
-			accept = (String)request.getAttribute(HttpHeaders.ACCEPT);
-
-			if (accept == null) {
-				String acceptHeader = request.getHeader(HttpHeaders.ACCEPT);
-
-				if (acceptHeader != null) {
-					accept = acceptHeader.toLowerCase();
-				}
-				else {
-					accept = StringPool.BLANK;
-				}
-
-				request.setAttribute(HttpHeaders.ACCEPT, accept);
-			}
+		if (request == null) {
+			return accept;
 		}
+
+		accept = String.valueOf(request.getAttribute(HttpHeaders.ACCEPT));
+
+		if (accept != null) {
+			return accept;
+		}
+
+		accept = request.getHeader(HttpHeaders.ACCEPT);
+
+		if (accept != null) {
+			accept = accept.toLowerCase();
+		}
+		else {
+			accept = StringPool.BLANK;
+		}
+
+		request.setAttribute(HttpHeaders.ACCEPT, accept);
 
 		return accept;
 	}
@@ -353,23 +357,27 @@ public class BrowserSnifferImpl implements BrowserSniffer {
 	protected String getUserAgent(HttpServletRequest request) {
 		String userAgent = StringPool.BLANK;
 
-		if (request != null) {
-			userAgent = (String)request.getAttribute(HttpHeaders.USER_AGENT);
-
-			if (userAgent == null) {
-				String userAgentHeader = request.getHeader(
-					HttpHeaders.USER_AGENT);
-
-				if (userAgentHeader != null) {
-					userAgent = userAgentHeader.toLowerCase();
-				}
-				else {
-					userAgent = StringPool.BLANK;
-				}
-
-				request.setAttribute(HttpHeaders.USER_AGENT, userAgent);
-			}
+		if (request == null) {
+			return userAgent;
 		}
+
+		userAgent = String.valueOf(
+			request.getAttribute(HttpHeaders.USER_AGENT));
+
+		if (userAgent != null) {
+			return userAgent;
+		}
+
+		userAgent = request.getHeader(HttpHeaders.USER_AGENT);
+
+		if (userAgent != null) {
+			userAgent = userAgent.toLowerCase();
+		}
+		else {
+			userAgent = StringPool.BLANK;
+		}
+
+		request.setAttribute(HttpHeaders.USER_AGENT, userAgent);
 
 		return userAgent;
 	}
