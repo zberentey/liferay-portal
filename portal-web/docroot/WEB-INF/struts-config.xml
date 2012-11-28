@@ -1166,6 +1166,11 @@
 
 		<action path="/message_boards/get_message_attachment" type="com.liferay.portlet.messageboards.action.GetMessageAttachmentAction" />
 
+		<action path="/message_boards/move_category" type="com.liferay.portlet.messageboards.action.MoveCategoryAction">
+			<forward name="portlet.message_boards.error" path="portlet.message_boards.error" />
+			<forward name="portlet.message_boards.move_category" path="portlet.message_boards.move_category" />
+		</action>
+
 		<action path="/message_boards/move_thread" type="com.liferay.portlet.messageboards.action.MoveThreadAction">
 			<forward name="portlet.message_boards.error" path="portlet.message_boards.error" />
 			<forward name="portlet.message_boards.move_thread" path="portlet.message_boards.move_thread" />
@@ -1249,6 +1254,11 @@
 		<action path="/message_boards_admin/find_thread" type="com.liferay.portlet.messageboards.action.FindThreadAction" />
 
 		<action path="/message_boards_admin/get_message_attachment" type="com.liferay.portlet.messageboards.action.GetMessageAttachmentAction" />
+
+		<action path="/message_boards_admin/move_category" type="com.liferay.portlet.messageboards.action.MoveCategoryAction">
+			<forward name="portlet.message_boards.error" path="portlet.message_boards.error" />
+			<forward name="portlet.message_boards.move_category" path="portlet.message_boards.move_category" />
+		</action>
 
 		<action path="/message_boards_admin/move_thread" type="com.liferay.portlet.messageboards.action.MoveThreadAction">
 			<forward name="portlet.message_boards.error" path="portlet.message_boards.error" />
@@ -1958,6 +1968,11 @@
 		<action path="/trash/restore_entry" forward="portlet.trash.restore_entry" />
 
 		<action path="/trash/view" forward="portlet.trash.view" />
+
+		<action path="/trash/view_container_model" type="com.liferay.portlet.trash.action.ContainerModelAction">
+			<forward name="portlet.trash.error" path="portlet.trash.error" />
+			<forward name="portlet.trash.view_container_model" path="portlet.trash.view_container_model" />
+		</action>
 
 		<action path="/trash/view_content" forward="portlet.trash.view_content" />
 
