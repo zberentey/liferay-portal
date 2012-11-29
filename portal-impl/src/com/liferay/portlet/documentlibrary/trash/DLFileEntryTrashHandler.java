@@ -25,6 +25,7 @@ import com.liferay.portal.repository.liferayrepository.LiferayRepository;
 import com.liferay.portal.security.permission.ActionKeys;
 import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portal.service.RepositoryServiceUtil;
+import com.liferay.portal.service.ServiceContext;
 import com.liferay.portlet.documentlibrary.model.DLFileEntry;
 import com.liferay.portlet.documentlibrary.model.DLFileVersion;
 import com.liferay.portlet.documentlibrary.model.DLFolder;
@@ -155,6 +156,33 @@ public class DLFileEntryTrashHandler extends DLBaseTrashHandler {
 		return false;
 	}
 
+	@Override
+	public boolean isRestorable(long classPK)
+		throws PortalException, SystemException {
+
+		DLFileEntry dlFileEntry = getDLFileEntry(classPK);
+
+		return !dlFileEntry.isInTrashFolder();
+	}
+
+	@Override
+	public void moveEntry(
+			long classPK, long containerModelId, ServiceContext serviceContext)
+		throws PortalException, SystemException {
+
+		DLAppServiceUtil.moveFileEntry(
+			classPK, containerModelId, serviceContext);
+	}
+
+	@Override
+	public void moveTrashEntry(
+			long classPK, long containerModelId, ServiceContext serviceContext)
+		throws PortalException, SystemException {
+
+		DLAppServiceUtil.moveFileEntryFromTrash(
+			classPK, containerModelId, serviceContext);
+	}
+
 	public void restoreTrashEntries(long[] classPKs)
 		throws PortalException, SystemException {
 
@@ -208,6 +236,22 @@ public class DLFileEntryTrashHandler extends DLBaseTrashHandler {
 		FileEntry fileEntry = repository.getFileEntry(classPK);
 
 		return (DLFileEntry)fileEntry.getModel();
+	}
+
+	@Override
+	protected Repository getRepository(long classPK)
+		throws PortalException, SystemException {
+
+		Repository repository = RepositoryServiceUtil.getRepositoryImpl(
+			0, classPK, 0);
+
+		if (!(repository instanceof LiferayRepository)) {
+			throw new InvalidRepositoryException(
+				"Repository " + repository.getRepositoryId() +
+					" does not support trash operations");
+		}
+
+		return repository;
 	}
 
 	@Override

@@ -979,9 +979,6 @@ public class ServicePreAction extends Action {
 					themeDisplay.setURLAddContent(
 						"Liferay.LayoutConfiguration.toggle('".concat(
 							PortletKeys.LAYOUT_CONFIGURATION).concat("');"));
-
-					themeDisplay.setURLLayoutTemplates(
-						"Liferay.LayoutConfiguration.showTemplates();");
 				}
 
 				if (hasCustomizeLayoutPermission && customizedView) {
@@ -2058,7 +2055,8 @@ public class ServicePreAction extends Action {
 		Boolean hasPrivateLayouts = null;
 
 		if (addDefaultUserPrivateLayouts) {
-			hasPrivateLayouts = LayoutLocalServiceUtil.hasLayouts(user, true);
+			hasPrivateLayouts = LayoutLocalServiceUtil.hasLayouts(
+				user, true, false);
 
 			if (!hasPrivateLayouts) {
 				addDefaultUserPrivateLayouts(user);
@@ -2083,7 +2081,7 @@ public class ServicePreAction extends Action {
 		if (deleteDefaultUserPrivateLayouts) {
 			if (hasPrivateLayouts == null) {
 				hasPrivateLayouts = LayoutLocalServiceUtil.hasLayouts(
-					user, true);
+					user, true, false);
 			}
 
 			if (hasPrivateLayouts) {
@@ -2114,7 +2112,8 @@ public class ServicePreAction extends Action {
 		Boolean hasPublicLayouts = null;
 
 		if (addDefaultUserPublicLayouts) {
-			hasPublicLayouts = LayoutLocalServiceUtil.hasLayouts(user, false);
+			hasPublicLayouts = LayoutLocalServiceUtil.hasLayouts(
+				user, false, false);
 
 			if (!hasPublicLayouts) {
 				addDefaultUserPublicLayouts(user);
@@ -2139,7 +2138,7 @@ public class ServicePreAction extends Action {
 		if (deleteDefaultUserPublicLayouts) {
 			if (hasPublicLayouts == null) {
 				hasPublicLayouts = LayoutLocalServiceUtil.hasLayouts(
-					user, false);
+					user, false, false);
 			}
 
 			if (hasPublicLayouts) {

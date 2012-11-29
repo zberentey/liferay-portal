@@ -49,6 +49,41 @@ public abstract class DLBaseTrashHandler extends BaseTrashHandler {
 	}
 
 	@Override
+	public String getContainerModelClassName() {
+		return DLFolder.class.getName();
+	}
+
+	@Override
+	public List<ContainerModel> getContainerModels(
+			long classPK, long parentContainerModelId, int start, int end)
+		throws PortalException, SystemException {
+
+		Repository repository = getRepository(classPK);
+
+		List<Folder> folders = repository.getFolders(
+			parentContainerModelId, false, start, end, null);
+
+		List<ContainerModel> containerModels = new ArrayList<ContainerModel>(
+			folders.size());
+
+		for (Folder folder : folders) {
+			containerModels.add((ContainerModel)folder.getModel());
+		}
+
+		return containerModels;
+	}
+
+	@Override
+	public int getContainerModelsCount(
+			long classPK, long parentContainerModelId)
+		throws PortalException, SystemException {
+
+		Repository repository = getRepository(classPK);
+
+		return repository.getFoldersCount(parentContainerModelId, false);
+	}
+
+	@Override
 	public List<ContainerModel> getParentContainerModels(long containerModelId)
 		throws PortalException, SystemException {
 
@@ -86,7 +121,8 @@ public abstract class DLBaseTrashHandler extends BaseTrashHandler {
 
 		Repository repository = getRepository(classPK);
 
-		return repository.getFileEntriesCount(classPK);
+		return repository.getFileEntriesAndFileShortcutsCount(
+			classPK, WorkflowConstants.STATUS_ANY);
 	}
 
 	@Override
@@ -175,17 +211,12 @@ public abstract class DLBaseTrashHandler extends BaseTrashHandler {
 		return trashRenderers;
 	}
 
-	protected DLFolder getDLFolder(long classPK)
-		throws PortalException, SystemException {
-
-		Repository repository = getRepository(classPK);
-
-		Folder folder = repository.getFolder(classPK);
-
-		return (DLFolder)folder.getModel();
+	@Override
+	public boolean isMovable() {
+		return true;
 	}
 
-	protected Repository getRepository(long classPK)
+	protected DLFolder getDLFolder(long classPK)
 		throws PortalException, SystemException {
 
 		Repository repository = RepositoryServiceUtil.getRepositoryImpl(
@@ -197,7 +228,12 @@ public abstract class DLBaseTrashHandler extends BaseTrashHandler {
 					" does not support trash operations");
 		}
 
-		return repository;
+		Folder folder = repository.getFolder(classPK);
+
+		return (DLFolder)folder.getModel();
 	}
+
+	protected abstract Repository getRepository(long classPK)
+		throws PortalException, SystemException;
 
 }

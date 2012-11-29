@@ -3117,7 +3117,10 @@ public class PortalImpl implements Portal {
 
 		StringBundler sb = new StringBundler();
 
-		if (secure || Http.HTTPS.equals(PropsValues.WEB_SERVER_PROTOCOL)) {
+		boolean https =
+			secure || Http.HTTPS.equals(PropsValues.WEB_SERVER_PROTOCOL);
+
+		if (https) {
 			sb.append(Http.HTTPS_WITH_SLASH);
 		}
 		else {
@@ -3131,7 +3134,7 @@ public class PortalImpl implements Portal {
 			sb.append(PropsValues.WEB_SERVER_HOST);
 		}
 
-		if (!secure) {
+		if (!https) {
 			if (PropsValues.WEB_SERVER_HTTP_PORT == -1) {
 				if ((serverPort != Http.HTTP_PORT) &&
 					(serverPort != Http.HTTPS_PORT)) {
@@ -3147,8 +3150,7 @@ public class PortalImpl implements Portal {
 				}
 			}
 		}
-
-		if (secure) {
+		else {
 			if (PropsValues.WEB_SERVER_HTTPS_PORT == -1) {
 				if ((serverPort != Http.HTTP_PORT) &&
 					(serverPort != Http.HTTPS_PORT)) {
@@ -5739,10 +5741,6 @@ public class PortalImpl implements Portal {
 			boolean portletActions)
 		throws PortalException, SystemException {
 
-		if ((layout != null) && layout.isTypeControlPanel()) {
-			groupId = layout.getGroupId();
-		}
-
 		String rootPortletId = portlet.getRootPortletId();
 
 		String portletPrimaryKey = PortletPermissionUtil.getPrimaryKey(
@@ -5756,6 +5754,12 @@ public class PortalImpl implements Portal {
 			primaryKey = portletPrimaryKey;
 		}
 		else {
+			Group group = GroupLocalServiceUtil.fetchGroup(groupId);
+
+			if ((group != null) && group.isStagingGroup()) {
+				groupId = group.getLiveGroupId();
+			}
+
 			name = ResourceActionsUtil.getPortletBaseResource(rootPortletId);
 			primaryKey = String.valueOf(groupId);
 		}
@@ -5870,8 +5874,8 @@ public class PortalImpl implements Portal {
 						DefaultControlPanelEntryFactory.getInstance();
 				}
 
-				if (!controlPanelEntry.isVisible(
-						portlet, category, themeDisplay)) {
+				if (!controlPanelEntry.hasAccessPermission(
+						themeDisplay.getPermissionChecker(), group, portlet)) {
 
 					itr.remove();
 				}
