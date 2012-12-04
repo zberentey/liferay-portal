@@ -15,6 +15,8 @@
 package com.liferay.portal.security.auth;
 
 import com.liferay.portal.NoSuchUserException;
+import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.facebook.FacebookConnectUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -37,61 +39,58 @@ public class FacebookAutoLogin implements AutoLogin {
 	public String[] login(
 		HttpServletRequest request, HttpServletResponse response) {
 
-		String[] credentials = null;
-
 		try {
 			long companyId = PortalUtil.getCompanyId(request);
 
 			if (!FacebookConnectUtil.isEnabled(companyId)) {
-				return credentials;
+				return null;
 			}
-
-			HttpSession session = request.getSession();
-
-			String emailAddress = (String)session.getAttribute(
-				WebKeys.FACEBOOK_USER_EMAIL_ADDRESS);
 
 			User user = null;
 
-			if (Validator.isNotNull(emailAddress)) {
-				session.removeAttribute(WebKeys.FACEBOOK_USER_EMAIL_ADDRESS);
-
-				try {
-					user = UserLocalServiceUtil.getUserByEmailAddress(
-						companyId, emailAddress);
-				}
-				catch (NoSuchUserException nsue) {
-				}
+			try {
+				user = getUser(request, companyId);
 			}
-			else {
-				long facebookId = GetterUtil.getLong(
-					(String)session.getAttribute(WebKeys.FACEBOOK_USER_ID));
-
-				if (facebookId > 0) {
-					try {
-						user = UserLocalServiceUtil.getUserByFacebookId(
-							companyId, facebookId);
-					}
-					catch (NoSuchUserException nsue) {
-						return credentials;
-					}
-				}
-				else {
-					return credentials;
-				}
+			catch (NoSuchUserException nsue) {
+				return null;
 			}
 
-			credentials = new String[3];
+			String[] credentials = new String[3];
 
 			credentials[0] = String.valueOf(user.getUserId());
 			credentials[1] = user.getPassword();
 			credentials[2] = Boolean.FALSE.toString();
+
+			return credentials;
 		}
 		catch (Exception e) {
 			_log.error(e, e);
-		}
 
-		return credentials;
+			return null;
+		}
+	}
+
+	protected User getUser(HttpServletRequest request, long companyId)
+		throws PortalException, SystemException {
+
+		HttpSession session = request.getSession();
+
+		String emailAddress = (String)session.getAttribute(
+			WebKeys.FACEBOOK_USER_EMAIL_ADDRESS);
+
+		if (Validator.isNotNull(emailAddress)) {
+			session.removeAttribute(WebKeys.FACEBOOK_USER_EMAIL_ADDRESS);
+
+			return UserLocalServiceUtil.getUserByEmailAddress(
+				companyId, emailAddress);
+		}
+		else {
+			long facebookId = GetterUtil.getLong(
+				(String)session.getAttribute(WebKeys.FACEBOOK_USER_ID));
+
+			return UserLocalServiceUtil.getUserByFacebookId(
+				companyId, facebookId);
+		}
 	}
 
 	private static Log _log = LogFactoryUtil.getLog(FacebookAutoLogin.class);
