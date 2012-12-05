@@ -435,22 +435,51 @@ public class SocialActivityCounterLocalServiceImpl
 			activityCounter = socialActivityCounterPersistence.findByPrimaryKey(
 				previousActivityCounterId);
 
-			if (periodLength ==
-					SocialActivityCounterConstants.PERIOD_LENGTH_SYSTEM) {
+			if (activityCounter.getStartPeriod() < startPeriod) {
+				if (periodLength ==
+						SocialActivityCounterConstants.PERIOD_LENGTH_SYSTEM) {
 
-				activityCounter.setEndPeriod(
-					SocialCounterPeriodUtil.getStartPeriod() - 1);
-			}
-			else {
-				activityCounter.setEndPeriod(
-					activityCounter.getStartPeriod() + periodLength - 1);
-			}
+					activityCounter.setEndPeriod(
+						SocialCounterPeriodUtil.getStartPeriod() - 1);
+				}
+				else {
+					activityCounter.setEndPeriod(
+						activityCounter.getStartPeriod() + periodLength - 1);
+				}
 
-			socialActivityCounterPersistence.update(activityCounter);
+				socialActivityCounterPersistence.update(activityCounter);
+			}
 		}
 
-		activityCounter = socialActivityCounterPersistence.fetchByG_C_C_N_O_E(
-			groupId, classNameId, classPK, name, ownerType, endPeriod, false);
+		activityCounter = socialActivityCounterPersistence.fetchByG_C_C_N_O_S(
+			groupId, classNameId, classPK, name, ownerType, startPeriod, false);
+
+		if (activityCounter != null) {
+			if (activityCounter.getEndPeriod() !=
+				SocialActivityCounterConstants.END_PERIOD_UNDEFINED) {
+
+				SocialActivityCounter latestActivityCounter =
+					socialActivityCounterPersistence.fetchByG_C_C_N_O_E(
+						groupId, classNameId, classPK, name, ownerType,
+						endPeriod, false);
+
+				if (latestActivityCounter == null) {
+					activityCounter.setEndPeriod(
+						SocialActivityCounterConstants.END_PERIOD_UNDEFINED);
+
+					socialActivityCounterPersistence.update(activityCounter);
+				}
+				else {
+					activityCounter = latestActivityCounter;
+				}
+			}
+		}
+		else {
+			activityCounter =
+				socialActivityCounterPersistence.fetchByG_C_C_N_O_E(
+					groupId, classNameId, classPK, name, ownerType, endPeriod,
+					false);
+		}
 
 		if (activityCounter != null) {
 			return activityCounter;
