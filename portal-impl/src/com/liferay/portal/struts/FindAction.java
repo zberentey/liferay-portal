@@ -25,7 +25,10 @@ import com.liferay.portal.model.Layout;
 import com.liferay.portal.model.LayoutConstants;
 import com.liferay.portal.model.LayoutTypePortlet;
 import com.liferay.portal.model.PortletConstants;
+import com.liferay.portal.security.permission.ActionKeys;
+import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portal.service.LayoutLocalServiceUtil;
+import com.liferay.portal.service.permission.LayoutPermissionUtil;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portlet.PortletURLFactoryUtil;
@@ -139,6 +142,9 @@ public abstract class FindAction extends Action {
 		ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(
 			WebKeys.THEME_DISPLAY);
 
+		PermissionChecker permissionChecker =
+			themeDisplay.getPermissionChecker();
+
 		long groupId = ParamUtil.getLong(
 			request, "groupId", themeDisplay.getScopeGroupId());
 
@@ -163,7 +169,10 @@ public abstract class FindAction extends Action {
 					(LayoutTypePortlet)layout.getLayoutType();
 
 				for (String portletId : _portletIds) {
-					if (layoutTypePortlet.hasPortletId(portletId)) {
+					if (layoutTypePortlet.hasPortletId(portletId) &&
+						LayoutPermissionUtil.contains(
+							permissionChecker, layout, ActionKeys.VIEW)) {
+
 						return new Object[] {plid, portletId};
 					}
 				}
@@ -175,8 +184,14 @@ public abstract class FindAction extends Action {
 		for (String portletId : _portletIds) {
 			plid = PortalUtil.getPlidFromPortletId(groupId, portletId);
 
-			if (plid != LayoutConstants.DEFAULT_PLID) {
-				Layout layout = LayoutLocalServiceUtil.getLayout(plid);
+			if (plid == LayoutConstants.DEFAULT_PLID) {
+				continue;
+			}
+
+			Layout layout = LayoutLocalServiceUtil.getLayout(plid);
+
+			if (LayoutPermissionUtil.contains(
+					permissionChecker, layout, ActionKeys.VIEW)) {
 
 				LayoutTypePortlet layoutTypePortlet =
 					(LayoutTypePortlet)layout.getLayoutType();

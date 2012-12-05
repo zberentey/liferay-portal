@@ -101,6 +101,8 @@ public interface PropsKeys {
 
 	public static final String ASSET_CATEGORIES_SEARCH_HIERARCHICAL = "asset.categories.search.hierarchical";
 
+	public static final String ASSET_CATEGORIES_SELECTOR_MAX_ENTRIES = "asset.categories.selector.max.entries";
+
 	public static final String ASSET_ENTRY_INCREMENT_VIEW_COUNTER_ENABLED = "asset.entry.increment.view.counter.enabled";
 
 	public static final String ASSET_ENTRY_VALIDATOR = "asset.entry.validator";
@@ -1614,6 +1616,20 @@ public interface PropsKeys {
 	public static final String OMNIADMIN_USERS = "omniadmin.users";
 
 	public static final String OPEN_ID_AUTH_ENABLED = "open.id.auth.enabled";
+
+	public static final String OPEN_ID_AX_SCHEMA = "open.id.ax.schema";
+
+	public static final String OPEN_ID_AX_TYPE_EMAIL = "open.id.ax.type.email";
+
+	public static final String OPEN_ID_AX_TYPE_FIRST_NAME = "open.id.ax.type.firstname";
+
+	public static final String OPEN_ID_AX_TYPE_FULL_NAME = "open.id.ax.type.fullname";
+
+	public static final String OPEN_ID_AX_TYPE_LAST_NAME = "open.id.ax.type.lastname";
+
+	public static final String OPEN_ID_PROVIDERS = "open.id.providers";
+
+	public static final String OPEN_ID_URL = "open.id.url";
 
 	public static final String OPEN_SSO_AUTH_ENABLED = "open.sso.auth.enabled";
 

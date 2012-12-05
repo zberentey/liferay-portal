@@ -561,6 +561,13 @@ public class GroupServiceImpl extends GroupServiceBaseImpl {
 		return getUserPlaces(getGuestOrUserId(), classNames, false, max);
 	}
 
+	public int getUserPlacesCount() throws PortalException, SystemException {
+		List<Group> userPlaces = getUserPlaces(
+			getGuestOrUserId(), null, true, QueryUtil.ALL_POS);
+
+		return userPlaces.size();
+	}
+
 	/**
 	 * Returns the guest or current user's layout set group, organization
 	 * groups, inherited organization groups, and site groups.

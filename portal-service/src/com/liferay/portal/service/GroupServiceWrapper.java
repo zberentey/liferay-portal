@@ -380,6 +380,12 @@ public class GroupServiceWrapper implements GroupService,
 		return _groupService.getUserPlaces(classNames, max);
 	}
 
+	public int getUserPlacesCount()
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return _groupService.getUserPlacesCount();
+	}
+
 	/**
 	* Returns the guest or current user's layout set group, organization
 	* groups, inherited organization groups, and site groups.

@@ -526,6 +526,19 @@ public class GroupServiceSoap {
 		}
 	}
 
+	public static int getUserPlacesCount() throws RemoteException {
+		try {
+			int returnValue = GroupServiceUtil.getUserPlacesCount();
+
+			return returnValue;
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
 	/**
 	* Returns the guest or current user's layout set group, organization
 	* groups, inherited organization groups, and site groups.

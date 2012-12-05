@@ -392,6 +392,12 @@ public class GroupServiceUtil {
 		return getService().getUserPlaces(classNames, max);
 	}
 
+	public static int getUserPlacesCount()
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getService().getUserPlacesCount();
+	}
+
 	/**
 	* Returns the guest or current user's layout set group, organization
 	* groups, inherited organization groups, and site groups.
