@@ -17,7 +17,11 @@ package com.liferay.portal.lar;
 import com.liferay.portal.NoSuchLayoutException;
 import com.liferay.portal.kernel.util.FriendlyURLNormalizerUtil;
 import com.liferay.portal.kernel.util.StringPool;
-import com.liferay.portal.model.*;
+import com.liferay.portal.model.Group;
+import com.liferay.portal.model.Layout;
+import com.liferay.portal.model.LayoutConstants;
+import com.liferay.portal.model.LayoutPrototype;
+import com.liferay.portal.model.LayoutTypePortlet;
 import com.liferay.portal.service.LayoutLocalServiceUtil;
 import com.liferay.portal.service.LayoutServiceUtil;
 import com.liferay.portal.service.ServiceContext;
@@ -61,6 +65,17 @@ public class BaseExportImportTestCase extends PowerMockito {
 			LayoutConstants.DEFAULT_PARENT_LAYOUT_ID, name, null,
 			"This is a test page.", LayoutConstants.TYPE_PORTLET, false,
 			friendlyURL, serviceContext);
+	}
+
+	protected String addPortlet(
+		Layout layout, String portletId, String columnId) throws Exception {
+		LayoutTypePortlet layoutTypePortlet =
+			(LayoutTypePortlet) layout.getLayoutType();
+
+		portletId = layoutTypePortlet.addPortletId(
+				TestPropsValues.getUserId(), portletId, columnId, 0);
+
+		return portletId;
 	}
 
 	protected void propagateChanges(Group group) throws Exception {
