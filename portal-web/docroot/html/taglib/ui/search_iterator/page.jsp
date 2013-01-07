@@ -177,6 +177,10 @@ int sortColumnIndex = -1;
 
 						<%
 						String headerNameValue = LanguageUtil.get(pageContext, headerName);
+
+						if (rowChecker == null || i > 0) {
+							headerNameValue = HtmlUtil.escape(headerNameValue);
+						}
 						%>
 
 						<c:choose>

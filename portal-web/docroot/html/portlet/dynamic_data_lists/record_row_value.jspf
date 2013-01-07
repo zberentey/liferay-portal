@@ -34,6 +34,8 @@ else {
 	value = StringPool.BLANK;
 }
 
+value = HtmlUtil.escape(value);
+
 if (editable) {
 	row.addText(value, rowURL);
 }
