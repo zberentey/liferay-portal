@@ -32,4 +32,6 @@ public @interface BufferedIncrement {
 
 	public boolean parallel() default true;
 
+	public String propertyKey() default "";
+
 }
