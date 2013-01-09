@@ -23,6 +23,8 @@ ActionUtil.getGroup(request);
 
 Group group = (Group)request.getAttribute(WebKeys.GROUP);
 
+group = group.toEscapedModel();
+
 long groupId = BeanParamUtil.getLong(group, request, "groupId");
 
 String friendlyURL = BeanParamUtil.getString(group, request, "friendlyURL");

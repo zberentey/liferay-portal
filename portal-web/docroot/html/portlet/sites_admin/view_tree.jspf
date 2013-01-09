@@ -21,6 +21,8 @@ Group group = null;
 
 if (groupId > 0) {
 	group = GroupServiceUtil.getGroup(groupId);
+
+	group = group.toEscapedModel();
 }
 
 long parentGroupId = GroupConstants.DEFAULT_PARENT_GROUP_ID;
