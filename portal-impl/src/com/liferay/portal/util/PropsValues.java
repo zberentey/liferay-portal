@@ -223,6 +223,8 @@ public class PropsValues {
 
 	public static final String BROWSER_LAUNCHER_URL = PropsUtil.get(PropsKeys.BROWSER_LAUNCHER_URL);
 
+	public static final int BUFFERED_INCREMENT_CONCURRENCY_LEVEL = GetterUtil.getInteger(PropsUtil.get(PropsKeys.BUFFERED_INCREMENT_CONCURRENCY_LEVEL));
+
 	public static final int BUFFERED_INCREMENT_PARALLEL_QUEUE_SIZE = GetterUtil.getInteger(PropsUtil.get(PropsKeys.BUFFERED_INCREMENT_PARALLEL_QUEUE_SIZE));
 
 	public static final int CACHE_CONTENT_THRESHOLD_SIZE = GetterUtil.getInteger(PropsUtil.get(PropsKeys.CACHE_CONTENT_THRESHOLD_SIZE));

@@ -299,6 +299,8 @@ public interface PropsKeys {
 
 	public static final String BROWSER_LAUNCHER_URL = "browser.launcher.url";
 
+	public static final String BUFFERED_INCREMENT_CONCURRENCY_LEVEL = "buffered.increment.concurrency.level";
+
 	public static final String BUFFERED_INCREMENT_PARALLEL_QUEUE_SIZE = "buffered.increment.parallel.queue.size";
 
 	public static final String CACHE_CONTENT_THRESHOLD_SIZE = "cache.content.threshold.size";

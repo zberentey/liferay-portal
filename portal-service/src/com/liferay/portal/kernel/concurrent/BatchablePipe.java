@@ -14,6 +14,8 @@
 
 package com.liferay.portal.kernel.concurrent;
 
+import com.liferay.portal.util.PropsValues;
+
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.DelayQueue;
 import java.util.concurrent.Delayed;
@@ -30,7 +32,7 @@ public class BatchablePipe<K, V> {
 	public BatchablePipe() {
 		_delayedEntries = new DelayQueue<Entry<K, V>>();
 		_delayedEntryKeys = new ConcurrentHashMap<K, Entry<K, V>>(
-			16, 0.75f, 1);
+			16, 0.75f, PropsValues.BUFFERED_INCREMENT_CONCURRENCY_LEVEL);
 		_headEntry = new Entry<K, V>(null);
 		_lastEntryReference = new AtomicReference<Entry<K, V>>(_headEntry);
 	}
