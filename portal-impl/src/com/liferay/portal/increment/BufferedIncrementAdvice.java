@@ -119,15 +119,8 @@ public class BufferedIncrementAdvice
 		}
 
 		if (_batchablePipe.put(bufferedIncreasableEntry)) {
-			if (bufferedIncrement.parallel()) {
-				MessageBusUtil.sendMessage(
-					DestinationNames.BUFFERED_INCREMENT_PARALLEL,
-					_batchablePipe);
-			}
-			else {
-				MessageBusUtil.sendMessage(
-					DestinationNames.BUFFERED_INCREMENT_SERIAL, _batchablePipe);
-			}
+			MessageBusUtil.sendMessage(
+				DestinationNames.BUFFERED_INCREMENT_PARALLEL, _batchablePipe);
 		}
 
 		return nullResult;

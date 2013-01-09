@@ -30,6 +30,7 @@ public @interface BufferedIncrement {
 
 	public Class<? extends Increment<?>> incrementClass();
 
+	@Deprecated
 	public boolean parallel() default true;
 
 	public String propertyKey() default "";
