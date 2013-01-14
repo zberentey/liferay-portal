@@ -29,7 +29,6 @@ import com.liferay.portal.security.auth.CompanyThreadLocal;
 import com.liferay.portal.service.ShardLocalServiceUtil;
 import com.liferay.portal.util.PropsValues;
 
-import java.util.EmptyStackException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Stack;
@@ -78,10 +77,10 @@ public class ShardAdvice {
 	public String getCurrentShardName() {
 		String shardName = null;
 
-		try {
+		Stack<String> stack = _getCompanyServiceStack();
+
+		if (!stack.isEmpty()) {
 			shardName = _getCompanyServiceStack().peek();
-		}
-		catch (EmptyStackException ese) {
 		}
 
 		if (shardName == null) {
