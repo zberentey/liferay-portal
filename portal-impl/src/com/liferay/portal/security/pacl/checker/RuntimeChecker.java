@@ -215,7 +215,7 @@ public class RuntimeChecker extends BaseReflectChecker {
 			if (referenceId.equals("portal")) {
 				Class<?> callerClass7 = Reflection.getCallerClass(7);
 
-				if (isTrustedCallerClass(callerClass7)) {
+				if (PACLClassUtil.isTrustedCallerClass(callerClass7)) {
 					return true;
 				}
 			}

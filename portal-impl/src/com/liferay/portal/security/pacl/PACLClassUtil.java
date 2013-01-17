@@ -23,6 +23,8 @@ import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.security.lang.PortalSecurityManagerThreadLocal;
 import com.liferay.portal.spring.util.FilterClassLoader;
+import com.liferay.portal.util.PortalImpl;
+import com.liferay.portal.util.PortalUtil;
 
 import java.net.URL;
 
@@ -110,6 +112,21 @@ public class PACLClassUtil {
 		finally {
 			PortalSecurityManagerThreadLocal.setEnabled(enabled);
 		}
+	}
+
+	public static boolean isTrustedCallerClass(Class<?> callerClass) {
+		String callerClassLocation = getClassLocation(callerClass);
+
+		if (callerClassLocation.startsWith(_JAR_LOCATION_PORTAL_IMPL) ||
+			callerClassLocation.startsWith(_JAR_LOCATION_PORTAL_SERVICE) ||
+			callerClassLocation.contains("/util-bridges.jar!/") ||
+			callerClassLocation.contains("/util-java.jar!/") ||
+			callerClassLocation.contains("/util-taglib.jar!/")) {
+
+			return true;
+		}
+
+		return false;
 	}
 
 	private PACLClassUtil() {
@@ -300,6 +317,12 @@ public class PACLClassUtil {
 
 	private static final String _CLASS_NAME_JSP_EXTENSION_CLASS_LOADER =
 		"com.ibm.ws.jsp.webcontainerext.JSPExtensionClassLoader";
+
+	private static final String _JAR_LOCATION_PORTAL_IMPL = getJarLocation(
+		PortalImpl.class);
+
+	private static final String _JAR_LOCATION_PORTAL_SERVICE = getJarLocation(
+		PortalUtil.class);
 
 	private static Log _log = LogFactoryUtil.getLog(PACLClassUtil.class);
 

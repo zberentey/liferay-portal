@@ -20,6 +20,7 @@ import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermissio
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.security.pacl.PACLClassUtil;
 
 import java.security.Permission;
 
@@ -127,7 +128,7 @@ public class PortalRuntimeChecker extends BaseChecker {
 
 		Class<?> callerClass10 = Reflection.getCallerClass(10);
 
-		return isTrustedCallerClass(callerClass10);
+		return PACLClassUtil.isTrustedCallerClass(callerClass10);
 	}
 
 	protected boolean hasSetBeanProperty(Class<?> clazz, String property) {
