@@ -126,6 +126,16 @@ public class PACLClassUtil {
 			return true;
 		}
 
+		ClassLoader callerClassLoader = getCallerClassLoader(callerClass);
+
+		if (callerClassLoader == _instance._portalClassLoader) {
+			return true;
+		}
+
+		if (callerClassLoader == _instance._commonClassLoader) {
+			return true;
+		}
+
 		return false;
 	}
 
