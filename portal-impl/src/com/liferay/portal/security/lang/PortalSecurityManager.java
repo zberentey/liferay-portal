@@ -94,8 +94,8 @@ public class PortalSecurityManager extends SecurityManager {
 
 		Class<?> callerClass = Reflection.getCallerClass(4);
 
-		ClassLoader callerClassLoader = PACLClassLoaderUtil.getClassLoader(
-			callerClass);
+		ClassLoader callerClassLoader = PACLClassUtil.getCallerClassLoader(
+				callerClass);
 
 		if (callerClassLoader == null) {
 			for (int i = 5;; i++) {
@@ -111,7 +111,7 @@ public class PortalSecurityManager extends SecurityManager {
 					!className.startsWith("java.security") &&
 					!className.startsWith("sun.reflect")) {
 
-					callerClassLoader = PACLClassLoaderUtil.getClassLoader(
+					callerClassLoader = PACLClassUtil.getCallerClassLoader(
 						callerClass);
 
 					break;
@@ -119,7 +119,9 @@ public class PortalSecurityManager extends SecurityManager {
 			}
 		}
 
-		if (classClassLoader == callerClassLoader) {
+		if ((classClassLoader == callerClassLoader) ||
+			PACLClassUtil.isTrustedCallerClass(callerClass)) {
+
 			return;
 		}
 
