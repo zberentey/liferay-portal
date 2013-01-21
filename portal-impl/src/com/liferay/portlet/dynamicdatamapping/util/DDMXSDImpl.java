@@ -505,13 +505,13 @@ public class DDMXSDImpl implements DDMXSD {
 			return fieldContext;
 		}
 
-		String documentAsXML = dynamicElementElement.getDocument().asXML();
+		Document document = dynamicElementElement.getDocument();
 
-		String[] availableLocales = LocalizationUtil.getAvailableLocales(
-			documentAsXML);
+		String xml = document.asXML();
 
-		String defaultLanguageId = LocalizationUtil.getDefaultLocale(
-			documentAsXML);
+		String[] availableLocales = LocalizationUtil.getAvailableLocales(xml);
+
+		String defaultLanguageId = LocalizationUtil.getDefaultLocale(xml);
 
 		String languageId = LocaleUtil.toLanguageId(locale);
 
