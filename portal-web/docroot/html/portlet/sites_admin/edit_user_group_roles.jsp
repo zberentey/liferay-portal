@@ -84,7 +84,7 @@ request.setAttribute("edit_user_group_roles.jsp-portletURL", portletURL);
 	backURL="<%= backURL %>"
 	escapeXml="<%= false %>"
 	localizeTitle="<%= false %>"
-	title="<%= HtmlUtil.escape(group.getDescriptiveName(locale)) %>"
+	title="<%= groupName %>"
 />
 
 <aui:form action="<%= portletURL.toString() %>" method="post" name="fm">
