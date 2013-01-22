@@ -41,26 +41,25 @@
 
 	buffer.append(escapedCurGroup.getDescriptiveName(locale));
 
-	if (!escapedCurGroup.isOrganization()) {
-		List<String> names = new ArrayList<String>();
+	List<String> names = new ArrayList<String>();
 
-		boolean organizationUser = SitesUtil.isOrganizationUser(company.getCompanyId(), escapedCurGroup, user, names);
+	boolean organizationUser = SitesUtil.isOrganizationUser(company.getCompanyId(), escapedCurGroup, user, names);
 
-		row.setParameter("organizationUser", organizationUser);
+	row.setParameter("organizationUser", organizationUser);
 
-		boolean userGroupUser = SitesUtil.isUserGroupUser(company.getCompanyId(), escapedCurGroup, user, names);
+	boolean userGroupUser = SitesUtil.isUserGroupUser(company.getCompanyId(), escapedCurGroup, user, names);
 
-		row.setParameter("userGroupUser", userGroupUser);
+	row.setParameter("userGroupUser", userGroupUser);
 
-		String message = StringPool.BLANK;
+	String message = StringPool.BLANK;
 
-		if (organizationUser || userGroupUser) {
-			if (names.size() == 1) {
-				message = LanguageUtil.format(pageContext, "you-are-a-member-of-x-because-you-belong-to-x", new Object[] {escapedCurGroup.getDescriptiveName(locale), names.get(0)});
-			}
-			else {
-				message = LanguageUtil.format(pageContext, "you-are-a-member-of-x-because-you-belong-to-x-and-x", new Object[] {escapedCurGroup.getDescriptiveName(locale), StringUtil.merge(names.toArray(new String[names.size()]), ", "), names.get(names.size() - 1)});
-			}
+	if (organizationUser || userGroupUser) {
+		if (names.size() == 1) {
+			message = LanguageUtil.format(pageContext, "you-are-a-member-of-x-because-you-belong-to-x", new Object[] {escapedCurGroup.getDescriptiveName(locale), names.get(0)});
+		}
+		else {
+			message = LanguageUtil.format(pageContext, "you-are-a-member-of-x-because-you-belong-to-x-and-x", new Object[] {escapedCurGroup.getDescriptiveName(locale), StringUtil.merge(names.toArray(new String[names.size()]), ", "), names.get(names.size() - 1)});
+		}
 	%>
 
 		<liferay-util:buffer var="iconHelp">
