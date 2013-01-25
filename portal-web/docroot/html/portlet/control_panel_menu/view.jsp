@@ -36,8 +36,162 @@
 
 		String controlPanelCategory = HttpUtil.getParameter(PortalUtil.getCurrentURL(request), "controlPanelCategory", false);
 
+		Group contentGroup = null;
+
+		String contentGroupLabel = null;
+
+		List<Layout> contentScopeLayouts = new ArrayList<Layout>();
+
+		String contentTitle = null;
+
 		if (Validator.isNotNull(controlPanelCategory)) {
 			allCategories = new String[] {controlPanelCategory};
+		}
+
+		if (ArrayUtil.contains(allCategories, PortletCategoryKeys.CONTENT)) {
+			Collection<Portlet> contentCategoryPortlets = PortalUtil.getControlPanelPortlets(themeDisplay.getCompanyId(), PortletCategoryKeys.CONTENT);
+
+			Layout scopeLayout = null;
+
+			contentGroup = themeDisplay.getScopeGroup();
+
+			if (contentGroup.isLayout()) {
+				scopeLayout = LayoutLocalServiceUtil.getLayout(contentGroup.getClassPK());
+
+				contentGroup = scopeLayout.getGroup();
+			}
+
+			List<Group> manageableSites = null;
+
+			if (Validator.isNotNull(controlPanelCategory)) {
+				manageableSites = new ArrayList<Group>();
+
+				if (contentGroup.isUser()) {
+					manageableSites.add(user.getGroup());
+				}
+				else {
+					long groupId = GetterUtil.getLong(HttpUtil.getParameter(PortalUtil.getCurrentURL(request), "doAsGroupId", false));
+
+					Group group = GroupLocalServiceUtil.getGroup(groupId);
+
+					manageableSites.add(group);
+				}
+			}
+			else {
+				manageableSites = GroupServiceUtil.getManageableSites(contentCategoryPortlets, PropsValues.CONTROL_PANEL_NAVIGATION_MAX_SITES);
+
+				Group userGroup = user.getGroup();
+
+				if (userGroup.hasPrivateLayouts() || userGroup.hasPublicLayouts()) {
+					manageableSites.add(0, userGroup);
+				}
+
+				if (PortalUtil.isCompanyControlPanelVisible(themeDisplay)) {
+					Group companyGroup = GroupLocalServiceUtil.getCompanyGroup(themeDisplay.getCompanyId());
+
+					manageableSites.add(0, companyGroup);
+				}
+			}
+
+			Group curLiveGroup = contentGroup;
+
+			if (contentGroup.isStagingGroup()) {
+				curLiveGroup = contentGroup.getLiveGroup();
+			}
+
+			if (!manageableSites.isEmpty() && !manageableSites.contains(curLiveGroup)) {
+				if (curLiveGroup.isSite() && PortletPermissionUtil.contains(permissionChecker, curLiveGroup.getGroupId(), 0, contentCategoryPortlets, ActionKeys.ACCESS_IN_CONTROL_PANEL)) {
+					manageableSites.add(0, curLiveGroup);
+				}
+				else {
+					contentGroup = manageableSites.get(0);
+
+					curLiveGroup = contentGroup;
+
+					themeDisplay.setScopeGroupId(contentGroup.getGroupId());
+				}
+			}
+
+			String curGroupName = null;
+
+			if (contentGroup.isUser() && (contentGroup.getClassPK() == user.getUserId())) {
+				curGroupName = LanguageUtil.format(pageContext, "x-personal-site", curLiveGroup.getDescriptiveName(locale));
+			}
+			else {
+				curGroupName = curLiveGroup.getDescriptiveName(locale);
+			}
+
+			if (category.equals(PortletCategoryKeys.CONTENT)) {
+				PortalUtil.addPortletBreadcrumbEntry(request, curGroupName, null);
+			}
+
+			if (scopeLayout == null) {
+				contentGroupLabel = LanguageUtil.get(pageContext, "default");
+			}
+			else {
+				contentGroupLabel = scopeLayout.getName(locale);
+
+				if (category.equals(PortletCategoryKeys.CONTENT)) {
+					PortalUtil.addPortletBreadcrumbEntry(request, contentGroupLabel, null);
+				}
+			}
+			%>
+
+			<liferay-util:buffer var="groupSelectorIconMenu">
+				<c:choose>
+					<c:when test="<%= !manageableSites.isEmpty() %>">
+						<liferay-ui:icon-menu align="left" direction="down" icon="<%= contentGroup.getIconURL(themeDisplay) %>" id="groupSelector" localizeMessage="<%= false %>" message="<%= HtmlUtil.escape(StringUtil.shorten(curGroupName, 25)) %>">
+
+							<%
+							for (int i = 0; i < manageableSites.size(); i++) {
+								Group group = manageableSites.get(i);
+
+								String message = group.getDescriptiveName(locale);
+
+								if (group.isUser()) {
+									message = LanguageUtil.format(pageContext, "x-personal-site", group.getDescriptiveName(locale));
+								}
+
+								String url = null;
+
+								if (manageableSites.size() > 1) {
+									url = HttpUtil.setParameter(PortalUtil.getCurrentURL(request), "doAsGroupId", group.getGroupId());
+								}
+							%>
+
+								<liferay-ui:icon
+									localizeMessage="<%= false %>"
+									message="<%= HtmlUtil.escape(message) %>"
+									src="<%= group.getIconURL(themeDisplay) %>"
+									url="<%= url %>"
+								/>
+
+							<%
+							}
+							%>
+
+						</liferay-ui:icon-menu>
+
+						<c:if test="<%= curLiveGroup.isCompany() %>">
+							<liferay-ui:staging cssClass="manage-pages-branch-menu" extended="<%= true %>" groupId="<%= curLiveGroup.getGroupId() %>" icon="/common/tool.png" showManageBranches="<%= false %>" />
+						</c:if>
+					</c:when>
+					<c:otherwise>
+						<liferay-ui:icon
+							cssClass="lfr-panel-title-single"
+							label="<%= true %>"
+							message="<%= HtmlUtil.escape(StringUtil.shorten(curGroupName, 25)) %>"
+							src="<%= contentGroup.getIconURL(themeDisplay) %>"
+						/>
+					</c:otherwise>
+				</c:choose>
+			</liferay-util:buffer>
+
+			<%
+			contentTitle = groupSelectorIconMenu;
+
+			contentScopeLayouts.addAll(LayoutLocalServiceUtil.getScopeGroupLayouts(contentGroup.getGroupId(), false));
+			contentScopeLayouts.addAll(LayoutLocalServiceUtil.getScopeGroupLayouts(contentGroup.getGroupId(), true));
 		}
 
 		for (String curCategory : allCategories) {
@@ -54,147 +208,13 @@
 				title = HtmlUtil.escape(StringUtil.shorten(user.getFullName(), 25));
 			}
 			else if (curCategory.equals(PortletCategoryKeys.CONTENT)) {
-				Layout scopeLayout = null;
+				scopeLayouts = contentScopeLayouts;
 
-				curGroup = themeDisplay.getScopeGroup();
+				curGroupLabel = contentGroupLabel;
 
-				if (curGroup.isLayout()) {
-					scopeLayout = LayoutLocalServiceUtil.getLayout(curGroup.getClassPK());
+				curGroup = contentGroup;
 
-					curGroup = scopeLayout.getGroup();
-				}
-
-				List<Group> manageableSites = null;
-
-				if (Validator.isNotNull(controlPanelCategory)) {
-					manageableSites = new ArrayList<Group>();
-
-					if (curGroup.isUser()) {
-						manageableSites.add(user.getGroup());
-					}
-					else {
-						long groupId = GetterUtil.getLong(HttpUtil.getParameter(PortalUtil.getCurrentURL(request), "doAsGroupId", false));
-
-						Group group = GroupLocalServiceUtil.getGroup(groupId);
-
-						manageableSites.add(group);
-					}
-				}
-				else {
-					manageableSites = GroupServiceUtil.getManageableSites(categoryPortlets, PropsValues.CONTROL_PANEL_NAVIGATION_MAX_SITES);
-
-					Group userGroup = user.getGroup();
-
-					if (userGroup.hasPrivateLayouts() || userGroup.hasPublicLayouts()) {
-						manageableSites.add(0, userGroup);
-					}
-
-					if (PortalUtil.isCompanyControlPanelVisible(themeDisplay)) {
-						Group companyGroup = GroupLocalServiceUtil.getCompanyGroup(themeDisplay.getCompanyId());
-
-						manageableSites.add(0, companyGroup);
-					}
-				}
-
-				Group curLiveGroup = curGroup;
-
-				if (curGroup.isStagingGroup()) {
-					curLiveGroup = curGroup.getLiveGroup();
-				}
-
-				if (!manageableSites.isEmpty() && !manageableSites.contains(curLiveGroup)) {
-					if (curLiveGroup.isSite() && PortletPermissionUtil.contains(permissionChecker, curLiveGroup.getGroupId(), 0, categoryPortlets, ActionKeys.ACCESS_IN_CONTROL_PANEL)) {
-						manageableSites.add(0, curLiveGroup);
-					}
-					else {
-						curGroup = manageableSites.get(0);
-
-						curLiveGroup = curGroup;
-
-						themeDisplay.setScopeGroupId(curGroup.getGroupId());
-					}
-				}
-
-				String curGroupName = null;
-
-				if (curGroup.isUser() && (curGroup.getClassPK() == user.getUserId())) {
-					curGroupName = LanguageUtil.format(pageContext, "x-personal-site", curLiveGroup.getDescriptiveName(locale));
-				}
-				else {
-					curGroupName = curLiveGroup.getDescriptiveName(locale);
-				}
-
-				if (category.equals(PortletCategoryKeys.CONTENT)) {
-					PortalUtil.addPortletBreadcrumbEntry(request, curGroupName, null);
-				}
-
-				if (scopeLayout == null) {
-					curGroupLabel = LanguageUtil.get(pageContext, "default");
-				}
-				else {
-					curGroupLabel = scopeLayout.getName(locale);
-
-					if (category.equals(PortletCategoryKeys.CONTENT)) {
-						PortalUtil.addPortletBreadcrumbEntry(request, curGroupLabel, null);
-					}
-				}
-				%>
-
-				<liferay-util:buffer var="groupSelectorIconMenu">
-					<c:choose>
-						<c:when test="<%= !manageableSites.isEmpty() %>">
-							<liferay-ui:icon-menu align="left" direction="down" icon="<%= curGroup.getIconURL(themeDisplay) %>" id="groupSelector" localizeMessage="<%= false %>" message="<%= HtmlUtil.escape(StringUtil.shorten(curGroupName, 25)) %>">
-
-								<%
-								for (int i = 0; i < manageableSites.size(); i++) {
-									Group group = manageableSites.get(i);
-
-									String message = group.getDescriptiveName(locale);
-
-									if (group.isUser()) {
-										message = LanguageUtil.format(pageContext, "x-personal-site", group.getDescriptiveName(locale));
-									}
-
-									String url = null;
-
-									if (manageableSites.size() > 1) {
-										url = HttpUtil.setParameter(PortalUtil.getCurrentURL(request), "doAsGroupId", group.getGroupId());
-									}
-								%>
-
-									<liferay-ui:icon
-										localizeMessage="<%= false %>"
-										message="<%= HtmlUtil.escape(message) %>"
-										src="<%= group.getIconURL(themeDisplay) %>"
-										url="<%= url %>"
-									/>
-
-								<%
-								}
-								%>
-
-							</liferay-ui:icon-menu>
-
-							<c:if test="<%= curLiveGroup.isCompany() %>">
-								<liferay-ui:staging cssClass="manage-pages-branch-menu" extended="<%= true %>" groupId="<%= curLiveGroup.getGroupId() %>" icon="/common/tool.png" showManageBranches="<%= false %>" />
-							</c:if>
-						</c:when>
-						<c:otherwise>
-							<liferay-ui:icon
-								cssClass="lfr-panel-title-single"
-								label="<%= true %>"
-								message="<%= HtmlUtil.escape(StringUtil.shorten(curGroupName, 25)) %>"
-								src="<%= curGroup.getIconURL(themeDisplay) %>"
-							/>
-						</c:otherwise>
-					</c:choose>
-				</liferay-util:buffer>
-
-				<%
-				scopeLayouts.addAll(LayoutLocalServiceUtil.getScopeGroupLayouts(curGroup.getGroupId(), false));
-				scopeLayouts.addAll(LayoutLocalServiceUtil.getScopeGroupLayouts(curGroup.getGroupId(), true));
-
-				title = groupSelectorIconMenu;
+				title = contentTitle;
 			}
 			else if (curCategory.equals(PortletCategoryKeys.PORTAL) && (CompanyLocalServiceUtil.getCompaniesCount(false) > 1)) {
 				title = HtmlUtil.escape(company.getName());
