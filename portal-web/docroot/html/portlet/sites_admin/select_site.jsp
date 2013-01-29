@@ -112,7 +112,7 @@ portletURL.setParameter("target", target);
 			className="com.liferay.portal.model.Group"
 			escapedModel="<%= true %>"
 			keyProperty="groupId"
-			modelVar="group"
+			modelVar="escapedGroup"
 			rowIdProperty="friendlyURL"
 		>
 
@@ -122,9 +122,9 @@ portletURL.setParameter("target", target);
 			sb.append("javascript:opener.");
 			sb.append(renderResponse.getNamespace());
 			sb.append("selectGroup('");
-			sb.append(group.getGroupId());
+			sb.append(escapedGroup.getGroupId());
 			sb.append("', '");
-			sb.append(UnicodeFormatter.toString(group.getDescriptiveName(locale)));
+			sb.append(UnicodeFormatter.toString(escapedGroup.getDescriptiveName(locale)));
 			sb.append("', '");
 			sb.append(target);
 			sb.append("'); window.close();");
@@ -135,13 +135,13 @@ portletURL.setParameter("target", target);
 			<liferay-ui:search-container-column-text
 				href="<%= rowHREF %>"
 				name="name"
-				value="<%= HtmlUtil.escape(group.getDescriptiveName(locale)) %>"
+				value="<%= escapedGroup.getDescriptiveName(locale) %>"
 			/>
 
 			<liferay-ui:search-container-column-text
 				href="<%= rowHREF %>"
 				name="type"
-				value="<%= LanguageUtil.get(pageContext, group.getTypeLabel()) %>"
+				value="<%= LanguageUtil.get(pageContext, escapedGroup.getTypeLabel()) %>"
 			/>
 		</liferay-ui:search-container-row>
 
