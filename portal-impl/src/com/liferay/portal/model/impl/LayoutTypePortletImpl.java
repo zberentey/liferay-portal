@@ -26,6 +26,7 @@ import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
+import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.UnicodeProperties;
@@ -968,9 +969,6 @@ public class LayoutTypePortletImpl
 			oldLayoutTemplateId = PropsValues.DEFAULT_LAYOUT_TEMPLATE_ID;
 		}
 
-		setTypeSettingsProperty(
-			LayoutTypePortletConstants.LAYOUT_TEMPLATE_ID, newLayoutTemplateId);
-
 		String themeId = getThemeId();
 
 		LayoutTemplate oldLayoutTemplate =
@@ -978,12 +976,37 @@ public class LayoutTypePortletImpl
 				oldLayoutTemplateId, false, themeId);
 
 		if (oldLayoutTemplate == null) {
+			if (_log.isWarnEnabled()) {
+				StringBundler sb = new StringBundler(5);
+
+				sb.append("Layout template ");
+				sb.append(newLayoutTemplateId);
+				sb.append(" cannot be set because current template ");
+				sb.append(oldLayoutTemplateId);
+				sb.append(" does not exist");
+
+				_log.warn(sb.toString());
+			}
+
 			return;
 		}
 
 		LayoutTemplate newLayoutTemplate =
 			LayoutTemplateLocalServiceUtil.getLayoutTemplate(
 				newLayoutTemplateId, false, themeId);
+
+		if (newLayoutTemplate == null) {
+			if (_log.isWarnEnabled()) {
+				_log.warn(
+					"Layout template " + newLayoutTemplateId +
+						" cannot be set because it does not exist");
+			}
+
+			return;
+		}
+
+		setTypeSettingsProperty(
+			LayoutTypePortletConstants.LAYOUT_TEMPLATE_ID, newLayoutTemplateId);
 
 		List<String> oldColumns = oldLayoutTemplate.getColumns();
 		List<String> newColumns = newLayoutTemplate.getColumns();
