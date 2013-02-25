@@ -1260,7 +1260,7 @@ public class JournalArticleFinderImpl
 			return StringPool.BLANK;
 		}
 
-		StringBundler sb = new StringBundler(folderIds.size() * 2 + 1);
+		StringBundler sb = new StringBundler(folderIds.size() * 3 + 1);
 
 		sb.append(StringPool.OPEN_PARENTHESIS);
 

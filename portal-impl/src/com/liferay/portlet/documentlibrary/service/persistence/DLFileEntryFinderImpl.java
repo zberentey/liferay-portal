@@ -470,7 +470,9 @@ public class DLFileEntryFinderImpl
 			return StringPool.BLANK;
 		}
 
-		StringBundler sb = new StringBundler(folderIds.size() * 2 - 1);
+		StringBundler sb = new StringBundler(folderIds.size() * 3 + 1);
+
+		sb.append(StringPool.OPEN_PARENTHESIS);
 
 		for (int i = 0; i < folderIds.size(); i++) {
 			sb.append(tableName);
@@ -480,6 +482,8 @@ public class DLFileEntryFinderImpl
 				sb.append(WHERE_OR);
 			}
 		}
+
+		sb.append(StringPool.CLOSE_PARENTHESIS);
 
 		return sb.toString();
 	}
