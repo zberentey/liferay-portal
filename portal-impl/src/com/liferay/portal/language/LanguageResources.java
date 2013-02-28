@@ -141,7 +141,7 @@ public class LanguageResources {
 
 		_languageMaps.put(locale, newLanguageMap);
 
-		return oldLanguageMap;
+		return newLanguageMap;
 	}
 
 	public void setConfig(String config) {
