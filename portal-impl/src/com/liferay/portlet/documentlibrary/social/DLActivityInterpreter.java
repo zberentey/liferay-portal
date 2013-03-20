@@ -73,13 +73,13 @@ public class DLActivityInterpreter extends BaseSocialActivityInterpreter {
 
 		String fileEntryLink = assetRenderer.getURLDownload(themeDisplay);
 
-		sb.append(wrapText("download-file", fileEntryLink, themeDisplay));
+		sb.append(wrapLink(fileEntryLink, "download-file", themeDisplay));
 
 		sb.append(StringPool.SPACE);
 
 		String folderLink = getFolderLink(fileEntry, themeDisplay);
 
-		sb.append(wrapText("go-to-folder", folderLink, themeDisplay));
+		sb.append(wrapLink(folderLink, "go-to-folder", themeDisplay));
 
 		return sb.toString();
 	}

@@ -59,7 +59,7 @@ public class MBActivityInterpreter extends BaseSocialActivityInterpreter {
 
 		String categoryLink = sb.toString();
 
-		return wrapText("go-to-category", categoryLink, themeDisplay);
+		return wrapLink(categoryLink, "go-to-category", themeDisplay);
 	}
 
 	@Override

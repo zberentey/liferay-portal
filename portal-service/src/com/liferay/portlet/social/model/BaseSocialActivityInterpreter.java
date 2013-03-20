@@ -278,7 +278,11 @@ public abstract class BaseSocialActivityInterpreter
 
 		String userName = getUserName(activity.getUserId(), themeDisplay);
 
-		return new Object[] {groupName, userName, wrapText(title, link)};
+		if (Validator.isNotNull(link)) {
+			title = wrapLink(link, title);
+		}
+
+		return new Object[] {groupName, userName, title};
 	}
 
 	protected String getTitlePattern(String groupName, SocialActivity activity)
@@ -328,38 +332,22 @@ public abstract class BaseSocialActivityInterpreter
 		return false;
 	}
 
-	protected String wrapText(String title, String link) {
-		title = HtmlUtil.escape(title);
-
-		if (link == null) {
-			return title;
-		}
-
-		return createLink(link, title);
-	}
-
-	protected String wrapText(
-		String key, String link, ThemeDisplay themeDisplay) {
-
-		String title = themeDisplay.translate(HtmlUtil.escape(key));
-
-		if (link == null) {
-			return title;
-		}
-
-		return createLink(link, title);
-	}
-
-	private String createLink(String link, String text) {
+	protected String wrapLink(String link, String text) {
 		StringBundler sb = new StringBundler(5);
 
 		sb.append("<a href=\"");
-		sb.append(link);
+		sb.append(HtmlUtil.escape(link));
 		sb.append("\">");
-		sb.append(text);
+		sb.append(HtmlUtil.escape(text));
 		sb.append("</a>");
 
 		return sb.toString();
+	}
+
+	protected String wrapLink(
+		String link, String key, ThemeDisplay themeDisplay) {
+
+		return wrapLink(link, themeDisplay.translate(key));
 	}
 
 	private static Log _log = LogFactoryUtil.getLog(
