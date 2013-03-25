@@ -85,7 +85,7 @@ public class SQLCheckerTest {
 		testSql(_SQL_CREATE_TABLE, _ALLOWED_PREFIX_TABLE_1, null, true);
 		testSql(_SQL_CREATE_TABLE, _NOT_ALLOWED_TABLE, null, false);
 		testSql(_SQL_CREATE_TABLE, _ALLOWED_TABLE, null, true);
-		testSql(_SQL_CREATE_TABLE, _NOT_PROTECTED_TABLE, null, true);
+		testSql(_SQL_CREATE_TABLE, _NOT_PROTECTED_TABLE, null, false);
 	}
 
 	@Test

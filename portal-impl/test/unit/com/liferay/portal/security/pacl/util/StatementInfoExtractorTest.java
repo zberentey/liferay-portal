@@ -40,6 +40,19 @@ public class StatementInfoExtractorTest {
 	}
 
 	@Test
+	public void testCreateTableStatements() {
+		StatementInfo info;
+
+		for (Tuple match : _createTableStatements) {
+			String sql = (String)match.getObject(0);
+
+			info = getStatementInfo(sql);
+
+			assertMainTable(sql, info, true, (String)match.getObject(1));
+		}
+	}
+
+	@Test
 	public void testMainTable() {
 		String sql = "drop index index_name";
 
@@ -187,6 +200,17 @@ public class StatementInfoExtractorTest {
 			true),
 		new Tuple(
 			"select * from user_ where user_.name='No company.'", false)
+	};
+
+	private static Tuple[] _createTableStatements = {
+		new Tuple("create table schema.foobar(", "foobar"),
+		new Tuple("create table schema.[foobar] (", "foobar"),
+		new Tuple("create table schema.[foo bar] (", "foo bar"),
+		new Tuple("create table schema.\"foo bar\" (", "foo bar"),
+		new Tuple("create table schema.`foo bar` (", "foo bar"),
+		new Tuple("create table [db schema].[foo bar](", "foo bar"),
+		new Tuple("create table \"db schema\".foobar (", "foobar"),
+		new Tuple("create table `db schema`.[foo bar](", "foo bar")
 	};
 
 }

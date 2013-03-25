@@ -167,6 +167,12 @@ public class SQLChecker extends BaseChecker {
 
 				return false;
 			}
+
+			if (statementInfo.isCreateTable()) {
+				TableRegistryUtil.registerPluginTables(
+					getServletContextName(),
+					new String[] {statementInfo.getMainTable()});
+			}
 		}
 		else if (!statementInfo.isParseTables()) {
 

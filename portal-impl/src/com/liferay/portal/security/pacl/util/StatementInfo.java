@@ -90,6 +90,10 @@ public class StatementInfo {
 		}
 	}
 
+	public boolean isCreateTable() {
+		return (_operation.equals("create") && _objectType.equals("table"));
+	}
+
 	public boolean isParseTables() {
 		return _parseTables;
 	}

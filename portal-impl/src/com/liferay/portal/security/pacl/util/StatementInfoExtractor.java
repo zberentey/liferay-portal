@@ -24,6 +24,8 @@ import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collections;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import jodd.util.CharUtil;
 
@@ -45,10 +47,15 @@ public class StatementInfoExtractor {
 		StatementInfo statementInfo = extractStatementInfo(sql);
 
 		if ((statementInfo != null) && statementInfo.isParseTables()) {
-			List<String> tables = extractTableNames(
-				sql, TableRegistryUtil.getTableNames(), statementInfo);
+			if (statementInfo.isCreateTable()) {
+				parseCreateTableStatment(sql, statementInfo);
+			}
+			else {
+				List<String> tables = extractTableNames(
+					sql, TableRegistryUtil.getTableNames(), statementInfo);
 
-			statementInfo.setTableNames(tables);
+				statementInfo.setTableNames(tables);
+			}
 		}
 
 		return statementInfo;
@@ -274,6 +281,35 @@ public class StatementInfoExtractor {
 		return true;
 	}
 
+	protected static void parseCreateTableStatment(
+			String sql, StatementInfo statementInfo)
+		throws InvalidStatementException {
+
+		validateStatement(sql, createLiteralBitSet(sql));
+
+		Matcher m = _CREATE_TABLE.matcher(sql);
+
+		if (m.find()) {
+			String tableName = m.group(1);
+
+			tableName = tableName.toLowerCase();
+
+			tableName = tableName.replaceAll("[\\[\\]\"'`]", StringPool.BLANK);
+
+			int pos = tableName.indexOf(CharPool.PERIOD);
+
+			if (pos > -1) {
+				tableName = tableName.substring(pos + 1);
+			}
+
+			List<String> tableNames = new ArrayList<String>();
+
+			tableNames.add(tableName);
+
+			statementInfo.setTableNames(tableNames);
+		}
+	}
+
 	protected static void validateStatement(String sql, BitSet literalBitSet)
 		throws InvalidStatementException {
 
@@ -302,6 +338,11 @@ public class StatementInfoExtractor {
 		CharPool.BACK_TICK, CharPool.COMMA, CharPool.OPEN_BRACKET,
 		CharPool.OPEN_PARENTHESIS, CharPool.PERIOD, CharPool.QUOTE,
 	};
+
+	private static final Pattern _CREATE_TABLE = Pattern.compile(
+		"create .*?table(?: if not exists)?\\s+" +
+		"(?:[^.\\[\"' (]+?\\.|\\[.+?\\]\\.|\".+?\"\\.|'.+?'\\.|`.+?`\\.)?" +
+		"([^.\\[\"'` (]+|\\[.+?\\]|\".+?\"|'.+?'|`.+?`)(?:\\s+|\\()");
 
 	private static final String[] _KEYWORDS = {
 		"alter ", "create ", "delete ", "drop ", "insert ", "merge ", "rename ",
