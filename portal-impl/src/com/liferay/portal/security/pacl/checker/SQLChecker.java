@@ -45,6 +45,13 @@ public class SQLChecker extends BaseChecker {
 
 	public void afterPropertiesSet() {
 		initTableNames();
+
+		registerProtectedTables();
+	}
+
+	@Override
+	public void destroy() {
+		unregisterProtectedTables();
 	}
 
 	@Override
@@ -280,6 +287,22 @@ public class SQLChecker extends BaseChecker {
 		}
 
 		return true;
+	}
+
+	protected void registerProtectedTables() {
+		Properties properties = getProperties();
+
+		String tableNames = properties.getProperty(
+			"security-manager-sql-register-test-tables");
+
+		TableRegistryUtil.registerPluginTables(
+			getServletContextName().concat("-test"),
+			StringUtil.split(tableNames));
+	}
+
+	protected void unregisterProtectedTables() {
+		TableRegistryUtil.unregisterPluginTables(
+			getServletContextName().concat("-test"));
 	}
 
 	private static Log _log = LogFactoryUtil.getLog(SQLChecker.class);

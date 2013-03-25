@@ -26,6 +26,8 @@ public interface Checker {
 
 	public void afterPropertiesSet();
 
+	public void destroy();
+
 	public AuthorizationProperty generateAuthorizationProperty(
 		Object... arguments);
 
