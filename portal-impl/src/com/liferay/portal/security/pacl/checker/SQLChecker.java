@@ -21,6 +21,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.security.pacl.sql.InvalidStatementException;
 import com.liferay.portal.security.pacl.util.StatementInfo;
 import com.liferay.portal.security.pacl.util.StatementInfoExtractor;
+import com.liferay.portal.util.TableRegistryUtil;
 
 import java.security.Permission;
 
@@ -218,6 +219,13 @@ public class SQLChecker extends BaseChecker {
 	}
 
 	protected boolean isAllowedTable(String key, String tableName) {
+		List<String> pluginTableNames = TableRegistryUtil.getTableNames(
+			getServletContextName());
+
+		if (pluginTableNames.contains(tableName)) {
+			return true;
+		}
+
 		Set<TableNameWrapper> tableNames = _tableNames.get(key);
 
 		if (tableNames == null) {
