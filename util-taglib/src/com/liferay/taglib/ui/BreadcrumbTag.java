@@ -14,10 +14,16 @@
 
 package com.liferay.taglib.ui;
 
+import com.liferay.portal.kernel.util.BreadcrumbUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.PropsUtil;
+import com.liferay.portal.kernel.util.StringBundler;
+import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.kernel.util.WebKeys;
+import com.liferay.portal.model.Group;
 import com.liferay.portal.model.Layout;
+import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.taglib.util.IncludeTag;
 
 import javax.portlet.PortletURL;
@@ -83,6 +89,51 @@ public class BreadcrumbTag extends IncludeTag {
 		_showPortletBreadcrumb = true;
 	}
 
+	protected String getBreadcrumbString(HttpServletRequest request) {
+		StringBundler sb = new StringBundler();
+
+		ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(
+			WebKeys.THEME_DISPLAY);
+
+		try {
+			if (Validator.isNull(_selLayout)) {
+				setSelLayout(themeDisplay.getLayout());
+			}
+
+			Group group = _selLayout.getGroup();
+
+			boolean showLayout = _showLayout && !group.isLayoutPrototype();
+
+			if (_showGuestGroup) {
+				BreadcrumbUtil.buildGuestGroupBreadcrumb(themeDisplay, sb);
+			}
+
+			if (_showParentGroups) {
+				BreadcrumbUtil.buildParentGroupsBreadcrumb(
+					_selLayout.getLayoutSet(), _portletURL, themeDisplay, sb);
+			}
+
+			if (showLayout) {
+				BreadcrumbUtil.buildLayoutBreadcrumb(
+					_selLayout, _selLayoutParam, true, _portletURL,
+					themeDisplay, sb);
+			}
+
+			if (_showPortletBreadcrumb) {
+				BreadcrumbUtil.buildPortletBreadcrumb(
+					request, _showCurrentGroup, _showCurrentPortlet,
+					themeDisplay, sb);
+			}
+		}
+		catch (Exception e) {
+		}
+
+		String breadcrumbString = BreadcrumbUtil.insertClassOption(
+			sb.toString());
+
+		return breadcrumbString;
+	}
+
 	@Override
 	protected String getPage() {
 		return _PAGE;
@@ -91,28 +142,10 @@ public class BreadcrumbTag extends IncludeTag {
 	@Override
 	protected void setAttributes(HttpServletRequest request) {
 		request.setAttribute(
+			"liferay-ui:breadcrumb:breadcrumbString",
+			getBreadcrumbString(request));
+		request.setAttribute(
 			"liferay-ui:breadcrumb:displayStyle", _displayStyle);
-		request.setAttribute("liferay-ui:breadcrumb:portletURL", _portletURL);
-		request.setAttribute("liferay-ui:breadcrumb:selLayout", _selLayout);
-		request.setAttribute(
-			"liferay-ui:breadcrumb:selLayoutParam", _selLayoutParam);
-		request.setAttribute(
-			"liferay-ui:breadcrumb:showCurrentGroup",
-			String.valueOf(_showCurrentGroup));
-		request.setAttribute(
-			"liferay-ui:breadcrumb:showCurrentPortlet",
-			String.valueOf(_showCurrentPortlet));
-		request.setAttribute(
-			"liferay-ui:breadcrumb:showGuestGroup",
-			String.valueOf(_showGuestGroup));
-		request.setAttribute(
-			"liferay-ui:breadcrumb:showLayout", String.valueOf(_showLayout));
-		request.setAttribute(
-			"liferay-ui:breadcrumb:showParentGroups",
-			String.valueOf(_showParentGroups));
-		request.setAttribute(
-			"liferay-ui:breadcrumb:showPortletBreadcrumb",
-			String.valueOf(_showPortletBreadcrumb));
 	}
 
 	private static final String _DISPLAY_STYLE = "0";

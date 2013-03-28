@@ -20,10 +20,7 @@ package com.liferay.portal.kernel.util;
 public class BreadcrumbsUtil {
 
 	public static String removeLastClass(String breadcrumbs) {
-		return StringUtil.replace(
-			breadcrumbs,
-			new String[] {"class=\"last\"", "class=\"first last\""},
-			new String[] {StringPool.BLANK, "class=\"first\""});
+		return BreadcrumbUtil.removeLastClass(breadcrumbs);
 	}
 
 }

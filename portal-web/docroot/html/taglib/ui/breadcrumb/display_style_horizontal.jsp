@@ -16,41 +16,6 @@
 
 <%@ include file="/html/taglib/ui/breadcrumb/init.jsp" %>
 
-<%
-StringBundler sb = new StringBundler();
-
-if (showGuestGroup) {
-	_buildGuestGroupBreadcrumb(themeDisplay, sb);
-}
-
-if (showParentGroups) {
-	_buildParentGroupsBreadcrumb(selLayout.getLayoutSet(), portletURL, themeDisplay, sb);
-}
-
-if (showLayout) {
-	_buildLayoutBreadcrumb(selLayout, selLayoutParam, true, portletURL, themeDisplay, sb);
-}
-
-if (showPortletBreadcrumb) {
-	_buildPortletBreadcrumb(request, showCurrentGroup, showCurrentPortlet, themeDisplay, sb);
-}
-
-String breadcrumbString = sb.toString();
-
-if (Validator.isNotNull(breadcrumbString)) {
-	int x = breadcrumbString.indexOf("<li");
-	int y = breadcrumbString.lastIndexOf("<li");
-
-	if (x == y) {
-		breadcrumbString = StringUtil.insert(breadcrumbString, " class=\"only\"", x + 3);
-	}
-	else {
-		breadcrumbString = StringUtil.insert(breadcrumbString, " class=\"last\"", y + 3);
-		breadcrumbString = StringUtil.insert(breadcrumbString, " class=\"first\"", x + 3);
-	}
-}
-%>
-
 <ul class="breadcrumbs breadcrumbs-horizontal lfr-component">
 	<%= breadcrumbString %>
 </ul>

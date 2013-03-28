@@ -394,6 +394,11 @@
 			<bean class="com.liferay.portal.upgrade.util.MemoryValueMapperFactoryImpl" />
 		</property>
 	</bean>
+	<bean id="com.liferay.portal.kernel.util.BreadcrumbUtil" class="com.liferay.portal.kernel.util.BreadcrumbUtil">
+		<property name="breadcrumb">
+			<bean class="com.liferay.portal.util.BreadcrumbImpl" />
+		</property>
+	</bean>
 	<bean id="com.liferay.portal.kernel.util.CalendarFactoryUtil" class="com.liferay.portal.kernel.util.CalendarFactoryUtil">
 		<property name="calendarFactory">
 			<bean class="com.liferay.portal.util.CalendarFactoryImpl" />
