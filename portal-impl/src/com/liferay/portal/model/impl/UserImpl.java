@@ -24,6 +24,7 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.util.Digester;
 import com.liferay.portal.kernel.util.DigesterUtil;
+import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.SetUtil;
@@ -71,8 +72,10 @@ import com.liferay.portal.util.PropsUtil;
 import com.liferay.portal.util.PropsValues;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.TreeSet;
@@ -181,6 +184,17 @@ public class UserImpl extends UserBaseImpl {
 
 		if (isDefaultUser()) {
 			return StringPool.BLANK;
+		}
+
+		if (Validator.isNotNull(PropsValues.USERS_PROFILE_FRIENDLY_URL)) {
+			StringBundler sb = new StringBundler(3);
+
+			sb.append(portalURL);
+			sb.append(mainPath);
+			sb.append(
+				getProfileFriendlyURL(PropsValues.USERS_PROFILE_FRIENDLY_URL));
+
+			return sb.toString();
 		}
 
 		Group group = getGroup();
@@ -297,14 +311,14 @@ public class UserImpl extends UserBaseImpl {
 		return getContact().getMale();
 	}
 
-	public List<Group> getMySites() throws PortalException, SystemException {
-		return getMySites(null, false, QueryUtil.ALL_POS);
-	}
-
 	public List<Group> getMySites(boolean includeControlPanel, int max)
 		throws PortalException, SystemException {
 
 		return getMySites(null, includeControlPanel, max);
+	}
+
+	public List<Group> getMySites() throws PortalException, SystemException {
+		return getMySites(null, false, QueryUtil.ALL_POS);
 	}
 
 	public List<Group> getMySites(int max)
@@ -351,10 +365,6 @@ public class UserImpl extends UserBaseImpl {
 		return getMySites(classNames, false, max);
 	}
 
-	public long[] getOrganizationIds() throws PortalException, SystemException {
-		return getOrganizationIds(false);
-	}
-
 	public long[] getOrganizationIds(boolean includeAdministrative)
 		throws PortalException, SystemException {
 
@@ -372,10 +382,8 @@ public class UserImpl extends UserBaseImpl {
 		return organizationIds;
 	}
 
-	public List<Organization> getOrganizations()
-		throws PortalException, SystemException {
-
-		return getOrganizations(false);
+	public long[] getOrganizationIds() throws PortalException, SystemException {
+		return getOrganizationIds(false);
 	}
 
 	public List<Organization> getOrganizations(boolean includeAdministrative)
@@ -383,6 +391,12 @@ public class UserImpl extends UserBaseImpl {
 
 		return OrganizationLocalServiceUtil.getUserOrganizations(
 			getUserId(), includeAdministrative);
+	}
+
+	public List<Organization> getOrganizations()
+		throws PortalException, SystemException {
+
+		return getOrganizations(false);
 	}
 
 	public boolean getPasswordModified() {
@@ -533,10 +547,6 @@ public class UserImpl extends UserBaseImpl {
 			getCompanyId(), Contact.class.getName(), getContactId());
 	}
 
-	public boolean hasCompanyMx() throws PortalException, SystemException {
-		return hasCompanyMx(getEmailAddress());
-	}
-
 	public boolean hasCompanyMx(String emailAddress)
 		throws PortalException, SystemException {
 
@@ -548,6 +558,10 @@ public class UserImpl extends UserBaseImpl {
 			getCompanyId());
 
 		return company.hasCompanyMx(emailAddress);
+	}
+
+	public boolean hasCompanyMx() throws PortalException, SystemException {
+		return hasCompanyMx(getEmailAddress());
 	}
 
 	public boolean hasMySites() throws PortalException, SystemException {
@@ -640,6 +654,18 @@ public class UserImpl extends UserBaseImpl {
 		_timeZone = TimeZoneUtil.getTimeZone(timeZoneId);
 
 		super.setTimeZoneId(timeZoneId);
+	}
+
+	protected String getProfileFriendlyURL(String profileFriendlyURL) {
+		Map<String, String> variables = new HashMap<String, String>();
+
+		variables.put("liferay:userId", String.valueOf(getUserId()));
+		variables.put(
+			"liferay:userScreenName", HtmlUtil.escapeURL(getScreenName()));
+
+		return StringUtil.replace(
+			profileFriendlyURL, StringPool.DOLLAR_AND_OPEN_CURLY_BRACE,
+			StringPool.CLOSE_CURLY_BRACE, variables);
 	}
 
 	private Locale _locale;
