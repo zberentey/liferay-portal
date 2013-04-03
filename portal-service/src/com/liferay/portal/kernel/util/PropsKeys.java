@@ -2399,7 +2399,7 @@ public interface PropsKeys {
 
 	public static final String USERS_LIST_VIEWS = "users.list.views";
 
-	public static final String USERS_PROFILE_URL = "users.profile.url";
+	public static final String USERS_PROFILE_FRIENDLY_URL = "users.profile.friendly.url";
 
 	public static final String USERS_REMINDER_QUERIES_CUSTOM_QUESTION_ENABLED = "users.reminder.queries.custom.question.enabled";
 
