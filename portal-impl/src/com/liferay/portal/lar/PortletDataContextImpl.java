@@ -608,30 +608,33 @@ public class PortletDataContextImpl implements PortletDataContext {
 	}
 
 	public Element addReferenceElement(
-		Element element, ClassedModel classedModel) {
+		Element element, ClassedModel classedModel, String type) {
 
 		return addReferenceElement(
-			element, classedModel, classedModel.getModelClassName(),
+			element, classedModel, type, classedModel.getModelClassName(),
 			StringPool.BLANK);
 	}
 
 	public Element addReferenceElement(
-		Element element, ClassedModel classedModel, Class<?> clazz) {
+		Element element, ClassedModel classedModel, String type,
+		Class<?> clazz) {
 
 		return addReferenceElement(
-			element, classedModel, clazz.getName(), StringPool.BLANK);
+			element, classedModel, type, clazz.getName(), StringPool.BLANK);
 	}
 
 	public Element addReferenceElement(
-		Element element, ClassedModel classedModel, String binPath) {
-
-		return addReferenceElement(
-			element, classedModel, classedModel.getModelClassName(), binPath);
-	}
-
-	public Element addReferenceElement(
-		Element element, ClassedModel classedModel, String className,
+		Element element, ClassedModel classedModel, String type,
 		String binPath) {
+
+		return addReferenceElement(
+			element, classedModel, type, classedModel.getModelClassName(),
+			binPath);
+	}
+
+	public Element addReferenceElement(
+		Element element, ClassedModel classedModel, String type,
+		String className, String binPath) {
 
 		Element referencesElement = element.element("references");
 
@@ -641,6 +644,7 @@ public class PortletDataContextImpl implements PortletDataContext {
 
 		Element referenceElement = referencesElement.addElement("reference");
 
+		referenceElement.addAttribute("type", type);
 		referenceElement.addAttribute("class-name", className);
 
 		if (Validator.isNotNull(binPath)) {
@@ -973,8 +977,14 @@ public class PortletDataContextImpl implements PortletDataContext {
 	public List<Element> getReferenceDataElements(
 		Element parentElement, Class<?> clazz) {
 
+		return getReferenceDataElements(parentElement, clazz, null);
+	}
+
+	public List<Element> getReferenceDataElements(
+		Element parentElement, Class<?> clazz, String type) {
+
 		List<Element> referenceElements = getReferenceElements(
-			parentElement, clazz);
+			parentElement, clazz, type);
 
 		return getReferenceDataElements(referenceElements, clazz);
 	}
@@ -982,8 +992,14 @@ public class PortletDataContextImpl implements PortletDataContext {
 	public List<Element> getReferenceDataElements(
 		StagedModel parentStagedModel, Class<?> clazz) {
 
+		return getReferenceDataElements(parentStagedModel, clazz, null);
+	}
+
+	public List<Element> getReferenceDataElements(
+		StagedModel parentStagedModel, Class<?> clazz, String type) {
+
 		List<Element> referenceElements = getReferenceElements(
-			parentStagedModel, clazz);
+			parentStagedModel, clazz, type);
 
 		return getReferenceDataElements(referenceElements, clazz);
 	}
@@ -1774,7 +1790,7 @@ public class PortletDataContextImpl implements PortletDataContext {
 	}
 
 	protected List<Element> getReferenceElements(
-		Element parentElement, Class<?> clazz) {
+		Element parentElement, Class<?> clazz, String type) {
 
 		if (parentElement == null) {
 			return Collections.emptyList();
@@ -1786,8 +1802,19 @@ public class PortletDataContextImpl implements PortletDataContext {
 			return Collections.emptyList();
 		}
 
-		XPath xPath = SAXReaderUtil.createXPath(
-			"reference[@class-name='"+ clazz.getName() + "']");
+		StringBundler sb = new StringBundler(5);
+
+		sb.append("reference[@class-name='");
+		sb.append(clazz.getName());
+
+		if (type != null) {
+			sb.append("' and @type='");
+			sb.append(type);
+		}
+
+		sb.append("']");
+
+		XPath xPath = SAXReaderUtil.createXPath(sb.toString());
 
 		List<Node> nodes = xPath.selectNodes(referencesElement);
 
@@ -1795,12 +1822,12 @@ public class PortletDataContextImpl implements PortletDataContext {
 	}
 
 	protected List<Element> getReferenceElements(
-		StagedModel parentStagedModel, Class<?> clazz) {
+		StagedModel parentStagedModel, Class<?> clazz, String type) {
 
 		Element stagedModelElement = getImportDataStagedModelElement(
 			parentStagedModel);
 
-		return getReferenceElements(stagedModelElement, clazz);
+		return getReferenceElements(stagedModelElement, clazz, type);
 	}
 
 	protected long getUserId(AuditedModel auditedModel) {
