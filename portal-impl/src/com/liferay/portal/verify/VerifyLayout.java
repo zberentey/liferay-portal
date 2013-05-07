@@ -65,7 +65,7 @@ public class VerifyLayout extends VerifyProcess {
 		sb.append(tableName);
 		sb.append(" target ");
 
-		sb.append("set target.layoutUuid = ");
+		sb.append("set layoutUuid = ");
 		sb.append("(select sourcePrototypeLayoutUuid from Layout where ");
 		sb.append("Layout.uuid_ = target.layoutUuid) ");
 
