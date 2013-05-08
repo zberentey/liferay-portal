@@ -14,6 +14,7 @@
 
 package com.liferay.portal.kernel.lar;
 
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.xml.Element;
 
@@ -25,8 +26,9 @@ public class MissingReference {
 	public MissingReference(Element element) {
 		className = element.attributeValue("class-name");
 		referrerClassName = element.attributeValue("referrer");
-		name = element.attributeValue("name");
-		referrerName = element.attributeValue("referrer-name");
+		name = GetterUtil.getString(element.attributeValue("name"));
+		referrerName = GetterUtil.getString(
+			element.attributeValue("referrer-name"));
 	}
 
 	public String getClassName() {
