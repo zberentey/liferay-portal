@@ -80,7 +80,7 @@ public class FolderStagedModelDataHandler
 				portletDataContext, repository);
 
 			portletDataContext.addReferenceElement(
-				folderElement, repository, false);
+				folder, folderElement, repository, false);
 
 			portletDataContext.addClassedModel(
 				folderElement, folderPath, folder,
@@ -250,7 +250,7 @@ public class FolderStagedModelDataHandler
 					portletDataContext, dlFileEntryType);
 
 				portletDataContext.addReferenceElement(
-					folderElement, dlFileEntryType, false);
+					folder, folderElement, dlFileEntryType, false);
 			}
 		}
 

@@ -68,7 +68,7 @@ public class DLFileEntryTypeStagedModelDataHandler
 				portletDataContext, ddmStructure);
 
 			portletDataContext.addReferenceElement(
-				fileEntryTypeElement, ddmStructure, false);
+				fileEntryType, fileEntryTypeElement, ddmStructure, false);
 		}
 
 		portletDataContext.addClassedModel(

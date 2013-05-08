@@ -204,7 +204,7 @@ public class JournalContentPortletDataHandler
 				article);
 
 			portletDataContext.addReferenceElement(
-				articleElement, ddmTemplate, false);
+				article, articleElement, ddmTemplate, false);
 		}
 
 		portletDataContext.setScopeGroupId(previousScopeGroupId);
