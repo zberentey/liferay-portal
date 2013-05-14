@@ -17,6 +17,7 @@ package com.liferay.portlet.social.service.impl;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portlet.social.model.SocialActivity;
+import com.liferay.portlet.social.model.SocialActivityConstants;
 import com.liferay.portlet.social.model.SocialActivitySet;
 import com.liferay.portlet.social.service.base.SocialActivitySetLocalServiceBaseImpl;
 import com.liferay.portlet.social.util.comparator.SocialActivitySetModifiedDateComparator;
@@ -33,10 +34,17 @@ public class SocialActivitySetLocalServiceImpl
 	public SocialActivitySet addActivitySet(long activityId)
 		throws PortalException, SystemException {
 
-		// Activity set
-
 		SocialActivity activity = socialActivityPersistence.findByPrimaryKey(
 			activityId);
+
+		return addActivitySet(activity);
+	}
+
+	@Override
+	public SocialActivitySet addActivitySet(SocialActivity activity)
+		throws PortalException, SystemException {
+
+		// Activity Set
 
 		long activitySetId = counterLocalService.increment();
 
@@ -59,7 +67,9 @@ public class SocialActivitySetLocalServiceImpl
 
 		activity.setActivitySetId(activitySetId);
 
-		socialActivityPersistence.update(activity);
+		if (activity.getActivityId() > 0) {
+			socialActivityPersistence.update(activity);
+		}
 
 		return activitySet;
 	}

@@ -190,6 +190,10 @@ public class SocialActivityLocalServiceImpl
 			mirrorActivity.setAssetEntry(assetEntry);
 		}
 
+		if (activity.getType() == SocialActivityConstants.TYPE_DELETE) {
+			socialActivitySetLocalService.addActivitySet(activity);
+		}
+
 		socialActivityLocalService.addActivity(activity, mirrorActivity);
 	}
 
@@ -277,7 +281,9 @@ public class SocialActivityLocalServiceImpl
 				socialActivityPersistence.update(mirrorActivity);
 			}
 
-			if (PropsValues.SOCIAL_ACTIVITY_SETS_ENABLED) {
+			if (PropsValues.SOCIAL_ACTIVITY_SETS_ENABLED ||
+				(activity.getType() != SocialActivityConstants.TYPE_DELETE)) {
+
 				socialActivityInterpreterLocalService.updateActivitySet(
 					activity.getActivityId());
 			}
