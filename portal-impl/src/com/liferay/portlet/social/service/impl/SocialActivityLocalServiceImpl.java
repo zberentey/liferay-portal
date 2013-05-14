@@ -19,8 +19,10 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.lar.ExportImportThreadLocal;
 import com.liferay.portal.kernel.messaging.async.Async;
+import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.Layout;
+import com.liferay.portal.model.ResourceConstants;
 import com.liferay.portal.model.User;
 import com.liferay.portal.security.auth.PrincipalThreadLocal;
 import com.liferay.portal.util.PortalUtil;
@@ -190,7 +192,12 @@ public class SocialActivityLocalServiceImpl
 			mirrorActivity.setAssetEntry(assetEntry);
 		}
 
-		socialActivityLocalService.addActivity(activity, mirrorActivity);
+		if (activity.getType() == SocialActivityConstants.TYPE_DELETE) {
+			addActivity(activity, mirrorActivity);
+		}
+		else {
+			socialActivityLocalService.addActivity(activity, mirrorActivity);
+		}
 	}
 
 	/**
@@ -385,14 +392,44 @@ public class SocialActivityLocalServiceImpl
 	}
 
 	@Override
-	public void deleteActivities(long groupId) throws SystemException {
-		socialActivityPersistence.removeByGroupId(groupId);
+	public void deleteActivities(long groupId)
+		throws PortalException, SystemException {
+
+		List<SocialActivity> activities =
+			socialActivityPersistence.findByGroupId(
+				groupId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+
+		for (SocialActivity activity : activities) {
+
+			// Activity
+
+			socialActivityPersistence.remove(activity);
+
+			String primKey =
+				String.valueOf(activity.getClassNameId()).concat(
+					StringPool.UNDERLINE).concat(
+						String.valueOf(activity.getClassPK()));
+
+			// Resource
+
+			resourceLocalService.deleteResource(
+				activity.getCompanyId(), SocialActivity.class.getName(),
+				ResourceConstants.SCOPE_INDIVIDUAL, primKey);
+		}
+
+		// Activity Set
 
 		socialActivitySetPersistence.removeByGroupId(groupId);
 
+		// Activity Counter
+
 		socialActivityCounterPersistence.removeByGroupId(groupId);
 
+		// Activity Limit
+
 		socialActivityLimitPersistence.removeByGroupId(groupId);
+
+		// Activity Setting
 
 		socialActivitySettingPersistence.removeByGroupId(groupId);
 	}
