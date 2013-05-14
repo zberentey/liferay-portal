@@ -14,6 +14,7 @@
 
 package com.liferay.portlet.messageboards.social;
 
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
@@ -142,10 +143,17 @@ public class MBThreadActivityInterpreter extends BaseSocialActivityInterpreter {
 			String actionId, ServiceContext serviceContext)
 		throws Exception {
 
-		MBMessage message = getMessage(activity);
+		if (super.hasPermissions(
+				permissionChecker, activity, actionId, serviceContext)) {
+
+			return true;
+		}
+
+		long rootMessageId = GetterUtil.getLong(
+			activity.getExtraDataValue("rootMessageId"));
 
 		return MBMessagePermission.contains(
-			permissionChecker, message.getMessageId(), actionId);
+			permissionChecker, rootMessageId, actionId);
 	}
 
 	private static final String[] _CLASS_NAMES = {MBThread.class.getName()};
