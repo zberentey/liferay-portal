@@ -212,6 +212,23 @@ public abstract class BaseSocialActivityInterpreter
 		return StringPool.BLANK;
 	}
 
+	protected String getDeletedEntryTitle(
+			SocialActivity activity, ServiceContext serviceContext)
+		throws Exception {
+
+		SocialActivitySet activitySet =
+			SocialActivitySetLocalServiceUtil.getClassActivitySet(
+				activity.getClassNameId(), activity.getClassPK(),
+				SocialActivityConstants.TYPE_DELETE);
+
+		if (activitySet == null) {
+			return StringPool.BLANK;
+		}
+
+		return activitySet.getExtraDataValue(
+			"title", serviceContext.getLocale());
+	}
+
 	protected Object getEntity() {
 		return _entityThreadLocal.get();
 	}
@@ -220,7 +237,7 @@ public abstract class BaseSocialActivityInterpreter
 			SocialActivity activity, ServiceContext serviceContext)
 		throws Exception {
 
-		return StringPool.BLANK;
+		return activity.getExtraDataValue("title");
 	}
 
 	protected String getGroupName(long groupId, ServiceContext serviceContext) {
@@ -395,7 +412,14 @@ public abstract class BaseSocialActivityInterpreter
 
 		String link = getLink(activity, serviceContext);
 
-		String entryTitle = getEntryTitle(activity, serviceContext);
+		String entryTitle;
+
+		if (getEntity() != null) {
+			entryTitle = getEntryTitle(activity, serviceContext);
+		}
+		else {
+			entryTitle = getDeletedEntryTitle(activity, serviceContext);
+		}
 
 		Object[] titleArguments = getTitleArguments(
 			groupName, activity, link, entryTitle, serviceContext);
