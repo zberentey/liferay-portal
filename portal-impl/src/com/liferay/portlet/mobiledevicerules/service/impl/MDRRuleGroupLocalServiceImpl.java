@@ -156,6 +156,7 @@ public class MDRRuleGroupLocalServiceImpl
 
 		JSONObject extraDataJSONObject = JSONFactoryUtil.createJSONObject();
 
+		extraDataJSONObject.put("title", ruleGroup.getName());
 		extraDataJSONObject.put("uuid", ruleGroup.getUuid());
 
 		socialActivityLocalService.addUniqueActivity(

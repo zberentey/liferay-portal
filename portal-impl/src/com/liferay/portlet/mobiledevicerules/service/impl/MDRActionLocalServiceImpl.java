@@ -122,6 +122,7 @@ public class MDRActionLocalServiceImpl extends MDRActionLocalServiceBaseImpl {
 
 		JSONObject extraDataJSONObject = JSONFactoryUtil.createJSONObject();
 
+		extraDataJSONObject.put("title", action.getName());
 		extraDataJSONObject.put("uuid", action.getUuid());
 
 		socialActivityLocalService.addUniqueActivity(

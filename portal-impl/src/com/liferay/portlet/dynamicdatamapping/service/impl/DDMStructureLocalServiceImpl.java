@@ -422,6 +422,7 @@ public class DDMStructureLocalServiceImpl
 		JSONObject extraDataJSONObject = JSONFactoryUtil.createJSONObject();
 
 		extraDataJSONObject.put("classNameId", structure.getClassNameId());
+		extraDataJSONObject.put("title", structure.getName());
 		extraDataJSONObject.put("uuid", structure.getUuid());
 
 		socialActivityLocalService.addUniqueActivity(

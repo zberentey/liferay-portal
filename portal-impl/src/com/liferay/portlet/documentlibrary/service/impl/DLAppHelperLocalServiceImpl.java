@@ -28,7 +28,6 @@ import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.IndexerRegistryUtil;
 import com.liferay.portal.kernel.transaction.TransactionCommitCallbackRegistryUtil;
 import com.liferay.portal.kernel.util.ListUtil;
-import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
@@ -536,10 +535,16 @@ public class DLAppHelperLocalServiceImpl
 
 		// Social
 
+		JSONObject extraDataJSONObject = JSONFactoryUtil.createJSONObject();
+
+		extraDataJSONObject.put(
+			"title", TrashUtil.getOriginalTitle(dlFileShortcut.getToTitle()));
+
 		socialActivityLocalService.addActivity(
 			userId, dlFileShortcut.getGroupId(), DLFileShortcut.class.getName(),
 			dlFileShortcut.getFileShortcutId(),
-			SocialActivityConstants.TYPE_MOVE_TO_TRASH, StringPool.BLANK, 0);
+			SocialActivityConstants.TYPE_MOVE_TO_TRASH,
+			extraDataJSONObject.toString(), 0);
 
 		// Trash
 
@@ -698,11 +703,15 @@ public class DLAppHelperLocalServiceImpl
 		socialActivityCounterLocalService.enableActivityCounters(
 			DLFileShortcut.class.getName(), dlFileShortcut.getFileShortcutId());
 
+		JSONObject extraDataJSONObject = JSONFactoryUtil.createJSONObject();
+
+		extraDataJSONObject.put("title", dlFileShortcut.getToTitle());
+
 		socialActivityLocalService.addActivity(
 			userId, dlFileShortcut.getGroupId(), DLFileShortcut.class.getName(),
 			dlFileShortcut.getFileShortcutId(),
-			SocialActivityConstants.TYPE_RESTORE_FROM_TRASH, StringPool.BLANK,
-			0);
+			SocialActivityConstants.TYPE_RESTORE_FROM_TRASH,
+			extraDataJSONObject.toString(), 0);
 
 		// Trash
 

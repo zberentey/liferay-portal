@@ -459,6 +459,7 @@ public class DDMTemplateLocalServiceImpl
 		JSONObject extraDataJSONObject = JSONFactoryUtil.createJSONObject();
 
 		extraDataJSONObject.put("classNameId", template.getClassNameId());
+		extraDataJSONObject.put("title", template.getName());
 		extraDataJSONObject.put("uuid", template.getUuid());
 
 		socialActivityLocalService.addUniqueActivity(

@@ -253,6 +253,7 @@ public class WikiNodeLocalServiceImpl extends WikiNodeLocalServiceBaseImpl {
 
 		JSONObject extraDataJSONObject = JSONFactoryUtil.createJSONObject();
 
+		extraDataJSONObject.put("title", node.getName());
 		extraDataJSONObject.put("uuid", node.getUuid());
 
 		socialActivityLocalService.addUniqueActivity(

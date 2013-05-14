@@ -142,6 +142,7 @@ public class MDRRuleLocalServiceImpl extends MDRRuleLocalServiceBaseImpl {
 
 		JSONObject extraDataJSONObject = JSONFactoryUtil.createJSONObject();
 
+		extraDataJSONObject.put("title", rule.getName());
 		extraDataJSONObject.put("uuid", rule.getUuid());
 
 		socialActivityLocalService.addUniqueActivity(

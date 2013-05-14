@@ -203,6 +203,7 @@ public class JournalFeedLocalServiceImpl
 
 		JSONObject extraDataJSONObject = JSONFactoryUtil.createJSONObject();
 
+		extraDataJSONObject.put("title", feed.getName());
 		extraDataJSONObject.put("uuid", feed.getUuid());
 
 		socialActivityLocalService.addActivity(

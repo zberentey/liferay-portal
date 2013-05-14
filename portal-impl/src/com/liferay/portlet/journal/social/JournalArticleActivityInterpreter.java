@@ -14,7 +14,9 @@
 
 package com.liferay.portlet.journal.social;
 
+import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portlet.journal.model.JournalArticle;
@@ -37,15 +39,12 @@ public class JournalArticleActivityInterpreter
 	}
 
 	@Override
-	protected String getEntryTitle(
+	protected Object doGetEntity(
 			SocialActivity activity, ServiceContext serviceContext)
-		throws Exception {
+		throws SystemException {
 
-		JournalArticle article =
-			JournalArticleLocalServiceUtil.getLatestArticle(
-				activity.getClassPK());
-
-		return article.getTitle(serviceContext.getLocale());
+		return JournalArticleLocalServiceUtil.fetchLatestArticle(
+			activity.getClassPK(), WorkflowConstants.STATUS_ANY, true);
 	}
 
 	@Override
@@ -53,9 +52,7 @@ public class JournalArticleActivityInterpreter
 			SocialActivity activity, ServiceContext serviceContext)
 		throws Exception {
 
-		JournalArticle article =
-			JournalArticleLocalServiceUtil.getLatestArticle(
-				activity.getClassPK());
+		JournalArticle article = (JournalArticle)getEntity();
 
 		if (Validator.isNotNull(article.getLayoutUuid())) {
 			String groupFriendlyURL = PortalUtil.getGroupFriendlyURL(
@@ -108,6 +105,14 @@ public class JournalArticleActivityInterpreter
 			}
 			else {
 				return "activity-journal-article-restore-from-trash-in";
+			}
+		}
+		else if (activityType == SocialActivityConstants.TYPE_DELETE) {
+			if (Validator.isNull(groupName)) {
+				return "activity-journal-article-delete";
+			}
+			else {
+				return "activity-journal-article-delete-in";
 			}
 		}
 

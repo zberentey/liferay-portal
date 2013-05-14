@@ -219,7 +219,7 @@ public abstract class BaseSocialActivityInterpreter
 			SocialActivity activity, ServiceContext serviceContext)
 		throws Exception {
 
-		return StringPool.BLANK;
+		return activity.getExtraDataValue("title", serviceContext.getLocale());
 	}
 
 	protected String getGroupName(long groupId, ServiceContext serviceContext) {
@@ -398,7 +398,9 @@ public abstract class BaseSocialActivityInterpreter
 
 		String link = getLink(activity, serviceContext);
 
-		String entryTitle = getEntryTitle(activity, serviceContext);
+		String entryTitle;
+
+		entryTitle = getEntryTitle(activity, serviceContext);
 
 		Object[] titleArguments = getTitleArguments(
 			groupName, activity, link, entryTitle, serviceContext);

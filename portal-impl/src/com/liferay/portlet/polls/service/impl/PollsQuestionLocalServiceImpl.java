@@ -204,6 +204,7 @@ public class PollsQuestionLocalServiceImpl
 
 		JSONObject extraDataJSONObject = JSONFactoryUtil.createJSONObject();
 
+		extraDataJSONObject.put("title", question.getTitle());
 		extraDataJSONObject.put("uuid", question.getUuid());
 
 		socialActivityLocalService.addUniqueActivity(
