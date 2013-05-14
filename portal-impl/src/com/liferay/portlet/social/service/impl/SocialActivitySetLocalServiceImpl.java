@@ -61,6 +61,11 @@ public class SocialActivitySetLocalServiceImpl
 		activitySet.setType(activity.getType());
 		activitySet.setActivityCount(1);
 
+		if (activity.getType() == SocialActivityConstants.TYPE_DELETE) {
+			activitySet.setExtraDataValue(
+				"title", activity.getExtraDataValue("title"));
+		}
+
 		socialActivitySetPersistence.update(activitySet);
 
 		// Activity

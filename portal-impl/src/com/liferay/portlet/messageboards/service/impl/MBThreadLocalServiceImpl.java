@@ -19,17 +19,21 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.increment.BufferedIncrement;
 import com.liferay.portal.kernel.increment.NumberIncrement;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
+import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.IndexerRegistryUtil;
-import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.model.ResourceConstants;
+import com.liferay.portal.model.ResourcePermission;
 import com.liferay.portal.model.User;
 import com.liferay.portal.portletfilerepository.PortletFileRepositoryUtil;
+import com.liferay.portal.security.permission.ActionKeys;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.util.PortletKeys;
+import com.liferay.portlet.asset.model.AssetEntry;
 import com.liferay.portlet.documentlibrary.model.DLFolderConstants;
 import com.liferay.portlet.messageboards.NoSuchCategoryException;
 import com.liferay.portlet.messageboards.SplitThreadException;
@@ -44,6 +48,7 @@ import com.liferay.portlet.messageboards.service.base.MBThreadLocalServiceBaseIm
 import com.liferay.portlet.messageboards.util.MBUtil;
 import com.liferay.portlet.social.model.SocialActivityConstants;
 import com.liferay.portlet.trash.model.TrashEntry;
+import com.liferay.portlet.trash.util.TrashUtil;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -133,9 +138,6 @@ public class MBThreadLocalServiceImpl extends MBThreadLocalServiceBaseImpl {
 	public void deleteThread(MBThread thread)
 		throws PortalException, SystemException {
 
-		MBMessage rootMessage = mbMessagePersistence.findByPrimaryKey(
-			thread.getRootMessageId());
-
 		// Indexer
 
 		Indexer indexer = IndexerRegistryUtil.nullSafeGetIndexer(
@@ -160,6 +162,33 @@ public class MBThreadLocalServiceImpl extends MBThreadLocalServiceBaseImpl {
 		// Thread flags
 
 		mbThreadFlagPersistence.removeByThreadId(thread.getThreadId());
+
+		// Root Message
+
+		MBMessage rootMessage = mbMessagePersistence.findByPrimaryKey(
+			thread.getRootMessageId());
+
+		rootMessage.setSubject(
+			TrashUtil.getOriginalTitle(rootMessage.getSubject()));
+
+		List<ResourcePermission> resourcePermissions =
+			resourcePermissionLocalService.getResourcePermissions(
+				rootMessage.getCompanyId(), MBMessage.class.getName(),
+				ResourceConstants.SCOPE_INDIVIDUAL,
+				String.valueOf(rootMessage.getMessageId()));
+
+		for (ResourcePermission resourcePermission : resourcePermissions) {
+			if (!resourcePermission.hasActionId(ActionKeys.VIEW)) {
+				continue;
+			}
+
+			resourcePermissionLocalService.setOwnerResourcePermissions(
+				resourcePermission.getCompanyId(), MBThread.class.getName(),
+				resourcePermission.getScope(),
+				String.valueOf(thread.getThreadId()),
+				resourcePermission.getRoleId(), resourcePermission.getOwnerId(),
+				new String[] {ActionKeys.VIEW});
+		}
 
 		// Messages
 
@@ -226,6 +255,15 @@ public class MBThreadLocalServiceImpl extends MBThreadLocalServiceBaseImpl {
 		}
 
 		// Thread Asset
+
+		AssetEntry assetEntry = assetEntryLocalService.fetchEntry(
+			MBThread.class.getName(), thread.getThreadId());
+
+		if (assetEntry != null) {
+			assetEntry.setTitle(rootMessage.getSubject());
+
+			assetEntryLocalService.updateAssetEntry(assetEntry);
+		}
 
 		assetEntryLocalService.deleteEntry(
 			MBThread.class.getName(), thread.getThreadId());
@@ -949,6 +987,14 @@ public class MBThreadLocalServiceImpl extends MBThreadLocalServiceBaseImpl {
 					category.getCompanyId(), category.getCategoryId());
 			}
 
+			MBMessage message = mbMessageLocalService.getMBMessage(
+				thread.getRootMessageId());
+
+			JSONObject extraDataJSON = JSONFactoryUtil.createJSONObject();
+
+			extraDataJSON.put("rootMessageId", thread.getRootMessageId());
+			extraDataJSON.put("title", message.getSubject());
+
 			if (status == WorkflowConstants.STATUS_IN_TRASH) {
 
 				// Social
@@ -957,7 +1003,7 @@ public class MBThreadLocalServiceImpl extends MBThreadLocalServiceBaseImpl {
 					userId, thread.getGroupId(), MBThread.class.getName(),
 					thread.getThreadId(),
 					SocialActivityConstants.TYPE_MOVE_TO_TRASH,
-					StringPool.BLANK, 0);
+					extraDataJSON.toString(), 0);
 
 				// Trash
 
@@ -973,7 +1019,7 @@ public class MBThreadLocalServiceImpl extends MBThreadLocalServiceBaseImpl {
 					userId, thread.getGroupId(), MBThread.class.getName(),
 					thread.getThreadId(),
 					SocialActivityConstants.TYPE_RESTORE_FROM_TRASH,
-					StringPool.BLANK, 0);
+					extraDataJSON.toString(), 0);
 
 				// Trash
 
