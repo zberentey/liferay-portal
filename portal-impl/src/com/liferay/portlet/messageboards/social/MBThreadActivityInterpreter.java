@@ -14,6 +14,7 @@
 
 package com.liferay.portlet.messageboards.social;
 
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
@@ -27,6 +28,9 @@ import com.liferay.portlet.messageboards.service.permission.MBMessagePermission;
 import com.liferay.portlet.social.model.BaseSocialActivityInterpreter;
 import com.liferay.portlet.social.model.SocialActivity;
 import com.liferay.portlet.social.model.SocialActivityConstants;
+import com.liferay.portlet.social.model.SocialActivitySet;
+import com.liferay.portlet.social.service.SocialActivitySetLocalServiceUtil;
+import com.liferay.portlet.social.service.permission.SocialActivitySetPermissionUtil;
 
 /**
  * @author Zsolt Berentey
@@ -142,10 +146,21 @@ public class MBThreadActivityInterpreter extends BaseSocialActivityInterpreter {
 			String actionId, ServiceContext serviceContext)
 		throws Exception {
 
-		MBMessage message = getMessage(activity);
+		SocialActivitySet activitySet =
+			SocialActivitySetLocalServiceUtil.getClassActivitySet(
+				activity.getClassNameId(), activity.getClassPK(),
+				SocialActivityConstants.TYPE_DELETE);
+
+		if (activitySet != null) {
+			return SocialActivitySetPermissionUtil.contains(
+				permissionChecker, activitySet, actionId);
+		}
+
+		long rootMessageId = GetterUtil.getLong(
+			activity.getExtraDataValue("rootMessageId"));
 
 		return MBMessagePermission.contains(
-			permissionChecker, message.getMessageId(), actionId);
+			permissionChecker, rootMessageId, actionId);
 	}
 
 	private static final String[] _CLASS_NAMES = {MBThread.class.getName()};
