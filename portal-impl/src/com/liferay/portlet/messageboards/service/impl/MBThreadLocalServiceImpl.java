@@ -47,6 +47,7 @@ import com.liferay.portlet.messageboards.model.MBTreeWalker;
 import com.liferay.portlet.messageboards.service.base.MBThreadLocalServiceBaseImpl;
 import com.liferay.portlet.messageboards.util.MBUtil;
 import com.liferay.portlet.social.model.SocialActivityConstants;
+import com.liferay.portlet.social.util.SocialActivityHierarchyEntryThreadLocal;
 import com.liferay.portlet.trash.model.TrashEntry;
 import com.liferay.portlet.trash.util.TrashUtil;
 
@@ -137,6 +138,9 @@ public class MBThreadLocalServiceImpl extends MBThreadLocalServiceBaseImpl {
 	@Override
 	public void deleteThread(MBThread thread)
 		throws PortalException, SystemException {
+
+		SocialActivityHierarchyEntryThreadLocal.push(
+			MBThread.class, thread.getThreadId());
 
 		// Indexer
 
@@ -232,6 +236,8 @@ public class MBThreadLocalServiceImpl extends MBThreadLocalServiceBaseImpl {
 				message.getCompanyId(), message.getGroupId(),
 				message.getWorkflowClassName(), message.getMessageId());
 		}
+
+		SocialActivityHierarchyEntryThreadLocal.pop();
 
 		// Category
 
