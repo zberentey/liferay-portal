@@ -2475,6 +2475,8 @@
 		<field name="mirrorActivityId" type="long" />
 		<field name="classNameId" type="long" />
 		<field name="classPK" type="long" />
+		<field name="parentClassNameId" type="long" />
+		<field name="parentClassPK" type="long" />
 		<field name="type" type="int" />
 		<field name="extraData" type="String">
 			<hint-collection name="TEXTAREA" />

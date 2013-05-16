@@ -6547,6 +6547,8 @@ public class SocialActivityPersistenceImpl extends BasePersistenceImpl<SocialAct
 		socialActivityImpl.setMirrorActivityId(socialActivity.getMirrorActivityId());
 		socialActivityImpl.setClassNameId(socialActivity.getClassNameId());
 		socialActivityImpl.setClassPK(socialActivity.getClassPK());
+		socialActivityImpl.setParentClassNameId(socialActivity.getParentClassNameId());
+		socialActivityImpl.setParentClassPK(socialActivity.getParentClassPK());
 		socialActivityImpl.setType(socialActivity.getType());
 		socialActivityImpl.setExtraData(socialActivity.getExtraData());
 		socialActivityImpl.setReceiverUserId(socialActivity.getReceiverUserId());

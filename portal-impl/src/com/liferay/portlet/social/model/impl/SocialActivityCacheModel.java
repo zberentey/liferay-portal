@@ -36,7 +36,7 @@ public class SocialActivityCacheModel implements CacheModel<SocialActivity>,
 	Externalizable {
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(25);
+		StringBundler sb = new StringBundler(29);
 
 		sb.append("{activityId=");
 		sb.append(activityId);
@@ -56,6 +56,10 @@ public class SocialActivityCacheModel implements CacheModel<SocialActivity>,
 		sb.append(classNameId);
 		sb.append(", classPK=");
 		sb.append(classPK);
+		sb.append(", parentClassNameId=");
+		sb.append(parentClassNameId);
+		sb.append(", parentClassPK=");
+		sb.append(parentClassPK);
 		sb.append(", type=");
 		sb.append(type);
 		sb.append(", extraData=");
@@ -80,6 +84,8 @@ public class SocialActivityCacheModel implements CacheModel<SocialActivity>,
 		socialActivityImpl.setMirrorActivityId(mirrorActivityId);
 		socialActivityImpl.setClassNameId(classNameId);
 		socialActivityImpl.setClassPK(classPK);
+		socialActivityImpl.setParentClassNameId(parentClassNameId);
+		socialActivityImpl.setParentClassPK(parentClassPK);
 		socialActivityImpl.setType(type);
 
 		if (extraData == null) {
@@ -107,6 +113,8 @@ public class SocialActivityCacheModel implements CacheModel<SocialActivity>,
 		mirrorActivityId = objectInput.readLong();
 		classNameId = objectInput.readLong();
 		classPK = objectInput.readLong();
+		parentClassNameId = objectInput.readLong();
+		parentClassPK = objectInput.readLong();
 		type = objectInput.readInt();
 		extraData = objectInput.readUTF();
 		receiverUserId = objectInput.readLong();
@@ -124,6 +132,8 @@ public class SocialActivityCacheModel implements CacheModel<SocialActivity>,
 		objectOutput.writeLong(mirrorActivityId);
 		objectOutput.writeLong(classNameId);
 		objectOutput.writeLong(classPK);
+		objectOutput.writeLong(parentClassNameId);
+		objectOutput.writeLong(parentClassPK);
 		objectOutput.writeInt(type);
 
 		if (extraData == null) {
@@ -145,6 +155,8 @@ public class SocialActivityCacheModel implements CacheModel<SocialActivity>,
 	public long mirrorActivityId;
 	public long classNameId;
 	public long classPK;
+	public long parentClassNameId;
+	public long parentClassPK;
 	public int type;
 	public String extraData;
 	public long receiverUserId;

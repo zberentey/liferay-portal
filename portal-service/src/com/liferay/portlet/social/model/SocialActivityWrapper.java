@@ -57,6 +57,8 @@ public class SocialActivityWrapper implements SocialActivity,
 		attributes.put("mirrorActivityId", getMirrorActivityId());
 		attributes.put("classNameId", getClassNameId());
 		attributes.put("classPK", getClassPK());
+		attributes.put("parentClassNameId", getParentClassNameId());
+		attributes.put("parentClassPK", getParentClassPK());
 		attributes.put("type", getType());
 		attributes.put("extraData", getExtraData());
 		attributes.put("receiverUserId", getReceiverUserId());
@@ -118,6 +120,18 @@ public class SocialActivityWrapper implements SocialActivity,
 
 		if (classPK != null) {
 			setClassPK(classPK);
+		}
+
+		Long parentClassNameId = (Long)attributes.get("parentClassNameId");
+
+		if (parentClassNameId != null) {
+			setParentClassNameId(parentClassNameId);
+		}
+
+		Long parentClassPK = (Long)attributes.get("parentClassPK");
+
+		if (parentClassPK != null) {
+			setParentClassPK(parentClassPK);
 		}
 
 		Integer type = (Integer)attributes.get("type");
@@ -374,6 +388,46 @@ public class SocialActivityWrapper implements SocialActivity,
 	@Override
 	public void setClassPK(long classPK) {
 		_socialActivity.setClassPK(classPK);
+	}
+
+	/**
+	* Returns the parent class name ID of this social activity.
+	*
+	* @return the parent class name ID of this social activity
+	*/
+	@Override
+	public long getParentClassNameId() {
+		return _socialActivity.getParentClassNameId();
+	}
+
+	/**
+	* Sets the parent class name ID of this social activity.
+	*
+	* @param parentClassNameId the parent class name ID of this social activity
+	*/
+	@Override
+	public void setParentClassNameId(long parentClassNameId) {
+		_socialActivity.setParentClassNameId(parentClassNameId);
+	}
+
+	/**
+	* Returns the parent class p k of this social activity.
+	*
+	* @return the parent class p k of this social activity
+	*/
+	@Override
+	public long getParentClassPK() {
+		return _socialActivity.getParentClassPK();
+	}
+
+	/**
+	* Sets the parent class p k of this social activity.
+	*
+	* @param parentClassPK the parent class p k of this social activity
+	*/
+	@Override
+	public void setParentClassPK(long parentClassPK) {
+		_socialActivity.setParentClassPK(parentClassPK);
 	}
 
 	/**

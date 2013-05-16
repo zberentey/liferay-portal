@@ -1969,6 +1969,8 @@ create table SocialActivity (
 	mirrorActivityId LONG,
 	classNameId LONG,
 	classPK LONG,
+	parentClassNameId LONG,
+	parentClassPK LONG,
 	type_ INTEGER,
 	extraData STRING null,
 	receiverUserId LONG

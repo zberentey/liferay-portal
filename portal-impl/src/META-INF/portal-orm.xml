@@ -3519,6 +3519,8 @@
 			<basic name="mirrorActivityId" />
 			<basic name="classNameId" />
 			<basic name="classPK" />
+			<basic name="parentClassNameId" />
+			<basic name="parentClassPK" />
 			<basic name="type">
 				<column name="TYPE_" />
 			</basic>
