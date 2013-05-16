@@ -38,6 +38,7 @@ import com.liferay.portlet.messageboards.model.MBThread;
 import com.liferay.portlet.messageboards.model.impl.MBCategoryImpl;
 import com.liferay.portlet.messageboards.service.base.MBCategoryLocalServiceBaseImpl;
 import com.liferay.portlet.social.model.SocialActivityConstants;
+import com.liferay.portlet.social.util.SocialActivityHierarchyEntryThreadLocal;
 import com.liferay.portlet.trash.model.TrashEntry;
 
 import java.util.ArrayList;
@@ -226,6 +227,9 @@ public class MBCategoryLocalServiceImpl extends MBCategoryLocalServiceBaseImpl {
 			MBCategory category, boolean includeTrashedEntries)
 		throws PortalException, SystemException {
 
+		SocialActivityHierarchyEntryThreadLocal.push(
+			MBCategory.class, category.getCategoryId());
+
 		// Categories
 
 		List<MBCategory> categories = mbCategoryPersistence.findByG_P(
@@ -277,6 +281,8 @@ public class MBCategoryLocalServiceImpl extends MBCategoryLocalServiceBaseImpl {
 			ResourceConstants.SCOPE_INDIVIDUAL, category.getCategoryId());
 
 		// Social
+
+		SocialActivityHierarchyEntryThreadLocal.pop();
 
 		JSONObject extraDataJSONObject = JSONFactoryUtil.createJSONObject();
 

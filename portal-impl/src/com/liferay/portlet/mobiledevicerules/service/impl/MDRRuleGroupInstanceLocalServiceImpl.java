@@ -29,6 +29,7 @@ import com.liferay.portlet.mobiledevicerules.model.MDRRuleGroupInstance;
 import com.liferay.portlet.mobiledevicerules.service.base.MDRRuleGroupInstanceLocalServiceBaseImpl;
 import com.liferay.portlet.mobiledevicerules.util.RuleGroupInstancePriorityComparator;
 import com.liferay.portlet.social.model.SocialActivityConstants;
+import com.liferay.portlet.social.util.SocialActivityHierarchyEntryThreadLocal;
 
 import java.util.Date;
 import java.util.List;
@@ -123,6 +124,10 @@ public class MDRRuleGroupInstanceLocalServiceImpl
 	public void deleteRuleGroupInstance(MDRRuleGroupInstance ruleGroupInstance)
 		throws PortalException, SystemException {
 
+		SocialActivityHierarchyEntryThreadLocal.push(
+			MDRRuleGroupInstance.class,
+			ruleGroupInstance.getRuleGroupInstanceId());
+
 		// Rule group instance
 
 		mdrRuleGroupInstancePersistence.remove(ruleGroupInstance);
@@ -133,6 +138,8 @@ public class MDRRuleGroupInstanceLocalServiceImpl
 			ruleGroupInstance.getRuleGroupInstanceId());
 
 		// Social
+
+		SocialActivityHierarchyEntryThreadLocal.pop();
 
 		JSONObject extraDataJSONObject = JSONFactoryUtil.createJSONObject();
 

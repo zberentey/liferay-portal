@@ -33,6 +33,7 @@ import com.liferay.portlet.polls.model.PollsChoice;
 import com.liferay.portlet.polls.model.PollsQuestion;
 import com.liferay.portlet.polls.service.base.PollsQuestionLocalServiceBaseImpl;
 import com.liferay.portlet.social.model.SocialActivityConstants;
+import com.liferay.portlet.social.util.SocialActivityHierarchyEntryThreadLocal;
 
 import java.util.Date;
 import java.util.List;
@@ -183,6 +184,9 @@ public class PollsQuestionLocalServiceImpl
 	public void deleteQuestion(PollsQuestion question)
 		throws PortalException, SystemException {
 
+		SocialActivityHierarchyEntryThreadLocal.push(
+			PollsQuestion.class, question.getQuestionId());
+
 		// Question
 
 		pollsQuestionPersistence.remove(question);
@@ -202,6 +206,8 @@ public class PollsQuestionLocalServiceImpl
 		pollsVotePersistence.removeByQuestionId(question.getQuestionId());
 
 		// Social
+
+		SocialActivityHierarchyEntryThreadLocal.pop();
 
 		JSONObject extraDataJSONObject = JSONFactoryUtil.createJSONObject();
 

@@ -31,6 +31,7 @@ import com.liferay.portlet.mobiledevicerules.model.MDRRule;
 import com.liferay.portlet.mobiledevicerules.model.MDRRuleGroup;
 import com.liferay.portlet.mobiledevicerules.service.base.MDRRuleGroupLocalServiceBaseImpl;
 import com.liferay.portlet.social.model.SocialActivityConstants;
+import com.liferay.portlet.social.util.SocialActivityHierarchyEntryThreadLocal;
 
 import java.util.Date;
 import java.util.LinkedHashMap;
@@ -140,6 +141,9 @@ public class MDRRuleGroupLocalServiceImpl
 	public void deleteRuleGroup(MDRRuleGroup ruleGroup)
 		throws PortalException, SystemException {
 
+		SocialActivityHierarchyEntryThreadLocal.push(
+			MDRRuleGroup.class, ruleGroup.getRuleGroupId());
+
 		// Rule group
 
 		mdrRuleGroupPersistence.remove(ruleGroup);
@@ -154,6 +158,8 @@ public class MDRRuleGroupLocalServiceImpl
 			ruleGroup.getRuleGroupId());
 
 		// Social
+
+		SocialActivityHierarchyEntryThreadLocal.pop();
 
 		JSONObject extraDataJSONObject = JSONFactoryUtil.createJSONObject();
 
