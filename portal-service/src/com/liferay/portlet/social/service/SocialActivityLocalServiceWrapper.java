@@ -420,6 +420,7 @@ public class SocialActivityLocalServiceWrapper
 		_socialActivityLocalService.deleteActivities(assetEntry);
 	}
 
+	@Override
 	public void deleteActivities(long groupId)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		_socialActivityLocalService.deleteActivities(groupId);
