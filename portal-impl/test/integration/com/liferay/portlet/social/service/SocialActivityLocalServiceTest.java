@@ -126,6 +126,8 @@ public class SocialActivityLocalServiceTest extends BaseSocialActivityTestCase {
 
 		Assert.assertNotNull(activitySet);
 
+		Assert.assertEquals("title2", activitySet.getExtraDataValue("title"));
+
 		Assert.assertFalse(
 			ResourcePermissionLocalServiceUtil.hasResourcePermission(
 				_group.getCompanyId(), SocialActivitySet.class.getName(),
