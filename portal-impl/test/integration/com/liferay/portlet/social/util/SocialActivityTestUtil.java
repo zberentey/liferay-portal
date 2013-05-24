@@ -54,16 +54,15 @@ public class SocialActivityTestUtil {
 			assetEntry.getClassPK(), type, extraData, 0);
 	}
 
-	public static AssetEntry addAssetEntry(User user, Group group)
+	public static AssetEntry addTestAssetEntry(User user, Group group)
 		throws Exception {
 
 		return AssetEntryLocalServiceUtil.updateEntry(
-			user.getUserId(), group.getGroupId(),
-			ServiceTestUtil.randomString(), ServiceTestUtil.randomLong(), null,
-			null);
+			user.getUserId(), group.getGroupId(), _TEST_MODEL,
+			ServiceTestUtil.randomLong(), null, null);
 	}
 
-	public static AssetEntry addAssetEntry(
+	public static AssetEntry addTestAssetEntry(
 			User user, Group group, AssetEntry assetEntry)
 		throws Exception {
 
@@ -72,7 +71,8 @@ public class SocialActivityTestUtil {
 		}
 
 		return AssetEntryLocalServiceUtil.updateEntry(
-			user.getUserId(), group.getGroupId(), _TEST_MODEL, 1, null, null);
+			user.getUserId(), group.getGroupId(), _TEST_MODEL,
+			ServiceTestUtil.randomLong(), null, null);
 	}
 
 	public static String createExtraDataJSON(String key, String value) {
