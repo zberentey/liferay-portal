@@ -19,6 +19,7 @@ import com.liferay.portal.kernel.lar.BasePortletDataHandler;
 import com.liferay.portal.kernel.lar.ManifestSummary;
 import com.liferay.portal.kernel.lar.PortletDataContext;
 import com.liferay.portal.kernel.lar.PortletDataHandlerBoolean;
+import com.liferay.portal.kernel.lar.PortletDataHandlerControl;
 import com.liferay.portal.kernel.lar.StagedModelDataHandlerUtil;
 import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portlet.mobiledevicerules.model.MDRAction;
@@ -51,7 +52,20 @@ public class MDRPortletDataHandler extends BasePortletDataHandler {
 				NAMESPACE, "rules", true, false, null, MDRRule.class.getName()),
 			new PortletDataHandlerBoolean(
 				NAMESPACE, "actions", true, false, null,
-				MDRAction.class.getName()));
+				MDRAction.class.getName()),
+			new PortletDataHandlerBoolean(
+				NAMESPACE, "classNames", false, false, true,
+				new PortletDataHandlerControl[] {
+					new PortletDataHandlerControl(
+						NAMESPACE, "rules", MDRRuleGroup.class.getName()),
+					new PortletDataHandlerControl(
+						NAMESPACE, "rules", MDRRule.class.getName()),
+					new PortletDataHandlerControl(
+						NAMESPACE, "rules",
+						MDRRuleGroupInstance.class.getName()),
+					new PortletDataHandlerControl(
+						NAMESPACE, "rules", MDRAction.class.getName())
+				}));
 		setImportControls(getExportControls());
 		setPublishToLiveByDefault(true);
 	}
