@@ -609,12 +609,11 @@ public class DDMXSDImpl implements DDMXSD {
 
 		Document document = dynamicElementElement.getDocument();
 
-		String xml = document.asXML();
-
 		String[] availableLanguageIds =
-			LocalizationUtil.getAvailableLanguageIds(xml);
+			LocalizationUtil.getAvailableLanguageIds(document);
 
-		String defaultLanguageId = LocalizationUtil.getDefaultLanguageId(xml);
+		String defaultLanguageId = LocalizationUtil.getDefaultLanguageId(
+			document);
 
 		String languageId = LocaleUtil.toLanguageId(locale);
 
