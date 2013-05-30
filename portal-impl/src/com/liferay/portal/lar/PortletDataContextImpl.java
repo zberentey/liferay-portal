@@ -511,6 +511,27 @@ public class PortletDataContextImpl implements PortletDataContext {
 	}
 
 	@Override
+	public void addPortletClassNames(PortletDataHandlerControl[] controls) {
+		if (controls == null) {
+			return;
+		}
+
+		for (PortletDataHandlerControl control : controls) {
+			if (control.getClassName() == null) {
+				continue;
+			}
+
+			boolean enabled = getBooleanParameter(
+				control.getNamespace(), control.getControlName());
+
+			if (enabled) {
+				_enabledClassNameIds.add(
+					PortalUtil.getClassNameId(control.getClassName()));
+			}
+		}
+	}
+
+	@Override
 	public boolean addPrimaryKey(Class<?> clazz, String primaryKey) {
 		boolean value = hasPrimaryKey(clazz, primaryKey);
 
@@ -838,6 +859,10 @@ public class PortletDataContextImpl implements PortletDataContext {
 	}
 
 	@Override
+	public Set<Long> getEnabledClassNameIds() {
+		return _enabledClassNameIds;
+	}
+
 	public Date getEndDate() {
 		return _endDate;
 	}
@@ -2253,6 +2278,7 @@ public class PortletDataContextImpl implements PortletDataContext {
 	private long _companyGroupId;
 	private long _companyId;
 	private String _dataStrategy;
+	private Set<Long> _enabledClassNameIds = new HashSet<Long>();
 	private Date _endDate;
 	private Map<String, List<ExpandoColumn>> _expandoColumnsMap =
 		new HashMap<String, List<ExpandoColumn>>();
