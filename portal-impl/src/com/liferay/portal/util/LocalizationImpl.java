@@ -31,6 +31,7 @@ import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Tuple;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.kernel.xml.Document;
 import com.liferay.portal.language.LanguageResources;
 
 import java.util.HashMap;
@@ -83,6 +84,14 @@ public class LocalizationImpl implements Localization {
 	}
 
 	@Override
+	public String[] getAvailableLocales(Document document) {
+		String attributeValue = _getRootAttribute(
+			document, _AVAILABLE_LOCALES, StringPool.BLANK);
+
+		return StringUtil.split(attributeValue);
+	}
+
+	@Override
 	public String[] getAvailableLocales(String xml) {
 		String attributeValue = _getRootAttribute(
 			xml, _AVAILABLE_LOCALES, StringPool.BLANK);
@@ -130,6 +139,14 @@ public class LocalizationImpl implements Localization {
 		}
 
 		return defaultLocale;
+	}
+
+	@Override
+	public String getDefaultLocale(Document document) {
+		String defaultLanguageId = LocaleUtil.toLanguageId(
+			LocaleUtil.getDefault());
+
+		return _getRootAttribute(document, _DEFAULT_LOCALE, defaultLanguageId);
 	}
 
 	@Override
@@ -990,6 +1007,16 @@ public class LocalizationImpl implements Localization {
 		else {
 			value = LanguageUtil.get(locale, key, defaultValue);
 		}
+
+		return value;
+	}
+
+	private String _getRootAttribute(
+		Document document, String name, String defaultValue) {
+
+		String value = null;
+
+		value = document.getRootElement().attributeValue(name, defaultValue);
 
 		return value;
 	}
