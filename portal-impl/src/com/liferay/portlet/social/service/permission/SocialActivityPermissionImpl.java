@@ -22,9 +22,9 @@ import com.liferay.portal.util.PortletKeys;
 /**
  * @author Zsolt Berentey
  */
-public class SocialActivityPermission {
+public class SocialActivityPermissionImpl implements SocialActivityPermission {
 
-	public static void check(
+	public void check(
 			PermissionChecker permissionChecker, long groupId, String actionId)
 		throws PortalException {
 
@@ -33,7 +33,7 @@ public class SocialActivityPermission {
 		}
 	}
 
-	public static boolean contains(
+	public boolean contains(
 		PermissionChecker permissionChecker, long groupId, String actionId) {
 
 		if (permissionChecker.isGroupAdmin(groupId) ||
