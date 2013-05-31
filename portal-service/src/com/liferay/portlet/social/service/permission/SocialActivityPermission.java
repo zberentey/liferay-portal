@@ -16,6 +16,7 @@ package com.liferay.portlet.social.service.permission;
 
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.security.permission.PermissionChecker;
+import com.liferay.portlet.social.model.SocialActivity;
 
 /**
  * @author Zsolt Berentey
@@ -28,5 +29,9 @@ public interface SocialActivityPermission {
 
 	public boolean contains(
 		PermissionChecker permissionChecker, long groupId, String actionId);
+
+	public boolean contains(
+		PermissionChecker permissionChecker, SocialActivity activity,
+		String actionId);
 
 }

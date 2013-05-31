@@ -273,6 +273,14 @@ public class SocialActivitySetLocalServiceWrapper
 	}
 
 	@Override
+	public com.liferay.portlet.social.model.SocialActivitySet addActivitySet(
+		com.liferay.portlet.social.model.SocialActivity activity)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return _socialActivitySetLocalService.addActivitySet(activity);
+	}
+
+	@Override
 	public void decrementActivityCount(long activitySetId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {

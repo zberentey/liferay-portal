@@ -260,6 +260,13 @@ public class SocialActivitySetLocalServiceUtil {
 		return getService().addActivitySet(activityId);
 	}
 
+	public static com.liferay.portlet.social.model.SocialActivitySet addActivitySet(
+		com.liferay.portlet.social.model.SocialActivity activity)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getService().addActivitySet(activity);
+	}
+
 	public static void decrementActivityCount(long activitySetId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
