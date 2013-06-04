@@ -18,6 +18,7 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.security.auth.PrincipalException;
 import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portal.util.PortletKeys;
+import com.liferay.portlet.social.model.SocialActivity;
 
 /**
  * @author Zsolt Berentey
@@ -51,6 +52,22 @@ public class SocialActivityPermissionImpl implements SocialActivityPermission {
 		}
 
 		return false;
+	}
+
+	public boolean contains(
+		PermissionChecker permissionChecker, SocialActivity activity,
+		String actionId) {
+
+		if (permissionChecker.hasOwnerPermission(
+				activity.getCompanyId(), activity.getClassName(),
+				activity.getClassPK(), activity.getUserId(), actionId)) {
+
+			return true;
+		}
+
+		return permissionChecker.hasPermission(
+			activity.getGroupId(), activity.getClassName(),
+			activity.getClassPK(), actionId);
 	}
 
 }
