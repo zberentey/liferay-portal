@@ -32,12 +32,16 @@ import com.liferay.portal.service.BaseLocalServiceImpl;
 import com.liferay.portal.service.LockLocalService;
 import com.liferay.portal.service.PersistedModelLocalServiceRegistry;
 import com.liferay.portal.service.ResourceLocalService;
+import com.liferay.portal.service.ResourcePermissionLocalService;
+import com.liferay.portal.service.ResourcePermissionService;
 import com.liferay.portal.service.SubscriptionLocalService;
 import com.liferay.portal.service.UserLocalService;
 import com.liferay.portal.service.UserService;
 import com.liferay.portal.service.WorkflowInstanceLinkLocalService;
 import com.liferay.portal.service.persistence.LockFinder;
 import com.liferay.portal.service.persistence.LockPersistence;
+import com.liferay.portal.service.persistence.ResourcePermissionFinder;
+import com.liferay.portal.service.persistence.ResourcePermissionPersistence;
 import com.liferay.portal.service.persistence.SubscriptionPersistence;
 import com.liferay.portal.service.persistence.UserFinder;
 import com.liferay.portal.service.persistence.UserPersistence;
@@ -842,6 +846,82 @@ public abstract class MBThreadLocalServiceBaseImpl extends BaseLocalServiceImpl
 	}
 
 	/**
+	 * Returns the resource permission local service.
+	 *
+	 * @return the resource permission local service
+	 */
+	public ResourcePermissionLocalService getResourcePermissionLocalService() {
+		return resourcePermissionLocalService;
+	}
+
+	/**
+	 * Sets the resource permission local service.
+	 *
+	 * @param resourcePermissionLocalService the resource permission local service
+	 */
+	public void setResourcePermissionLocalService(
+		ResourcePermissionLocalService resourcePermissionLocalService) {
+		this.resourcePermissionLocalService = resourcePermissionLocalService;
+	}
+
+	/**
+	 * Returns the resource permission remote service.
+	 *
+	 * @return the resource permission remote service
+	 */
+	public ResourcePermissionService getResourcePermissionService() {
+		return resourcePermissionService;
+	}
+
+	/**
+	 * Sets the resource permission remote service.
+	 *
+	 * @param resourcePermissionService the resource permission remote service
+	 */
+	public void setResourcePermissionService(
+		ResourcePermissionService resourcePermissionService) {
+		this.resourcePermissionService = resourcePermissionService;
+	}
+
+	/**
+	 * Returns the resource permission persistence.
+	 *
+	 * @return the resource permission persistence
+	 */
+	public ResourcePermissionPersistence getResourcePermissionPersistence() {
+		return resourcePermissionPersistence;
+	}
+
+	/**
+	 * Sets the resource permission persistence.
+	 *
+	 * @param resourcePermissionPersistence the resource permission persistence
+	 */
+	public void setResourcePermissionPersistence(
+		ResourcePermissionPersistence resourcePermissionPersistence) {
+		this.resourcePermissionPersistence = resourcePermissionPersistence;
+	}
+
+	/**
+	 * Returns the resource permission finder.
+	 *
+	 * @return the resource permission finder
+	 */
+	public ResourcePermissionFinder getResourcePermissionFinder() {
+		return resourcePermissionFinder;
+	}
+
+	/**
+	 * Sets the resource permission finder.
+	 *
+	 * @param resourcePermissionFinder the resource permission finder
+	 */
+	public void setResourcePermissionFinder(
+		ResourcePermissionFinder resourcePermissionFinder) {
+		this.resourcePermissionFinder = resourcePermissionFinder;
+	}
+
+	/**
 	 * Returns the subscription local service.
 	 *
 	 * @return the subscription local service
@@ -1402,6 +1482,14 @@ public abstract class MBThreadLocalServiceBaseImpl extends BaseLocalServiceImpl
 	protected LockFinder lockFinder;
 	@BeanReference(type = ResourceLocalService.class)
 	protected ResourceLocalService resourceLocalService;
+	@BeanReference(type = ResourcePermissionLocalService.class)
+	protected ResourcePermissionLocalService resourcePermissionLocalService;
+	@BeanReference(type = ResourcePermissionService.class)
+	protected ResourcePermissionService resourcePermissionService;
+	@BeanReference(type = ResourcePermissionPersistence.class)
+	protected ResourcePermissionPersistence resourcePermissionPersistence;
+	@BeanReference(type = ResourcePermissionFinder.class)
+	protected ResourcePermissionFinder resourcePermissionFinder;
 	@BeanReference(type = SubscriptionLocalService.class)
 	protected SubscriptionLocalService subscriptionLocalService;
 	@BeanReference(type = SubscriptionPersistence.class)
