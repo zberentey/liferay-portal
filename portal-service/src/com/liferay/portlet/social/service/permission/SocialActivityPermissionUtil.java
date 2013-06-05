@@ -17,6 +17,7 @@ package com.liferay.portlet.social.service.permission;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
 import com.liferay.portal.security.permission.PermissionChecker;
+import com.liferay.portlet.social.model.SocialActivity;
 
 /**
  * @author Zsolt Berentey
@@ -36,6 +37,14 @@ public class SocialActivityPermissionUtil {
 
 		return getSocialActivityPermission().contains(
 			permissionChecker, groupId, actionId);
+	}
+
+	public static boolean contains(
+		PermissionChecker permissionChecker, SocialActivity activity,
+		String actionId) {
+
+		return getSocialActivityPermission().contains(
+			permissionChecker, activity, actionId);
 	}
 
 	public static SocialActivityPermission getSocialActivityPermission() {
