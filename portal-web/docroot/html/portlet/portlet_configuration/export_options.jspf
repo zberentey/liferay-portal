@@ -79,6 +79,8 @@ if (endDateTime > 0) {
 		ManifestSummary manifestSummary = portletDataContext.getManifestSummary();
 
 		long exportModelCount = portletDataHandler.getExportModelCount(manifestSummary);
+
+		long deletionCount = portletDataHandler.getDeletionCount(manifestSummary);
 		%>
 
 		<c:if test="<%= (exportModelCount > 0) || (startDate != null) || (endDate != null) %>">
@@ -269,6 +271,12 @@ if (endDateTime > 0) {
 							}
 							%>
 
+						</li>
+					</c:if>
+
+					<c:if test="<%= deletionCount != 0 %>">
+						<li class="tree-item">
+							<aui:input checked="<%= true %>" helpMessage="export-deletions-help" id="deletions" label="export-deleted-items" name="<%= PortletDataHandlerKeys.EXPORT_DELETIONS %>" type="checkbox" value="<%= true %>" />
 						</li>
 					</c:if>
 				</ul>

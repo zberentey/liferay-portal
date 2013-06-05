@@ -78,16 +78,12 @@ public abstract class BasePortletDataHandler implements PortletDataHandler {
 		}
 
 		try {
-			for (PortletDataHandlerControl exportMetaDataControl :
-					_exportMetadataControls) {
+			PortletDataHandlerControl classNamesMetaDataControl =
+				getExportMetaDataControl("classNames");
 
-				String controlName = exportMetaDataControl.getControlName();
-
-				if (controlName.equals("classNames")) {
-					portletDataContext.addPortletClassNames(
-						exportMetaDataControl.getChildren());
-				}
-
+			if (classNamesMetaDataControl != null) {
+				portletDataContext.addPortletClassNames(
+					classNamesMetaDataControl.getChildren());
 			}
 
 			return doExportData(
@@ -113,6 +109,38 @@ public abstract class BasePortletDataHandler implements PortletDataHandler {
 	@Override
 	public String[] getDataPortletPreferences() {
 		return _dataPortletPreferences;
+	}
+
+	@Override
+	public long getDeletionCount(ManifestSummary manifestSummary) {
+		PortletDataHandlerControl classNamesMetaDataControl =
+			getExportMetaDataControl("classNames");
+
+		if (classNamesMetaDataControl == null) {
+			return 0;
+		}
+
+		long totalDeletionCount = -1;
+
+		for (PortletDataHandlerControl control :
+				classNamesMetaDataControl.getChildren()) {
+
+			long deletionCount = manifestSummary.getDeletionCount(
+				control.getClassName());
+
+			if (deletionCount == -1) {
+				continue;
+			}
+
+			if (totalDeletionCount == -1) {
+				totalDeletionCount = deletionCount;
+			}
+			else {
+				totalDeletionCount += deletionCount;
+			}
+		}
+
+		return totalDeletionCount;
 	}
 
 	@Override
@@ -310,6 +338,20 @@ public abstract class BasePortletDataHandler implements PortletDataHandler {
 		catch (IOException ioe) {
 			return StringPool.BLANK;
 		}
+	}
+
+	protected PortletDataHandlerControl getExportMetaDataControl(String name) {
+		for (PortletDataHandlerControl exportMetaDataControl :
+				_exportMetadataControls) {
+
+			String controlName = exportMetaDataControl.getControlName();
+
+			if (controlName.equals("classNames")) {
+				return exportMetaDataControl;
+			}
+		}
+
+		return null;
 	}
 
 	/**
