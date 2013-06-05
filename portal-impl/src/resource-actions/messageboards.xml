@@ -155,6 +155,7 @@
 		<permissions>
 			<supports>
 				<action-key>SUBSCRIBE</action-key>
+				<action-key>VIEW</action-key>
 			</supports>
 			<site-member-defaults>
 				<action-key>SUBSCRIBE</action-key>
