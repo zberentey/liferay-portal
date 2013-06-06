@@ -14,27 +14,103 @@
 
 package com.liferay.portal.service.impl;
 
+import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.model.Group;
+import com.liferay.portal.model.SystemEventEntry;
+import com.liferay.portal.model.User;
+import com.liferay.portal.security.auth.PrincipalThreadLocal;
 import com.liferay.portal.service.base.SystemEventEntryLocalServiceBaseImpl;
 
+import java.util.List;
+
 /**
- * The implementation of the system event entry local service.
- *
- * <p>
- * All custom service methods should be put in this class. Whenever methods are added, rerun ServiceBuilder to copy their definitions into the {@link com.liferay.portal.service.SystemEventEntryLocalService} interface.
- *
- * <p>
- * This is a local service. Methods of this service will not have security checks based on the propagated JAAS credentials because this service can only be accessed from within the same VM.
- * </p>
- *
- * @author Brian Wing Shun Chan
- * @see com.liferay.portal.service.base.SystemEventEntryLocalServiceBaseImpl
- * @see com.liferay.portal.service.SystemEventEntryLocalServiceUtil
+ * @author Zsolt Berentey
  */
 public class SystemEventEntryLocalServiceImpl
 	extends SystemEventEntryLocalServiceBaseImpl {
-	/*
-	 * NOTE FOR DEVELOPERS:
-	 *
-	 * Never reference this interface directly. Always use {@link com.liferay.portal.service.SystemEventEntryLocalServiceUtil} to access the system event entry local service.
-	 */
+
+	@Override
+	public void addEvent(
+			long groupId, long userId, int eventType, long classNameId,
+			long classPK, String classUuid)
+		throws PortalException, SystemException {
+
+		long companyId = 0;
+		String userName;
+
+		if (userId == 0) {
+			userId = PrincipalThreadLocal.getUserId();
+		}
+
+		if (userId > 0) {
+			User user = userPersistence.findByPrimaryKey(userId);
+
+			companyId = user.getCompanyId();
+			userName = user.getFullName();
+		}
+		else {
+			userName = "system";
+		}
+
+		if (companyId == 0) {
+			if (groupId > 0) {
+				Group group = groupLocalService.getGroup(groupId);
+
+				companyId = group.getCompanyId();
+			}
+			else {
+				throw new IllegalArgumentException();
+			}
+		}
+
+		long systemEventId = counterLocalService.increment();
+
+		SystemEventEntry entry = systemEventEntryPersistence.create(
+			systemEventId);
+
+		entry.setGroupId(groupId);
+		entry.setCompanyId(companyId);
+		entry.setUserId(userId);
+		entry.setUserName(userName);
+		entry.setEventType(eventType);
+		entry.setClassNameId(classNameId);
+		entry.setClassPK(classPK);
+		entry.setClassUuid(classUuid);
+
+		systemEventEntryPersistence.update(entry);
+	}
+
+	@Override
+	public void deleteEvents(long groupId) throws SystemException {
+		systemEventEntryPersistence.removeByGroupId(groupId);
+	}
+
+	@Override
+	public SystemEventEntry fetchEvent(
+			long groupId, int eventType, long classNameId, long classPK)
+		throws SystemException {
+
+		return systemEventEntryPersistence.fetchByG_E_C_C_First(
+			groupId, eventType, classNameId, classPK, null);
+	}
+
+	@Override
+	public List<SystemEventEntry> findEvents(
+			long groupId, int eventType, long classNameId, long classPK)
+		throws SystemException {
+
+		return systemEventEntryPersistence.findByG_E_C_C(
+			groupId, eventType, classNameId, classPK);
+	}
+
+	@Override
+	public List<SystemEventEntry> findEvents(
+			long groupId, long classNameId, long classPK)
+		throws SystemException {
+
+		return systemEventEntryPersistence.findByG_C_C(
+			groupId, classNameId, classPK);
+	}
+
 }

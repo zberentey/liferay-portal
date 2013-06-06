@@ -17,23 +17,9 @@ package com.liferay.portal.service.impl;
 import com.liferay.portal.service.base.SystemEventEntryServiceBaseImpl;
 
 /**
- * The implementation of the system event entry remote service.
- *
- * <p>
- * All custom service methods should be put in this class. Whenever methods are added, rerun ServiceBuilder to copy their definitions into the {@link com.liferay.portal.service.SystemEventEntryService} interface.
- *
- * <p>
- * This is a remote service. Methods of this service are expected to have security checks based on the propagated JAAS credentials because this service can be accessed remotely.
- * </p>
- *
- * @author Brian Wing Shun Chan
- * @see com.liferay.portal.service.base.SystemEventEntryServiceBaseImpl
- * @see com.liferay.portal.service.SystemEventEntryServiceUtil
+ * @author Zsolt Berentey
  */
-public class SystemEventEntryServiceImpl extends SystemEventEntryServiceBaseImpl {
-	/*
-	 * NOTE FOR DEVELOPERS:
-	 *
-	 * Never reference this interface directly. Always use {@link com.liferay.portal.service.SystemEventEntryServiceUtil} to access the system event entry remote service.
-	 */
+public class SystemEventEntryServiceImpl
+	extends SystemEventEntryServiceBaseImpl {
+
 }
