@@ -96,6 +96,8 @@ public class SocialActivityCounterLocalServiceImpl
 	 * @throws PortalException if the group or the previous activity counter
 	 *         could not be found
 	 * @throws SystemException if a system exception occurred
+	 * @deprecated As of 6.2.0, replaced by {@link #addActivityCounter(long,
+	 *             long, long, String, int, int, long, int)}
 	 */
 	@Override
 	public SocialActivityCounter addActivityCounter(
@@ -105,8 +107,7 @@ public class SocialActivityCounterLocalServiceImpl
 		throws PortalException, SystemException {
 
 		return addActivityCounter(
-			groupId, classNameId, classPK, name, ownerType, currentValue,
-			totalValue, startPeriod, endPeriod, 0, 0);
+			groupId, classNameId, classPK, name, ownerType, totalValue, 0, 0);
 	}
 
 	/**
