@@ -56,6 +56,12 @@ public interface Localization {
 	 */
 	public Object deserialize(JSONObject jsonObject);
 
+	/**
+	 * Returns the available locales from the Document.
+	 *
+	 * @param  document the Document with localizations
+	 * @return the language IDs of the available locales
+	 */
 	public String[] getAvailableLanguageIds(Document document);
 
 	/**
@@ -79,6 +85,14 @@ public interface Localization {
 		String className, long classPK, Locale contentDefaultLocale,
 		Locale[] contentAvailableLocales);
 
+	/**
+	 * Returns the default locale from the Document.
+	 *
+	 * @param  document the Document with localizations
+	 * @return the language ID of the default locale, or the system default
+	 *         locale if the default locale cannot be retrieved from the
+	 *         Document
+	 */
 	public String getDefaultLanguageId(Document document);
 
 	/**
