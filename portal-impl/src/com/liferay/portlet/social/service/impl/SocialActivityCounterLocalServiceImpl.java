@@ -24,7 +24,6 @@ import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.lock.LockProtectedAction;
 import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.transaction.Transactional;
-import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Tuple;
@@ -1183,8 +1182,11 @@ public class SocialActivityCounterLocalServiceImpl
 			final long previousActivityCounterId, final int periodLength)
 		throws PortalException, SystemException {
 
-		String lockKey = getLockKey(
-			groupId, classNameId, classPK, name, ownerType);
+		String lockKey = StringUtil.merge(
+			new Object[] {
+				groupId, classNameId, classPK, name, ownerType
+			},
+			StringPool.POUND);
 
 		LockProtectedAction<SocialActivityCounter> lockProtectedAction =
 			new LockProtectedAction<SocialActivityCounter>(
@@ -1222,23 +1224,6 @@ public class SocialActivityCounterLocalServiceImpl
 		lockProtectedAction.performAction();
 
 		return lockProtectedAction.getReturnValue();
-	}
-
-	protected String getLockKey(
-		long groupId, long classNameId, long classPK, String name,
-		int ownerType) {
-
-		StringBundler sb = new StringBundler(7);
-
-		sb.append(StringUtil.toHexString(groupId));
-		sb.append(StringPool.POUND);
-		sb.append(StringUtil.toHexString(classNameId));
-		sb.append(StringPool.POUND);
-		sb.append(StringUtil.toHexString(classPK));
-		sb.append(StringPool.POUND);
-		sb.append(name);
-
-		return sb.toString();
 	}
 
 	protected void incrementActivityCounter(
