@@ -1227,12 +1227,102 @@ public class SocialActivityCounterLocalServiceImpl
 		return lockProtectedAction.getReturnValue();
 	}
 
+	protected void createActivityLimit(
+			final long groupId, final User user, final SocialActivity activity,
+			final SocialActivityCounterDefinition activityCounterDefinition)
+		throws PortalException, SystemException {
+
+		final long classPK = getLimitClassPK(
+			activity, activityCounterDefinition);
+
+		String lockKey = StringUtil.merge(
+			new Object[] {
+				groupId, user.getUserId(), activity.getClassNameId(), classPK,
+				activity.getType(), activityCounterDefinition.getName()
+			},
+			StringPool.POUND);
+
+		LockProtectedAction<SocialActivityLimit> protectedAction =
+			new LockProtectedAction<SocialActivityLimit>(
+				SocialActivityLimit.class, lockKey,
+				PropsValues.SOCIAL_ACTIVITY_LOCK_TIMEOUT,
+				PropsValues.SOCIAL_ACTIVITY_LOCK_RETRY_DELAY) {
+
+			@Override
+			protected SocialActivityLimit performProtectedAction()
+				throws PortalException, SystemException {
+
+				SocialActivityLimit activityLimit=
+					socialActivityLimitPersistence.fetchByG_U_C_C_A_A(
+						groupId, user.getUserId(), activity.getClassNameId(),
+						classPK, activity.getType(),
+						activityCounterDefinition.getName());
+
+				if (activityLimit == null) {
+					activityLimit =
+						socialActivityLimitLocalService.addActivityLimit(
+							user.getUserId(), activity.getGroupId(),
+							activity.getClassNameId(), classPK,
+							activity.getType(),
+							activityCounterDefinition.getName(),
+							activityCounterDefinition.getLimitPeriod());
+				}
+
+				return activityLimit;
+			}
+		};
+
+		protectedAction.performAction();
+
+		socialActivityLimitPersistence.cacheResult(
+			protectedAction.getReturnValue());
+	}
+
 	protected SocialActivityCounter getActivityCounter(
 			final long groupId, final User user, final SocialActivity activity,
 			final SocialActivityCounterDefinition activityCounterDefinition)
 		throws PortalException, SystemException {
 
-		return null;
+		int ownerType = activityCounterDefinition.getOwnerType();
+
+		long classNameId = getClassNameId(activity.getAssetEntry(), ownerType);
+		long classPK = getClassPK(user, activity.getAssetEntry(), ownerType);
+
+		SocialActivityCounter activityCounter = fetchLatestActivityCounter(
+			groupId, classNameId, classPK, activityCounterDefinition.getName(),
+			ownerType);
+
+		if (activityCounter == null) {
+			activityCounter = createActivityCounter(
+				groupId, classNameId, classPK,
+				activityCounterDefinition.getName(), ownerType, 0, 0,
+				activityCounterDefinition.getPeriodLength());
+		}
+		else if (!activityCounter.isActivePeriod(
+					activityCounterDefinition.getPeriodLength())) {
+
+			activityCounter = createActivityCounter(
+				groupId, classNameId, classPK,
+				activityCounterDefinition.getName(), ownerType,
+				activityCounter.getTotalValue(),
+				activityCounter.getActivityCounterId(),
+				activityCounterDefinition.getPeriodLength());
+		}
+
+		if (activityCounterDefinition.getLimitValue() > 0) {
+			SocialActivityLimit activityLimit=
+				socialActivityLimitPersistence.fetchByG_U_C_C_A_A(
+					groupId, user.getUserId(), activity.getClassNameId(),
+					getLimitClassPK(activity, activityCounterDefinition),
+					activity.getType(), activityCounterDefinition.getName());
+
+			if (activityLimit == null) {
+				createActivityLimit(
+					groupId, user, activity, activityCounterDefinition);
+			}
+		}
+
+		return activityCounter;
 	}
 
 	protected SocialActivityCounter getAssetActivitiesCounter(
