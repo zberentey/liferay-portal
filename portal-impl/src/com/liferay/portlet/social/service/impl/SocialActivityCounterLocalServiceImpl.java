@@ -1150,32 +1150,9 @@ public class SocialActivityCounterLocalServiceImpl
 		}
 
 		SocialActivityLimit activityLimit =
-			socialActivityLimitPersistence.fetchByG_U_C_C_A_A(
+			socialActivityLimitPersistence.findByG_U_C_C_A_A(
 				activity.getGroupId(), user.getUserId(),
-				activity.getClassNameId(), classPK, activity.getType(),
-				activityCounterDefinition.getName());
-
-		if (activityLimit == null) {
-			try {
-				activityLimit =
-					socialActivityLimitLocalService.addActivityLimit(
-						user.getUserId(), activity.getGroupId(),
-						activity.getClassNameId(), classPK, activity.getType(),
-						activityCounterDefinition.getName(),
-						activityCounterDefinition.getLimitPeriod());
-			}
-			catch (SystemException se) {
-				activityLimit =
-					socialActivityLimitPersistence.fetchByG_U_C_C_A_A(
-						activity.getGroupId(), user.getUserId(),
-						activity.getClassNameId(), classPK, activity.getType(),
-						activityCounterDefinition.getName());
-
-				if (activityLimit == null) {
-					throw se;
-				}
-			}
-		}
+				activity.getClassNameId(), classPK, activity.getType(), name);
 
 		int count = activityLimit.getCount(
 			activityCounterDefinition.getLimitPeriod());
