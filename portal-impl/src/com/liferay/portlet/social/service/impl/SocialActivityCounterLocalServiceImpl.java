@@ -1226,6 +1226,41 @@ public class SocialActivityCounterLocalServiceImpl
 		return lockProtectedAction.getReturnValue();
 	}
 
+	protected long getClassNameId(AssetEntry assetEntry, int ownerType) {
+		if (ownerType == SocialActivityCounterConstants.TYPE_ASSET) {
+			return assetEntry.getClassNameId();
+		}
+
+		return PortalUtil.getClassNameId(User.class.getName());
+	}
+
+	protected long getClassPK(User user, AssetEntry assetEntry, int ownerType) {
+		if (ownerType == SocialActivityCounterConstants.TYPE_ACTOR) {
+			return user.getUserId();
+		}
+
+		if (ownerType == SocialActivityCounterConstants.TYPE_ASSET) {
+			return assetEntry.getClassPK();
+		}
+		else {
+			return assetEntry.getUserId();
+		}
+	}
+
+	protected long getLimitClassPK(
+		SocialActivity activity,
+		SocialActivityCounterDefinition activityCounterDefinition) {
+
+		String name = activityCounterDefinition.getName();
+
+		if (name.equals(SocialActivityCounterConstants.NAME_PARTICIPATION)) {
+			return 0;
+		}
+		else {
+			return activity.getClassPK();
+		}
+	}
+
 	protected void incrementActivityCounter(
 			long groupId, long classNameId, long classPK, String name,
 			int ownerType, int increment, int periodLength)
