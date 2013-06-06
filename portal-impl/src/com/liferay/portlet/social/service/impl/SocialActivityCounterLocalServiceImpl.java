@@ -40,10 +40,12 @@ import com.liferay.portlet.social.model.SocialActivityCounterDefinition;
 import com.liferay.portlet.social.model.SocialActivityDefinition;
 import com.liferay.portlet.social.model.SocialActivityLimit;
 import com.liferay.portlet.social.model.SocialActivityProcessor;
+import com.liferay.portlet.social.model.impl.SocialActivityImpl;
 import com.liferay.portlet.social.service.base.SocialActivityCounterLocalServiceBaseImpl;
 import com.liferay.portlet.social.service.persistence.SocialActivityCounterFinder;
 import com.liferay.portlet.social.util.SocialCounterPeriodUtil;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -332,42 +334,60 @@ public class SocialActivityCounterLocalServiceImpl
 		User assetEntryUser = userPersistence.findByPrimaryKey(
 			assetEntry.getUserId());
 
+		List<SocialActivityCounter> activityCounters =
+			new ArrayList<SocialActivityCounter>();
+
 		for (SocialActivityCounterDefinition activityCounterDefinition :
 				activityDefinition.getActivityCounterDefinitions()) {
 
 			if (addActivityCounter(
-					user, assetEntryUser, activityCounterDefinition) &&
-				checkActivityLimit(user, activity, activityCounterDefinition)) {
+					user, assetEntryUser, activityCounterDefinition)) {
 
-				incrementActivityCounter(
-					activity.getGroupId(), user, activity.getAssetEntry(),
-					activityCounterDefinition);
+				activityCounters.add(
+					getActivityCounter(
+						activity.getGroupId(), user, activity,
+						activityCounterDefinition));
 			}
+		}
+
+		SocialActivityCounter assetActivitiesCounter = null;
+		SocialActivityCounter userActivitiesCounter = null;
+
+		if (!user.isDefaultUser() && user.isActive()) {
+			userActivitiesCounter = getUserActivitiesCounter(activity);
+		}
+
+		if (!assetEntryUser.isDefaultUser() && assetEntryUser.isActive()) {
+			assetActivitiesCounter = getAssetActivitiesCounter(activity);
+		}
+
+		for (SocialActivityCounter activityCounter : activityCounters) {
+			SocialActivityCounterDefinition activityCounterDefinition =
+				activityDefinition.getActivityCounterDefinition(
+					activityCounter.getName());
+
+			if (checkActivityLimit(user, activity, activityCounterDefinition)) {
+				incrementActivityCounter(
+					activityCounter, activityCounterDefinition);
+			}
+		}
+
+		if (assetActivitiesCounter != null) {
+			incrementActivityCounter(
+				assetActivitiesCounter,
+				SocialActivityCounterDefinition.ASSET_ACTIVITIES);
+		}
+
+		if (userActivitiesCounter != null) {
+			incrementActivityCounter(
+				userActivitiesCounter,
+				SocialActivityCounterDefinition.USER_ACTIVITIES);
 		}
 
 		for (SocialAchievement achievement :
 				activityDefinition.getAchievements()) {
 
 			achievement.processActivity(activity);
-		}
-
-		if (!user.isDefaultUser() && user.isActive()) {
-			incrementActivityCounter(
-				activity.getGroupId(),
-				PortalUtil.getClassNameId(User.class.getName()),
-				activity.getUserId(),
-				SocialActivityCounterConstants.NAME_USER_ACTIVITIES,
-				SocialActivityCounterConstants.TYPE_ACTOR, 1,
-				SocialActivityCounterConstants.PERIOD_LENGTH_SYSTEM);
-		}
-
-		if (!assetEntryUser.isDefaultUser() && assetEntryUser.isActive()) {
-			incrementActivityCounter(
-				activity.getGroupId(), activity.getClassNameId(),
-				activity.getClassPK(),
-				SocialActivityCounterConstants.NAME_ASSET_ACTIVITIES,
-				SocialActivityCounterConstants.TYPE_ASSET, 1,
-				SocialActivityCounterConstants.PERIOD_LENGTH_SYSTEM);
 		}
 	}
 
@@ -995,11 +1015,15 @@ public class SocialActivityCounterLocalServiceImpl
 	public void incrementUserAchievementCounter(long userId, long groupId)
 		throws PortalException, SystemException {
 
+		User user = userPersistence.findByPrimaryKey(userId);
+
+		SocialActivityCounter activityCounter =
+			getActivityCounter(
+				groupId, user, new SocialActivityImpl(),
+				SocialActivityCounterDefinition.USER_ACHIEVEMENTS);
+
 		incrementActivityCounter(
-			groupId, PortalUtil.getClassNameId(User.class.getName()), userId,
-			SocialActivityCounterConstants.NAME_USER_ACHIEVEMENTS,
-			SocialActivityCounterConstants.TYPE_ACTOR, 1,
-			SocialActivityCounterConstants.PERIOD_LENGTH_SYSTEM);
+			activityCounter, SocialActivityCounterDefinition.USER_ACHIEVEMENTS);
 	}
 
 	protected boolean addActivityCounter(
@@ -1226,6 +1250,25 @@ public class SocialActivityCounterLocalServiceImpl
 		return lockProtectedAction.getReturnValue();
 	}
 
+	protected SocialActivityCounter getActivityCounter(
+			final long groupId, final User user, final SocialActivity activity,
+			final SocialActivityCounterDefinition activityCounterDefinition)
+		throws PortalException, SystemException {
+
+		return null;
+	}
+
+	protected SocialActivityCounter getAssetActivitiesCounter(
+			SocialActivity activity)
+		throws PortalException, SystemException {
+
+		User user = userPersistence.findByPrimaryKey(activity.getUserId());
+
+		return getActivityCounter(
+			activity.getGroupId(), user, activity,
+			SocialActivityCounterDefinition.ASSET_ACTIVITIES);
+	}
+
 	protected long getClassNameId(AssetEntry assetEntry, int ownerType) {
 		if (ownerType == SocialActivityCounterConstants.TYPE_ASSET) {
 			return assetEntry.getClassNameId();
@@ -1259,6 +1302,17 @@ public class SocialActivityCounterLocalServiceImpl
 		else {
 			return activity.getClassPK();
 		}
+	}
+
+	protected SocialActivityCounter getUserActivitiesCounter(
+			SocialActivity activity)
+		throws PortalException, SystemException {
+
+		User user = userPersistence.findByPrimaryKey(activity.getUserId());
+
+		return getActivityCounter(
+			activity.getGroupId(), user, activity,
+			SocialActivityCounterDefinition.USER_ACTIVITIES);
 	}
 
 	protected void incrementActivityCounter(
