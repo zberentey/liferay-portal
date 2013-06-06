@@ -1188,8 +1188,8 @@ public class SocialActivityCounterLocalServiceImpl
 		LockProtectedAction<SocialActivityCounter> lockProtectedAction =
 			new LockProtectedAction<SocialActivityCounter>(
 				SocialActivityCounter.class, lockKey,
-				PropsValues.SOCIAL_ACTIVITY_COUNTER_LOCK_TIMEOUT,
-				PropsValues.SOCIAL_ACTIVITY_COUNTER_LOCK_RETRY_DELAY) {
+				PropsValues.SOCIAL_ACTIVITY_LOCK_TIMEOUT,
+				PropsValues.SOCIAL_ACTIVITY_LOCK_RETRY_DELAY) {
 
 			@Override
 			protected SocialActivityCounter performProtectedAction()
