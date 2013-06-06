@@ -16,8 +16,6 @@ package com.liferay.portlet.social.service.impl;
 
 import com.liferay.portal.kernel.cache.MultiVMPoolUtil;
 import com.liferay.portal.kernel.cache.PortalCache;
-import com.liferay.portal.kernel.dao.db.DB;
-import com.liferay.portal.kernel.dao.db.DBFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
@@ -1199,25 +1197,12 @@ public class SocialActivityCounterLocalServiceImpl
 			protected SocialActivityCounter performProtectedAction()
 				throws PortalException, SystemException {
 
-				DB db = DBFactoryUtil.getDB();
-
-				String dbType = db.getType();
-
-				if (dbType.equals(DB.TYPE_HYPERSONIC)) {
-
-					// LPS-25408
-
-					return addActivityCounter(
+				SocialActivityCounter activityCounter =
+					socialActivityCounterLocalService.addActivityCounter(
 						groupId, classNameId, classPK, name, ownerType,
 						totalValue, previousActivityCounterId, periodLength);
-				}
-				else {
-					return
-						socialActivityCounterLocalService.addActivityCounter(
-							groupId, classNameId, classPK, name, ownerType,
-							totalValue, previousActivityCounterId,
-							periodLength);
-				}
+
+				return activityCounter;
 			}
 
 		};
