@@ -281,16 +281,6 @@ public class SystemEventLocalServiceUtil {
 
 	public static void addSystemEvent(long userId, long groupId,
 		long companyId, java.lang.String className, long classPK,
-		java.lang.String classUuid, int type, java.lang.String extraData)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
-		getService()
-			.addSystemEvent(userId, groupId, companyId, className, classPK,
-			classUuid, type, extraData);
-	}
-
-	public static void addSystemEvent(long userId, long groupId,
-		long companyId, java.lang.String className, long classPK,
 		java.lang.String classUuid, java.lang.String referrerClassName,
 		int type, java.lang.String extraData)
 		throws com.liferay.portal.kernel.exception.PortalException,
