@@ -25,6 +25,7 @@ import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.lar.ExportImportPathUtil;
 import com.liferay.portal.kernel.lar.ExportImportThreadLocal;
 import com.liferay.portal.kernel.lar.ExportImportUtil;
+import com.liferay.portal.kernel.lar.ManifestSummary;
 import com.liferay.portal.kernel.lar.PortletDataContext;
 import com.liferay.portal.kernel.lar.PortletDataContextFactoryUtil;
 import com.liferay.portal.kernel.lar.PortletDataHandler;
@@ -857,6 +858,12 @@ public class PortletExporter {
 			"group-id", String.valueOf(systemEventEntry.getGroupId()));
 
 		deletionElement.addAttribute("uuid", systemEventEntry.getClassUuid());
+
+		ManifestSummary manifestSummary =
+			portletDataContext.getManifestSummary();
+
+		manifestSummary.incrementDeletionCount(
+			PortalUtil.getClassName(systemEventEntry.getClassNameId()));
 	}
 
 	protected void exportDeletions(final PortletDataContext portletDataContext)
