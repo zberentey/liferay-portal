@@ -14,6 +14,8 @@
 
 package com.liferay.portlet.wiki.lar;
 
+import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.lar.BaseStagedModelDataHandler;
 import com.liferay.portal.kernel.lar.ExportImportHelperUtil;
 import com.liferay.portal.kernel.lar.ExportImportPathUtil;
@@ -45,6 +47,17 @@ public class WikiPageStagedModelDataHandler
 	public static final String[] CLASS_NAMES = {WikiPage.class.getName()};
 
 	@Override
+	public void deleteStagedModel(
+			String uuid, long groupId, String className, String extraData)
+		throws PortalException, SystemException {
+
+		WikiPage wikiPage =
+			WikiPageLocalServiceUtil.getWikiPageByUuidAndGroupId(uuid, groupId);
+
+		WikiPageLocalServiceUtil.deletePage(wikiPage);
+	}
+
+	@Override
 	public String[] getClassNames() {
 		return CLASS_NAMES;
 	}
@@ -74,12 +87,6 @@ public class WikiPageStagedModelDataHandler
 				portletDataContext.addReferenceElement(
 					page, pageElement, fileEntry, FileEntry.class,
 					PortletDataContext.REFERENCE_TYPE_WEAK, false);
-			}
-
-			long folderId = page.getAttachmentsFolderId();
-
-			if (folderId != 0) {
-				page.setAttachmentsFolderId(folderId);
 			}
 		}
 
