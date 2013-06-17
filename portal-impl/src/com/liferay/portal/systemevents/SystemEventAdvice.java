@@ -14,6 +14,7 @@
 
 package com.liferay.portal.systemevents;
 
+import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.systemevents.SystemEvent;
@@ -23,7 +24,7 @@ import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.model.GroupedModel;
 import com.liferay.portal.model.StagedModel;
 import com.liferay.portal.model.SystemEventConstants;
-import com.liferay.portal.service.SystemEventLocalServiceUtil;
+import com.liferay.portal.service.SystemEventLocalService;
 import com.liferay.portal.spring.aop.AnnotationChainableMethodAdvice;
 
 import java.io.Serializable;
@@ -51,7 +52,13 @@ public class SystemEventAdvice
 
 		Method method = methodInvocation.getMethod();
 
-		Class<?> parameter = method.getParameterTypes()[0];
+		Class<?>[] parameterTypes = method.getParameterTypes();
+
+		if (parameterTypes.length == 0) {
+			return;
+		}
+
+		Class<?> parameter = parameterTypes[0];
 
 		if (!GroupedModel.class.isAssignableFrom(parameter)) {
 			return;
@@ -70,14 +77,14 @@ public class SystemEventAdvice
 			SystemEventHierarchyEntryThreadLocal.peek();
 
 		if (systemEventHierarchyEntry != null) {
-			SystemEventLocalServiceUtil.addSystemEvent(
+			systemEventLocalService.addSystemEvent(
 				groupedModel.getGroupId(),
 				systemEventHierarchyEntry.getClassName(), (Long)primaryKeyObj,
 				systemEventHierarchyEntry.getUuid(), systemEvent.type(),
 				systemEventHierarchyEntry.getExtraData());
 		}
 		else {
-			SystemEventLocalServiceUtil.addSystemEvent(
+			systemEventLocalService.addSystemEvent(
 				groupedModel.getGroupId(), groupedModel.getModelClassName(),
 				(Long)primaryKeyObj, getUuid(groupedModel), systemEvent.type());
 		}
@@ -93,7 +100,13 @@ public class SystemEventAdvice
 
 		Method method = methodInvocation.getMethod();
 
-		Class<?> parameter = method.getParameterTypes()[0];
+		Class<?>[] parameterTypes = method.getParameterTypes();
+
+		if (parameterTypes.length == 0) {
+			return null;
+		}
+
+		Class<?> parameter = parameterTypes[0];
 
 		if (!GroupedModel.class.isAssignableFrom(parameter)) {
 			if (_log.isWarnEnabled()) {
@@ -124,8 +137,7 @@ public class SystemEventAdvice
 			SystemEventHierarchyEntry systemEventHierarchyEntry =
 				SystemEventHierarchyEntryThreadLocal.push(
 					groupedModel.getModelClass(),
-					(Long)groupedModel.getPrimaryKeyObj(),
-					systemEvent.action());
+					(Long)primaryKeyObj, systemEvent.action());
 
 			systemEventHierarchyEntry.setUuid(getUuid(groupedModel));
 		}
@@ -143,7 +155,13 @@ public class SystemEventAdvice
 
 		Method method = methodInvocation.getMethod();
 
-		Class<?> parameter = method.getParameterTypes()[0];
+		Class<?>[] parameterTypes = method.getParameterTypes();
+
+		if (parameterTypes.length == 0) {
+			return;
+		}
+
+		Class<?> parameter = parameterTypes[0];
 
 		if (!GroupedModel.class.isAssignableFrom(parameter)) {
 			return;
@@ -164,9 +182,11 @@ public class SystemEventAdvice
 
 			if (hierarchyEntry != null) {
 				Class<?> modelClass = groupedModel.getModelClass();
-				long primaryKey = (Long)groupedModel.getPrimaryKeyObj();
+				long primaryKey = (Long)primaryKeyObj;
 
-				if (hierarchyEntry.isAsset(modelClass.getName(), primaryKey)) {
+				if (hierarchyEntry.isCurrentAsset(
+						modelClass.getName(), primaryKey)) {
+
 					SystemEventHierarchyEntryThreadLocal.pop();
 				}
 			}
@@ -226,5 +246,8 @@ public class SystemEventAdvice
 			}
 
 		};
+
+	@BeanReference(type = SystemEventLocalService.class)
+	protected SystemEventLocalService systemEventLocalService;
 
 }

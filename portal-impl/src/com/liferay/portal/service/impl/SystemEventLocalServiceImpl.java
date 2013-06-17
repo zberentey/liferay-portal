@@ -61,7 +61,8 @@ public class SystemEventLocalServiceImpl
 			action = systemEventHierarchyEntry.getAction();
 
 			if ((action == SystemEventConstants.ACTION_SKIP) &&
-				!systemEventHierarchyEntry.isAsset(classNameId, classPK)) {
+				!systemEventHierarchyEntry.isCurrentAsset(
+					classNameId, classPK)) {
 
 				return;
 			}
@@ -93,12 +94,12 @@ public class SystemEventLocalServiceImpl
 			}
 		}
 
-		long systemEventId;
+		long systemEventId = 0;
 
 		if ((systemEventHierarchyEntry != null) &&
-			systemEventHierarchyEntry.isAsset(classNameId, classPK)) {
+			systemEventHierarchyEntry.isCurrentAsset(classNameId, classPK)) {
 
-			systemEventId = systemEventHierarchyEntry.getEventId();
+			systemEventId = systemEventHierarchyEntry.getSystemEventId();
 		}
 		else {
 			systemEventId = counterLocalService.increment();
@@ -128,13 +129,15 @@ public class SystemEventLocalServiceImpl
 		}
 
 		if (action == SystemEventConstants.ACTION_HIERARCHY) {
-			if (systemEventHierarchyEntry.isAsset(classNameId, classPK)) {
-				systemEvent.setParentEventId(
-					systemEventHierarchyEntry.getParentEventId());
+			if (systemEventHierarchyEntry.isCurrentAsset(
+					classNameId, classPK)) {
+
+				systemEvent.setParentSystemEventId(
+					systemEventHierarchyEntry.getParentSystemEventId());
 			}
 			else {
-				systemEvent.setParentEventId(
-					systemEventHierarchyEntry.getEventId());
+				systemEvent.setParentSystemEventId(
+					systemEventHierarchyEntry.getSystemEventId());
 			}
 		}
 

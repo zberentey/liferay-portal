@@ -25,15 +25,15 @@ import com.liferay.portal.util.PortalUtil;
 public class SystemEventHierarchyEntry {
 
 	public SystemEventHierarchyEntry(
-		long classNameId, long classPK, long eventSetId, long eventId,
-		long parentEventId, int action) {
+		long systemEventId, long classNameId, long classPK, long eventSetId,
+		long parentSystemEventId, int action) {
 
 		_action = action;
 		_classNameId = classNameId;
 		_classPK = classPK;
-		_eventId = eventId;
+		_systemEventId = systemEventId;
 		_eventSetId = eventSetId;
-		_parentEventId = parentEventId;
+		_parentSystemEventId = parentSystemEventId;
 	}
 
 	public int getAction() {
@@ -48,10 +48,6 @@ public class SystemEventHierarchyEntry {
 		return _classNameId;
 	}
 
-	public long getEventId() {
-		return _eventId;
-	}
-
 	public long getEventSetId() {
 		return _eventSetId;
 	}
@@ -64,22 +60,30 @@ public class SystemEventHierarchyEntry {
 		return _extraDataJSONObject.toString();
 	}
 
-	public long getParentEventId() {
-		return _parentEventId;
+	public long getParentSystemEventId() {
+		return _parentSystemEventId;
+	}
+
+	public long getSystemEventId() {
+		return _systemEventId;
 	}
 
 	public String getUuid() {
 		return _uuid;
 	}
 
-	public boolean isAsset(long classNameId, long classPK) {
-		return ((_classNameId == classNameId) && (_classPK == classPK));
+	public boolean isCurrentAsset(long classNameId, long classPK) {
+		if ((_classNameId == classNameId) && (_classPK == classPK)) {
+			return true;
+		}
+
+		return false;
 	}
 
-	public boolean isAsset(String className, long classPK) {
+	public boolean isCurrentAsset(String className, long classPK) {
 		long classNameId = PortalUtil.getClassNameId(className);
 
-		return isAsset(classNameId, classPK);
+		return isCurrentAsset(classNameId, classPK);
 	}
 
 	public void setClassName(String className) {
@@ -105,10 +109,10 @@ public class SystemEventHierarchyEntry {
 	private int _action;
 	private long _classNameId;
 	private long _classPK;
-	private long _eventId;
 	private long _eventSetId;
 	private JSONObject _extraDataJSONObject;
-	private long _parentEventId;
+	private long _parentSystemEventId;
+	private long _systemEventId;
 	private String _uuid;
 
 }

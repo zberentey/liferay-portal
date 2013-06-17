@@ -94,8 +94,8 @@ public class SystemEventHierarchyEntryThreadLocal {
 			parentEntry = systemEventHierarchyEntries.peek();
 		}
 
-		long eventSetId;
-		long parentEventId = 0;
+		long eventSetId = 0;
+		long parentSystemEventId = 0;
 
 		if (parentEntry == null) {
 			eventSetId = CounterLocalServiceUtil.increment();
@@ -105,15 +105,17 @@ public class SystemEventHierarchyEntryThreadLocal {
 		}
 		else {
 			eventSetId = parentEntry.getEventSetId();
-			parentEventId = parentEntry.getEventId();
+			parentSystemEventId = parentEntry.getSystemEventId();
 		}
 
-		long eventId = CounterLocalServiceUtil.increment();
+		long systemEventId = CounterLocalServiceUtil.increment();
 
-		return systemEventHierarchyEntries.push(
+		SystemEventHierarchyEntry systemEventHierarchyEntry =
 			new SystemEventHierarchyEntry(
-				classNameId, classPK, eventSetId, eventId, parentEventId,
-				action));
+				systemEventId, classNameId, classPK, eventSetId,
+				parentSystemEventId, action);
+
+		return systemEventHierarchyEntries.push(systemEventHierarchyEntry);
 	}
 
 	private static ThreadLocal<Stack<SystemEventHierarchyEntry>>
