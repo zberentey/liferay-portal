@@ -272,11 +272,11 @@ public abstract class WebDAVPropsLocalServiceBaseImpl
 	}
 
 	/**
-	 * Returns the number of rows that match the dynamic query.
+	 * Returns the number of rows that match the dynamic query with the given projection.
 	 *
 	 * @param dynamicQuery the dynamic query
-	 * @param projection the projection to apply to the query
-	 * @return the number of rows that match the dynamic query
+	 * @param projection the count projection that applied to the query
+	 * @return the number of rows that match the dynamic query with the given projection
 	 * @throws SystemException if a system exception occurred
 	 */
 	@Override

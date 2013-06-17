@@ -166,11 +166,11 @@ public class SystemEventLocalServiceUtil {
 	}
 
 	/**
-	* Returns the number of rows that match the dynamic query.
+	* Returns the number of rows that match the dynamic query with the given projection.
 	*
 	* @param dynamicQuery the dynamic query
-	* @param projection the projection to apply to the query
-	* @return the number of rows that match the dynamic query
+	* @param projection the count projection that applied to the query
+	* @return the number of rows that match the dynamic query with the given projection
 	* @throws SystemException if a system exception occurred
 	*/
 	public static long dynamicQueryCount(
@@ -292,6 +292,16 @@ public class SystemEventLocalServiceUtil {
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
 		getService().addSystemEvent(groupId, className, classPK, classUuid, type);
+	}
+
+	public static void addSystemEvent(long groupId, java.lang.String className,
+		long classPK, java.lang.String classUuid, int type,
+		java.lang.String extraData)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		getService()
+			.addSystemEvent(groupId, className, classPK, classUuid, type,
+			extraData);
 	}
 
 	public static void deleteSystemEvents(long groupId)
