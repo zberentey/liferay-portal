@@ -253,6 +253,10 @@ public class DLFileEntryTypeLocalServiceImpl
 			long groupId, String fileEntryTypeKey)
 		throws PortalException, SystemException {
 
+		if (fileEntryTypeKey != null) {
+			fileEntryTypeKey = fileEntryTypeKey.trim().toUpperCase();
+		}
+
 		return dlFileEntryTypePersistence.findByG_F(groupId, fileEntryTypeKey);
 	}
 
