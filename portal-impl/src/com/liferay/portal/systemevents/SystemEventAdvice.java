@@ -136,8 +136,8 @@ public class SystemEventAdvice
 
 			SystemEventHierarchyEntry systemEventHierarchyEntry =
 				SystemEventHierarchyEntryThreadLocal.push(
-					groupedModel.getModelClass(),
-					(Long)primaryKeyObj, systemEvent.action());
+					groupedModel.getModelClass(), (Long)primaryKeyObj,
+					systemEvent.action());
 
 			systemEventHierarchyEntry.setUuid(getUuid(groupedModel));
 		}
@@ -220,6 +220,9 @@ public class SystemEventAdvice
 		return uuid;
 	}
 
+	@BeanReference(type = SystemEventLocalService.class)
+	protected SystemEventLocalService systemEventLocalService;
+
 	private static Log _log = LogFactoryUtil.getLog(SystemEventAdvice.class);
 
 	private static SystemEvent _nullSystemEvent =
@@ -246,8 +249,5 @@ public class SystemEventAdvice
 			}
 
 		};
-
-	@BeanReference(type = SystemEventLocalService.class)
-	protected SystemEventLocalService systemEventLocalService;
 
 }
