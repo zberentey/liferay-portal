@@ -18,8 +18,13 @@ import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.LocalizationUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.kernel.xml.Document;
+import com.liferay.portal.kernel.xml.DocumentException;
+import com.liferay.portal.kernel.xml.SAXReaderUtil;
 import com.liferay.portal.test.LiferayIntegrationJUnitTestRunner;
 import com.liferay.portlet.PortletPreferencesImpl;
+
+import edu.emory.mathcs.backport.java.util.Arrays;
 
 import java.util.HashMap;
 import java.util.Locale;
@@ -36,6 +41,7 @@ import org.springframework.mock.web.portlet.MockPortletRequest;
 
 /**
  * @author Connor McKay
+ * @author Peter Borkuti
  */
 @RunWith(LiferayIntegrationJUnitTestRunner.class)
 public class LocalizationImplTest {
@@ -47,6 +53,47 @@ public class LocalizationImplTest {
 
 		_german = new Locale("de", "DE");
 		_germanId = LocaleUtil.toLanguageId(_german);
+	}
+
+	@Test
+	public void testAvailableLocalesMatchXmlDoc() throws DocumentException {
+		int numOfAvailableLocales = 2;
+
+		StringBundler sb = new StringBundler();
+
+		sb.append("<?xml version='1.0' encoding='UTF-8'?>");
+
+		sb.append("<root available-locales=\"en_US,es_ES\" ");
+		sb.append("default-locale=\"en_US\">");
+		sb.append("<static-content language-id=\"es_ES\">");
+		sb.append("foo&amp;bar");
+		sb.append("</static-content>");
+		sb.append("<static-content language-id=\"en_US\">");
+		sb.append("<![CDATA[Example in English]]>");
+		sb.append("</static-content>");
+		sb.append("</root>");
+
+		String xml = sb.toString();
+
+		Document document = SAXReaderUtil.read(xml);
+
+		String[] localesFromDoc = LocalizationUtil.getAvailableLocales(
+			document);
+
+		String[] localesFromXml = LocalizationUtil.getAvailableLocales(xml);
+
+		Assert.assertEquals(
+			"Number of locales not match", localesFromDoc.length,
+			localesFromXml.length);
+
+		Assert.assertEquals(localesFromXml.length, numOfAvailableLocales);
+
+		Arrays.sort(localesFromXml);
+		Arrays.sort(localesFromDoc);
+
+		Assert.assertTrue(
+			"locales are different",
+			Arrays.equals(localesFromDoc, localesFromXml));
 	}
 
 	@Test
@@ -76,6 +123,34 @@ public class LocalizationImplTest {
 
 		Assert.assertNotNull(translation);
 		Assert.assertEquals(18, translation.length());
+	}
+
+	@Test
+	public void testDefaultLocaleMatchXmlDoc() throws DocumentException {
+		StringBundler sb = new StringBundler();
+
+		sb.append("<?xml version='1.0' encoding='UTF-8'?>");
+
+		sb.append("<root available-locales=\"en_US,es_ES\" ");
+		sb.append("default-locale=\"en_US\">");
+		sb.append("<static-content language-id=\"es_ES\">");
+		sb.append("foo&amp;bar");
+		sb.append("</static-content>");
+		sb.append("<static-content language-id=\"en_US\">");
+		sb.append("<![CDATA[Example in English]]>");
+		sb.append("</static-content>");
+		sb.append("</root>");
+
+		String xml = sb.toString();
+
+		Document document = SAXReaderUtil.read(xml);
+
+		String localeFromDoc = LocalizationUtil.getDefaultLocale(document);
+
+		String localeFromXml = LocalizationUtil.getDefaultLocale(xml);
+
+		Assert.assertEquals("Locales not match", localeFromDoc, localeFromXml);
+
 	}
 
 	@Test
