@@ -88,17 +88,6 @@ public class SystemEventLocalServiceImpl
 	@Override
 	public void addSystemEvent(
 			long userId, long groupId, long companyId, String className,
-			long classPK, String classUuid, int type, String extraData)
-		throws PortalException, SystemException {
-
-		addSystemEvent(
-			userId, groupId, companyId, PortalUtil.getClassNameId(className),
-			classPK, classUuid, 0, type, extraData);
-	}
-
-	@Override
-	public void addSystemEvent(
-			long userId, long groupId, long companyId, String className,
 			long classPK, String classUuid, String referrerClassName, int type,
 			String extraData)
 		throws PortalException, SystemException {
