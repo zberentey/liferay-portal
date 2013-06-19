@@ -36,6 +36,8 @@ public class ${entity.name}ExportActionableDynamicQuery extends ${entity.name}Ac
 		<#if entity.isStagedGroupedModel()>
 			setGroupId(_portletDataContext.getScopeGroupId());
 		</#if>
+
+		setCompanyId(_portletDataContext.getCompanyId());
 	}
 
 	@Override
