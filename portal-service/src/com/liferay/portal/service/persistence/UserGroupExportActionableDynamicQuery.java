@@ -42,6 +42,8 @@ public class UserGroupExportActionableDynamicQuery
 	public UserGroupExportActionableDynamicQuery(
 		PortletDataContext portletDataContext) throws SystemException {
 		_portletDataContext = portletDataContext;
+
+		setCompanyId(_portletDataContext.getCompanyId());
 	}
 
 	@Override

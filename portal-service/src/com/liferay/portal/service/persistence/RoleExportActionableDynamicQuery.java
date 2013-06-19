@@ -41,6 +41,8 @@ public class RoleExportActionableDynamicQuery extends RoleActionableDynamicQuery
 	public RoleExportActionableDynamicQuery(
 		PortletDataContext portletDataContext) throws SystemException {
 		_portletDataContext = portletDataContext;
+
+		setCompanyId(_portletDataContext.getCompanyId());
 	}
 
 	@Override

@@ -46,6 +46,8 @@ public class MBThreadExportActionableDynamicQuery
 		_portletDataContext = portletDataContext;
 
 		setGroupId(_portletDataContext.getScopeGroupId());
+
+		setCompanyId(_portletDataContext.getCompanyId());
 	}
 
 	@Override

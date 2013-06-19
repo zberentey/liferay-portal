@@ -44,6 +44,8 @@ public class LayoutFriendlyURLExportActionableDynamicQuery
 		_portletDataContext = portletDataContext;
 
 		setGroupId(_portletDataContext.getScopeGroupId());
+
+		setCompanyId(_portletDataContext.getCompanyId());
 	}
 
 	@Override

@@ -42,6 +42,8 @@ public class EmailAddressExportActionableDynamicQuery
 	public EmailAddressExportActionableDynamicQuery(
 		PortletDataContext portletDataContext) throws SystemException {
 		_portletDataContext = portletDataContext;
+
+		setCompanyId(_portletDataContext.getCompanyId());
 	}
 
 	@Override

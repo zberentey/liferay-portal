@@ -42,6 +42,8 @@ public class AddressExportActionableDynamicQuery
 	public AddressExportActionableDynamicQuery(
 		PortletDataContext portletDataContext) throws SystemException {
 		_portletDataContext = portletDataContext;
+
+		setCompanyId(_portletDataContext.getCompanyId());
 	}
 
 	@Override

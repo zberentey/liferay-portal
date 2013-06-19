@@ -42,6 +42,8 @@ public class WebsiteExportActionableDynamicQuery
 	public WebsiteExportActionableDynamicQuery(
 		PortletDataContext portletDataContext) throws SystemException {
 		_portletDataContext = portletDataContext;
+
+		setCompanyId(_portletDataContext.getCompanyId());
 	}
 
 	@Override
