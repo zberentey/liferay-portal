@@ -160,7 +160,9 @@ public class DeletionSystemEventExporter {
 			portletDataContext.getManifestSummary();
 
 		manifestSummary.incrementModelDeletionCount(
-			new StagedModelType(systemEvent.getClassNameId()));
+			new StagedModelType(
+				systemEvent.getClassNameId(),
+				systemEvent.getReferrerClassNameId()));
 	}
 
 }
