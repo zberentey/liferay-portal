@@ -66,8 +66,9 @@ public class DLPortletDataHandler extends BasePortletDataHandler {
 
 	public DLPortletDataHandler() {
 		setDeletionSystemEventModelTypes(
-			DLFileEntry.class.getName(), DLFileRank.class.getName(),
-			DLFileShortcut.class.getName(), DLFolder.class.getName());
+			DLFileEntry.class.getName(), DLFileEntryType.class.getName(),
+			DLFileRank.class.getName(), DLFileShortcut.class.getName(),
+			DLFolder.class.getName());
 		setDataLocalized(true);
 		setDataPortletPreferences("rootFolderId");
 		setExportControls(
