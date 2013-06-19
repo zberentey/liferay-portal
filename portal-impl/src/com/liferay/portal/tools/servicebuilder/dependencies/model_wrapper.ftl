@@ -76,6 +76,10 @@ public class ${entity.name}Wrapper implements ${entity.name}, ModelWrapper<${ent
 
 	<#list methods as method>
 		<#if !method.isConstructor() && !method.isStatic() && method.isPublic() && !serviceBuilder.isDuplicateMethod(method, tempMap)>
+			<#if method.name == "getStagedModelType">
+				<#assign hasGetStagedModelTypeMethod = true>
+			</#if>
+
 			<#assign parameters = method.parameters>
 
 			${serviceBuilder.getJavadocComment(method)}
@@ -130,7 +134,7 @@ public class ${entity.name}Wrapper implements ${entity.name}, ModelWrapper<${ent
 		</#if>
 	</#list>
 
-	<#if entity.isStagedModel()>
+	<#if entity.isStagedModel() && !hasGetStagedModelTypeMethod!false>
 		@Override
 		public StagedModelType getStagedModelType() {
 			return _${entity.varName}.getStagedModelType();
