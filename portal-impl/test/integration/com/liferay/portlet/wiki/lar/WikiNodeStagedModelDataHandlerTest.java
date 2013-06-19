@@ -56,6 +56,24 @@ public class WikiNodeStagedModelDataHandlerTest
 	}
 
 	@Override
+	protected void deleteStagedModel(
+			StagedModel stagedModel,
+			Map<String, List<StagedModel>> dependentStagedModelsMap,
+			Group group)
+		throws Exception {
+
+		WikiNodeLocalServiceUtil.deleteNode((WikiNode)stagedModel);
+	}
+
+	@Override
+	protected Object[] getDeletionSystemEventModelTypes() {
+		WikiPortletDataHandler portletDataHandler =
+			new WikiPortletDataHandler();
+
+		return portletDataHandler.getDeletionSystemEventModelTypes();
+	}
+
+	@Override
 	protected StagedModel getStagedModel(String uuid, Group group) {
 		try {
 			return WikiNodeLocalServiceUtil.getWikiNodeByUuidAndGroupId(

@@ -727,7 +727,8 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 
 		List<Element> referenceDataElements =
 			portletDataContext.getReferenceDataElements(
-				entityElement, FileEntry.class);
+				entityElement, FileEntry.class,
+				PortletDataContext.REFERENCE_TYPE_DEPENDENCY);
 
 		for (Element referenceDataElement : referenceDataElements) {
 			String fileEntryUUID = referenceDataElement.attributeValue("uuid");
@@ -736,10 +737,14 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 				continue;
 			}
 
+			String path = referenceDataElement.attributeValue("path");
+
+			if (!content.contains("[$dl-reference=" + path + "$]")) {
+				continue;
+			}
+
 			StagedModelDataHandlerUtil.importStagedModel(
 				portletDataContext, referenceDataElement);
-
-			String path = referenceDataElement.attributeValue("path");
 
 			FileEntry fileEntry = null;
 

@@ -15,15 +15,14 @@
 package com.liferay.portlet.dynamicdatamapping.lar;
 
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.lar.BaseStagedModelDataHandler;
 import com.liferay.portal.kernel.lar.ExportImportPathUtil;
-import com.liferay.portal.kernel.lar.ManifestSummary;
 import com.liferay.portal.kernel.lar.PortletDataContext;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.LocalizationUtil;
 import com.liferay.portal.kernel.xml.Element;
-import com.liferay.portal.model.StagedModel;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.UserLocalServiceUtil;
 import com.liferay.portlet.dynamicdatamapping.model.DDMStructure;
@@ -43,6 +42,18 @@ public class DDMStructureStagedModelDataHandler
 	public static final String[] CLASS_NAMES = {DDMStructure.class.getName()};
 
 	@Override
+	public void deleteStagedModel(
+			String uuid, long groupId, String className, String extraData)
+		throws PortalException, SystemException {
+
+		DDMStructure ddmStructure =
+			DDMStructureLocalServiceUtil.getDDMStructureByUuidAndGroupId(
+				uuid, groupId);
+
+		DDMStructureLocalServiceUtil.deleteStructure(ddmStructure);
+	}
+
+	@Override
 	public String[] getClassNames() {
 		return CLASS_NAMES;
 	}
@@ -50,18 +61,6 @@ public class DDMStructureStagedModelDataHandler
 	@Override
 	public String getDisplayName(DDMStructure structure) {
 		return structure.getNameCurrentValue();
-	}
-
-	@Override
-	public String getManifestSummaryKey(StagedModel stagedModel) {
-		if (stagedModel == null) {
-			return DDMStructure.class.getName();
-		}
-
-		DDMStructure structure = (DDMStructure)stagedModel;
-
-		return ManifestSummary.getManifestSummaryKey(
-			DDMStructure.class.getName(), structure.getClassName());
 	}
 
 	@Override
