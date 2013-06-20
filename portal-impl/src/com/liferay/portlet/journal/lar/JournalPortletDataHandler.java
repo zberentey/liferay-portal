@@ -92,8 +92,10 @@ public class JournalPortletDataHandler extends BasePortletDataHandler {
 		setDeletionSystemEventModelTypes(
 			new StagedModelType(DDMStructure.class, JournalArticle.class),
 			new StagedModelType(DDMTemplate.class, DDMStructure.class),
-			JournalArticle.class.getName(), JournalFeed.class.getName(),
-			JournalFolder.class.getName());
+			new StagedModelType(JournalArticle.class),
+			new StagedModelType(JournalFeed.class),
+			new StagedModelType(JournalFolder.class));
+
 		setDataLocalized(true);
 		setExportControls(
 			new PortletDataHandlerBoolean(
