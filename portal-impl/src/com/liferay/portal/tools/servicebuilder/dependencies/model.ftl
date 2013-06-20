@@ -95,7 +95,7 @@ public interface ${entity.name}Model extends
 		<#assign overrideColumnNames = overrideColumnNames + ["companyId", "createDate", "modifiedDate", "uuid"]>
 	</#if>
 
-	<#if entity.isTypedModel()>
+	<#if entity.isTypedModel() && !entity.isAttachedModel()>
 		, TypedModel
 
 		<#assign overrideColumnNames = overrideColumnNames + ["className", "classNameId"]>

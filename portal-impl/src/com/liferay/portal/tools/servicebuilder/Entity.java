@@ -578,17 +578,16 @@ public class Entity {
 	}
 
 	public boolean isAttachedModel() {
-		if (hasColumn("classNameId") && hasColumn("classPK")) {
-			EntityColumn classNameIdCol = getColumn("classNameId");
+		if (!isTypedModel()) {
+			return false;
+		}
 
-			String classNameIdColType = classNameIdCol.getType();
-
+		if (hasColumn("classPK")) {
 			EntityColumn classPKCol = getColumn("classPK");
 
 			String classPKColType = classPKCol.getType();
 
-			if (classNameIdColType.equals("long") &&
-				classPKColType.equals("long")) {
+			if (classPKColType.equals("long")) {
 
 				return true;
 			}
