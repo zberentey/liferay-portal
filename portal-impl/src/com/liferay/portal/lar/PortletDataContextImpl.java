@@ -368,28 +368,25 @@ public class PortletDataContextImpl implements PortletDataContext {
 		Object... deletionSystemEventTypes) {
 
 		for (Object deletionSystemEventType : deletionSystemEventTypes) {
-			long classNameId = 0;
+			StagedModelType stagedModelType = null;
 
 			if (deletionSystemEventType instanceof Class) {
-				classNameId = PortalUtil.getClassNameId(
+				long classNameId = PortalUtil.getClassNameId(
 					((Class<?>)deletionSystemEventType).getName());
-			}
-			else if (deletionSystemEventType instanceof String) {
-				classNameId = PortalUtil.getClassNameId(
-					((String)deletionSystemEventType));
+
+				stagedModelType = new StagedModelType(classNameId);
 			}
 			else if (deletionSystemEventType instanceof StagedModelType) {
-				_deletionSystemEventModelTypes.add(
-					(StagedModelType)deletionSystemEventType);
-
-				continue;
+				stagedModelType = (StagedModelType)deletionSystemEventType;
 			}
-			else {
-				continue;
+			else if (deletionSystemEventType instanceof String) {
+				long classNameId = PortalUtil.getClassNameId(
+					((String)deletionSystemEventType));
+
+				stagedModelType = new StagedModelType(classNameId);
 			}
 
-			_deletionSystemEventModelTypes.add(
-				new StagedModelType(classNameId));
+			_deletionSystemEventModelTypes.add(stagedModelType);
 		}
 	}
 

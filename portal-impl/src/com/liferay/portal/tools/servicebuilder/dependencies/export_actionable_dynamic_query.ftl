@@ -5,7 +5,6 @@ import ${packagePath}.service.${entity.name}LocalServiceUtil;
 
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Conjunction;
-import com.liferay.portal.kernel.dao.orm.Disjunction;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Property;
 import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
@@ -73,11 +72,7 @@ public class ${entity.name}ExportActionableDynamicQuery extends ${entity.name}Ac
 				conjunction.add(classNameIdProperty.eq(stagedModelType.getClassNameId()));
 				conjunction.add(referrerClassNameIdProperty.eq(stagedModelType.getReferrerClassNameId()));
 
-				Disjunction disjunction = RestrictionsFactoryUtil.disjunction();
-
-				disjunction.add(conjunction);
-
-				dynamicQuery.add(disjunction);
+				dynamicQuery.add(conjunction);
 
 				Property typeProperty = PropertyFactoryUtil.forName("type");
 
