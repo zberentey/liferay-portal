@@ -467,6 +467,8 @@ public class LayoutExporter {
 
 		portletDataContext.setMissingReferencesElement(
 			missingReferencesElement);
+		portletDataContext.addDeletionSystemEventModelTypes(
+			Layout.class.getName());
 
 		Element layoutsElement = portletDataContext.getExportDataGroupElement(
 			Layout.class);

@@ -15,6 +15,7 @@
 package com.liferay.portal.lar;
 
 import com.liferay.portal.kernel.dao.orm.FinderCacheUtil;
+import com.liferay.portal.kernel.lar.ExportImportPathUtil;
 import com.liferay.portal.kernel.lar.ManifestSummary;
 import com.liferay.portal.kernel.lar.PortletDataContext;
 import com.liferay.portal.kernel.lar.PortletDataContextFactoryUtil;
@@ -24,18 +25,25 @@ import com.liferay.portal.kernel.transaction.Transactional;
 import com.liferay.portal.kernel.util.LongWrapper;
 import com.liferay.portal.kernel.util.Time;
 import com.liferay.portal.kernel.xml.Element;
+import com.liferay.portal.kernel.xml.ElementHandler;
+import com.liferay.portal.kernel.xml.ElementProcessor;
 import com.liferay.portal.kernel.xml.SAXReaderUtil;
-import com.liferay.portal.kernel.zip.ZipWriter;
-import com.liferay.portal.kernel.zip.ZipWriterFactoryUtil;
+import com.liferay.portal.kernel.zip.ZipReader;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portal.util.GroupTestUtil;
 import com.liferay.portlet.PortletPreferencesImpl;
 
+import java.io.StringReader;
+
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
+
+import org.apache.xerces.parsers.SAXParser;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -43,6 +51,8 @@ import org.junit.Before;
 import org.junit.Test;
 
 import org.powermock.api.mockito.PowerMockito;
+
+import org.xml.sax.InputSource;
 
 /**
  * @author Zsolt Berentey
@@ -66,6 +76,52 @@ public abstract class BasePortletDataHandlerTestCase extends PowerMockito {
 
 	@Test
 	@Transactional
+	public void testDeletions() throws Exception {
+		initExport();
+
+		addStagedModels();
+
+		portletDataContext.setEndDate(getEndDate());
+
+		portletDataHandler.prepareManifestSummary(portletDataContext);
+
+		ManifestSummary manifestSummary =
+			portletDataContext.getManifestSummary();
+
+		Map<String, LongWrapper> modelAdditionCounters =
+			manifestSummary.getModelAdditionCounters();
+
+		Map<String, LongWrapper> expectedModelDeletionCounters =
+			new HashMap<String, LongWrapper>(modelAdditionCounters);
+
+		modelAdditionCounters.clear();
+
+		portletDataHandler.exportData(
+			portletDataContext, portletId, new PortletPreferencesImpl());
+
+		deleteStagedModels();
+
+		portletDataContext.setEndDate(getEndDate());
+
+		portletDataHandler.prepareManifestSummary(portletDataContext);
+
+		Map<String, LongWrapper> modelDeletionCounters =
+			manifestSummary.getModelDeletionCounters();
+
+		checkCounters(expectedModelDeletionCounters, modelDeletionCounters);
+
+		modelDeletionCounters.clear();
+
+		DeletionSystemEventExporter deletionExporter =
+			new DeletionSystemEventExporter();
+
+		deletionExporter.export(portletDataContext);
+
+		checkDeletions();
+	}
+
+	@Test
+	@Transactional
 	public void testPrepareManifestSummary() throws Exception {
 		initExport();
 
@@ -81,7 +137,7 @@ public abstract class BasePortletDataHandlerTestCase extends PowerMockito {
 		Map<String, LongWrapper> modelAdditionCounters =
 			manifestSummary.getModelAdditionCounters();
 
-		Map<String, LongWrapper> expectedModelAdditionCounters =
+		Map<String, LongWrapper> preparedModelAdditionCounters =
 			new HashMap<String, LongWrapper>(modelAdditionCounters);
 
 		modelAdditionCounters.clear();
@@ -89,7 +145,21 @@ public abstract class BasePortletDataHandlerTestCase extends PowerMockito {
 		portletDataHandler.exportData(
 			portletDataContext, portletId, new PortletPreferencesImpl());
 
-		checkManifestSummary(expectedModelAdditionCounters);
+		Set<String> classNames = preparedModelAdditionCounters.keySet();
+
+		for (Iterator<String> it = classNames.iterator(); it.hasNext(); ) {
+			String className = it.next();
+
+			LongWrapper counter = preparedModelAdditionCounters.get(className);
+
+			if (counter.getValue() == 0) {
+				it.remove();
+			}
+		}
+
+		checkCounters(
+			manifestSummary.getModelAdditionCounters(),
+			preparedModelAdditionCounters);
 	}
 
 	protected void addBooleanParameter(
@@ -109,42 +179,76 @@ public abstract class BasePortletDataHandlerTestCase extends PowerMockito {
 
 	protected abstract void addStagedModels() throws Exception;
 
-	protected void checkManifestSummary(
-		Map<String, LongWrapper> expectedModelAdditionCounters) {
+	protected void checkCounters(
+		Map<String, LongWrapper> expectedCounters,
+		Map<String, LongWrapper> actualCounters) {
+
+		int expectedCountersSize = expectedCounters.size();
+
+		for (String className : expectedCounters.keySet()) {
+			LongWrapper actualCounter = actualCounters.get(className);
+			LongWrapper expectedCounter = expectedCounters.get(className);
+
+			Assert.assertEquals(
+				className, expectedCounter.getValue(),
+				actualCounter.getValue());
+		}
+
+		Assert.assertEquals(expectedCountersSize, actualCounters.size());
+	}
+
+	protected void checkDeletions() throws Exception {
+
+		final Map<String, LongWrapper> modelDeletionCounters =
+			new HashMap<String, LongWrapper>();
+
+		SAXParser saxParser = new SAXParser();
+
+		ElementHandler elementHandler = new ElementHandler(
+			new ElementProcessor() {
+
+				@Override
+				public void processElement(Element element) {
+					String className = element.attributeValue("class-name");
+
+					LongWrapper counter = modelDeletionCounters.get(className);
+
+					if (counter != null) {
+						counter.increment();
+					}
+					else {
+						modelDeletionCounters.put(
+							className, new LongWrapper(1));
+					}
+				}
+
+			},
+			new String[] {"deletion-system-event"});
+
+		saxParser.setContentHandler(elementHandler);
+
+		ZipReader zipReader = (ZipReader)portletDataContext.getZipWriter();
+
+		String deletions = zipReader.getEntryAsString(
+			ExportImportPathUtil.getRootPath(portletDataContext) +
+				"/deletion-system-events.xml");
+
+		Assert.assertNotNull(deletions);
+
+		saxParser.parse(new InputSource(new StringReader(deletions)));
 
 		ManifestSummary manifestSummary =
 			portletDataContext.getManifestSummary();
 
-		Map<String, LongWrapper> modelAdditionCounters =
-			manifestSummary.getModelAdditionCounters();
-
-		int expectedModelAdditionCountersSize =
-			expectedModelAdditionCounters.size();
-
-		for (String manifestSummaryKey :
-				expectedModelAdditionCounters.keySet()) {
-
-			LongWrapper expectedModelAdditionCounter =
-				expectedModelAdditionCounters.get(manifestSummaryKey);
-
-			if (expectedModelAdditionCounter.getValue() == 0) {
-				expectedModelAdditionCountersSize--;
-			}
-			else {
-				LongWrapper modelAdditionCounter = modelAdditionCounters.get(
-					manifestSummaryKey);
-
-				Assert.assertEquals(
-					expectedModelAdditionCounter.getValue(),
-					modelAdditionCounter.getValue());
-			}
-		}
-
-		Assert.assertEquals(
-			modelAdditionCounters.size(), expectedModelAdditionCountersSize);
+		checkCounters(
+			manifestSummary.getModelDeletionCounters(), modelDeletionCounters);
 	}
 
 	protected abstract PortletDataHandler createPortletDataHandler();
+
+	protected void deleteStagedModels() throws Exception {
+		portletDataHandler.deleteData(portletDataContext, portletId, null);
+	};
 
 	protected Date getEndDate() {
 		return new Date();
@@ -162,12 +266,12 @@ public abstract class BasePortletDataHandlerTestCase extends PowerMockito {
 
 		addParameters(parameterMap);
 
-		zipWriter = ZipWriterFactoryUtil.getZipWriter();
+		TestReaderWriter testReaderWriter = new TestReaderWriter();
 
 		portletDataContext =
 			PortletDataContextFactoryUtil.createExportPortletDataContext(
 				stagingGroup.getCompanyId(), stagingGroup.getGroupId(),
-				parameterMap, getStartDate(), getEndDate(), zipWriter);
+				parameterMap, getStartDate(), getEndDate(), testReaderWriter);
 
 		rootElement = SAXReaderUtil.createElement("root");
 
@@ -186,6 +290,5 @@ public abstract class BasePortletDataHandlerTestCase extends PowerMockito {
 	protected String portletId;
 	protected Element rootElement;
 	protected Group stagingGroup;
-	protected ZipWriter zipWriter;
 
 }

@@ -14,6 +14,7 @@
 
 package com.liferay.portlet.layoutsetprototypes.lar;
 
+import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.lar.ExportImportPathUtil;
 import com.liferay.portal.kernel.test.ExecutionTestListeners;
 import com.liferay.portal.kernel.util.UnicodeProperties;
@@ -196,6 +197,16 @@ public class LayoutSetPrototypeStagedModelDataHandlerTest
 		LayoutPrototypeLocalServiceUtil.deleteLayoutPrototype(layoutPrototype);
 	}
 
+	@Override
+	protected Object[] getDeletionSystemEventModelTypes() {
+		LayoutSetPrototypePortletDataHandler
+			layoutSetPrototypePortletDataHandler =
+				new LayoutSetPrototypePortletDataHandler();
+
+		return layoutSetPrototypePortletDataHandler.
+			getDeletionSystemEventModelTypes();
+	}
+
 	protected LayoutPrototype getImportedLayoutPrototype(
 			Map<String, List<StagedModel>> dependentStagedModelsMap,
 			Group group)
@@ -228,15 +239,12 @@ public class LayoutSetPrototypeStagedModelDataHandlerTest
 	}
 
 	@Override
-	protected StagedModel getStagedModel(String uuid, Group group) {
-		try {
-			return LayoutSetPrototypeLocalServiceUtil.
-				fetchLayoutSetPrototypeByUuidAndCompanyId(
-					uuid, group.getCompanyId());
-		}
-		catch (Exception e) {
-			return null;
-		}
+	protected StagedModel getStagedModel(String uuid, Group group)
+		throws SystemException {
+
+		return LayoutSetPrototypeLocalServiceUtil.
+			fetchLayoutSetPrototypeByUuidAndCompanyId(
+				uuid, group.getCompanyId());
 	}
 
 	@Override
@@ -292,6 +300,25 @@ public class LayoutSetPrototypeStagedModelDataHandlerTest
 		Assert.assertEquals(1, importedLayouts.size());
 
 		return importedLayouts.get(0);
+	}
+
+	@Override
+	protected void validateDeletion(
+			Map<String, List<StagedModel>> dependentStagedModelsMap,
+			Group group)
+		throws Exception {
+
+		List<StagedModel> dependentStagedModels = dependentStagedModelsMap.get(
+			Layout.class.getSimpleName());
+
+		for (StagedModel stagedModel : dependentStagedModels) {
+			Layout layout = (Layout)stagedModel;
+
+			layout = LayoutLocalServiceUtil.fetchLayoutByUuidAndGroupId(
+				layout.getUuid(), group.getGroupId(), layout.isPrivateLayout());
+
+			Assert.assertNull("Not Deleted: " + Layout.class, layout);
+		}
 	}
 
 	@Override

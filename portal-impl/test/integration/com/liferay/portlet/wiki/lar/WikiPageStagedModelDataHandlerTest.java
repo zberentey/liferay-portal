@@ -29,6 +29,10 @@ import com.liferay.portal.test.LiferayIntegrationJUnitTestRunner;
 import com.liferay.portal.test.MainServletExecutionTestListener;
 import com.liferay.portal.test.TransactionalExecutionTestListener;
 import com.liferay.portal.util.TestPropsValues;
+import com.liferay.portlet.documentlibrary.NoSuchFileEntryException;
+import com.liferay.portlet.documentlibrary.NoSuchFolderException;
+import com.liferay.portlet.documentlibrary.service.DLFileEntryLocalServiceUtil;
+import com.liferay.portlet.documentlibrary.service.DLFolderLocalServiceUtil;
 import com.liferay.portlet.wiki.attachments.WikiAttachmentsTest;
 import com.liferay.portlet.wiki.model.WikiNode;
 import com.liferay.portlet.wiki.model.WikiPage;
@@ -123,6 +127,24 @@ public class WikiPageStagedModelDataHandlerTest
 	}
 
 	@Override
+	protected void deleteStagedModel(
+			StagedModel stagedModel,
+			Map<String, List<StagedModel>> dependentStagedModelsMap,
+			Group group)
+		throws Exception {
+
+		WikiPageLocalServiceUtil.deletePage((WikiPage)stagedModel);
+	}
+
+	@Override
+	protected Object[] getDeletionSystemEventModelTypes() {
+		WikiPortletDataHandler portletDataHandler =
+			new WikiPortletDataHandler();
+
+		return portletDataHandler.getDeletionSystemEventModelTypes();
+	}
+
+	@Override
 	protected StagedModel getStagedModel(String uuid, Group group) {
 		try {
 			return WikiPageLocalServiceUtil.getWikiPageByUuidAndGroupId(
@@ -157,6 +179,43 @@ public class WikiPageStagedModelDataHandlerTest
 	}
 
 	@Override
+	protected void validateDeletion(
+			Map<String, List<StagedModel>> dependentStagedModelsMap,
+			Group group)
+		throws Exception {
+
+		List<StagedModel> dependentStagedModels = dependentStagedModelsMap.get(
+			Folder.class.getSimpleName());
+
+		Folder folder = (Folder)dependentStagedModels.get(0);
+
+		try {
+			DLFolderLocalServiceUtil.getDLFolderByUuidAndGroupId(
+				folder.getUuid(), folder.getGroupId());
+
+			Assert.fail("Not Deleted: " + Folder.class);
+		}
+		catch (NoSuchFolderException nsfe) {
+		}
+
+		dependentStagedModels = dependentStagedModelsMap.get(
+			FileEntry.class.getSimpleName());
+
+		Assert.assertEquals(1, dependentStagedModels.size());
+
+		FileEntry fileEntry = (FileEntry)dependentStagedModels.get(0);
+
+		try {
+			DLFileEntryLocalServiceUtil.getDLFileEntryByUuidAndGroupId(
+				fileEntry.getUuid(), fileEntry.getGroupId());
+
+			Assert.fail("Not Deleted: " + FileEntry.class);
+		}
+		catch (NoSuchFileEntryException nsfee) {
+		}
+	}
+
+	@Override
 	protected void validateImport(
 			Map<String, List<StagedModel>> dependentStagedModelsMap,
 			Group group)
@@ -180,7 +239,7 @@ public class WikiPageStagedModelDataHandlerTest
 			Group group)
 		throws Exception {
 
-		WikiPage page = (WikiPage)stagedModel;
+		WikiPage page = (WikiPage)getStagedModel(stagedModel.getUuid(), group);
 
 		List<FileEntry> attachmentFileEntries =
 			page.getAttachmentsFileEntries();

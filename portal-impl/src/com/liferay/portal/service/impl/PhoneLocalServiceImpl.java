@@ -18,12 +18,16 @@ import com.liferay.portal.PhoneNumberException;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.format.PhoneNumberFormatUtil;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.Account;
 import com.liferay.portal.model.Contact;
 import com.liferay.portal.model.ListTypeConstants;
 import com.liferay.portal.model.Organization;
 import com.liferay.portal.model.Phone;
+import com.liferay.portal.model.SystemEventConstants;
 import com.liferay.portal.model.User;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.base.PhoneLocalServiceBaseImpl;
@@ -99,6 +103,18 @@ public class PhoneLocalServiceImpl extends PhoneLocalServiceBaseImpl {
 			companyId, classNameId, classPK);
 
 		for (Phone phone : phones) {
+			try {
+				systemEventLocalService.addSystemEvent(
+					0, 0, companyId, Phone.class.getName(), phone.getPhoneId(),
+					phone.getUuid(), null, SystemEventConstants.TYPE_DELETE,
+					StringPool.BLANK);
+			}
+			catch (PortalException pe) {
+				if (_log.isWarnEnabled()) {
+					_log.warn("Unable to create system event");
+				}
+			}
+
 			deletePhone(phone);
 		}
 	}
@@ -195,5 +211,8 @@ public class PhoneLocalServiceImpl extends PhoneLocalServiceBaseImpl {
 
 		validate(phoneId, companyId, classNameId, classPK, primary);
 	}
+
+	private static Log _log = LogFactoryUtil.getLog(
+		PhoneLocalServiceImpl.class);
 
 }

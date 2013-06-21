@@ -15,6 +15,7 @@
 package com.liferay.portal.lar;
 
 import com.liferay.portal.kernel.dao.orm.FinderCacheUtil;
+import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.lar.ExportImportPathUtil;
 import com.liferay.portal.kernel.lar.PortletDataContext;
 import com.liferay.portal.kernel.lar.PortletDataContextFactoryUtil;
@@ -25,6 +26,8 @@ import com.liferay.portal.kernel.transaction.Transactional;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.Time;
 import com.liferay.portal.kernel.xml.Element;
+import com.liferay.portal.kernel.xml.ElementHandler;
+import com.liferay.portal.kernel.xml.ElementProcessor;
 import com.liferay.portal.kernel.xml.SAXReaderUtil;
 import com.liferay.portal.kernel.zip.ZipReader;
 import com.liferay.portal.kernel.zip.ZipReaderFactoryUtil;
@@ -32,11 +35,15 @@ import com.liferay.portal.kernel.zip.ZipWriter;
 import com.liferay.portal.kernel.zip.ZipWriterFactoryUtil;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.StagedModel;
+import com.liferay.portal.model.SystemEvent;
 import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.ServiceContextThreadLocal;
+import com.liferay.portal.service.SystemEventLocalServiceUtil;
 import com.liferay.portal.util.GroupTestUtil;
 import com.liferay.portal.util.TestPropsValues;
+
+import java.io.StringReader;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -46,12 +53,16 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.xerces.parsers.SAXParser;
+
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import org.powermock.api.mockito.PowerMockito;
+
+import org.xml.sax.InputSource;
 
 /**
  * @author Daniel Kocsis
@@ -97,11 +108,36 @@ public abstract class BaseStagedModelDataHandlerTestCase extends PowerMockito {
 		validateExport(
 			portletDataContext, stagedModel, dependentStagedModelsMap);
 
+		System.out.println("Deletion model types: ");
+
+		for (Object o : getDeletionSystemEventModelTypes()) {
+			System.out.println("\t" + o);
+		}
+
+		portletDataContext.addDeletionSystemEventModelTypes(
+			getDeletionSystemEventModelTypes());
+
+		deleteStagedModel(stagedModel, dependentStagedModelsMap, stagingGroup);
+
+		System.out.println("All events count: " +
+			SystemEventLocalServiceUtil.getSystemEventsCount());
+
+		for (SystemEvent se :
+				SystemEventLocalServiceUtil.getSystemEvents(-1, -1)) {
+
+			System.out.println(se);
+		}
+
+		portletDataContext.setEndDate(new Date());
+
+		DeletionSystemEventExporter deletionExporter =
+			new DeletionSystemEventExporter();
+
+		deletionExporter.export(portletDataContext);
+
 		// Import
 
 		initImport();
-
-		deleteStagedModel(stagedModel, dependentStagedModelsMap, stagingGroup);
 
 		// Reread the staged model for import from ZIP for true testing
 
@@ -113,6 +149,40 @@ public abstract class BaseStagedModelDataHandlerTestCase extends PowerMockito {
 			portletDataContext, exportedStagedModel);
 
 		validateImport(stagedModel, dependentStagedModelsMap, liveGroup);
+
+		SAXParser saxParser = new SAXParser();
+
+		ElementHandler elementHandler = new ElementHandler(
+			new ElementProcessor() {
+
+				@Override
+				public void processElement(Element element) {
+					try {
+						StagedModelDataHandlerUtil.deleteStagedModel(
+							portletDataContext, element);
+					}
+					catch (Exception e) {
+					}
+				}
+
+			},
+			new String[] {"deletion-system-event"});
+
+		saxParser.setContentHandler(elementHandler);
+
+		ZipReader zipReader = portletDataContext.getZipReader();
+
+		String deletions = zipReader.getEntryAsString(
+			ExportImportPathUtil.getSourceRootPath(portletDataContext) +
+				"/deletion-system-events.xml");
+
+		System.out.println(deletions);
+
+		Assert.assertNotNull(deletions);
+
+		saxParser.parse(new InputSource(new StringReader(deletions)));
+
+		validateDeletion(stagedModel, dependentStagedModelsMap, liveGroup);
 	}
 
 	protected List<StagedModel> addDependentStagedModel(
@@ -153,6 +223,10 @@ public abstract class BaseStagedModelDataHandlerTestCase extends PowerMockito {
 		throws Exception {
 	}
 
+	protected Object[] getDeletionSystemEventModelTypes() {
+		return new Object[0];
+	}
+
 	protected Date getEndDate() {
 		return new Date();
 	}
@@ -187,7 +261,8 @@ public abstract class BaseStagedModelDataHandlerTestCase extends PowerMockito {
 		return parameterMap;
 	}
 
-	protected abstract StagedModel getStagedModel(String uuid, Group group);
+	protected abstract StagedModel getStagedModel(String uuid, Group group)
+		throws SystemException;
 
 	protected abstract Class<? extends StagedModel> getStagedModelClass();
 
@@ -240,6 +315,26 @@ public abstract class BaseStagedModelDataHandlerTestCase extends PowerMockito {
 				stagedModelPath);
 
 		return exportedStagedModel;
+	}
+
+	protected void validateDeletion(
+			Map<String, List<StagedModel>> dependentStagedModelsMap,
+			Group group)
+		throws Exception {
+	}
+
+	protected void validateDeletion(
+			StagedModel stagedModel,
+			Map<String, List<StagedModel>> dependentStagedModelsMap,
+			Group group)
+		throws Exception {
+
+		StagedModel importedStagedModel = getStagedModel(
+			stagedModel.getUuid(), group);
+
+		Assert.assertNull(importedStagedModel);
+
+		validateDeletion(dependentStagedModelsMap, group);
 	}
 
 	protected void validateExport(
