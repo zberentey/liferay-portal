@@ -56,7 +56,7 @@ public class DLFileEntryTypeStagedModelDataHandler
 				fetchDLFileEntryTypeByUuidAndGroupId(uuid, groupId);
 
 		if (dlFileEntryType != null) {
-			DLFileEntryTypeLocalServiceUtil.deleteDLFileEntryType(
+			DLFileEntryTypeLocalServiceUtil.deleteFileEntryType(
 				dlFileEntryType);
 		}
 	}

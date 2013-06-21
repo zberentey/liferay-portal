@@ -15,7 +15,9 @@
 package com.liferay.portlet.documentlibrary.lar;
 
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.lar.StagedModelType;
 import com.liferay.portal.kernel.test.ExecutionTestListeners;
+import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.lar.BaseStagedModelDataHandlerTestCase;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.StagedModel;
@@ -89,13 +91,22 @@ public class DLFileEntryTypeStagedModelDataHandlerTest
 
 		DLFileEntryTypeLocalServiceUtil.deleteFileEntryType(
 			(DLFileEntryType)stagedModel);
+
+		List<StagedModel> dependentStagedModels = dependentStagedModelsMap.get(
+			DDMStructure.class.getSimpleName());
+
+		DDMStructure ddmStructure = (DDMStructure)dependentStagedModels.get(0);
+
+		DDMStructureLocalServiceUtil.deleteStructure(ddmStructure);
 	}
 
 	@Override
 	protected Object[] getDeletionSystemEventModelTypes() {
 		DLPortletDataHandler dlPortletDataHandler = new DLPortletDataHandler();
 
-		return dlPortletDataHandler.getDeletionSystemEventModelTypes();
+		return ArrayUtil.append(
+			dlPortletDataHandler.getDeletionSystemEventModelTypes(),
+			new StagedModelType(DDMStructure.class, DLFileEntryType.class));
 	}
 
 	@Override
