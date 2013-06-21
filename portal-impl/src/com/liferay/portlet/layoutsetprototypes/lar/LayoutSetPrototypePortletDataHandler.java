@@ -20,6 +20,7 @@ import com.liferay.portal.kernel.lar.DataLevel;
 import com.liferay.portal.kernel.lar.PortletDataContext;
 import com.liferay.portal.kernel.lar.PortletDataHandlerBoolean;
 import com.liferay.portal.kernel.lar.StagedModelDataHandlerUtil;
+import com.liferay.portal.kernel.lar.StagedModelType;
 import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.model.LayoutSetPrototype;
 import com.liferay.portal.service.LayoutSetPrototypeLocalServiceUtil;
@@ -39,8 +40,8 @@ public class LayoutSetPrototypePortletDataHandler
 	public static final String NAMESPACE = "layout_set_prototypes";
 
 	public LayoutSetPrototypePortletDataHandler() {
-		super();
-
+		setDeletionSystemEventModelTypes(
+			new StagedModelType(LayoutSetPrototype.class));
 		setDataLevel(DataLevel.PORTAL);
 		setExportControls(
 			new PortletDataHandlerBoolean(
