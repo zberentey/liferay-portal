@@ -81,6 +81,23 @@ public class DLFileEntryTypeStagedModelDataHandlerTest
 	}
 
 	@Override
+	protected void deleteStagedModel(
+			StagedModel stagedModel,
+			Map<String, List<StagedModel>> dependentStagedModelsMap,
+			Group group)
+		throws Exception {
+
+		DLFileEntryTypeLocalServiceUtil.deleteFileEntryType(
+			(DLFileEntryType)stagedModel);
+	}
+
+	@Override
+	protected Object[] getDeletionSystemEventModelTypes() {
+		DLPortletDataHandler dlPortletDataHandler = new DLPortletDataHandler();
+
+		return dlPortletDataHandler.getDeletionSystemEventModelTypes();
+	}
+
 	@Override
 	protected StagedModel getStagedModel(String uuid, Group group)
 		throws SystemException {
@@ -92,6 +109,26 @@ public class DLFileEntryTypeStagedModelDataHandlerTest
 	@Override
 	protected Class<? extends StagedModel> getStagedModelClass() {
 		return DLFileEntryType.class;
+	}
+
+	@Override
+	protected void validateDeletion(
+			Map<String, List<StagedModel>> dependentStagedModelsMap,
+			Group group)
+		throws Exception {
+
+		List<StagedModel> dependentStagedModels = dependentStagedModelsMap.get(
+			DDMStructure.class.getSimpleName());
+
+		Assert.assertEquals(1, dependentStagedModels.size());
+
+		DDMStructure ddmStructure = (DDMStructure)dependentStagedModels.get(0);
+
+		ddmStructure =
+			DDMStructureLocalServiceUtil.fetchDDMStructureByUuidAndGroupId(
+				ddmStructure.getUuid(), group.getGroupId());
+
+		Assert.assertNull("Not Deleted: " + DDMStructure.class, ddmStructure);
 	}
 
 	@Override

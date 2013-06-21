@@ -53,6 +53,23 @@ public class MDRRuleGroupStagedModelDataHandlerTest
 	}
 
 	@Override
+	protected void deleteStagedModel(
+			StagedModel stagedModel,
+			Map<String, List<StagedModel>> dependentStagedModelsMap,
+			Group group)
+		throws Exception {
+
+		MDRRuleGroupLocalServiceUtil.deleteRuleGroup((MDRRuleGroup)stagedModel);
+	}
+
+	@Override
+	protected Object[] getDeletionSystemEventModelTypes() {
+		MDRPortletDataHandler mdrPortletDataHandler =
+			new MDRPortletDataHandler();
+
+		return mdrPortletDataHandler.getDeletionSystemEventModelTypes();
+	}
+
 	@Override
 	protected StagedModel getStagedModel(String uuid, Group group)
 		throws SystemException {

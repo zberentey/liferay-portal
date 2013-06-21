@@ -53,6 +53,23 @@ public class MBBanStagedModelDataHandlerTest
 	}
 
 	@Override
+	protected void deleteStagedModel(
+			StagedModel stagedModel,
+			Map<String, List<StagedModel>> dependentStagedModelsMap,
+			Group group)
+		throws Exception {
+
+		MBBanLocalServiceUtil.deleteBan((MBBan)stagedModel);
+	}
+
+	@Override
+	protected Object[] getDeletionSystemEventModelTypes() {
+		MBPortletDataHandler mbPortletDataHandler = new MBPortletDataHandler();
+
+		return mbPortletDataHandler.getDeletionSystemEventModelTypes();
+	}
+
+	@Override
 	protected StagedModel getStagedModel(String uuid, Group group) {
 		List<MBBan> bans = null;
 

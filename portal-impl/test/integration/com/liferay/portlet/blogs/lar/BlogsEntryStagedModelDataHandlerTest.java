@@ -54,6 +54,23 @@ public class BlogsEntryStagedModelDataHandlerTest
 	}
 
 	@Override
+	protected void deleteStagedModel(
+			StagedModel stagedModel,
+			Map<String, List<StagedModel>> dependentStagedModelsMap,
+			Group group)
+		throws Exception {
+
+		BlogsEntryLocalServiceUtil.deleteEntry((BlogsEntry)stagedModel);
+	}
+
+	@Override
+	protected Object[] getDeletionSystemEventModelTypes() {
+		BlogsPortletDataHandler blogsPortletDataHandler =
+			new BlogsPortletDataHandler();
+
+		return blogsPortletDataHandler.getDeletionSystemEventModelTypes();
+	}
+
 	@Override
 	protected StagedModel getStagedModel(String uuid, Group group)
 		throws SystemException {

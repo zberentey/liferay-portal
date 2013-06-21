@@ -82,6 +82,20 @@ public class DDMTemplateStagedModelDataHandlerTest
 	}
 
 	@Override
+	protected void deleteStagedModel(
+			StagedModel stagedModel,
+			Map<String, List<StagedModel>> dependentStagedModelsMap,
+			Group group)
+		throws Exception {
+
+		DDMTemplateLocalServiceUtil.deleteTemplate((DDMTemplate)stagedModel);
+	}
+
+	@Override
+	protected Object[] getDeletionSystemEventModelTypes() {
+		return new String[] {DDMTemplate.class.getName()};
+	}
+
 	@Override
 	protected StagedModel getStagedModel(String uuid, Group group)
 		throws SystemException {
