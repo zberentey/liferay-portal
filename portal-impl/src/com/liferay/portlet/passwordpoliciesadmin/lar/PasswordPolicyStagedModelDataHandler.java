@@ -46,7 +46,9 @@ public class PasswordPolicyStagedModelDataHandler
 				fetchPasswordPolicyByUuidAndCompanyId(
 					uuid, group.getCompanyId());
 
-		PasswordPolicyLocalServiceUtil.deletePasswordPolicy(passwordPolicy);
+		if (passwordPolicy != null) {
+			PasswordPolicyLocalServiceUtil.deletePasswordPolicy(passwordPolicy);
+		}
 	}
 
 	@Override
