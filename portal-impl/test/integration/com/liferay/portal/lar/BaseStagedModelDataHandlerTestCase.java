@@ -15,6 +15,7 @@
 package com.liferay.portal.lar;
 
 import com.liferay.portal.kernel.dao.orm.FinderCacheUtil;
+import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.lar.ExportImportPathUtil;
 import com.liferay.portal.kernel.lar.PortletDataContext;
 import com.liferay.portal.kernel.lar.PortletDataContextFactoryUtil;
@@ -34,9 +35,11 @@ import com.liferay.portal.kernel.zip.ZipWriter;
 import com.liferay.portal.kernel.zip.ZipWriterFactoryUtil;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.StagedModel;
+import com.liferay.portal.model.SystemEvent;
 import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.ServiceContextThreadLocal;
+import com.liferay.portal.service.SystemEventLocalServiceUtil;
 import com.liferay.portal.util.GroupTestUtil;
 import com.liferay.portal.util.TestPropsValues;
 
@@ -105,10 +108,25 @@ public abstract class BaseStagedModelDataHandlerTestCase extends PowerMockito {
 		validateExport(
 			portletDataContext, stagedModel, dependentStagedModelsMap);
 
+		System.out.println("Deletion model types: ");
+
+		for (Object o : getDeletionSystemEventModelTypes()) {
+			System.out.println("\t" + o);
+		}
+
 		portletDataContext.addDeletionSystemEventModelTypes(
 			getDeletionSystemEventModelTypes());
 
 		deleteStagedModel(stagedModel, dependentStagedModelsMap, stagingGroup);
+
+		System.out.println("All events count: " +
+			SystemEventLocalServiceUtil.getSystemEventsCount());
+
+		for (SystemEvent se :
+				SystemEventLocalServiceUtil.getSystemEvents(-1, -1)) {
+
+			System.out.println(se);
+		}
 
 		portletDataContext.setEndDate(new Date());
 
@@ -157,6 +175,8 @@ public abstract class BaseStagedModelDataHandlerTestCase extends PowerMockito {
 		String deletions = zipReader.getEntryAsString(
 			ExportImportPathUtil.getSourceRootPath(portletDataContext) +
 				"/deletion-system-events.xml");
+
+		System.out.println(deletions);
 
 		Assert.assertNotNull(deletions);
 
@@ -241,7 +261,8 @@ public abstract class BaseStagedModelDataHandlerTestCase extends PowerMockito {
 		return parameterMap;
 	}
 
-	protected abstract StagedModel getStagedModel(String uuid, Group group);
+	protected abstract StagedModel getStagedModel(String uuid, Group group)
+		throws SystemException;
 
 	protected abstract Class<? extends StagedModel> getStagedModelClass();
 
