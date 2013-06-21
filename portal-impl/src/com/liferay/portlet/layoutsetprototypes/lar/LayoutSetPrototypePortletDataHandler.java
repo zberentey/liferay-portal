@@ -17,10 +17,10 @@ package com.liferay.portlet.layoutsetprototypes.lar;
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.lar.BasePortletDataHandler;
 import com.liferay.portal.kernel.lar.DataLevel;
-import com.liferay.portal.kernel.lar.ManifestSummary;
 import com.liferay.portal.kernel.lar.PortletDataContext;
 import com.liferay.portal.kernel.lar.PortletDataHandlerBoolean;
 import com.liferay.portal.kernel.lar.StagedModelDataHandlerUtil;
+import com.liferay.portal.kernel.lar.StagedModelType;
 import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.model.LayoutSetPrototype;
 import com.liferay.portal.service.LayoutSetPrototypeLocalServiceUtil;
@@ -41,6 +41,9 @@ public class LayoutSetPrototypePortletDataHandler
 
 	public LayoutSetPrototypePortletDataHandler() {
 		super();
+
+		setDeletionSystemEventModelTypes(
+			new StagedModelType(LayoutSetPrototype.class));
 
 		setDataLevel(DataLevel.PORTAL);
 		setExportControls(
@@ -119,16 +122,11 @@ public class LayoutSetPrototypePortletDataHandler
 			PortletDataContext portletDataContext)
 		throws Exception {
 
-		ManifestSummary manifestSummary =
-			portletDataContext.getManifestSummary();
-
 		ActionableDynamicQuery layoutSetPrototypeExportActionableDynamicQuery =
 			new LayoutSetPrototypeExportActionableDynamicQuery(
 				portletDataContext);
 
-		manifestSummary.addModelAdditionCount(
-			LayoutSetPrototype.class,
-			layoutSetPrototypeExportActionableDynamicQuery.performCount());
+		layoutSetPrototypeExportActionableDynamicQuery.performCount();
 	}
 
 }

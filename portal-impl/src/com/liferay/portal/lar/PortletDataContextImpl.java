@@ -29,6 +29,7 @@ import com.liferay.portal.kernel.lar.PortletDataContextListener;
 import com.liferay.portal.kernel.lar.PortletDataHandlerControl;
 import com.liferay.portal.kernel.lar.PortletDataHandlerKeys;
 import com.liferay.portal.kernel.lar.StagedModelDataHandlerUtil;
+import com.liferay.portal.kernel.lar.StagedModelType;
 import com.liferay.portal.kernel.lar.UserIdStrategy;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -363,14 +364,29 @@ public class PortletDataContextImpl implements PortletDataContext {
 	}
 
 	@Override
-	public void addDeletionSystemEventClassNames(
-		String... deletionSystemEventClassNames) {
+	public void addDeletionSystemEventModelTypes(
+		Object... deletionSystemEventTypes) {
 
-		for (String deletionSystemEventClassName :
-				deletionSystemEventClassNames) {
+		for (Object deletionSystemEventType : deletionSystemEventTypes) {
+			StagedModelType stagedModelType = null;
 
-			_deletionSystemEventClassNameIds.add(
-				PortalUtil.getClassNameId(deletionSystemEventClassName));
+			if (deletionSystemEventType instanceof Class) {
+				long classNameId = PortalUtil.getClassNameId(
+					((Class<?>)deletionSystemEventType).getName());
+
+				stagedModelType = new StagedModelType(classNameId);
+			}
+			else if (deletionSystemEventType instanceof StagedModelType) {
+				stagedModelType = (StagedModelType)deletionSystemEventType;
+			}
+			else if (deletionSystemEventType instanceof String) {
+				long classNameId = PortalUtil.getClassNameId(
+					((String)deletionSystemEventType));
+
+				stagedModelType = new StagedModelType(classNameId);
+			}
+
+			_deletionSystemEventModelTypes.add(stagedModelType);
 		}
 	}
 
@@ -840,8 +856,8 @@ public class PortletDataContextImpl implements PortletDataContext {
 	}
 
 	@Override
-	public Set<Long> getDeletionSystemEventClassNameIds() {
-		return _deletionSystemEventClassNameIds;
+	public Set<StagedModelType> getDeletionSystemEventTypes() {
+		return _deletionSystemEventModelTypes;
 	}
 
 	@Override
@@ -2263,7 +2279,8 @@ public class PortletDataContextImpl implements PortletDataContext {
 	private long _companyGroupId;
 	private long _companyId;
 	private String _dataStrategy;
-	private Set<Long> _deletionSystemEventClassNameIds = new HashSet<Long>();
+	private Set<StagedModelType> _deletionSystemEventModelTypes =
+		new HashSet<StagedModelType>();
 	private Date _endDate;
 	private Map<String, List<ExpandoColumn>> _expandoColumnsMap =
 		new HashMap<String, List<ExpandoColumn>>();
