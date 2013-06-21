@@ -20,6 +20,7 @@ import com.liferay.portal.kernel.systemevents.SystemEventHierarchyEntry;
 import com.liferay.portal.kernel.systemevents.SystemEventHierarchyEntryThreadLocal;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.model.Company;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.SystemEvent;
 import com.liferay.portal.model.SystemEventConstants;
@@ -83,6 +84,14 @@ public class SystemEventLocalServiceImpl
 				throw new IllegalArgumentException(
 					"Unable to determine company");
 			}
+		}
+
+		Company company = companyLocalService.fetchCompany(companyId);
+
+		Group companyGroup = company.getGroup();
+
+		if (companyGroup.getGroupId() == groupId) {
+			groupId = 0;
 		}
 
 		long systemEventId = 0;
