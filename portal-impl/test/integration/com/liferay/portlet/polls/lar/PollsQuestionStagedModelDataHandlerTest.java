@@ -73,8 +73,8 @@ public class PollsQuestionStagedModelDataHandlerTest
 	protected StagedModel getStagedModel(String uuid, Group group)
 		throws SystemException {
 
-		return PollsQuestionLocalServiceUtil.
-			fetchPollsQuestionByUuidAndGroupId(uuid, group.getGroupId());
+		return PollsQuestionLocalServiceUtil.fetchPollsQuestionByUuidAndGroupId(
+			uuid, group.getGroupId());
 	}
 
 	@Override

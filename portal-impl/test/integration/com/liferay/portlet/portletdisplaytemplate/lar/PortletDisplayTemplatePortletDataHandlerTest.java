@@ -53,7 +53,6 @@ public class PortletDisplayTemplatePortletDataHandlerTest
 		for (Class<?> clazz : _DDM_TEPMLATE_CLASSES) {
 			DDMTemplateTestUtil.addTemplate(
 				stagingGroup.getGroupId(), PortalUtil.getClassNameId(clazz), 0);
-
 		}
 	}
 

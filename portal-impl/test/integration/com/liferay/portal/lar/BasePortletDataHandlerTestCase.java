@@ -274,7 +274,7 @@ public abstract class BasePortletDataHandlerTestCase extends PowerMockito {
 
 	protected void deleteStagedModels() throws Exception {
 		portletDataHandler.deleteData(portletDataContext, portletId, null);
-	};
+	}
 
 	protected Date getEndDate() {
 		return new Date();
