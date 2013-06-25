@@ -14,7 +14,6 @@
 
 package com.liferay.portlet.journal.model;
 
-import com.liferay.portal.kernel.lar.StagedModelType;
 import com.liferay.portal.model.ModelWrapper;
 
 import java.util.Date;
@@ -1574,11 +1573,6 @@ public class JournalArticleWrapper implements JournalArticle,
 	@Override
 	public void setSmallImageType(java.lang.String smallImageType) {
 		_journalArticle.setSmallImageType(smallImageType);
-	}
-
-	@Override
-	public StagedModelType getStagedModelType() {
-		return _journalArticle.getStagedModelType();
 	}
 
 	/**
