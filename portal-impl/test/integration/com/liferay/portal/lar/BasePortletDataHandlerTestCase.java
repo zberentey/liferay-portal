@@ -31,8 +31,11 @@ import com.liferay.portal.kernel.xml.ElementProcessor;
 import com.liferay.portal.kernel.xml.SAXReaderUtil;
 import com.liferay.portal.kernel.zip.ZipReader;
 import com.liferay.portal.model.Group;
+import com.liferay.portal.model.SystemEvent;
 import com.liferay.portal.service.GroupLocalServiceUtil;
+import com.liferay.portal.service.SystemEventLocalServiceUtil;
 import com.liferay.portal.util.GroupTestUtil;
+import com.liferay.portal.util.PortalUtil;
 import com.liferay.portlet.PortletPreferencesImpl;
 
 import java.io.StringReader;
@@ -79,6 +82,8 @@ public abstract class BasePortletDataHandlerTestCase extends PowerMockito {
 	@Test
 	@Transactional
 	public void testDeletions() throws Exception {
+		System.out.println("DELETE");
+
 		initExport();
 
 		addStagedModels();
@@ -98,12 +103,47 @@ public abstract class BasePortletDataHandlerTestCase extends PowerMockito {
 
 		removeUnsupportedDeletionModelTypes(expectedModelDeletionCounters);
 
+		System.out.println("Expected model addition counters: ");
+
+		for (Map.Entry<String, LongWrapper> entry :
+				expectedModelDeletionCounters.entrySet()) {
+
+			System.out.println("\t" + entry.getKey() + " : " +
+				entry.getValue().getValue());
+		}
+
 		modelAdditionCounters.clear();
 
 		portletDataHandler.exportData(
 			portletDataContext, portletId, new PortletPreferencesImpl());
 
+		System.out.println("Real model addition counters after export: ");
+
+		for (Map.Entry<String, LongWrapper> entry :
+				manifestSummary.getModelAdditionCounters().entrySet()) {
+
+			System.out.println("\t" + entry.getKey() + " : " +
+				entry.getValue().getValue());
+		}
+
 		deleteStagedModels();
+
+		System.out.println("All events count: " +
+			SystemEventLocalServiceUtil.getSystemEventsCount());
+
+		for (SystemEvent se :
+				SystemEventLocalServiceUtil.getSystemEvents(-1, -1)) {
+
+			System.out.print("\t" + se.getClassName() + "#");
+
+			if (se.getReferrerClassNameId() > 0) {
+				System.out.println(
+					PortalUtil.getClassName(se.getReferrerClassNameId()));
+			}
+			else {
+				System.out.println(se.getReferrerClassNameId());
+			}
+		}
 
 		portletDataContext.setEndDate(getEndDate());
 
@@ -113,6 +153,15 @@ public abstract class BasePortletDataHandlerTestCase extends PowerMockito {
 			manifestSummary.getModelDeletionCounters();
 
 		removeUnsupportedDeletionModelTypes(modelDeletionCounters);
+
+		System.out.println("Model deletion counters: ");
+
+		for (Map.Entry<String, LongWrapper> entry :
+				modelDeletionCounters.entrySet()) {
+
+			System.out.println("\t" + entry.getKey() + " : " +
+				entry.getValue().getValue());
+		}
 
 		checkCounters(expectedModelDeletionCounters, modelDeletionCounters);
 
@@ -129,6 +178,8 @@ public abstract class BasePortletDataHandlerTestCase extends PowerMockito {
 	@Test
 	@Transactional
 	public void testPrepareManifestSummary() throws Exception {
+		System.out.println("ADD");
+
 		initExport();
 
 		addStagedModels();
@@ -161,6 +212,24 @@ public abstract class BasePortletDataHandlerTestCase extends PowerMockito {
 			if (counter.getValue() == 0) {
 				it.remove();
 			}
+		}
+
+		System.out.println("Model addition counters without zeros: ");
+
+		for (Map.Entry<String, LongWrapper> entry :
+				preparedModelAdditionCounters.entrySet()) {
+
+			System.out.println("\t" + entry.getKey() + " : " +
+				entry.getValue().getValue());
+		}
+
+		System.out.println("Real model addition counters after export: ");
+
+		for (Map.Entry<String, LongWrapper> entry :
+				manifestSummary.getModelAdditionCounters().entrySet()) {
+
+			System.out.println("\t" + entry.getKey() + " : " +
+				entry.getValue().getValue());
 		}
 
 		checkCounters(
