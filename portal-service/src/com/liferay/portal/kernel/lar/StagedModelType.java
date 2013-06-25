@@ -147,7 +147,7 @@ public class StagedModelType {
 			return _className;
 		}
 
-		return _className + StringPool.POUND + _referrerClassName;
+		return _className.concat(StringPool.POUND).concat(_referrerClassName);
 	}
 
 	private String _className;
