@@ -68,11 +68,11 @@ public class DLPortletDataHandler extends BasePortletDataHandler {
 		setDataLocalized(true);
 		setDataPortletPreferences("rootFolderId");
 		setDeletionSystemEventModelTypes(
-			new StagedModelType(DLFileEntry.class),
 			new StagedModelType(DLFileEntryType.class),
 			new StagedModelType(DLFileRank.class),
 			new StagedModelType(DLFileShortcut.class),
-			new StagedModelType(DLFolder.class));
+			new StagedModelType(FileEntry.class),
+			new StagedModelType(Folder.class));
 		setExportControls(
 			new PortletDataHandlerBoolean(
 				NAMESPACE, "documents", true, false,
