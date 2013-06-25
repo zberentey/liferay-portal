@@ -29,6 +29,7 @@ import com.liferay.portlet.asset.model.AssetEntry;
 import com.liferay.portlet.asset.model.AssetTag;
 import com.liferay.portlet.blogs.model.BlogsEntry;
 import com.liferay.portlet.dynamicdatalists.model.DDLRecordSet;
+import com.liferay.portlet.dynamicdatamapping.service.DDMTemplateLocalServiceUtil;
 import com.liferay.portlet.dynamicdatamapping.util.DDMTemplateTestUtil;
 import com.liferay.portlet.journal.model.JournalArticle;
 import com.liferay.portlet.wiki.model.WikiPage;
@@ -59,6 +60,11 @@ public class PortletDisplayTemplatePortletDataHandlerTest
 	@Override
 	protected PortletDataHandler createPortletDataHandler() {
 		return new PortletDisplayTemplatePortletDataHandler();
+	}
+
+	@Override
+	protected void deleteStagedModels() throws Exception {
+		DDMTemplateLocalServiceUtil.deleteTemplates(stagingGroup.getGroupId());
 	}
 
 	@Override
