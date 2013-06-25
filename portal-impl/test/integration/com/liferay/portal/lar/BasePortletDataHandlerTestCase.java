@@ -252,6 +252,18 @@ public abstract class BasePortletDataHandlerTestCase extends PowerMockito {
 		ManifestSummary manifestSummary =
 			portletDataContext.getManifestSummary();
 
+		Set<String> classNames = expectedModelDeletionCounters.keySet();
+
+		for (Iterator<String> it = classNames.iterator(); it.hasNext(); ) {
+			String className = it.next();
+
+			LongWrapper counter = expectedModelDeletionCounters.get(className);
+
+			if (counter.getValue() == 0) {
+				it.remove();
+			}
+		}
+
 		checkCounters(
 			manifestSummary.getModelDeletionCounters(), modelDeletionCounters);
 
