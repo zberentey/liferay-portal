@@ -15,9 +15,11 @@
 package com.liferay.portlet.dynamicdatamapping.service.persistence;
 
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
+import com.liferay.portal.kernel.dao.orm.Disjunction;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Property;
 import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
+import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.lar.ManifestSummary;
@@ -67,6 +69,14 @@ public class DDMTemplateExportActionableDynamicQuery
 	@Override
 	protected void addCriteria(DynamicQuery dynamicQuery) {
 		_portletDataContext.addDateRangeCriteria(dynamicQuery, "modifiedDate");
+
+		if (getStagedModelType().getReferrerClassNameId() >= 0) {
+			Property classNameIdProperty = PropertyFactoryUtil.forName(
+					"classNameId");
+
+			dynamicQuery.add(classNameIdProperty.eq(getStagedModelType()
+														.getReferrerClassNameId()));
+		}
 	}
 
 	protected long getModelDeletionCount(final StagedModelType stagedModelType)
@@ -74,6 +84,24 @@ public class DDMTemplateExportActionableDynamicQuery
 		ActionableDynamicQuery actionableDynamicQuery = new SystemEventActionableDynamicQuery() {
 				@Override
 				protected void addCriteria(DynamicQuery dynamicQuery) {
+					Property companyIdProperty = PropertyFactoryUtil.forName(
+							"companyId");
+
+					dynamicQuery.add(companyIdProperty.eq(
+							_portletDataContext.getCompanyId()));
+
+					Property groupIdProperty = PropertyFactoryUtil.forName(
+							"groupId");
+
+					Disjunction disjunction = RestrictionsFactoryUtil.disjunction();
+
+					disjunction.add(groupIdProperty.eq(0L));
+
+					disjunction.add(groupIdProperty.eq(
+							_portletDataContext.getScopeGroupId()));
+
+					dynamicQuery.add(disjunction);
+
 					Property classNameIdProperty = PropertyFactoryUtil.forName(
 							"classNameId");
 
@@ -115,8 +143,6 @@ public class DDMTemplateExportActionableDynamicQuery
 					dynamicQuery.add(createDateProperty.le(endDate));
 				}
 			};
-
-		actionableDynamicQuery.setGroupId(_portletDataContext.getScopeGroupId());
 
 		return actionableDynamicQuery.performCount();
 	}
