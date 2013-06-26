@@ -25,6 +25,7 @@ import com.liferay.portal.kernel.lar.PortletDataException;
 import com.liferay.portal.kernel.lar.PortletDataHandlerBoolean;
 import com.liferay.portal.kernel.lar.PortletDataHandlerControl;
 import com.liferay.portal.kernel.lar.StagedModelDataHandlerUtil;
+import com.liferay.portal.kernel.lar.StagedModelType;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.kernel.xml.Element;
@@ -58,8 +59,9 @@ public class WikiPortletDataHandler extends BasePortletDataHandler {
 
 	public WikiPortletDataHandler() {
 		setDataPortletPreferences("hiddenNodes, visibleNodes");
-		setDeletionSystemEventClassNames(
-			WikiNode.class.getName(), WikiPage.class.getName());
+		setDeletionSystemEventModelTypes(
+			new StagedModelType(WikiNode.class),
+			new StagedModelType(WikiPage.class));
 		setExportControls(
 			new PortletDataHandlerBoolean(
 				NAMESPACE, "wiki-pages", true, false,
