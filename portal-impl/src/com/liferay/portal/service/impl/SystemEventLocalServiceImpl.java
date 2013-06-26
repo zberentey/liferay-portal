@@ -34,8 +34,8 @@ public class SystemEventLocalServiceImpl
 
 	@Override
 	public void addSystemEvent(
-			long userId, long groupId, String className, long classPK,
-			String classUuid, String referrerClassName, int type,
+			long userId, long groupId, long companyId, String className,
+			long classPK, String classUuid, String referrerClassName, int type,
 			String extraData)
 		throws PortalException, SystemException {
 
@@ -43,14 +43,16 @@ public class SystemEventLocalServiceImpl
 			userId = PrincipalThreadLocal.getUserId();
 		}
 
-		long companyId = 0;
 		String userName = StringPool.BLANK;
 
 		if (userId > 0) {
 			User user = userPersistence.findByPrimaryKey(userId);
 
-			companyId = user.getCompanyId();
 			userName = user.getFullName();
+
+			if (companyId == 0) {
+				companyId = user.getCompanyId();
+			}
 		}
 
 		if (companyId == 0) {
