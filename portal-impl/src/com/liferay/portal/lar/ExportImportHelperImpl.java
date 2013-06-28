@@ -558,7 +558,9 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 
 				String pathContext = PortalUtil.getPathContext();
 
-				if ((pathContext != null) && (pathContext.length() >= 1)) {
+				if (Validator.isNotNull(pathContext) &&
+					(pathContext.length() > 1)) {
+
 					if (startsWithPath(url, pathContext)) {
 						newUrl.append("@data_handler_path_context@");
 
@@ -1407,9 +1409,8 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 		}
 
 		if (url.startsWith(path) &&
-			(((url.length() > path.length()) &&
-			  (url.charAt(url.indexOf(path)) == CharPool.SLASH)) ||
-			 (url.length() == path.length()))) {
+			((url.length() == path.length()) ||
+			 (url.charAt(path.length()) == CharPool.SLASH))) {
 
 			return true;
 		}
