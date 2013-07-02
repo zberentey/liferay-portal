@@ -1110,6 +1110,20 @@ public class GroupLocalServiceWrapper implements GroupLocalService,
 		_groupLocalService.checkSystemGroups(companyId);
 	}
 
+	@Override
+	public void disableStaging(long groupId, java.lang.String stagedPortletIds)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		_groupLocalService.disableStaging(groupId, stagedPortletIds);
+	}
+
+	@Override
+	public void enableStaging(long groupId, java.lang.String stagedPortletIds)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		_groupLocalService.enableStaging(groupId, stagedPortletIds);
+	}
+
 	/**
 	* Returns the group with the matching friendly URL.
 	*

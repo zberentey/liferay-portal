@@ -242,6 +242,30 @@ public class GroupServiceImpl extends GroupServiceBaseImpl {
 		groupLocalService.deleteGroup(groupId);
 	}
 
+	@Override
+	public void disableStaging(long groupId, String stagedPortletIds)
+		throws PortalException, SystemException {
+
+		Group group = groupLocalService.getGroup(groupId);
+
+		GroupPermissionUtil.check(
+			getPermissionChecker(), group, ActionKeys.UPDATE);
+
+		groupLocalService.disableStaging(groupId, stagedPortletIds);
+	}
+
+	@Override
+	public void enableStaging(long groupId, String stagedPortletIds)
+		throws PortalException, SystemException {
+
+		Group group = groupLocalService.getGroup(groupId);
+
+		GroupPermissionUtil.check(
+			getPermissionChecker(), group, ActionKeys.UPDATE);
+
+		groupLocalService.enableStaging(groupId, stagedPortletIds);
+	}
+
 	/**
 	 * Returns the company group.
 	 *

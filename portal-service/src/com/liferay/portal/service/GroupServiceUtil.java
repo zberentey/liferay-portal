@@ -196,6 +196,20 @@ public class GroupServiceUtil {
 		getService().deleteGroup(groupId);
 	}
 
+	public static void disableStaging(long groupId,
+		java.lang.String stagedPortletIds)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		getService().disableStaging(groupId, stagedPortletIds);
+	}
+
+	public static void enableStaging(long groupId,
+		java.lang.String stagedPortletIds)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		getService().enableStaging(groupId, stagedPortletIds);
+	}
+
 	/**
 	* Returns the company group.
 	*

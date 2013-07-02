@@ -190,6 +190,20 @@ public class GroupServiceWrapper implements GroupService,
 		_groupService.deleteGroup(groupId);
 	}
 
+	@Override
+	public void disableStaging(long groupId, java.lang.String stagedPortletIds)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		_groupService.disableStaging(groupId, stagedPortletIds);
+	}
+
+	@Override
+	public void enableStaging(long groupId, java.lang.String stagedPortletIds)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		_groupService.enableStaging(groupId, stagedPortletIds);
+	}
+
 	/**
 	* Returns the company group.
 	*

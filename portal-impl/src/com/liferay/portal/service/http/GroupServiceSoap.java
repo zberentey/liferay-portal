@@ -243,6 +243,30 @@ public class GroupServiceSoap {
 		}
 	}
 
+	public static void disableStaging(long groupId,
+		java.lang.String stagedPortletIds) throws RemoteException {
+		try {
+			GroupServiceUtil.disableStaging(groupId, stagedPortletIds);
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
+	public static void enableStaging(long groupId,
+		java.lang.String stagedPortletIds) throws RemoteException {
+		try {
+			GroupServiceUtil.enableStaging(groupId, stagedPortletIds);
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
 	/**
 	* Returns the company group.
 	*
