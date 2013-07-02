@@ -357,9 +357,11 @@ update ExpandoRow set modifiedDate = CURRENT_TIMESTAMP;
 
 alter table Group_ add uuid_ VARCHAR(75) null;
 alter table Group_ add treePath STRING null;
+alter table Group_ add remoteStagingGroupCount INTEGER;
 
 update Group_ set site = FALSE where name = 'Control Panel';
 update Group_ set site = TRUE where friendlyURL = '/global';
+update Group_ set remoteStagingGroupCount = 0;
 
 drop table Groups_Permissions;
 
