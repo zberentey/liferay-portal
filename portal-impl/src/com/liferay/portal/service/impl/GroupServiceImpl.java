@@ -18,11 +18,9 @@ import com.liferay.portal.NoSuchGroupException;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.staging.StagingConstants;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.MapUtil;
-import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.util.UniqueList;
 import com.liferay.portal.model.Group;
@@ -68,22 +66,6 @@ import java.util.Map;
  * @see    com.liferay.portal.service.impl.GroupLocalServiceImpl
  */
 public class GroupServiceImpl extends GroupServiceBaseImpl {
-
-	@Override
-	public void activateStaging(long groupId)
-		throws PortalException, SystemException {
-
-		Group group = groupLocalService.getGroup(groupId);
-
-		GroupPermissionUtil.check(
-			getPermissionChecker(), group, ActionKeys.UPDATE);
-
-		synchronized(this) {
-			group.setStagingGroupCount(group.getStagingGroupCount() + 1);
-
-			groupLocalService.updateGroup(group);
-		}
-	}
 
 	/**
 	 * Adds a group.
@@ -234,41 +216,6 @@ public class GroupServiceImpl extends GroupServiceBaseImpl {
 		}
 	}
 
-	@Override
-	public void deactivateStaging(long groupId)
-		throws PortalException, SystemException {
-
-		Group group = groupLocalService.getGroup(groupId);
-
-		GroupPermissionUtil.check(
-			getPermissionChecker(), group, ActionKeys.UPDATE);
-
-		synchronized(this) {
-			if (group.getStagingGroupCount() > 0) {
-				group.setStagingGroupCount(group.getStagingGroupCount() - 1);
-
-				if (group.getStagingGroupCount() == 0) {
-					UnicodeProperties typeSettingsProperties =
-						group.getTypeSettingsProperties();
-
-					List<String> keys = new ArrayList<String>();
-
-					for (String key : typeSettingsProperties.keySet()) {
-						if (key.startsWith(StagingConstants.STAGED_PORTLET)) {
-							keys.add(key);
-						}
-					}
-
-					for (String key : keys) {
-						typeSettingsProperties.remove(key);
-					}
-				}
-
-				groupLocalService.updateGroup(group);
-			}
-		}
-	}
-
 	/**
 	 * Deletes the group.
 	 *
@@ -293,6 +240,30 @@ public class GroupServiceImpl extends GroupServiceBaseImpl {
 			getPermissionChecker(), groupId, ActionKeys.DELETE);
 
 		groupLocalService.deleteGroup(groupId);
+	}
+
+	@Override
+	public void disableStaging(long groupId, String stagedPortletIds)
+		throws PortalException, SystemException {
+
+		Group group = groupLocalService.getGroup(groupId);
+
+		GroupPermissionUtil.check(
+			getPermissionChecker(), group, ActionKeys.UPDATE);
+
+		groupLocalService.disableStaging(groupId, stagedPortletIds);
+	}
+
+	@Override
+	public void enableStaging(long groupId, String stagedPortletIds)
+		throws PortalException, SystemException {
+
+		Group group = groupLocalService.getGroup(groupId);
+
+		GroupPermissionUtil.check(
+			getPermissionChecker(), group, ActionKeys.UPDATE);
+
+		groupLocalService.enableStaging(groupId, stagedPortletIds);
 	}
 
 	/**
@@ -1212,26 +1183,6 @@ public class GroupServiceImpl extends GroupServiceBaseImpl {
 		else {
 			return groupLocalService.updateGroup(groupId, typeSettings);
 		}
-	}
-
-	@Override
-	public void updateRemoteGroup(long groupId, String stagedPortletIds)
-		throws PortalException, SystemException {
-
-		GroupPermissionUtil.check(
-			getPermissionChecker(), groupId, ActionKeys.UPDATE);
-
-		Group group = groupPersistence.findByPrimaryKey(groupId);
-
-		UnicodeProperties typeSettings = group.getTypeSettingsProperties();
-
-		for (String portletId : StringUtil.split(stagedPortletIds)) {
-			typeSettings.setProperty(
-				StagingConstants.STAGED_PORTLET.concat(portletId),
-				Boolean.TRUE.toString());
-		}
-
-		groupLocalService.updateGroup(group);
 	}
 
 	protected List<Group> filterGroups(List<Group> groups)

@@ -139,10 +139,10 @@ public class StagingImplTest {
 			new String[] {String.valueOf(stageJournal)});
 
 		serviceContext.setAttribute(
-			StagingConstants.STAGED_PORTLET + PortletDataHandlerKeys.CATEGORIES,
+			StagingUtil.getStagedPortletId(PortletDataHandlerKeys.CATEGORIES),
 				stageCategories);
 		serviceContext.setAttribute(
-			StagingConstants.STAGED_PORTLET + PortletKeys.JOURNAL,
+			StagingUtil.getStagedPortletId(PortletKeys.JOURNAL),
 			stageJournal);
 
 		for (String parameterName : parameters.keySet()) {
