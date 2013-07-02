@@ -19,6 +19,7 @@ import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.staging.StagingConstants;
+import com.liferay.portal.kernel.staging.StagingUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
@@ -714,7 +715,7 @@ public class GroupImpl extends GroupBaseImpl {
 		portletId = PortletConstants.getRootPortletId(portletId);
 
 		String typeSettingsProperty = typeSettingsProperties.getProperty(
-			StagingConstants.STAGED_PORTLET.concat(portletId));
+			StagingUtil.getStagedPortletId(portletId));
 
 		if (Validator.isNotNull(typeSettingsProperty)) {
 			return GetterUtil.getBoolean(typeSettingsProperty);
