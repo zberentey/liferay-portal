@@ -558,90 +558,86 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 				continue;
 			}
 
-			try {
-				StringBundler newUrl = new StringBundler(5);
+			StringBundler newUrl = new StringBundler(5);
 
-				String pathContext = PortalUtil.getPathContext();
+			String pathContext = PortalUtil.getPathContext();
 
-				if (pathContext.length() > 1) {
-					if (!url.startsWith(pathContext)) {
-						continue;
-					}
-
-					newUrl.append("@data_handler_path_context@");
-
-					url = url.substring(pathContext.length());
-				}
-
-				int pos = url.indexOf(StringPool.SLASH, 1);
-
-				if (!url.startsWith(StringPool.SLASH) || (pos == -1)) {
-					if (newUrl.length() > 0) {
-						newUrl.append(url);
-
-						sb.replace(beginPos + offset, endPos, newUrl.toString());
-					}
-
+			if (pathContext.length() > 1) {
+				if (!url.startsWith(pathContext)) {
 					continue;
 				}
 
-				String localePath = url.substring(0, pos);
+				newUrl.append("@data_handler_path_context@");
 
-				Locale locale = LocaleUtil.fromLanguageId(
-					localePath.substring(1), true, false);
-
-				if (locale != null) {
-					String urlWithoutLocale = url.substring(localePath.length());
-
-					if (urlWithoutLocale.startsWith(
-							_PRIVATE_GROUP_SERVLET_MAPPING) ||
-						urlWithoutLocale.startsWith(
-							_PRIVATE_USER_SERVLET_MAPPING) ||
-						urlWithoutLocale.startsWith(
-							_PUBLIC_GROUP_SERVLET_MAPPING)) {
-
-						newUrl.append(localePath);
-
-						url = urlWithoutLocale;
-					}
-				}
-
-				if (url.startsWith(_PRIVATE_GROUP_SERVLET_MAPPING)) {
-					newUrl.append("@data_handler_private_group_servlet_mapping@");
-
-					url = url.substring(
-						_PRIVATE_GROUP_SERVLET_MAPPING.length() - 1);
-				}
-				else if (url.startsWith(_PRIVATE_USER_SERVLET_MAPPING)) {
-					newUrl.append("@data_handler_private_user_servlet_mapping@");
-
-					url = url.substring(_PRIVATE_USER_SERVLET_MAPPING.length() - 1);
-				}
-				else if (url.startsWith(_PUBLIC_GROUP_SERVLET_MAPPING)) {
-					newUrl.append("@data_handler_public_servlet_mapping@");
-
-					url = url.substring(_PUBLIC_GROUP_SERVLET_MAPPING.length() - 1);
-				}
-				else {
-					continue;
-				}
-
-				String groupFriendlyURL = group.getFriendlyURL();
-
-				if (url.equals(groupFriendlyURL) ||
-					url.startsWith(groupFriendlyURL + StringPool.SLASH)) {
-
-					newUrl.append("@data_handler_group_friendly_url@");
-
-					url = url.substring(groupFriendlyURL.length());
-				}
-
-				newUrl.append(url);
-
-				sb.replace(beginPos + offset, endPos, newUrl.toString());
+				url = url.substring(pathContext.length());
 			}
-			finally {
+
+			int pos = url.indexOf(StringPool.SLASH, 1);
+
+			if (!url.startsWith(StringPool.SLASH) || (pos == -1)) {
+				if (newUrl.length() > 0) {
+					newUrl.append(url);
+
+					sb.replace(beginPos + offset, endPos, newUrl.toString());
+				}
+
+				continue;
 			}
+
+			String localePath = url.substring(0, pos);
+
+			Locale locale = LocaleUtil.fromLanguageId(
+				localePath.substring(1), true, false);
+
+			if (locale != null) {
+				String urlWithoutLocale = url.substring(localePath.length());
+
+				if (urlWithoutLocale.startsWith(
+						_PRIVATE_GROUP_SERVLET_MAPPING) ||
+					urlWithoutLocale.startsWith(
+						_PRIVATE_USER_SERVLET_MAPPING) ||
+					urlWithoutLocale.startsWith(
+						_PUBLIC_GROUP_SERVLET_MAPPING)) {
+
+					newUrl.append(localePath);
+
+					url = urlWithoutLocale;
+				}
+			}
+
+			if (url.startsWith(_PRIVATE_GROUP_SERVLET_MAPPING)) {
+				newUrl.append("@data_handler_private_group_servlet_mapping@");
+
+				url = url.substring(
+					_PRIVATE_GROUP_SERVLET_MAPPING.length() - 1);
+			}
+			else if (url.startsWith(_PRIVATE_USER_SERVLET_MAPPING)) {
+				newUrl.append("@data_handler_private_user_servlet_mapping@");
+
+				url = url.substring(_PRIVATE_USER_SERVLET_MAPPING.length() - 1);
+			}
+			else if (url.startsWith(_PUBLIC_GROUP_SERVLET_MAPPING)) {
+				newUrl.append("@data_handler_public_servlet_mapping@");
+
+				url = url.substring(_PUBLIC_GROUP_SERVLET_MAPPING.length() - 1);
+			}
+			else {
+				continue;
+			}
+
+			String groupFriendlyURL = group.getFriendlyURL();
+
+			if (url.equals(groupFriendlyURL) ||
+				url.startsWith(groupFriendlyURL + StringPool.SLASH)) {
+
+				newUrl.append("@data_handler_group_friendly_url@");
+
+				url = url.substring(groupFriendlyURL.length());
+			}
+
+			newUrl.append(url);
+
+			sb.replace(beginPos + offset, endPos, newUrl.toString());
 		}
 
 		return sb.toString();
