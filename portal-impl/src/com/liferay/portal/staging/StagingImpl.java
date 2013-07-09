@@ -19,7 +19,6 @@ import com.liferay.portal.LARFileException;
 import com.liferay.portal.LARFileSizeException;
 import com.liferay.portal.LARTypeException;
 import com.liferay.portal.LayoutPrototypeException;
-import com.liferay.portal.LayoutSetBranchNameException;
 import com.liferay.portal.LocaleException;
 import com.liferay.portal.MissingReferenceException;
 import com.liferay.portal.NoSuchGroupException;
@@ -1842,6 +1841,50 @@ public class StagingImpl implements Staging {
 		}
 	}
 
+	protected void addDefaultLayoutSetBranch(
+			long userId, long groupId, String groupName, boolean privateLayout,
+			ServiceContext serviceContext)
+		throws SystemException {
+
+		String description = LanguageUtil.format(
+			LocaleUtil.getDefault(),
+			LayoutSetBranchConstants.MASTER_BRANCH_DESCRIPTION_PRIVATE,
+			groupName);
+
+		try {
+			LayoutSetBranch layoutSetBranch =
+				LayoutSetBranchLocalServiceUtil.addLayoutSetBranch(
+					userId, groupId, privateLayout,
+					LayoutSetBranchConstants.MASTER_BRANCH_NAME, description,
+					true, LayoutSetBranchConstants.ALL_BRANCHES,
+					serviceContext);
+
+			List<LayoutRevision> layoutRevisions =
+				LayoutRevisionLocalServiceUtil.getLayoutRevisions(
+					layoutSetBranch.getLayoutSetBranchId(), false);
+
+			for (LayoutRevision layoutRevision : layoutRevisions) {
+				LayoutRevisionLocalServiceUtil.updateStatus(
+					userId, layoutRevision.getLayoutRevisionId(),
+					WorkflowConstants.STATUS_APPROVED, serviceContext);
+			}
+		}
+		catch (PortalException pe) {
+			if (_log.isWarnEnabled()) {
+				if (privateLayout) {
+					_log.warn(
+						"Unable to create master branch for private layouts",
+						pe);
+				}
+				else {
+					_log.warn(
+						"Unable to create master branch for public layouts",
+						pe);
+				}
+			}
+		}
+	}
+
 	protected String buildRemoteURL(UnicodeProperties typeSettingsProperties) {
 		String remoteAddress = typeSettingsProperties.getProperty(
 			"remoteAddress");
@@ -1879,72 +1922,28 @@ public class StagingImpl implements Staging {
 		}
 
 		if (branchingPublic) {
-			Locale locale = LocaleUtil.getDefault();
+			LayoutSetBranch layoutSetBranch =
+				LayoutSetBranchLocalServiceUtil.fetchLayoutSetBranch(
+					targetGroupId, false,
+					LayoutSetBranchConstants.MASTER_BRANCH_NAME);
 
-			String description = LanguageUtil.format(
-				locale,
-				LayoutSetBranchConstants.MASTER_BRANCH_DESCRIPTION_PUBLIC,
-				liveGroup.getDescriptiveName());
-
-			try {
-				LayoutSetBranch layoutSetBranch =
-					LayoutSetBranchLocalServiceUtil.addLayoutSetBranch(
-						userId, targetGroupId, false,
-						LayoutSetBranchConstants.MASTER_BRANCH_NAME,
-						description, true,
-						LayoutSetBranchConstants.ALL_BRANCHES, serviceContext);
-
-				List<LayoutRevision> layoutRevisions =
-					LayoutRevisionLocalServiceUtil.getLayoutRevisions(
-						layoutSetBranch.getLayoutSetBranchId(), false);
-
-				for (LayoutRevision layoutRevision : layoutRevisions) {
-					LayoutRevisionLocalServiceUtil.updateStatus(
-						userId, layoutRevision.getLayoutRevisionId(),
-						WorkflowConstants.STATUS_APPROVED, serviceContext);
-				}
-			}
-			catch (LayoutSetBranchNameException lsbne) {
-				if (_log.isWarnEnabled()) {
-					_log.warn(
-						"Unable to create master branch for public layouts",
-						lsbne);
-				}
+			if (layoutSetBranch == null) {
+				addDefaultLayoutSetBranch(
+					userId, targetGroupId, liveGroup.getDescriptiveName(),
+					false, serviceContext);
 			}
 		}
 
 		if (branchingPrivate) {
-			Locale locale = LocaleUtil.getDefault();
+			LayoutSetBranch layoutSetBranch =
+				LayoutSetBranchLocalServiceUtil.fetchLayoutSetBranch(
+					targetGroupId, true,
+					LayoutSetBranchConstants.MASTER_BRANCH_NAME);
 
-			String description = LanguageUtil.format(
-				locale,
-				LayoutSetBranchConstants.MASTER_BRANCH_DESCRIPTION_PRIVATE,
-				liveGroup.getDescriptiveName());
-
-			try {
-				LayoutSetBranch layoutSetBranch =
-					LayoutSetBranchLocalServiceUtil.addLayoutSetBranch(
-						userId, targetGroupId, true,
-						LayoutSetBranchConstants.MASTER_BRANCH_NAME,
-						description, true,
-						LayoutSetBranchConstants.ALL_BRANCHES, serviceContext);
-
-				List<LayoutRevision> layoutRevisions =
-					LayoutRevisionLocalServiceUtil.getLayoutRevisions(
-						layoutSetBranch.getLayoutSetBranchId(), false);
-
-				for (LayoutRevision layoutRevision : layoutRevisions) {
-					LayoutRevisionLocalServiceUtil.updateStatus(
-						userId, layoutRevision.getLayoutRevisionId(),
-						WorkflowConstants.STATUS_APPROVED, serviceContext);
-				}
-			}
-			catch (LayoutSetBranchNameException lsbne) {
-				if (_log.isWarnEnabled()) {
-					_log.warn(
-						"Unable to create master branch for private layouts",
-						lsbne);
-				}
+			if (layoutSetBranch == null) {
+				addDefaultLayoutSetBranch(
+					userId, targetGroupId, liveGroup.getDescriptiveName(), true,
+					serviceContext);
 			}
 		}
 	}
