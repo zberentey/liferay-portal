@@ -40,20 +40,8 @@ public abstract class BaseStagedModelDataHandler<T extends StagedModel>
 			PortletDataContext portletDataContext, T stagedModel)
 		throws PortletDataException {
 
-		String path = ExportImportPathUtil.getModelPath(stagedModel);
-
-		if (portletDataContext.isPathExportedInScope(path)) {
+		if (!isExportable(portletDataContext, stagedModel)) {
 			return;
-		}
-
-		if (stagedModel instanceof WorkflowedModel) {
-			WorkflowedModel workflowedModel = (WorkflowedModel)stagedModel;
-
-			if (!ArrayUtil.contains(
-					getExportableStatuses(), workflowedModel.getStatus())) {
-
-				return;
-			}
 		}
 
 		try {
@@ -160,6 +148,28 @@ public abstract class BaseStagedModelDataHandler<T extends StagedModel>
 	protected abstract void doImportStagedModel(
 			PortletDataContext portletDataContext, T stagedModel)
 		throws Exception;
+
+	protected boolean isExportable(
+		PortletDataContext portletDataContext, T stagedModel) {
+
+		String path = ExportImportPathUtil.getModelPath(stagedModel);
+
+		if (portletDataContext.isPathExportedInScope(path)) {
+			return false;
+		}
+
+		if (stagedModel instanceof WorkflowedModel) {
+			WorkflowedModel workflowedModel = (WorkflowedModel)stagedModel;
+
+			if (!ArrayUtil.contains(
+					getExportableStatuses(), workflowedModel.getStatus())) {
+
+				return false;
+			}
+		}
+
+		return true;
+	}
 
 	protected boolean validateMissingReference(
 			String uuid, long companyId, long groupId)
