@@ -85,7 +85,7 @@ public class LocalizationImpl implements Localization {
 
 	@Override
 	public String[] getAvailableLocales(Document document) {
-		String attributeValue = _getRootAttribute(
+		String attributeValue = _getRootAttributeValue(
 			document, _AVAILABLE_LOCALES, StringPool.BLANK);
 
 		return StringUtil.split(attributeValue);
@@ -93,7 +93,7 @@ public class LocalizationImpl implements Localization {
 
 	@Override
 	public String[] getAvailableLocales(String xml) {
-		String attributeValue = _getRootAttribute(
+		String attributeValue = _getRootAttributeValue(
 			xml, _AVAILABLE_LOCALES, StringPool.BLANK);
 
 		return StringUtil.split(attributeValue);
@@ -146,7 +146,8 @@ public class LocalizationImpl implements Localization {
 		String defaultLanguageId = LocaleUtil.toLanguageId(
 			LocaleUtil.getDefault());
 
-		return _getRootAttribute(document, _DEFAULT_LOCALE, defaultLanguageId);
+		return _getRootAttributeValue(
+			document, _DEFAULT_LOCALE, defaultLanguageId);
 	}
 
 	@Override
@@ -154,7 +155,7 @@ public class LocalizationImpl implements Localization {
 		String defaultLanguageId = LocaleUtil.toLanguageId(
 			LocaleUtil.getDefault());
 
-		return _getRootAttribute(xml, _DEFAULT_LOCALE, defaultLanguageId);
+		return _getRootAttributeValue(xml, _DEFAULT_LOCALE, defaultLanguageId);
 	}
 
 	@Override
@@ -1011,7 +1012,7 @@ public class LocalizationImpl implements Localization {
 		return value;
 	}
 
-	private String _getRootAttribute(
+	private String _getRootAttributeValue(
 		Document document, String name, String defaultValue) {
 
 		String value = null;
@@ -1021,7 +1022,7 @@ public class LocalizationImpl implements Localization {
 		return value;
 	}
 
-	private String _getRootAttribute(
+	private String _getRootAttributeValue(
 		String xml, String name, String defaultValue) {
 
 		String value = null;
