@@ -52,11 +52,6 @@ public class LocalizationImplTest {
 
 		_german = new Locale("de", "DE");
 		_germanId = LocaleUtil.toLanguageId(_german);
-	}
-
-	@Test
-	public void testAvailableLocalesMatchXmlDoc() throws DocumentException {
-		int numOfAvailableLocales = 2;
 
 		StringBundler sb = new StringBundler();
 
@@ -72,84 +67,55 @@ public class LocalizationImplTest {
 		sb.append("</static-content>");
 		sb.append("</root>");
 
-		String xml = sb.toString();
+		_xml = sb.toString();
+	}
 
-		Document document = SAXReaderUtil.read(xml);
+	@Test
+	public void testAvailableLanguageIds() throws DocumentException {
+		Document document = SAXReaderUtil.read(_xml);
 
-		String[] localesFromDoc = LocalizationUtil.getAvailableLocales(
+		String[] languageIdsFromDoc = LocalizationUtil.getAvailableLanguageIds(
 			document);
 
-		String[] localesFromXml = LocalizationUtil.getAvailableLocales(xml);
+		String[] languageIdsFromXml = LocalizationUtil.getAvailableLanguageIds(
+			_xml);
 
-		Assert.assertEquals(
-			"Number of locales not match", localesFromDoc.length,
-			localesFromXml.length);
+		Assert.assertEquals(languageIdsFromDoc.length, 2);
+		Assert.assertEquals(languageIdsFromXml.length, 2);
 
-		Assert.assertEquals(localesFromXml.length, numOfAvailableLocales);
-
-		Arrays.sort(localesFromXml);
-		Arrays.sort(localesFromDoc);
+		Arrays.sort(languageIdsFromDoc);
+		Arrays.sort(languageIdsFromXml);
 
 		Assert.assertTrue(
-			"locales are different",
-			Arrays.equals(localesFromDoc, localesFromXml));
+			"Available language ids from Document and XML don't match",
+			Arrays.equals(languageIdsFromDoc, languageIdsFromXml));
 	}
 
 	@Test
 	public void testChunkedText() {
-		StringBundler sb = new StringBundler();
-
-		sb.append("<?xml version='1.0' encoding='UTF-8'?>");
-
-		sb.append("<root available-locales=\"en_US,es_ES\" ");
-		sb.append("default-locale=\"en_US\">");
-		sb.append("<static-content language-id=\"es_ES\">");
-		sb.append("foo&amp;bar");
-		sb.append("</static-content>");
-		sb.append("<static-content language-id=\"en_US\">");
-		sb.append("<![CDATA[Example in English]]>");
-		sb.append("</static-content>");
-		sb.append("</root>");
-
-		String translation = LocalizationUtil.getLocalization(
-			sb.toString(), "es_ES");
+		String translation = LocalizationUtil.getLocalization(_xml, "es_ES");
 
 		Assert.assertNotNull(translation);
 		Assert.assertEquals("foo&bar", translation);
 		Assert.assertEquals(7, translation.length());
 
-		translation = LocalizationUtil.getLocalization(sb.toString(), "en_US");
+		translation = LocalizationUtil.getLocalization(_xml, "en_US");
 
 		Assert.assertNotNull(translation);
 		Assert.assertEquals(18, translation.length());
 	}
 
 	@Test
-	public void testDefaultLocaleMatchXmlDoc() throws DocumentException {
-		StringBundler sb = new StringBundler();
+	public void testDefaultLanguageId() throws DocumentException {
+		Document document = SAXReaderUtil.read(_xml);
 
-		sb.append("<?xml version='1.0' encoding='UTF-8'?>");
+		String languageIdsFromDoc = LocalizationUtil.getDefaultLanguageId(
+			document);
+		String languageIdsFromXml = LocalizationUtil.getDefaultLanguageId(_xml);
 
-		sb.append("<root available-locales=\"en_US,es_ES\" ");
-		sb.append("default-locale=\"en_US\">");
-		sb.append("<static-content language-id=\"es_ES\">");
-		sb.append("foo&amp;bar");
-		sb.append("</static-content>");
-		sb.append("<static-content language-id=\"en_US\">");
-		sb.append("<![CDATA[Example in English]]>");
-		sb.append("</static-content>");
-		sb.append("</root>");
-
-		String xml = sb.toString();
-
-		Document document = SAXReaderUtil.read(xml);
-
-		String localeFromDoc = LocalizationUtil.getDefaultLocale(document);
-
-		String localeFromXml = LocalizationUtil.getDefaultLocale(xml);
-
-		Assert.assertEquals("Locales not match", localeFromDoc, localeFromXml);
-
+		Assert.assertEquals(
+			"The default language ids from Document and XML don't match",
+			languageIdsFromDoc, languageIdsFromXml);
 	}
 
 	@Test
@@ -285,5 +251,6 @@ public class LocalizationImplTest {
 	private Locale _german;
 	private String _germanHello = "Hallo Welt";
 	private String _germanId;
+	private String _xml;
 
 }
