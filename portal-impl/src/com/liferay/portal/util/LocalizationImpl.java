@@ -32,6 +32,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Tuple;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.xml.Document;
+import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.language.LanguageResources;
 
 import java.util.HashMap;
@@ -1015,11 +1016,9 @@ public class LocalizationImpl implements Localization {
 	private String _getRootAttributeValue(
 		Document document, String name, String defaultValue) {
 
-		String value = null;
+		Element rootElement = document.getRootElement();
 
-		value = document.getRootElement().attributeValue(name, defaultValue);
-
-		return value;
+		return rootElement.attributeValue(name, defaultValue);
 	}
 
 	private String _getRootAttributeValue(
