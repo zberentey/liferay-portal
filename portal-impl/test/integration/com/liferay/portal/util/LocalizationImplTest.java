@@ -24,8 +24,7 @@ import com.liferay.portal.kernel.xml.SAXReaderUtil;
 import com.liferay.portal.test.LiferayIntegrationJUnitTestRunner;
 import com.liferay.portlet.PortletPreferencesImpl;
 
-import edu.emory.mathcs.backport.java.util.Arrays;
-
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -261,7 +260,7 @@ public class LocalizationImplTest {
 		sb.append("<root available-locales=\"en_US,de_DE\" ");
 		sb.append("default-locale=\"en_US\">");
 		sb.append("<greeting language-id=\"de_DE\">");
-		sb.append("<![CDATA[Beispiel auf Deutschl]]>");
+		sb.append("<![CDATA[Beispiel auf Deutsch]]>");
 		sb.append("</greeting>");
 		sb.append("<greeting language-id=\"en_US\">");
 		sb.append("<![CDATA[Example in English]]>");
