@@ -16,6 +16,10 @@ package com.liferay.portal.kernel.lar;
 
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.trash.TrashHandler;
+import com.liferay.portal.kernel.trash.TrashHandlerRegistryUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.kernel.xml.Element;
@@ -168,6 +172,28 @@ public abstract class BaseStagedModelDataHandler<T extends StagedModel>
 			}
 		}
 
+		TrashHandler trashHandler = TrashHandlerRegistryUtil.getTrashHandler(
+			stagedModel.getModelClassName());
+
+		if (trashHandler != null) {
+			try {
+				Long classPK = (Long)stagedModel.getPrimaryKeyObj();
+
+				if (trashHandler.isInTrash(classPK) ||
+					trashHandler.isInTrashContainer(classPK)) {
+
+					return false;
+				}
+			}
+			catch (Exception e) {
+				if (_log.isWarnEnabled()) {
+					_log.warn(
+						"Unable to check trashed status for " +
+							stagedModel.getModelClassName());
+				}
+			}
+		}
+
 		return true;
 	}
 
@@ -177,5 +203,8 @@ public abstract class BaseStagedModelDataHandler<T extends StagedModel>
 
 		return true;
 	}
+
+	private static Log _log = LogFactoryUtil.getLog(
+		BaseStagedModelDataHandler.class);
 
 }
