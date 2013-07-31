@@ -36,6 +36,7 @@ import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.GroupConstants;
 import com.liferay.portal.model.Layout;
 import com.liferay.portal.model.LayoutRevision;
+import com.liferay.portal.model.LayoutSetBranch;
 import com.liferay.portal.model.LayoutTypePortletConstants;
 import com.liferay.portal.security.auth.PrincipalException;
 import com.liferay.portal.service.LayoutLocalServiceUtil;
@@ -588,8 +589,10 @@ public class ConfigurationActionImpl extends DefaultConfigurationAction {
 			HttpServletRequest request = PortalUtil.getHttpServletRequest(
 				actionRequest);
 
-			long layoutSetBranchId = LayoutStagingUtil.getLayoutSetBranch(
-				layout.getLayoutSet()).getLayoutSetBranchId();
+			LayoutSetBranch layoutSetBranch =
+				LayoutStagingUtil.getLayoutSetBranch(layout.getLayoutSet());
+
+			long layoutSetBranchId = layoutSetBranch.getLayoutSetBranchId();
 
 			long layoutRevisionId = StagingUtil.getRecentLayoutRevisionId(
 				request, layoutSetBranchId, layout.getPlid());
