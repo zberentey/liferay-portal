@@ -70,8 +70,6 @@ public class WikiPortletDataHandlerTest extends BasePortletDataHandlerTestCase {
 			stagingGroup.getGroupId());
 
 		for (WikiNode node : nodes) {
-			WikiPageLocalServiceUtil.deletePages(node.getNodeId());
-
 			WikiNodeLocalServiceUtil.deleteNode(node);
 		}
 	}
