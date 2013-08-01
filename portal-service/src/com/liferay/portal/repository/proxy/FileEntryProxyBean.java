@@ -286,7 +286,8 @@ public class FileEntryProxyBean
 	}
 
 	/**
-	 * @deprecated As of 6.2.0, replaced by {@link FileVersionProxyBean#getUserId()}
+	 * @deprecated As of 6.2.0, replaced by {@link
+	 *             FileVersionProxyBean#getUserId()}
 	 */
 	@Override
 	public long getVersionUserId() {
@@ -305,7 +306,8 @@ public class FileEntryProxyBean
 	}
 
 	/**
-	 * @deprecated As of 6.2.0, replaced by {@link FileVersionProxyBean#getUserName()}
+	 * @deprecated As of 6.2.0, replaced by {@link
+	 *             FileVersionProxyBean#getUserName()}
 	 */
 	@Override
 	public String getVersionUserName() {
@@ -324,7 +326,8 @@ public class FileEntryProxyBean
 	}
 
 	/**
-	 * @deprecated As of 6.2.0, replaced by {@link FileVersionProxyBean#getUserUuid()}
+	 * @deprecated As of 6.2.0, replaced by {@link
+	 *             FileVersionProxyBean#getUserUuid()}
 	 */
 	@Override
 	public String getVersionUserUuid() {

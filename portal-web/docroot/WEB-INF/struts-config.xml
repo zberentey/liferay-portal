@@ -2174,8 +2174,8 @@
 		</action>
 
 		<action path="/wiki/select_version" type="com.liferay.portlet.wiki.action.ViewPageAction">
-			<forward name="portlet.wiki.view_page" path="portlet.wiki.select_version" />
 			<forward name="portlet.wiki.error" path="portlet.wiki.error" />
+			<forward name="portlet.wiki.view_page" path="portlet.wiki.select_version" />
 		</action>
 
 		<action path="/wiki/view" type="com.liferay.portlet.wiki.action.ViewPageAction">
@@ -2323,6 +2323,11 @@
 		<action path="/wiki_admin/search" type="com.liferay.portlet.wiki.action.ViewNodeAction">
 			<forward name="portlet.wiki.error" path="portlet.wiki.error" />
 			<forward name="portlet.wiki.view_node" path="portlet.wiki.search" />
+		</action>
+
+		<action path="/wiki_admin/select_version" type="com.liferay.portlet.wiki.action.ViewPageAction">
+			<forward name="portlet.wiki.view_page" path="portlet.wiki.select_version" />
+			<forward name="portlet.wiki.error" path="portlet.wiki.error" />
 		</action>
 
 		<action path="/wiki_admin/view" type="com.liferay.portlet.wiki.action.ViewPageAction">

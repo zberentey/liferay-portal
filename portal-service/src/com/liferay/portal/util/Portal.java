@@ -280,8 +280,8 @@ public interface Portal {
 	 * @param  locale the locale of the translated page
 	 * @param  layout the layout
 	 * @return the alternate URL
-	 * @throws     PortalException if a portal exception occurred
-	 * @throws     SystemException if a system exception occurred
+	 * @throws PortalException if a portal exception occurred
+	 * @throws SystemException if a system exception occurred
 	 */
 	public String getAlternateURL(
 			String canonicalURL, ThemeDisplay themeDisplay, Locale locale,

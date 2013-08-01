@@ -56,6 +56,10 @@ if (Validator.isNotNull(fieldParam)) {
 		dateString += ",new Date(" + endCal.get(Calendar.YEAR) + "," + endCal.get(Calendar.MONTH) + "," + endCal.get(Calendar.DAY_OF_MONTH) + ",23,59,0,0)";
 	}
 }
+
+Calendar localeCal = CalendarFactoryUtil.getCalendar(timeZone, locale);
+
+int firstDayOfWeek = localeCal.getFirstDayOfWeek() - 1;
 %>
 
 <c:if test="<%= Validator.isNotNull(fieldParamFrom) && Validator.isNotNull(fieldParamTo) %>">
@@ -170,7 +174,8 @@ if (Validator.isNotNull(fieldParam)) {
 			allowNone: true,
 			dateFormat: '%Y%m%d000000',
 			dates: [<%= dateString %>],
-			firstDayOfWeek: 0,
+			firstDayOfWeek: <%= firstDayOfWeek %>,
+			locale: '<%= locale %>',
 			maxDate: now,
 			minDate: A.DataType.DateMath.subtract(now, A.DataType.DateMath.YEAR, 2),
 			selectMultipleDates: true,

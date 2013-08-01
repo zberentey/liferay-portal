@@ -25,7 +25,10 @@ import com.liferay.portal.test.TransactionalExecutionTestListener;
 import com.liferay.portal.util.PortletKeys;
 import com.liferay.portal.util.TestPropsValues;
 import com.liferay.portlet.wiki.model.WikiNode;
+import com.liferay.portlet.wiki.service.WikiNodeLocalServiceUtil;
 import com.liferay.portlet.wiki.util.WikiTestUtil;
+
+import java.util.List;
 
 import org.junit.runner.RunWith;
 
@@ -58,6 +61,16 @@ public class WikiPortletDataHandlerTest extends BasePortletDataHandlerTestCase {
 	@Override
 	protected PortletDataHandler createPortletDataHandler() {
 		return new WikiPortletDataHandler();
+	}
+
+	@Override
+	protected void deleteStagedModels() throws Exception {
+		List<WikiNode> nodes = WikiNodeLocalServiceUtil.getNodes(
+			stagingGroup.getGroupId());
+
+		for (WikiNode node : nodes) {
+			WikiNodeLocalServiceUtil.deleteNode(node);
+		}
 	}
 
 	@Override

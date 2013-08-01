@@ -157,10 +157,24 @@ CKEDITOR.config.toolbar_liferayArticle = [
 	['Image', 'Flash', 'Table', '-', 'Smiley', 'SpecialChar', 'LiferayPageBreak']
 ];
 
+CKEDITOR.config.toolbar_phone = [
+	['Bold', 'Italic', 'Underline', 'Strike'],
+	['NumberedList', 'BulletedList'],
+	['Image', 'Link', 'Unlink']
+];
+
 CKEDITOR.config.toolbar_simple = [
 	['Bold', 'Italic', 'Underline', 'Strike'],
 	['NumberedList', 'BulletedList'],
 	['Image', 'Link', 'Unlink', 'Table']
+];
+
+CKEDITOR.config.toolbar_tablet = [
+	['Bold', 'Italic', 'Underline', 'Strike'],
+	['NumberedList', 'BulletedList'],
+	['Image', 'Link', 'Unlink'],
+	['JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock'],
+	['Styles', 'FontSize']
 ];
 
 CKEDITOR.on(

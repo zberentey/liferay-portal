@@ -635,12 +635,14 @@ public class BaseRepositoryProxyBean
 		_baseRepository.revertFileEntry(fileEntryId, version, serviceContext);
 	}
 
+	@Override
 	public Hits search(long creatorUserId, int status, int start, int end)
 		throws PortalException, SystemException {
 
 		return _baseRepository.search(creatorUserId, status, start, end);
 	}
 
+	@Override
 	public Hits search(
 			long creatorUserId, long folderId, String[] mimeTypes, int status,
 			int start, int end)

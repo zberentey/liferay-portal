@@ -162,8 +162,56 @@ public class ManifestSummary implements Serializable {
 		return _modelAdditionCounters;
 	}
 
+	public long getModelDeletionCount() {
+		long modelDeletionCount = -1;
+
+		for (String manifestSummaryKey : _manifestSummaryKeys) {
+			long manifestSummaryKeyModelDeletionCount = getModelDeletionCount(
+				manifestSummaryKey);
+
+			if (manifestSummaryKeyModelDeletionCount == -1) {
+				continue;
+			}
+
+			if (modelDeletionCount == -1) {
+				modelDeletionCount = manifestSummaryKeyModelDeletionCount;
+			}
+			else {
+				modelDeletionCount += manifestSummaryKeyModelDeletionCount;
+			}
+		}
+
+		return modelDeletionCount;
+	}
+
 	public long getModelDeletionCount(Class<? extends ClassedModel> clazz) {
 		return getModelDeletionCount(clazz.getName());
+	}
+
+	public long getModelDeletionCount(StagedModelType[] stagedModelTypes) {
+		if (Validator.isNull(stagedModelTypes)) {
+			return 0;
+		}
+
+		long modelDeletionCount = -1;
+
+		for (StagedModelType stagedModelType : stagedModelTypes) {
+			long stagedModelTypeModelDeletionCount = getModelDeletionCount(
+				stagedModelType.toString());
+
+			if (stagedModelTypeModelDeletionCount == -1) {
+				continue;
+			}
+
+			if (modelDeletionCount == -1) {
+				modelDeletionCount = stagedModelTypeModelDeletionCount;
+			}
+			else {
+				modelDeletionCount += stagedModelTypeModelDeletionCount;
+			}
+		}
+
+		return modelDeletionCount;
 	}
 
 	public long getModelDeletionCount(String modelName) {
