@@ -93,10 +93,11 @@ public abstract class BasePortletDataHandlerTestCase extends PowerMockito {
 		Map<String, LongWrapper> modelAdditionCounters =
 			manifestSummary.getModelAdditionCounters();
 
-		Map<String, LongWrapper> expectedModelDeletionCounters =
+		Map<String, LongWrapper> initialModelDeletionCounters =
 			new HashMap<String, LongWrapper>(modelAdditionCounters);
 
-		removeUnsupportedDeletionModelTypes(expectedModelDeletionCounters);
+		removeUnsupportedDeletionSystemEventStagedModelTypes(
+			initialModelDeletionCounters);
 
 		modelAdditionCounters.clear();
 
@@ -112,18 +113,20 @@ public abstract class BasePortletDataHandlerTestCase extends PowerMockito {
 		Map<String, LongWrapper> modelDeletionCounters =
 			manifestSummary.getModelDeletionCounters();
 
-		removeUnsupportedDeletionModelTypes(modelDeletionCounters);
+		removeUnsupportedDeletionSystemEventStagedModelTypes(
+			modelDeletionCounters);
 
-		checkCounters(expectedModelDeletionCounters, modelDeletionCounters);
+		checkCounters(initialModelDeletionCounters, modelDeletionCounters);
 
 		modelDeletionCounters.clear();
 
-		DeletionSystemEventExporter deletionExporter =
+		DeletionSystemEventExporter deletionSystemEventExporter =
 			new DeletionSystemEventExporter();
 
-		deletionExporter.exportDeletionSystemEvents(portletDataContext);
+		deletionSystemEventExporter.exportDeletionSystemEvents(
+			portletDataContext);
 
-		checkDeletions(expectedModelDeletionCounters);
+		checkDeletions(initialModelDeletionCounters);
 	}
 
 	@Test
@@ -143,7 +146,7 @@ public abstract class BasePortletDataHandlerTestCase extends PowerMockito {
 		Map<String, LongWrapper> modelAdditionCounters =
 			manifestSummary.getModelAdditionCounters();
 
-		Map<String, LongWrapper> preparedModelAdditionCounters =
+		Map<String, LongWrapper> initialModelAdditionCounters =
 			new HashMap<String, LongWrapper>(modelAdditionCounters);
 
 		modelAdditionCounters.clear();
@@ -151,21 +154,23 @@ public abstract class BasePortletDataHandlerTestCase extends PowerMockito {
 		portletDataHandler.exportData(
 			portletDataContext, portletId, new PortletPreferencesImpl());
 
-		Set<String> classNames = preparedModelAdditionCounters.keySet();
+		Set<String> classNames = initialModelAdditionCounters.keySet();
+		
+		Iterator<String> iterator = classNames.iterator();
 
-		for (Iterator<String> it = classNames.iterator(); it.hasNext(); ) {
-			String className = it.next();
+		while (iterator.hasNext()) {
+			String className = iterator.next();
 
-			LongWrapper counter = preparedModelAdditionCounters.get(className);
+			LongWrapper counter = initialModelAdditionCounters.get(className);
 
 			if (counter.getValue() == 0) {
-				it.remove();
+				iterator.remove();
 			}
 		}
 
 		checkCounters(
-			manifestSummary.getModelAdditionCounters(),
-			preparedModelAdditionCounters);
+			initialModelAdditionCounters,
+			manifestSummary.getModelAdditionCounters());
 	}
 
 	protected void addBooleanParameter(
@@ -189,8 +194,6 @@ public abstract class BasePortletDataHandlerTestCase extends PowerMockito {
 		Map<String, LongWrapper> expectedCounters,
 		Map<String, LongWrapper> actualCounters) {
 
-		int expectedCountersSize = expectedCounters.size();
-
 		for (String className : expectedCounters.keySet()) {
 			LongWrapper actualCounter = actualCounters.get(className);
 			LongWrapper expectedCounter = expectedCounters.get(className);
@@ -200,14 +203,14 @@ public abstract class BasePortletDataHandlerTestCase extends PowerMockito {
 				actualCounter.getValue());
 		}
 
-		Assert.assertEquals(expectedCountersSize, actualCounters.size());
+		Assert.assertEquals(expectedCounters.size(), actualCounters.size());
 	}
 
 	protected void checkDeletions(
 			Map<String, LongWrapper> expectedModelDeletionCounters)
 		throws Exception {
 
-		final Map<String, LongWrapper> modelDeletionCounters =
+		final Map<String, LongWrapper> actualModelDeletionCounters =
 			new HashMap<String, LongWrapper>();
 
 		SAXParser saxParser = new SAXParser();
@@ -222,14 +225,14 @@ public abstract class BasePortletDataHandlerTestCase extends PowerMockito {
 							element.attributeValue("class-name"),
 							element.attributeValue("referrer-class-name"));
 
-					LongWrapper counter = modelDeletionCounters.get(
+					LongWrapper counter = actualModelDeletionCounters.get(
 						stagedModelType.toString());
 
 					if (counter != null) {
 						counter.increment();
 					}
 					else {
-						modelDeletionCounters.put(
+						actualModelDeletionCounters.put(
 							stagedModelType.toString(), new LongWrapper(1));
 					}
 				}
@@ -241,33 +244,37 @@ public abstract class BasePortletDataHandlerTestCase extends PowerMockito {
 
 		ZipReader zipReader = (ZipReader)portletDataContext.getZipWriter();
 
-		String deletions = zipReader.getEntryAsString(
+		String deletionSystemEventsXML = zipReader.getEntryAsString(
 			ExportImportPathUtil.getRootPath(portletDataContext) +
 				"/deletion-system-events.xml");
 
-		Assert.assertNotNull(deletions);
+		Assert.assertNotNull(deletionSystemEventsXML);
 
-		saxParser.parse(new InputSource(new StringReader(deletions)));
+		saxParser.parse(
+			new InputSource(new StringReader(deletionSystemEventsXML)));
 
 		ManifestSummary manifestSummary =
 			portletDataContext.getManifestSummary();
 
 		Set<String> classNames = expectedModelDeletionCounters.keySet();
+		
+		Iterator<String> iterator = classNames.iterator();
 
-		for (Iterator<String> it = classNames.iterator(); it.hasNext(); ) {
-			String className = it.next();
+		while (iterator.hasNext()) {
+			String className = iterator.next();
 
 			LongWrapper counter = expectedModelDeletionCounters.get(className);
 
 			if (counter.getValue() == 0) {
-				it.remove();
+				iterator.remove();
 			}
 		}
 
 		checkCounters(
-			manifestSummary.getModelDeletionCounters(), modelDeletionCounters);
-
-		checkCounters(expectedModelDeletionCounters, modelDeletionCounters);
+			manifestSummary.getModelDeletionCounters(),
+			actualModelDeletionCounters);
+		checkCounters(
+			expectedModelDeletionCounters, actualModelDeletionCounters);
 	}
 
 	protected abstract PortletDataHandler createPortletDataHandler();
@@ -310,32 +317,35 @@ public abstract class BasePortletDataHandlerTestCase extends PowerMockito {
 			missingReferencesElement);
 	}
 
-	protected void removeUnsupportedDeletionModelTypes(
+	protected void removeUnsupportedDeletionSystemEventStagedModelTypes(
 		Map<String, LongWrapper> expectedModelDeletionCounters) {
 
-		Set<String> supportedModelTypes = new HashSet<String>();
+		Set<String> stagedModelTypes = new HashSet<String>();
 
-		for (Object modelType :
+		for (Object deletionSystemEventStagedModelTypes :
 				portletDataHandler.getDeletionSystemEventStagedModelTypes()) {
 
-			if (modelType instanceof Class) {
-				supportedModelTypes.add(((Class<?>)modelType).getName());
+			if (deletionSystemEventStagedModelTypes instanceof Class) {
+				Class<?> clazz = (Class<?>)deletionSystemEventStagedModelTypes;
+
+				stagedModelTypes.add(clazz.getName());
 			}
 			else {
-				supportedModelTypes.add(modelType.toString());
+				stagedModelTypes.add(
+					deletionSystemEventStagedModelTypes.toString());
 			}
 		}
 
-		Set<Map.Entry<String, LongWrapper>> entrySet =
+		Set<Map.Entry<String, LongWrapper>> set =
 			expectedModelDeletionCounters.entrySet();
 
-		Iterator<Map.Entry<String, LongWrapper>> it = entrySet.iterator();
+		Iterator<Map.Entry<String, LongWrapper>> iterator = set.iterator();
 
-		while (it.hasNext()) {
-			Map.Entry<String, LongWrapper> entry = it.next();
+		while (iterator.hasNext()) {
+			Map.Entry<String, LongWrapper> entry = iterator.next();
 
-			if (!supportedModelTypes.contains(entry.getKey())) {
-				it.remove();
+			if (!stagedModelTypes.contains(entry.getKey())) {
+				iterator.remove();
 			}
 		}
 	}

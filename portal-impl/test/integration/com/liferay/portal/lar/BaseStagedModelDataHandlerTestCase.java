@@ -114,10 +114,11 @@ public abstract class BaseStagedModelDataHandlerTestCase extends PowerMockito {
 
 		portletDataContext.setEndDate(new Date());
 
-		DeletionSystemEventExporter deletionExporter =
+		DeletionSystemEventExporter deletionSystemEventExporter =
 			new DeletionSystemEventExporter();
 
-		deletionExporter.exportDeletionSystemEvents(portletDataContext);
+		deletionSystemEventExporter.exportDeletionSystemEvents(
+			portletDataContext);
 
 		// Import
 
@@ -156,13 +157,14 @@ public abstract class BaseStagedModelDataHandlerTestCase extends PowerMockito {
 
 		ZipReader zipReader = portletDataContext.getZipReader();
 
-		String deletions = zipReader.getEntryAsString(
+		String deletionSystemEventsXML = zipReader.getEntryAsString(
 			ExportImportPathUtil.getSourceRootPath(portletDataContext) +
 				"/deletion-system-events.xml");
 
-		Assert.assertNotNull(deletions);
+		Assert.assertNotNull(deletionSystemEventsXML);
 
-		saxParser.parse(new InputSource(new StringReader(deletions)));
+		saxParser.parse(
+			new InputSource(new StringReader(deletionSystemEventsXML)));
 
 		validateDeletion(stagedModel, dependentStagedModelsMap, liveGroup);
 	}
