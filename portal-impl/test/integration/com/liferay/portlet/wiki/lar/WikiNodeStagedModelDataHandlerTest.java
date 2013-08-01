@@ -15,6 +15,7 @@
 package com.liferay.portlet.wiki.lar;
 
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.lar.PortletDataHandler;
 import com.liferay.portal.kernel.lar.StagedModelType;
 import com.liferay.portal.kernel.test.ExecutionTestListeners;
 import com.liferay.portal.lar.BaseStagedModelDataHandlerTestCase;
@@ -69,8 +70,7 @@ public class WikiNodeStagedModelDataHandlerTest
 
 	@Override
 	protected StagedModelType[] getDeletionSystemEventStagedModelTypes() {
-		WikiPortletDataHandler portletDataHandler =
-			new WikiPortletDataHandler();
+		PortletDataHandler portletDataHandler = new WikiPortletDataHandler();
 
 		return portletDataHandler.getDeletionSystemEventStagedModelTypes();
 	}

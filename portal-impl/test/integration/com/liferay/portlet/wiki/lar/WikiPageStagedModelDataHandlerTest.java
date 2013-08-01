@@ -16,6 +16,7 @@ package com.liferay.portlet.wiki.lar;
 
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.lar.ExportImportPathUtil;
+import com.liferay.portal.kernel.lar.PortletDataHandler;
 import com.liferay.portal.kernel.lar.StagedModelType;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.Folder;
@@ -166,8 +167,7 @@ public class WikiPageStagedModelDataHandlerTest
 
 	@Override
 	protected StagedModelType[] getDeletionSystemEventStagedModelTypes() {
-		WikiPortletDataHandler portletDataHandler =
-			new WikiPortletDataHandler();
+		PortletDataHandler portletDataHandler = new WikiPortletDataHandler();
 
 		return portletDataHandler.getDeletionSystemEventStagedModelTypes();
 	}
@@ -209,34 +209,34 @@ public class WikiPageStagedModelDataHandlerTest
 			Group group)
 		throws Exception {
 
-		List<StagedModel> dependentStagedModels = dependentStagedModelsMap.get(
-			Folder.class.getSimpleName());
+		List<StagedModel> fileEntryDependentStagedModels =
+			dependentStagedModelsMap.get(FileEntry.class.getSimpleName());
 
-		Folder folder = (Folder)dependentStagedModels.get(0);
+		Assert.assertEquals(1, fileEntryDependentStagedModels.size());
 
-		try {
-			DLFolderLocalServiceUtil.getDLFolderByUuidAndGroupId(
-				folder.getUuid(), folder.getGroupId());
-
-			Assert.fail(Folder.class);
-		}
-		catch (NoSuchFolderException nsfe) {
-		}
-
-		dependentStagedModels = dependentStagedModelsMap.get(
-			FileEntry.class.getSimpleName());
-
-		Assert.assertEquals(1, dependentStagedModels.size());
-
-		FileEntry fileEntry = (FileEntry)dependentStagedModels.get(0);
+		FileEntry fileEntry = (FileEntry)fileEntryDependentStagedModels.get(0);
 
 		try {
 			DLFileEntryLocalServiceUtil.getDLFileEntryByUuidAndGroupId(
 				fileEntry.getUuid(), fileEntry.getGroupId());
 
-			Assert.fail(FileEntry.class);
+			Assert.fail(FileEntry.class.getName());
 		}
 		catch (NoSuchFileEntryException nsfee) {
+		}
+
+		List<StagedModel> folderDependentStagedModels =
+			dependentStagedModelsMap.get(Folder.class.getSimpleName());
+
+		Folder folder = (Folder)folderDependentStagedModels.get(0);
+
+		try {
+			DLFolderLocalServiceUtil.getDLFolderByUuidAndGroupId(
+				folder.getUuid(), folder.getGroupId());
+
+			Assert.fail(Folder.class.getName());
+		}
+		catch (NoSuchFolderException nsfe) {
 		}
 	}
 
