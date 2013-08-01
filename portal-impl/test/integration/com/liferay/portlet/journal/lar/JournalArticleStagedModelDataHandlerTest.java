@@ -323,7 +323,7 @@ public class JournalArticleStagedModelDataHandlerTest
 			DDMStructureLocalServiceUtil.fetchDDMStructureByUuidAndGroupId(
 				ddmStructure.getUuid(), group.getGroupId());
 
-		Assert.assertNull("Not Deleted: " + DDMStructure.class, ddmStructure);
+		Assert.assertNull(ddmStructure);
 
 		dependentStagedModels = dependentStagedModelsMap.get(
 			DDMTemplate.class.getSimpleName());
@@ -336,7 +336,7 @@ public class JournalArticleStagedModelDataHandlerTest
 			DDMTemplateLocalServiceUtil.fetchDDMTemplateByUuidAndGroupId(
 				ddmTemplate.getUuid(), group.getGroupId());
 
-		Assert.assertNull("Not Deleted: " + DDMTemplate.class, ddmTemplate);
+		Assert.assertNull(ddmTemplate);
 
 		dependentStagedModels = dependentStagedModelsMap.get(
 			JournalFolder.class.getSimpleName());
@@ -349,7 +349,7 @@ public class JournalArticleStagedModelDataHandlerTest
 			JournalFolderLocalServiceUtil.fetchJournalFolderByUuidAndGroupId(
 				folder.getUuid(), group.getGroupId());
 
-		Assert.assertNull("Not Deleted: " + JournalFolder.class, folder);
+		Assert.assertNull(folder);
 	}
 
 	@Override

@@ -183,7 +183,7 @@ public class DLFileShortcutStagedModelDataHandlerTest
 			DLFileEntryLocalServiceUtil.fetchDLFileEntryByUuidAndGroupId(
 				fileEntry.getUuid(), group.getGroupId());
 
-		Assert.assertNull("Not Deleted: " + FileEntry.class, dlFileEntry);
+		Assert.assertNull(dlFileEntry);
 
 		dependentStagedModels = dependentStagedModelsMap.get(
 			Folder.class.getSimpleName());
@@ -196,7 +196,7 @@ public class DLFileShortcutStagedModelDataHandlerTest
 			DLFolderLocalServiceUtil.fetchDLFolderByUuidAndGroupId(
 				folder.getUuid(), group.getGroupId());
 
-		Assert.assertNull("Not Deleted: " + Folder.class, dlFolder);
+		Assert.assertNull(dlFolder);
 	}
 
 	@Override

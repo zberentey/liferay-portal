@@ -198,7 +198,7 @@ public class JournalFeedStagedModelDataHandlerTest
 			DDMStructureLocalServiceUtil.fetchDDMStructureByUuidAndGroupId(
 				ddmStructure.getUuid(), group.getGroupId());
 
-		Assert.assertNull("Not Deleted: " + DDMStructure.class, ddmStructure);
+		Assert.assertNull(ddmStructure);
 
 		dependentStagedModels = dependentStagedModelsMap.get(
 			DDMTemplate.class.getSimpleName());
@@ -213,7 +213,7 @@ public class JournalFeedStagedModelDataHandlerTest
 					ddmTemplateDependentStagedModel.getUuid(),
 					group.getGroupId());
 
-			Assert.assertNull("Not Deleted: " + DDMTemplate.class, ddmTemplate);
+			Assert.assertNull(ddmTemplate);
 		}
 	}
 

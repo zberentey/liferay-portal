@@ -218,7 +218,7 @@ public class WikiPageStagedModelDataHandlerTest
 			DLFolderLocalServiceUtil.getDLFolderByUuidAndGroupId(
 				folder.getUuid(), folder.getGroupId());
 
-			Assert.fail("Not Deleted: " + Folder.class);
+			Assert.fail(Folder.class);
 		}
 		catch (NoSuchFolderException nsfe) {
 		}
@@ -234,7 +234,7 @@ public class WikiPageStagedModelDataHandlerTest
 			DLFileEntryLocalServiceUtil.getDLFileEntryByUuidAndGroupId(
 				fileEntry.getUuid(), fileEntry.getGroupId());
 
-			Assert.fail("Not Deleted: " + FileEntry.class);
+			Assert.fail(FileEntry.class);
 		}
 		catch (NoSuchFileEntryException nsfee) {
 		}

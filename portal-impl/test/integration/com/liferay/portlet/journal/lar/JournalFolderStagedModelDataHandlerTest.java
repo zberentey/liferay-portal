@@ -134,7 +134,7 @@ public class JournalFolderStagedModelDataHandlerTest
 			JournalFolderLocalServiceUtil.fetchJournalFolderByUuidAndGroupId(
 				folder.getUuid(), group.getGroupId());
 
-		Assert.assertNull("Not Deleted: " + JournalFolder.class, folder);
+		Assert.assertNull(folder);
 	}
 
 	@Override

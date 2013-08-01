@@ -180,7 +180,7 @@ public class MDRActionStagedModelDataHandlerTest
 			MDRRuleGroupLocalServiceUtil.fetchMDRRuleGroupByUuidAndGroupId(
 				ruleGroup.getUuid(), group.getGroupId());
 
-		Assert.assertNull("Not Deleted: " + MDRRuleGroup.class, ruleGroup);
+		Assert.assertNull(ruleGroup);
 
 		dependentStagedModels = dependentStagedModelsMap.get(
 			MDRRuleGroupInstance.class.getSimpleName());
@@ -195,8 +195,7 @@ public class MDRActionStagedModelDataHandlerTest
 				fetchMDRRuleGroupInstanceByUuidAndGroupId(
 					ruleGroupInstance.getUuid(), group.getGroupId());
 
-		Assert.assertNull(
-			"Not Deleted: " + MDRRuleGroupInstance.class, ruleGroupInstance);
+		Assert.assertNull(ruleGroupInstance);
 	}
 
 	@Override

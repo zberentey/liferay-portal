@@ -133,7 +133,7 @@ public class MBThreadFlagStagedModelDataHandlerTest
 		message = MBMessageLocalServiceUtil.fetchMBMessageByUuidAndGroupId(
 			message.getUuid(), group.getGroupId());
 
-		Assert.assertNull("Not Deleted: " + MBMessage.class, message);
+		Assert.assertNull(message);
 	}
 
 	@Override

@@ -134,7 +134,7 @@ public class LayoutPrototypeStagedModelDataHandlerTest
 		layout = LayoutLocalServiceUtil.fetchLayoutByUuidAndGroupId(
 			layout.getUuid(), group.getGroupId(), layout.isPrivateLayout());
 
-		Assert.assertNull("Not Deleted: " + Layout.class, layout);
+		Assert.assertNull(layout);
 
 		dependentStagedModels = dependentStagedModelsMap.get(
 			LayoutFriendlyURL.class.getSimpleName());
@@ -149,8 +149,7 @@ public class LayoutPrototypeStagedModelDataHandlerTest
 				fetchLayoutFriendlyURLByUuidAndGroupId(
 					layoutFriendlyURL.getUuid(), group.getGroupId());
 
-		Assert.assertNull(
-			"Not Deleted: " + LayoutFriendlyURL.class, layoutFriendlyURL);
+		Assert.assertNull(layoutFriendlyURL);
 	}
 
 	@Override

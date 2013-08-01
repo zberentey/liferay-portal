@@ -133,7 +133,7 @@ public class MDRRuleStagedModelDataHandlerTest
 			MDRRuleGroupLocalServiceUtil.fetchMDRRuleGroupByUuidAndGroupId(
 				ruleGroup.getUuid(), group.getGroupId());
 
-		Assert.assertNull("Not Deleted: " + MDRRuleGroup.class, ruleGroup);
+		Assert.assertNull(ruleGroup);
 	}
 
 	@Override

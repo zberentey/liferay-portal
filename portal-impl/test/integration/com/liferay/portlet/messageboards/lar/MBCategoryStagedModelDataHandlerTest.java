@@ -129,7 +129,7 @@ public class MBCategoryStagedModelDataHandlerTest
 
 		category = (MBCategory)getStagedModel(category.getUuid(), group);
 
-		Assert.assertNull("Not Deleted: " + MBCategory.class, category);
+		Assert.assertNull(category);
 	}
 
 	@Override

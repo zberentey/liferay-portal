@@ -281,7 +281,7 @@ public class FileEntryStagedModelDataHandlerTest
 			DLFolderLocalServiceUtil.fetchDLFolderByUuidAndGroupId(
 				folder.getUuid(), group.getGroupId());
 
-		Assert.assertNull("Not Deleted: " + Folder.class, dlFolder);
+		Assert.assertNull(dlFolder);
 	}
 
 	@Override

@@ -318,7 +318,7 @@ public class LayoutSetPrototypeStagedModelDataHandlerTest
 			layout = LayoutLocalServiceUtil.fetchLayoutByUuidAndGroupId(
 				layout.getUuid(), group.getGroupId(), layout.isPrivateLayout());
 
-			Assert.assertNull("Not Deleted: " + Layout.class, layout);
+			Assert.assertNull(layout);
 		}
 	}
 

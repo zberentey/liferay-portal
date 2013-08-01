@@ -155,7 +155,7 @@ public abstract class BasePortletDataHandlerTestCase extends PowerMockito {
 			portletDataContext, portletId, new PortletPreferencesImpl());
 
 		Set<String> classNames = initialModelAdditionCounters.keySet();
-		
+
 		Iterator<String> iterator = classNames.iterator();
 
 		while (iterator.hasNext()) {
@@ -257,7 +257,7 @@ public abstract class BasePortletDataHandlerTestCase extends PowerMockito {
 			portletDataContext.getManifestSummary();
 
 		Set<String> classNames = expectedModelDeletionCounters.keySet();
-		
+
 		Iterator<String> iterator = classNames.iterator();
 
 		while (iterator.hasNext()) {

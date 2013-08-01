@@ -202,8 +202,7 @@ public class OrganizationStagedModelDataHandlerTest
 			OrganizationLocalServiceUtil.fetchOrganizationByUuidAndCompanyId(
 				suborganization.getUuid(), group.getCompanyId());
 
-		Assert.assertNull(
-			"Not Deleted: " + Organization.class, suborganization);
+		Assert.assertNull(suborganization);
 
 		dependentStagedModels = dependentStagedModelsMap.get(
 			Address.class.getSimpleName());
@@ -215,7 +214,7 @@ public class OrganizationStagedModelDataHandlerTest
 		address = AddressLocalServiceUtil.fetchAddressByUuidAndCompanyId(
 			address.getUuid(), group.getCompanyId());
 
-		Assert.assertNull("Not Deleted: " + Address.class, address);
+		Assert.assertNull(address);
 
 		dependentStagedModels = dependentStagedModelsMap.get(
 			EmailAddress.class.getSimpleName());
@@ -228,7 +227,7 @@ public class OrganizationStagedModelDataHandlerTest
 			EmailAddressLocalServiceUtil.fetchEmailAddressByUuidAndCompanyId(
 				emailAddress.getUuid(), group.getCompanyId());
 
-		Assert.assertNull("Not Deleted: " + EmailAddress.class, emailAddress);
+		Assert.assertNull(emailAddress);
 
 		dependentStagedModels = dependentStagedModelsMap.get(
 			Phone.class.getSimpleName());
@@ -240,7 +239,7 @@ public class OrganizationStagedModelDataHandlerTest
 		phone = PhoneLocalServiceUtil.fetchPhoneByUuidAndCompanyId(
 			phone.getUuid(), group.getCompanyId());
 
-		Assert.assertNull("Not Deleted: " + Phone.class, phone);
+		Assert.assertNull(phone);
 
 		dependentStagedModels = dependentStagedModelsMap.get(
 			Website.class.getSimpleName());
@@ -252,7 +251,7 @@ public class OrganizationStagedModelDataHandlerTest
 		website = WebsiteLocalServiceUtil.fetchWebsiteByUuidAndCompanyId(
 			website.getUuid(), group.getCompanyId());
 
-		Assert.assertNull("Not Deleted: " + Website.class, website);
+		Assert.assertNull(website);
 	}
 
 	@Override

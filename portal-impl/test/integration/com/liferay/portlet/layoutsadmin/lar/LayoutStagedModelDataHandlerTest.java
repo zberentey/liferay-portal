@@ -270,7 +270,7 @@ public class LayoutStagedModelDataHandlerTest
 
 		layout = (Layout)getStagedModel(layout.getUuid(), group);
 
-		Assert.assertNull("Not Deleted: " + Layout.class, layout);
+		Assert.assertNull(layout);
 	}
 
 	@Override

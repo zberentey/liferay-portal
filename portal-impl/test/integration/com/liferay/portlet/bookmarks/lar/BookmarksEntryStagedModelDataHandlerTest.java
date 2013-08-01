@@ -154,7 +154,7 @@ public class BookmarksEntryStagedModelDataHandlerTest
 				fetchBookmarksFolderByUuidAndGroupId(
 					folder.getUuid(), group.getGroupId());
 
-		Assert.assertNull("Not Deleted: " + BookmarksFolder.class, folder);
+		Assert.assertNull(folder);
 	}
 
 	@Override

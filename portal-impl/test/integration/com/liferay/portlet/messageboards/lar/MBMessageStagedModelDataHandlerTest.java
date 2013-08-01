@@ -157,7 +157,7 @@ public class MBMessageStagedModelDataHandlerTest
 		category = MBCategoryLocalServiceUtil.fetchMBCategoryByUuidAndGroupId(
 			category.getUuid(), group.getGroupId());
 
-		Assert.assertNull("Not Deleted: " + MBCategory.class, category);
+		Assert.assertNull(category);
 	}
 
 	@Override

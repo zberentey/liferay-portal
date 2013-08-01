@@ -137,7 +137,7 @@ public class DLFileEntryTypeStagedModelDataHandlerTest
 			DDMStructureLocalServiceUtil.fetchDDMStructureByUuidAndGroupId(
 				ddmStructure.getUuid(), group.getGroupId());
 
-		Assert.assertNull("Not Deleted: " + DDMStructure.class, ddmStructure);
+		Assert.assertNull(ddmStructure);
 	}
 
 	@Override

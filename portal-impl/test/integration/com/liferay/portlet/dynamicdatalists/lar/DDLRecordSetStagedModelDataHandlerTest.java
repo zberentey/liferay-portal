@@ -168,7 +168,7 @@ public class DDLRecordSetStagedModelDataHandlerTest
 			DDMStructureLocalServiceUtil.fetchDDMStructureByUuidAndGroupId(
 				ddmStructure.getUuid(), group.getGroupId());
 
-		Assert.assertNull("Not Deleted: " + DDMStructure.class, ddmStructure);
+		Assert.assertNull(ddmStructure);
 
 		dependentStagedModels = dependentStagedModelsMap.get(
 			DDMTemplate.class.getSimpleName());
@@ -183,7 +183,7 @@ public class DDLRecordSetStagedModelDataHandlerTest
 					ddmTemplateDependentStagedModel.getUuid(),
 					group.getGroupId());
 
-			Assert.assertNull("Not Deleted: " + DDMTemplate.class, template);
+			Assert.assertNull(template);
 		}
 	}
 
