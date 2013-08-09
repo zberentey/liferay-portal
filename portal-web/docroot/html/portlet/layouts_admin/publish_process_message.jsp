@@ -110,15 +110,10 @@ BackgroundTask backgroundTask = (BackgroundTask)row.getObject();
 				</div>
 			</c:when>
 			<c:otherwise>
-
-				<%
-				Map<String, Serializable> taskContextMap = backgroundTask.getTaskContextMap();
-				%>
-
 				<div class="alert alert-error publish-error">
 					<h4 class="upload-error-message">
 						<c:choose>
-							<c:when test='<%= GetterUtil.getBoolean(taskContextMap.get("validated")) %>'>
+							<c:when test='<%= MapUtil.getBoolean(backgroundTask.getTaskContextMap(), "validated") %>'>
 								<liferay-ui:message key="the-publication-process-failed" /></h4>
 							</c:when>
 							<c:otherwise>
