@@ -62,7 +62,7 @@ public abstract class BaseStagingBackgroundTaskExecutor
 		backgroundTaskStatus.clearAttributes();
 	}
 
-	protected BackgroundTask markBackgroundTastAsValidated(
+	protected BackgroundTask markBackgroundTaskAsValidated(
 			BackgroundTask backgroundTask)
 		throws SystemException {
 
