@@ -71,6 +71,8 @@ public class LayoutStagingBackgroundTaskExecutor
 				LayoutLocalServiceUtil.validateImportLayoutsFile(
 					userId, targetGroupId, privateLayout, parameterMap, file);
 
+			backgroundTask = markBackgroundTastAsValidated(backgroundTask);
+
 			LayoutLocalServiceUtil.importLayouts(
 				userId, targetGroupId, privateLayout, parameterMap, file);
 		}
