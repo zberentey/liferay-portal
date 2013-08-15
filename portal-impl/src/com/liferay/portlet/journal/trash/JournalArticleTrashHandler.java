@@ -19,6 +19,7 @@ import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.trash.TrashActionKeys;
 import com.liferay.portal.kernel.trash.TrashRenderer;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.model.ClassedModel;
 import com.liferay.portal.model.ContainerModel;
 import com.liferay.portal.model.TrashedModel;
 import com.liferay.portal.security.permission.ActionKeys;
@@ -208,6 +209,23 @@ public class JournalArticleTrashHandler extends JournalBaseTrashHandler {
 		}
 
 		return !article.isInTrashContainer();
+	}
+
+	@Override
+	public boolean isTrashEntry(
+		TrashEntry trashEntry, ClassedModel classedModel) {
+
+		if ((trashEntry == null) || (classedModel == null)) {
+			return false;
+		}
+
+		JournalArticle article = (JournalArticle)classedModel;
+
+		if (trashEntry.getClassPK() == article.getResourcePrimKey()) {
+			return true;
+		}
+
+		return false;
 	}
 
 	@Override
