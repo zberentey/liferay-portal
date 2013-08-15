@@ -507,10 +507,26 @@ public class JournalFolderLocalServiceUtil {
 	}
 
 	public static com.liferay.portlet.journal.model.JournalFolder moveFolderToTrash(
+		long userId, com.liferay.portlet.journal.model.JournalFolder folder,
+		com.liferay.portal.kernel.trash.TrashContext trashContext)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getService().moveFolderToTrash(userId, folder, trashContext);
+	}
+
+	public static com.liferay.portlet.journal.model.JournalFolder moveFolderToTrash(
 		long userId, long folderId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
 		return getService().moveFolderToTrash(userId, folderId);
+	}
+
+	public static void restoreFolderFromTrash(long userId,
+		com.liferay.portlet.journal.model.JournalFolder folder, int status,
+		com.liferay.portal.kernel.trash.TrashContext trashContext)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		getService().restoreFolderFromTrash(userId, folder, status, trashContext);
 	}
 
 	public static void restoreFolderFromTrash(long userId, long folderId)
@@ -543,10 +559,10 @@ public class JournalFolderLocalServiceUtil {
 
 	public static com.liferay.portlet.journal.model.JournalFolder updateStatus(
 		long userId, com.liferay.portlet.journal.model.JournalFolder folder,
-		int status)
+		int status, com.liferay.portal.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		return getService().updateStatus(userId, folder, status);
+		return getService().updateStatus(userId, folder, status, serviceContext);
 	}
 
 	public static JournalFolderLocalService getService() {

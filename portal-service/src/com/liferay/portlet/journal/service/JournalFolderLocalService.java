@@ -436,7 +436,19 @@ public interface JournalFolderLocalService extends BaseLocalService,
 			com.liferay.portal.kernel.exception.SystemException;
 
 	public com.liferay.portlet.journal.model.JournalFolder moveFolderToTrash(
+		long userId, com.liferay.portlet.journal.model.JournalFolder folder,
+		com.liferay.portal.kernel.trash.TrashContext trashContext)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException;
+
+	public com.liferay.portlet.journal.model.JournalFolder moveFolderToTrash(
 		long userId, long folderId)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException;
+
+	public void restoreFolderFromTrash(long userId,
+		com.liferay.portlet.journal.model.JournalFolder folder, int status,
+		com.liferay.portal.kernel.trash.TrashContext trashContext)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
 
@@ -460,7 +472,7 @@ public interface JournalFolderLocalService extends BaseLocalService,
 
 	public com.liferay.portlet.journal.model.JournalFolder updateStatus(
 		long userId, com.liferay.portlet.journal.model.JournalFolder folder,
-		int status)
+		int status, com.liferay.portal.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
 }
