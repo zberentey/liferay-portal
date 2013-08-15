@@ -31,12 +31,10 @@ import com.liferay.portlet.journal.service.permission.JournalArticlePermission;
 import com.liferay.portlet.journal.service.permission.JournalPermission;
 
 import java.io.File;
-import java.io.Serializable;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -2174,7 +2172,7 @@ public class JournalArticleServiceImpl extends JournalArticleServiceBaseImpl {
 
 		return journalArticleLocalService.updateStatus(
 			getUserId(), groupId, articleId, version, status, articleURL,
-			new HashMap<String, Serializable>(), serviceContext);
+			serviceContext);
 	}
 
 }
