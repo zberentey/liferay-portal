@@ -30,6 +30,7 @@ import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.search.SearchEngineUtil;
 import com.liferay.portal.kernel.search.Summary;
+import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
@@ -361,7 +362,13 @@ public class JournalArticleIndexer extends BaseIndexer {
 		String articleId = article.getArticleId();
 
 		if (article.isInTrash()) {
-			articleId = TrashUtil.getOriginalTitle(articleId);
+			if (articleId.contains(StringPool.UNDERLINE)) {
+				articleId = articleId.substring(
+					articleId.indexOf(CharPool.UNDERLINE) + 1);
+			}
+			else {
+				articleId = TrashUtil.getOriginalTitle(articleId);
+			}
 		}
 
 		document.addKeyword("articleId", articleId);

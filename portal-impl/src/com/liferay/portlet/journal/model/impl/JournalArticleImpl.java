@@ -220,18 +220,6 @@ public class JournalArticleImpl extends JournalArticleBaseImpl {
 	}
 
 	@Override
-	public boolean isInTrashContainer()
-		throws PortalException, SystemException {
-
-		if (getTrashContainer() != null) {
-			return true;
-		}
-		else {
-			return false;
-		}
-	}
-
-	@Override
 	public boolean isTemplateDriven() {
 		if (Validator.isNull(getStructureId())) {
 			return false;
