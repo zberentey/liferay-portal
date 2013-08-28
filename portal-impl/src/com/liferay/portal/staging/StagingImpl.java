@@ -2541,7 +2541,12 @@ public class StagingImpl implements Staging {
 
 		for (String key : typeSettingsProperties.keySet()) {
 			if (key.startsWith(StagingConstants.STAGED_PORTLET)) {
-				stagedPortletIds.add(key);
+				boolean enabled = GetterUtil.getBoolean(
+					typeSettingsProperties.getProperty(key));
+
+				if (enabled) {
+					stagedPortletIds.add(key);
+				}
 			}
 		}
 

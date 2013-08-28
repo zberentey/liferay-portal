@@ -18,6 +18,7 @@ import com.liferay.portal.NoSuchGroupException;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.staging.StagingConstants;
 import com.liferay.portal.kernel.staging.StagingUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.ListUtil;
@@ -49,7 +50,6 @@ import com.liferay.portlet.asset.model.AssetTag;
 import com.liferay.portlet.expando.model.ExpandoBridge;
 
 import java.io.Serializable;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -1185,10 +1185,18 @@ public class GroupServiceImpl extends GroupServiceBaseImpl {
 
 		Group group = groupPersistence.findByPrimaryKey(groupId);
 
-		UnicodeProperties typeSettings = group.getTypeSettingsProperties();
+		UnicodeProperties typeSettingsProperties =
+			group.getTypeSettingsProperties();
+
+		for (String key : typeSettingsProperties.keySet()) {
+			if (key.startsWith(StagingConstants.STAGED_PORTLET)) {
+				typeSettingsProperties.setProperty(
+					key, Boolean.FALSE.toString());
+			}
+		}
 
 		for (String stagedPortletId : StringUtil.split(stagedPortletIds)) {
-			typeSettings.setProperty(
+			typeSettingsProperties.setProperty(
 				StagingUtil.getStagedPortletId(stagedPortletId),
 				Boolean.TRUE.toString());
 		}
