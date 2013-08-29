@@ -30,15 +30,15 @@ import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.search.SearchEngineUtil;
 import com.liferay.portal.kernel.search.Summary;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.workflow.WorkflowConstants;
+import com.liferay.portal.model.TrashedModel;
 import com.liferay.portal.security.permission.ActionKeys;
 import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portal.util.PortletKeys;
-import com.liferay.portlet.journal.asset.JournalFolderAssetRendererFactory;
 import com.liferay.portlet.journal.model.JournalFolder;
 import com.liferay.portlet.journal.service.JournalFolderLocalServiceUtil;
 import com.liferay.portlet.journal.service.permission.JournalFolderPermission;
 import com.liferay.portlet.journal.service.persistence.JournalFolderActionableDynamicQuery;
+import com.liferay.portlet.trash.util.TrashUtil;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -94,6 +94,20 @@ public class JournalFolderIndexer extends BaseIndexer {
 	}
 
 	@Override
+	protected void addTrashFields(Document document, TrashedModel trashedModel)
+		throws SystemException {
+
+		super.addTrashFields(document, trashedModel);
+
+		JournalFolder folder = (JournalFolder)trashedModel;
+
+		document.remove(Field.TITLE);
+
+		document.addText(
+			Field.TITLE, TrashUtil.getOriginalTitle(folder.getName()));
+	}
+
+	@Override
 	protected void doDelete(Object obj) throws Exception {
 		JournalFolder folder = (JournalFolder)obj;
 
@@ -118,25 +132,14 @@ public class JournalFolderIndexer extends BaseIndexer {
 
 		document.addText(Field.DESCRIPTION, folder.getDescription());
 		document.addKeyword(Field.FOLDER_ID, folder.getParentFolderId());
-		document.addText(Field.TITLE, folder.getName());
 
-		if (!folder.isInTrash() && folder.isInTrashContainer()) {
-			JournalFolder trashedFolder = folder.getTrashContainer();
+		String title = folder.getName();
 
-			if (trashedFolder != null) {
-				addTrashFields(
-					document, JournalFolder.class.getName(),
-					trashedFolder.getFolderId(), null, null,
-					JournalFolderAssetRendererFactory.TYPE);
-
-				document.addKeyword(
-					Field.ROOT_ENTRY_CLASS_NAME, JournalFolder.class.getName());
-				document.addKeyword(
-					Field.ROOT_ENTRY_CLASS_PK, trashedFolder.getFolderId());
-				document.addKeyword(
-					Field.STATUS, WorkflowConstants.STATUS_IN_TRASH);
-			}
+		if (folder.isInTrash()) {
+			title = TrashUtil.getOriginalTitle(folder.getName());
 		}
+
+		document.addText(Field.TITLE, title);
 
 		if (_log.isDebugEnabled()) {
 			_log.debug("Document " + folder + " indexed successfully");
