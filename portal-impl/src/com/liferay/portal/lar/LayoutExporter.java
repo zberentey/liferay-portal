@@ -39,7 +39,6 @@ import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Time;
-import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.xml.Document;
 import com.liferay.portal.kernel.xml.Element;
@@ -194,26 +193,6 @@ public class LayoutExporter {
 			LayoutLocalServiceUtil.getLayouts(groupId, privateLayout));
 	}
 
-	public static void updateLastPublishDate(
-			LayoutSet layoutSet, long lastPublishDate)
-		throws Exception {
-
-		UnicodeProperties settingsProperties =
-			layoutSet.getSettingsProperties();
-
-		if (lastPublishDate <= 0) {
-			settingsProperties.remove("last-publish-date");
-		}
-		else {
-			settingsProperties.setProperty(
-				"last-publish-date", String.valueOf(lastPublishDate));
-		}
-
-		LayoutSetLocalServiceUtil.updateSettings(
-			layoutSet.getGroupId(), layoutSet.isPrivateLayout(),
-			settingsProperties.toString());
-	}
-
 	public byte[] exportLayouts(
 			long groupId, boolean privateLayout, long[] layoutIds,
 			Map<String, String[]> parameterMap, Date startDate, Date endDate)
@@ -269,8 +248,6 @@ public class LayoutExporter {
 			parameterMap, PortletDataHandlerKeys.LOGO);
 		boolean exportLayoutSetSettings = MapUtil.getBoolean(
 			parameterMap, PortletDataHandlerKeys.LAYOUT_SET_SETTINGS);
-		boolean updateLastPublishDate = MapUtil.getBoolean(
-			parameterMap, PortletDataHandlerKeys.UPDATE_LAST_PUBLISH_DATE);
 
 		if (_log.isDebugEnabled()) {
 			_log.debug("Export permissions " + exportPermissions);
@@ -302,12 +279,6 @@ public class LayoutExporter {
 			parameterMap, "layoutSetBranchId");
 
 		serviceContext.setAttribute("layoutSetBranchId", layoutSetBranchId);
-
-		long lastPublishDate = System.currentTimeMillis();
-
-		if (endDate != null) {
-			lastPublishDate = endDate.getTime();
-		}
 
 		if (exportIgnoreLastPublishDate) {
 			endDate = null;
@@ -607,14 +578,7 @@ public class LayoutExporter {
 		portletDataContext.addZipEntry(
 			"/manifest.xml", document.formattedString());
 
-		try {
-			return zipWriter.getFile();
-		}
-		finally {
-			if (updateLastPublishDate) {
-				updateLastPublishDate(layoutSet, lastPublishDate);
-			}
-		}
+		return zipWriter.getFile();
 	}
 
 	protected void exportAssetCategories(
