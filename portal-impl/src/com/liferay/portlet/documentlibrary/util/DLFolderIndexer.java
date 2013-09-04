@@ -33,15 +33,14 @@ import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.search.SearchEngineUtil;
 import com.liferay.portal.kernel.search.Summary;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.security.permission.ActionKeys;
 import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portal.util.PortletKeys;
-import com.liferay.portlet.documentlibrary.asset.DLFileEntryAssetRendererFactory;
 import com.liferay.portlet.documentlibrary.model.DLFolder;
 import com.liferay.portlet.documentlibrary.service.DLFolderLocalServiceUtil;
 import com.liferay.portlet.documentlibrary.service.permission.DLFolderPermission;
 import com.liferay.portlet.documentlibrary.service.persistence.DLFolderActionableDynamicQuery;
+import com.liferay.portlet.trash.util.TrashUtil;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -118,31 +117,19 @@ public class DLFolderIndexer extends BaseIndexer {
 			_log.debug("Indexing folder " + dlFolder);
 		}
 
+		String title = dlFolder.getName();
+
+		if (dlFolder.isInTrash()) {
+			title = TrashUtil.getOriginalTitle(title);
+		}
+
 		Document document = getBaseModelDocument(PORTLET_ID, dlFolder);
 
 		document.addText(Field.DESCRIPTION, dlFolder.getDescription());
 		document.addKeyword(Field.FOLDER_ID, dlFolder.getParentFolderId());
 		document.addKeyword(
 			Field.HIDDEN, (dlFolder.isHidden() || dlFolder.isInHiddenFolder()));
-		document.addText(Field.TITLE, dlFolder.getName());
-
-		if (!dlFolder.isInTrash() && dlFolder.isInTrashContainer()) {
-			DLFolder trashedFolder = dlFolder.getTrashContainer();
-
-			if (trashedFolder != null) {
-				addTrashFields(
-					document, DLFolder.class.getName(),
-					trashedFolder.getFolderId(), null, null,
-					DLFileEntryAssetRendererFactory.TYPE);
-
-				document.addKeyword(
-					Field.ROOT_ENTRY_CLASS_NAME, DLFolder.class.getName());
-				document.addKeyword(
-					Field.ROOT_ENTRY_CLASS_PK, trashedFolder.getFolderId());
-				document.addKeyword(
-					Field.STATUS, WorkflowConstants.STATUS_IN_TRASH);
-			}
-		}
+		document.addText(Field.TITLE, title);
 
 		if (_log.isDebugEnabled()) {
 			_log.debug("Document " + dlFolder + " indexed successfully");
