@@ -45,7 +45,6 @@ import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.Repository;
 import com.liferay.portal.security.permission.ActionKeys;
@@ -57,7 +56,6 @@ import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.PortletKeys;
 import com.liferay.portal.util.PrefsPropsUtil;
 import com.liferay.portal.util.PropsValues;
-import com.liferay.portlet.documentlibrary.asset.DLFileEntryAssetRendererFactory;
 import com.liferay.portlet.documentlibrary.model.DLFileEntry;
 import com.liferay.portlet.documentlibrary.model.DLFileEntryMetadata;
 import com.liferay.portlet.documentlibrary.model.DLFileEntryType;
@@ -82,6 +80,7 @@ import com.liferay.portlet.expando.model.ExpandoBridge;
 import com.liferay.portlet.expando.util.ExpandoBridgeFactoryUtil;
 import com.liferay.portlet.expando.util.ExpandoBridgeIndexerUtil;
 import com.liferay.portlet.messageboards.model.MBMessage;
+import com.liferay.portlet.trash.util.TrashUtil;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -348,6 +347,12 @@ public class DLFileEntryIndexer extends BaseIndexer {
 			_log.debug("Indexing document " + dlFileEntry);
 		}
 
+		String title = dlFileEntry.getTitle();
+
+		if (dlFileEntry.isInTrash()) {
+			title = TrashUtil.getOriginalTitle(title);
+		}
+
 		boolean indexContent = true;
 
 		InputStream is = null;
@@ -393,8 +398,7 @@ public class DLFileEntryIndexer extends BaseIndexer {
 			if (indexContent) {
 				if (is != null) {
 					try {
-						document.addFile(
-							Field.CONTENT, is, dlFileEntry.getTitle());
+						document.addFile(Field.CONTENT, is, title);
 					}
 					catch (IOException ioe) {
 						throw new SearchException(
@@ -415,7 +419,7 @@ public class DLFileEntryIndexer extends BaseIndexer {
 			document.addKeyword(Field.HIDDEN, dlFileEntry.isInHiddenFolder());
 			document.addText(
 				Field.PROPERTIES, dlFileEntry.getLuceneProperties());
-			document.addText(Field.TITLE, dlFileEntry.getTitle());
+			document.addText(Field.TITLE, title);
 
 			document.addKeyword(
 				"dataRepositoryId", dlFileEntry.getDataRepositoryId());
@@ -427,7 +431,7 @@ public class DLFileEntryIndexer extends BaseIndexer {
 				StringUtil.replace(
 					dlFileEntry.getMimeType(), CharPool.FORWARD_SLASH,
 					CharPool.UNDERLINE));
-			document.addKeyword("path", dlFileEntry.getTitle());
+			document.addKeyword("path", title);
 			document.addKeyword("readCount", dlFileEntry.getReadCount());
 			document.addKeyword("size", dlFileEntry.getSize());
 
@@ -456,23 +460,6 @@ public class DLFileEntryIndexer extends BaseIndexer {
 				}
 				catch (Exception e) {
 				}
-			}
-
-			if (!dlFileVersion.isInTrash() &&
-				dlFileVersion.isInTrashContainer()) {
-
-				DLFolder folder = dlFileVersion.getTrashContainer();
-
-				addTrashFields(
-					document, DLFolder.class.getName(), folder.getFolderId(),
-					null, null, DLFileEntryAssetRendererFactory.TYPE);
-
-				document.addKeyword(
-					Field.ROOT_ENTRY_CLASS_NAME, DLFolder.class.getName());
-				document.addKeyword(
-					Field.ROOT_ENTRY_CLASS_PK, folder.getFolderId());
-				document.addKeyword(
-					Field.STATUS, WorkflowConstants.STATUS_IN_TRASH);
 			}
 
 			if (_log.isDebugEnabled()) {

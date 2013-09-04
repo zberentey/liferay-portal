@@ -471,6 +471,44 @@ public class DLFileShortcutLocalServiceWrapper
 	}
 
 	@Override
+	public com.liferay.portlet.documentlibrary.model.DLFileShortcut moveFileShortcutToTrash(
+		long userId,
+		com.liferay.portlet.documentlibrary.model.DLFileShortcut dlFileShortcut,
+		com.liferay.portal.kernel.trash.TrashContext trashContext)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return _dlFileShortcutLocalService.moveFileShortcutToTrash(userId,
+			dlFileShortcut, trashContext);
+	}
+
+	@Override
+	public com.liferay.portlet.documentlibrary.model.DLFileShortcut moveFileShortcutToTrash(
+		long userId, long dlFileShortcutId)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return _dlFileShortcutLocalService.moveFileShortcutToTrash(userId,
+			dlFileShortcutId);
+	}
+
+	@Override
+	public void restoreFileShortcutFromTrash(long userId,
+		com.liferay.portlet.documentlibrary.model.DLFileShortcut dlFileShortcut,
+		int status, com.liferay.portal.kernel.trash.TrashContext trashContext)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		_dlFileShortcutLocalService.restoreFileShortcutFromTrash(userId,
+			dlFileShortcut, status, trashContext);
+	}
+
+	@Override
+	public void restoreFileShortcutFromTrash(long userId, long dlFileShortcutId)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		_dlFileShortcutLocalService.restoreFileShortcutFromTrash(userId,
+			dlFileShortcutId);
+	}
+
+	@Override
 	public void updateAsset(long userId,
 		com.liferay.portlet.documentlibrary.model.DLFileShortcut fileShortcut,
 		long[] assetCategoryIds, java.lang.String[] assetTagNames)

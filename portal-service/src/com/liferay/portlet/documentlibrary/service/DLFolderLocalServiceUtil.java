@@ -808,6 +808,37 @@ public class DLFolderLocalServiceUtil {
 				   .moveFolder(userId, folderId, parentFolderId, serviceContext);
 	}
 
+	public static com.liferay.portlet.documentlibrary.model.DLFolder moveFolderToTrash(
+		long userId,
+		com.liferay.portlet.documentlibrary.model.DLFolder dlFolder,
+		com.liferay.portal.kernel.trash.TrashContext trashContext)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getService().moveFolderToTrash(userId, dlFolder, trashContext);
+	}
+
+	public static com.liferay.portlet.documentlibrary.model.DLFolder moveFolderToTrash(
+		long userId, long folderId)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getService().moveFolderToTrash(userId, folderId);
+	}
+
+	public static void restoreFolderFromTrash(long userId,
+		com.liferay.portlet.documentlibrary.model.DLFolder dlFolder,
+		int status, com.liferay.portal.kernel.trash.TrashContext trashContext)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		getService()
+			.restoreFolderFromTrash(userId, dlFolder, status, trashContext);
+	}
+
+	public static void restoreFolderFromTrash(long userId, long folderId)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		getService().restoreFolderFromTrash(userId, folderId);
+	}
+
 	public static void unlockFolder(long groupId, long parentFolderId,
 		java.lang.String name, java.lang.String lockUuid)
 		throws com.liferay.portal.kernel.exception.PortalException,
@@ -871,6 +902,16 @@ public class DLFolderLocalServiceUtil {
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
 		getService().updateLastPostDate(folderId, lastPostDate);
+	}
+
+	public static com.liferay.portlet.documentlibrary.model.DLFolder updateStatus(
+		long userId,
+		com.liferay.portlet.documentlibrary.model.DLFolder dlFolder,
+		int status, com.liferay.portal.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getService()
+				   .updateStatus(userId, dlFolder, status, serviceContext);
 	}
 
 	public static com.liferay.portlet.documentlibrary.model.DLFolder updateStatus(
