@@ -21,6 +21,8 @@ import com.liferay.portal.NoSuchWorkflowDefinitionLinkException;
 import com.liferay.portal.kernel.dao.orm.QueryDefinition;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
+import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.search.Indexable;
@@ -28,6 +30,8 @@ import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.IndexerRegistryUtil;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
+import com.liferay.portal.kernel.trash.TrashConstants;
+import com.liferay.portal.kernel.trash.TrashContext;
 import com.liferay.portal.kernel.util.ObjectValuePair;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ParamUtil;
@@ -49,13 +53,21 @@ import com.liferay.portlet.documentlibrary.DuplicateFolderNameException;
 import com.liferay.portlet.documentlibrary.FolderNameException;
 import com.liferay.portlet.documentlibrary.NoSuchDirectoryException;
 import com.liferay.portlet.documentlibrary.NoSuchFileEntryException;
+import com.liferay.portlet.documentlibrary.model.DLFileEntry;
+import com.liferay.portlet.documentlibrary.model.DLFileEntryConstants;
 import com.liferay.portlet.documentlibrary.model.DLFileEntryType;
 import com.liferay.portlet.documentlibrary.model.DLFileEntryTypeConstants;
 import com.liferay.portlet.documentlibrary.model.DLFolder;
 import com.liferay.portlet.documentlibrary.model.DLFolderConstants;
+import com.liferay.portlet.documentlibrary.model.DLSyncConstants;
 import com.liferay.portlet.documentlibrary.model.impl.DLFolderImpl;
 import com.liferay.portlet.documentlibrary.service.base.DLFolderLocalServiceBaseImpl;
 import com.liferay.portlet.documentlibrary.store.DLStoreUtil;
+import com.liferay.portlet.journal.model.JournalFolder;
+import com.liferay.portlet.social.model.SocialActivityConstants;
+import com.liferay.portlet.trash.model.TrashEntry;
+import com.liferay.portlet.trash.model.TrashVersion;
+import com.liferay.portlet.trash.util.TrashUtil;
 
 import java.io.Serializable;
 
@@ -762,6 +774,182 @@ public class DLFolderLocalServiceImpl extends DLFolderLocalServiceBaseImpl {
 	}
 
 	@Override
+	public DLFolder moveFolderToTrash(
+			long userId, DLFolder dlFolder, TrashContext trashContext)
+		throws PortalException, SystemException {
+
+		if (!dlFolder.isTrashEntry() && !dlFolder.isApproved()) {
+			TrashEntry trashEntry = (TrashEntry)trashContext.getAttribute(
+				TrashConstants.TRASH_ENTRY);
+
+			trashVersionLocalService.addTrashVersion(
+				trashEntry.getEntryId(), JournalFolder.class.getName(),
+				dlFolder.getFolderId(), dlFolder.getStatus());
+		}
+
+		// Folder
+
+		dlFolder = updateStatus(
+			userId, dlFolder, WorkflowConstants.STATUS_IN_TRASH, trashContext);
+
+		// File rank
+
+		dlFileRankLocalService.disableFileRanksByFolderId(
+			dlFolder.getFolderId());
+
+		// Sync
+
+		dlAppHelperLocalService.registerDLSyncEventCallback(
+			DLSyncConstants.EVENT_DELETE, DLSyncConstants.TYPE_FOLDER,
+			dlFolder.getFolderId());
+
+		// File entries & Folders
+
+		moveDependentsToTrash(
+			userId, dlFolder.getGroupId(), dlFolder.getFolderId(),
+			trashContext);
+
+		return dlFolder;
+	}
+
+	@Override
+	public DLFolder moveFolderToTrash(long userId, long folderId)
+		throws PortalException, SystemException {
+
+		DLFolder dlFolder = dlFolderPersistence.findByPrimaryKey(folderId);
+
+		String title = dlFolder.getName();
+
+		UnicodeProperties typeSettingsProperties = new UnicodeProperties();
+
+		typeSettingsProperties.put("title", title);
+
+		TrashEntry trashEntry = trashEntryLocalService.addTrashEntry(
+			userId, dlFolder.getGroupId(), DLFolderConstants.getClassName(),
+			dlFolder.getFolderId(), dlFolder.getStatus(), null,
+			typeSettingsProperties);
+
+		dlFolder.setTrashEntryId(trashEntry.getEntryId());
+
+		dlFolder.setName(TrashUtil.getTrashTitle(trashEntry.getEntryId()));
+
+		TrashContext trashContext = new TrashContext();
+
+		trashContext.setAttribute(TrashConstants.TRASH_ENTRY, trashEntry);
+
+		// Folder
+
+		dlFolder = moveFolderToTrash(userId, dlFolder, trashContext);
+
+		// Social
+
+		JSONObject extraDataJSONObject = JSONFactoryUtil.createJSONObject();
+
+		extraDataJSONObject.put("title", title);
+
+		socialActivityLocalService.addActivity(
+			userId, dlFolder.getGroupId(), DLFolderConstants.getClassName(),
+			dlFolder.getFolderId(), SocialActivityConstants.TYPE_MOVE_TO_TRASH,
+			extraDataJSONObject.toString(), 0);
+
+		return dlFolder;
+	}
+
+	@Override
+	public void restoreFolderFromTrash(
+			long userId, DLFolder dlFolder, int status,
+			TrashContext trashContext)
+		throws PortalException, SystemException {
+
+		// Folder
+
+		dlFolder.setName(TrashUtil.getOriginalTitle(dlFolder.getName()));
+
+		dlFolder = updateStatus(
+			userId, dlFolder, WorkflowConstants.STATUS_APPROVED, trashContext);
+
+		// File rank
+
+		dlFileRankLocalService.enableFileRanksByFolderId(
+			dlFolder.getFolderId());
+
+		// Sync
+
+		dlAppHelperLocalService.registerDLSyncEventCallback(
+			DLSyncConstants.EVENT_RESTORE, DLSyncConstants.TYPE_FOLDER,
+			dlFolder.getFolderId());
+
+		// File entries & Folders
+
+		restoreDependentsFromTrash(
+			userId, dlFolder.getGroupId(), dlFolder.getFolderId(),
+			trashContext);
+	}
+
+	@Indexable(type = IndexableType.REINDEX)
+	@Override
+	public void restoreFolderFromTrash(long userId, long folderId)
+		throws PortalException, SystemException {
+
+		DLFolder dlFolder = dlFolderPersistence.findByPrimaryKey(folderId);
+
+		TrashEntry trashEntry = dlFolder.getTrashEntry();
+
+		TrashContext trashContext = new TrashContext();
+
+		trashContext.setAttribute(TrashConstants.TRASH_ENTRY, trashEntry);
+
+		int status = WorkflowConstants.STATUS_APPROVED;
+
+		if (trashEntry.isTrashEntry(dlFolder)) {
+			status = trashEntry.getStatus();
+		}
+		else {
+			TrashVersion trashVersion =
+				trashVersionLocalService.fetchVersion(
+					trashEntry.getEntryId(), JournalFolder.class.getName(),
+					dlFolder.getFolderId());
+
+			if (trashVersion != null) {
+				status = trashVersion.getStatus();
+			}
+		}
+
+		dlFolder.setTrashEntryId(0);
+
+		// Dependents
+
+		trashContext.addDependentStatuses(trashEntry.getEntryId());
+
+		trashContext.addTrashEntries(
+			trashEntry.getGroupId(), DLFolderConstants.getClassName());
+
+		trashContext.addTrashEntries(
+			trashEntry.getGroupId(), DLFileEntryConstants.getClassName());
+
+		restoreFolderFromTrash(userId, dlFolder, status, trashContext);
+
+		// Social
+
+		if (trashEntry.isTrashEntry(dlFolder)) {
+			JSONObject extraDataJSONObject = JSONFactoryUtil.createJSONObject();
+
+			extraDataJSONObject.put("title", dlFolder.getName());
+
+			socialActivityLocalService.addActivity(
+				userId, dlFolder.getGroupId(), DLFolderConstants.getClassName(),
+				dlFolder.getFolderId(),
+				SocialActivityConstants.TYPE_RESTORE_FROM_TRASH,
+				extraDataJSONObject.toString(), 0);
+		}
+
+		// Trash
+
+		trashEntryLocalService.deleteEntry(
+			DLFolderConstants.getClassName(), dlFolder.getFolderId());
+	}
+
+	@Override
 	public void unlockFolder(
 			long groupId, long parentFolderId, String name, String lockUuid)
 		throws PortalException, SystemException {
@@ -976,16 +1164,13 @@ public class DLFolderLocalServiceImpl extends DLFolderLocalServiceBaseImpl {
 
 	@Override
 	public DLFolder updateStatus(
-			long userId, long folderId, int status,
-			Map<String, Serializable> workflowContext,
+			long userId, DLFolder dlFolder, int status,
 			ServiceContext serviceContext)
 		throws PortalException, SystemException {
 
 		// Folder
 
 		User user = userPersistence.findByPrimaryKey(userId);
-
-		DLFolder dlFolder = dlFolderPersistence.findByPrimaryKey(folderId);
 
 		int oldStatus = dlFolder.getStatus();
 
@@ -1003,7 +1188,8 @@ public class DLFolderLocalServiceImpl extends DLFolderLocalServiceBaseImpl {
 
 		List<Object> foldersAndFileEntriesAndFileShortcuts =
 			getFoldersAndFileEntriesAndFileShortcuts(
-				dlFolder.getGroupId(), folderId, null, false, queryDefinition);
+				dlFolder.getGroupId(), dlFolder.getFolderId(), null, false,
+				queryDefinition);
 
 		dlAppHelperLocalService.updateDependentStatus(
 			user, foldersAndFileEntriesAndFileShortcuts, status);
@@ -1017,23 +1203,6 @@ public class DLFolderLocalServiceImpl extends DLFolderLocalServiceBaseImpl {
 		else if (status == WorkflowConstants.STATUS_IN_TRASH) {
 			assetEntryLocalService.updateVisible(
 				DLFolder.class.getName(), dlFolder.getFolderId(), false);
-		}
-
-		// Trash
-
-		if (status == WorkflowConstants.STATUS_IN_TRASH) {
-			UnicodeProperties typeSettingsProperties = new UnicodeProperties();
-
-			typeSettingsProperties.put("title", dlFolder.getName());
-
-			trashEntryLocalService.addTrashEntry(
-				userId, dlFolder.getGroupId(), DLFolderConstants.getClassName(),
-				dlFolder.getFolderId(), WorkflowConstants.STATUS_APPROVED, null,
-				typeSettingsProperties);
-		}
-		else {
-			trashEntryLocalService.deleteEntry(
-				DLFolderConstants.getClassName(), dlFolder.getFolderId());
 		}
 
 		// Indexer
@@ -1050,6 +1219,18 @@ public class DLFolderLocalServiceImpl extends DLFolderLocalServiceBaseImpl {
 		}
 
 		return dlFolder;
+	}
+
+	@Override
+	public DLFolder updateStatus(
+			long userId, long folderId, int status,
+			Map<String, Serializable> workflowContext,
+			ServiceContext serviceContext)
+		throws PortalException, SystemException {
+
+		DLFolder dlFolder = dlFolderPersistence.findByPrimaryKey(folderId);
+
+		return updateStatus(userId, dlFolder, status, serviceContext);
 	}
 
 	protected void addFolderResources(
@@ -1141,6 +1322,74 @@ public class DLFolderLocalServiceImpl extends DLFolderLocalServiceBaseImpl {
 		}
 
 		return parentFolderId;
+	}
+
+	protected void moveDependentsToTrash(
+			long userId, long groupId, long parentFolderId,
+			TrashContext trashContext)
+		throws PortalException, SystemException {
+
+		List<DLFolder> folders = getFolders(groupId, parentFolderId);
+
+		for (DLFolder folder : folders) {
+			if (folder.isInTrash()) {
+				continue;
+			}
+
+			moveFolderToTrash(userId, folder, trashContext);
+		}
+
+		List<DLFileEntry> fileEntries = dlFileEntryLocalService.getFileEntries(
+			groupId, parentFolderId);
+
+		for (DLFileEntry fileEntry : fileEntries) {
+			if (fileEntry.isInTrash()) {
+				continue;
+			}
+
+			dlFileEntryLocalService.moveFileEntryToTrash(
+				userId, fileEntry, trashContext);
+		}
+	}
+
+	protected void restoreDependentsFromTrash(
+			long userId, long groupId, long parentFolderId,
+			TrashContext trashContext)
+		throws PortalException, SystemException {
+
+		List<DLFolder> folders = getFolders(groupId, parentFolderId);
+
+		for (DLFolder folder : folders) {
+			if (trashContext.hasTrashEntry(
+					DLFolderConstants.getClassName(), folder.getFolderId())) {
+
+				continue;
+			}
+
+			int oldStatus = trashContext.getDependentStatus(
+				DLFolderConstants.getClassName(), folder.getFolderId());
+
+			restoreFolderFromTrash(userId, folder, oldStatus, trashContext);
+		}
+
+		List<DLFileEntry> fileEntries = dlFileEntryLocalService.getFileEntries(
+			groupId, parentFolderId);
+
+		for (DLFileEntry fileEntry : fileEntries) {
+			if (trashContext.hasTrashEntry(
+					DLFileEntryConstants.getClassName(),
+					fileEntry.getFileEntryId())) {
+
+				continue;
+			}
+
+			int oldStatus = trashContext.getDependentStatus(
+				DLFileEntryConstants.getClassName(),
+				fileEntry.getFileEntryId());
+
+			dlFileEntryLocalService.restoreFileEntryFromTrash(
+				userId, fileEntry, oldStatus, trashContext);
+		}
 	}
 
 	protected void validateFolder(
