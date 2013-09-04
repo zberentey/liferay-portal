@@ -724,6 +724,38 @@ public class DLFileEntryLocalServiceUtil {
 			serviceContext);
 	}
 
+	public static com.liferay.portlet.documentlibrary.model.DLFileEntry moveFileEntryToTrash(
+		long userId,
+		com.liferay.portlet.documentlibrary.model.DLFileEntry dlFileEntry,
+		com.liferay.portal.kernel.trash.TrashContext trashContext)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getService()
+				   .moveFileEntryToTrash(userId, dlFileEntry, trashContext);
+	}
+
+	public static com.liferay.portlet.documentlibrary.model.DLFileEntry moveFileEntryToTrash(
+		long userId, long fileEntryId)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getService().moveFileEntryToTrash(userId, fileEntryId);
+	}
+
+	public static void restoreFileEntryFromTrash(long userId,
+		com.liferay.portlet.documentlibrary.model.DLFileEntry dlFileEntry,
+		int status, com.liferay.portal.kernel.trash.TrashContext trashContext)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		getService()
+			.restoreFileEntryFromTrash(userId, dlFileEntry, status, trashContext);
+	}
+
+	public static void restoreFileEntryFromTrash(long userId, long fileEntryId)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		getService().restoreFileEntryFromTrash(userId, fileEntryId);
+	}
+
 	public static void revertFileEntry(long userId, long fileEntryId,
 		java.lang.String version,
 		com.liferay.portal.service.ServiceContext serviceContext)
@@ -776,6 +808,20 @@ public class DLFileEntryLocalServiceUtil {
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
 		getService().updateSmallImage(smallImageId, largeImageId);
+	}
+
+	public static com.liferay.portlet.documentlibrary.model.DLFileEntry updateStatus(
+		long userId,
+		com.liferay.portlet.documentlibrary.model.DLFileEntry dlFileEntry,
+		com.liferay.portlet.documentlibrary.model.DLFileVersion dlFileVersion,
+		int status,
+		java.util.Map<java.lang.String, java.io.Serializable> workflowContext,
+		com.liferay.portal.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getService()
+				   .updateStatus(userId, dlFileEntry, dlFileVersion, status,
+			workflowContext, serviceContext);
 	}
 
 	public static com.liferay.portlet.documentlibrary.model.DLFileEntry updateStatus(

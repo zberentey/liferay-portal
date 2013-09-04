@@ -373,6 +373,26 @@ public class DLFileVersionLocalServiceUtil {
 		return getService().getLatestFileVersion(userId, fileEntryId);
 	}
 
+	public static com.liferay.portlet.documentlibrary.model.DLFileVersion moveFileVersionToTrash(
+		long userId,
+		com.liferay.portlet.documentlibrary.model.DLFileVersion dlFileVersion,
+		com.liferay.portal.kernel.trash.TrashContext trashContext)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getService()
+				   .moveFileVersionToTrash(userId, dlFileVersion, trashContext);
+	}
+
+	public static void restoreFileVersionFromTrash(long userId,
+		com.liferay.portlet.documentlibrary.model.DLFileVersion fileVersion,
+		int status, com.liferay.portal.kernel.trash.TrashContext trashContext)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		getService()
+			.restoreFileVersionFromTrash(userId, fileVersion, status,
+			trashContext);
+	}
+
 	public static DLFileVersionLocalService getService() {
 		if (_service == null) {
 			_service = (DLFileVersionLocalService)PortalBeanLocatorUtil.locate(DLFileVersionLocalService.class.getName());
