@@ -1685,7 +1685,8 @@ public class DLFileEntryLocalServiceImpl
 			trashEntryLocalService.addTrashEntry(
 				userId, dlFileEntry.getGroupId(),
 				DLFileEntryConstants.getClassName(),
-				dlFileEntry.getFileEntryId(), oldDLFileVersionStatus,
+				dlFileEntry.getFileEntryId(), dlFileEntry.getUuid(),
+				dlFileEntry.getClassName(), oldDLFileVersionStatus,
 				dlFileVersionStatusOVPs, typeSettingsProperties);
 		}
 
