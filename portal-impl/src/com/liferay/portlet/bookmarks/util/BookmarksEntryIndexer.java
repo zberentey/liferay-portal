@@ -126,7 +126,7 @@ public class BookmarksEntryIndexer extends BaseIndexer {
 		document.addKeyword("treePath", entry.getTreePath());
 
 		if (!entry.isInTrash() && entry.isInTrashContainer()) {
-			BookmarksFolder folder = entry.getTrashContainer();
+			BookmarksFolder folder = (BookmarksFolder)entry.getTrashContainer();
 
 			addTrashFields(
 				document, BookmarksFolder.class.getName(), folder.getFolderId(),
