@@ -25,7 +25,6 @@ import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.model.Repository;
 import com.liferay.portal.repository.liferayrepository.model.LiferayFolder;
 import com.liferay.portal.service.RepositoryLocalServiceUtil;
-import com.liferay.portlet.documentlibrary.NoSuchFolderException;
 import com.liferay.portlet.documentlibrary.model.DLFolder;
 import com.liferay.portlet.documentlibrary.service.DLAppLocalServiceUtil;
 import com.liferay.portlet.documentlibrary.service.DLFolderLocalServiceUtil;
@@ -81,26 +80,6 @@ public class DLFileShortcutImpl extends DLFileShortcutBaseImpl {
 	}
 
 	@Override
-	public DLFolder getTrashContainer()
-		throws PortalException, SystemException {
-
-		DLFolder dlFolder = null;
-
-		try {
-			dlFolder = getDLFolder();
-		}
-		catch (NoSuchFolderException nsfe) {
-			return null;
-		}
-
-		if (dlFolder.isInTrash()) {
-			return dlFolder;
-		}
-
-		return dlFolder.getTrashContainer();
-	}
-
-	@Override
 	public boolean isInHiddenFolder() {
 		try {
 			long repositoryId = getRepositoryId();
@@ -118,18 +97,6 @@ public class DLFileShortcutImpl extends DLFileShortcutBaseImpl {
 		}
 
 		return false;
-	}
-
-	@Override
-	public boolean isInTrashContainer()
-		throws PortalException, SystemException {
-
-		if (getTrashContainer() != null) {
-			return true;
-		}
-		else {
-			return false;
-		}
 	}
 
 	protected void buildTreePath(StringBundler sb, DLFolder dlFolder)
