@@ -51,6 +51,7 @@ import com.liferay.portlet.expando.model.ExpandoBridge;
 
 import java.io.IOException;
 import java.io.InputStream;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -406,15 +407,16 @@ public class DLFileEntryImpl extends DLFileEntryBaseImpl {
 	}
 
 	@Override
-	public boolean isInTrashContainer()
-		throws PortalException, SystemException {
+	public boolean isInTrashContainer() {
+		try {
+			if (getTrashContainer() != null) {
+				return true;
+			}
+		}
+		catch (Exception e) {
+		}
 
-		if (getTrashContainer() != null) {
-			return true;
-		}
-		else {
-			return false;
-		}
+		return false;
 	}
 
 	@Override
