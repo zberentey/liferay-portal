@@ -123,7 +123,8 @@ public class JournalFolderIndexer extends BaseIndexer {
 		document.addKeyword("treePath", folder.getTreePath());
 
 		if (!folder.isInTrash() && folder.isInTrashContainer()) {
-			JournalFolder trashedFolder = folder.getTrashContainer();
+			JournalFolder trashedFolder =
+				(JournalFolder)folder.getTrashContainer();
 
 			if (trashedFolder != null) {
 				addTrashFields(
