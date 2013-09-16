@@ -16,16 +16,24 @@ package com.liferay.portlet.documentlibrary.service.impl;
 
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
+import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.repository.model.FileEntry;
+import com.liferay.portal.kernel.trash.TrashConstants;
+import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.model.ResourceConstants;
 import com.liferay.portal.model.User;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portlet.documentlibrary.NoSuchFileEntryException;
+import com.liferay.portlet.documentlibrary.model.DLFileEntryConstants;
 import com.liferay.portlet.documentlibrary.model.DLFileShortcut;
 import com.liferay.portlet.documentlibrary.model.DLFolder;
 import com.liferay.portlet.documentlibrary.model.DLFolderConstants;
 import com.liferay.portlet.documentlibrary.service.base.DLFileShortcutLocalServiceBaseImpl;
+import com.liferay.portlet.social.model.SocialActivityConstants;
+import com.liferay.portlet.trash.model.TrashEntry;
+import com.liferay.portlet.trash.model.TrashVersion;
 
 import java.util.Date;
 import java.util.List;
@@ -286,6 +294,79 @@ public class DLFileShortcutLocalServiceImpl
 	}
 
 	@Override
+	public DLFileShortcut moveFileShortcutToTrash(
+			long userId, DLFileShortcut dlFileShortcut,
+			ServiceContext serviceContext)
+		throws PortalException, SystemException {
+
+		TrashEntry trashEntry = (TrashEntry)serviceContext.getAttribute(
+			TrashConstants.TRASH_ENTRY);
+
+		if (!trashEntry.isTrashEntry(dlFileShortcut) &&
+			!dlFileShortcut.isApproved()) {
+
+			trashVersionLocalService.addTrashVersion(
+				trashEntry.getEntryId(), DLFileEntryConstants.getClassName(),
+				dlFileShortcut.getFileShortcutId(), dlFileShortcut.getStatus());
+		}
+
+		dlFileShortcutLocalService.updateStatus(
+			userId, dlFileShortcut.getFileShortcutId(),
+			WorkflowConstants.STATUS_IN_TRASH, serviceContext);
+
+		return dlFileShortcut;
+	}
+
+	@Override
+	public DLFileShortcut moveFileShortcutToTrash(
+			long userId, long dlFileShortcutId)
+		throws PortalException, SystemException {
+
+		DLFileShortcut dlFileShortcut =
+			dlFileShortcutPersistence.findByPrimaryKey(dlFileShortcutId);
+
+		// Trash
+
+		int oldStatus = dlFileShortcut.getStatus();
+
+		if (oldStatus == WorkflowConstants.STATUS_PENDING) {
+			oldStatus = WorkflowConstants.STATUS_DRAFT;
+		}
+
+		String title = dlFileShortcut.getToTitle();
+
+		UnicodeProperties typeSettingsProperties = new UnicodeProperties();
+
+		typeSettingsProperties.put("title", title);
+
+		TrashEntry trashEntry = trashEntryLocalService.addTrashEntry(
+			userId, dlFileShortcut.getGroupId(), DLFileShortcut.class.getName(),
+			dlFileShortcut.getFileShortcutId(), dlFileShortcut.getUuid(), null,
+			oldStatus, null, null);
+
+		ServiceContext trashContext = new ServiceContext();
+
+		trashContext.setAttribute(TrashConstants.TRASH_ENTRY, trashEntry);
+
+		dlFileShortcut = moveFileShortcutToTrash(
+			userId, dlFileShortcut, trashContext);
+
+		// Social
+
+		JSONObject extraDataJSONObject = JSONFactoryUtil.createJSONObject();
+
+		extraDataJSONObject.put("title", title);
+
+		socialActivityLocalService.addActivity(
+			userId, dlFileShortcut.getGroupId(), DLFileShortcut.class.getName(),
+			dlFileShortcut.getFileShortcutId(),
+			SocialActivityConstants.TYPE_MOVE_TO_TRASH,
+			extraDataJSONObject.toString(), 0);
+
+		return dlFileShortcut;
+	}
+
+	@Override
 	public void rebuildTree(long companyId)
 		throws PortalException, SystemException {
 
@@ -302,6 +383,71 @@ public class DLFileShortcutLocalServiceImpl
 
 			dlFileShortcutPersistence.update(fileShortcut);
 		}
+	}
+
+	@Override
+	public void restoreFileShortcutFromTrash(
+			long userId, DLFileShortcut dlFileShortcut, int status,
+			ServiceContext serviceContext)
+		throws PortalException, SystemException {
+
+		dlFileShortcutLocalService.updateStatus(
+			userId, dlFileShortcut.getFileShortcutId(), status, serviceContext);
+	}
+
+	@Override
+	public void restoreFileShortcutFromTrash(long userId, long dlFileShortcutId)
+		throws PortalException, SystemException {
+
+		// File shortcut
+
+		DLFileShortcut dlFileShortcut = dlAppService.getFileShortcut(
+			dlFileShortcutId);
+
+		TrashEntry trashEntry = dlFileShortcut.getTrashEntry();
+
+		ServiceContext trashContext = new ServiceContext();
+
+		trashContext.setAttribute(TrashConstants.TRASH_ENTRY, trashEntry);
+
+		int status = WorkflowConstants.STATUS_APPROVED;
+
+		if (trashEntry.isTrashEntry(dlFileShortcut)) {
+			status = trashEntry.getStatus();
+		}
+		else {
+			TrashVersion trashVersion =
+				trashVersionLocalService.fetchVersion(
+					trashEntry.getEntryId(), DLFileShortcut.class.getName(),
+					dlFileShortcut.getFileShortcutId());
+
+			if (trashVersion != null) {
+				status = trashVersion.getStatus();
+			}
+		}
+
+		restoreFileShortcutFromTrash(
+			userId, dlFileShortcut, status, trashContext);
+
+		if (trashEntry.isTrashEntry(dlFileShortcut)) {
+
+			// Social
+
+			JSONObject extraDataJSONObject = JSONFactoryUtil.createJSONObject();
+
+			extraDataJSONObject.put("title", dlFileShortcut.getToTitle());
+
+			socialActivityLocalService.addActivity(
+				userId, dlFileShortcut.getGroupId(),
+				DLFileShortcut.class.getName(),
+				dlFileShortcut.getFileShortcutId(),
+				SocialActivityConstants.TYPE_RESTORE_FROM_TRASH,
+				extraDataJSONObject.toString(), 0);
+		}
+
+		// Trash
+
+		trashEntryLocalService.deleteEntry(trashEntry.getEntryId());
 	}
 
 	@Override

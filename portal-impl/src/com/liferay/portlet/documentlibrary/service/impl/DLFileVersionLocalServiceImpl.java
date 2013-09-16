@@ -16,13 +16,16 @@ package com.liferay.portlet.documentlibrary.service.impl;
 
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.trash.TrashConstants;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
+import com.liferay.portal.service.ServiceContext;
 import com.liferay.portlet.documentlibrary.NoSuchFileVersionException;
 import com.liferay.portlet.documentlibrary.model.DLFileEntryConstants;
 import com.liferay.portlet.documentlibrary.model.DLFileVersion;
 import com.liferay.portlet.documentlibrary.service.base.DLFileVersionLocalServiceBaseImpl;
 import com.liferay.portlet.documentlibrary.util.comparator.FileVersionVersionComparator;
+import com.liferay.portlet.trash.model.TrashEntry;
 
 import java.util.Collections;
 import java.util.List;
@@ -129,6 +132,26 @@ public class DLFileVersionLocalServiceImpl
 	}
 
 	@Override
+	public DLFileVersion moveFileVersionToTrash(
+			long userId, DLFileVersion dlFileVersion,
+			ServiceContext serviceContext)
+		throws PortalException, SystemException {
+
+		if (!dlFileVersion.isApproved()) {
+			TrashEntry trashEntry = (TrashEntry)serviceContext.getAttribute(
+				TrashConstants.TRASH_ENTRY);
+
+			trashVersionLocalService.addTrashVersion(
+				trashEntry.getEntryId(), DLFileVersion.class.getName(),
+				dlFileVersion.getFileVersionId(), dlFileVersion.getStatus());
+		}
+
+		dlFileVersion.setStatus(WorkflowConstants.STATUS_IN_TRASH);
+
+		return dlFileVersionPersistence.update(dlFileVersion);
+	}
+
+	@Override
 	public void rebuildTree(long companyId)
 		throws PortalException, SystemException {
 
@@ -137,14 +160,23 @@ public class DLFileVersionLocalServiceImpl
 				companyId, WorkflowConstants.STATUS_IN_TRASH);
 
 		for (DLFileVersion dlFileVersion : dlFileVersions) {
-			if (dlFileVersion.isInTrashContainer()) {
-				continue;
-			}
-
 			dlFileVersion.setTreePath(dlFileVersion.buildTreePath());
 
 			dlFileVersionPersistence.update(dlFileVersion);
 		}
+	}
+
+	@Override
+	public void restoreFileVersionFromTrash(
+			long userId, DLFileVersion fileVersion, int status,
+			ServiceContext serviceContext)
+		throws PortalException, SystemException {
+
+		// File Version
+
+		fileVersion.setStatus(status);
+
+		dlFileVersionPersistence.update(fileVersion);
 	}
 
 }
