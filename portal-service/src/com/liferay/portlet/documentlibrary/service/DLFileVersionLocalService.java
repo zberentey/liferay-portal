@@ -337,7 +337,20 @@ public interface DLFileVersionLocalService extends BaseLocalService,
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
 
+	public com.liferay.portlet.documentlibrary.model.DLFileVersion moveFileVersionToTrash(
+		long userId,
+		com.liferay.portlet.documentlibrary.model.DLFileVersion dlFileVersion,
+		com.liferay.portal.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException;
+
 	public void rebuildTree(long companyId)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException;
+
+	public void restoreFileVersionFromTrash(long userId,
+		com.liferay.portlet.documentlibrary.model.DLFileVersion fileVersion,
+		int status, com.liferay.portal.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
 }

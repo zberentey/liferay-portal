@@ -31,6 +31,7 @@ import com.liferay.portal.service.BaseLocalServiceImpl;
 import com.liferay.portal.service.PersistedModelLocalServiceRegistry;
 import com.liferay.portal.service.persistence.UserFinder;
 import com.liferay.portal.service.persistence.UserPersistence;
+import com.liferay.portal.service.persistence.WorkflowInstanceLinkPersistence;
 
 import com.liferay.portlet.documentlibrary.model.DLFileVersion;
 import com.liferay.portlet.documentlibrary.service.DLFileVersionLocalService;
@@ -47,6 +48,7 @@ import com.liferay.portlet.documentlibrary.service.persistence.DLFileVersionPers
 import com.liferay.portlet.documentlibrary.service.persistence.DLFolderFinder;
 import com.liferay.portlet.documentlibrary.service.persistence.DLFolderPersistence;
 import com.liferay.portlet.documentlibrary.service.persistence.DLSyncEventPersistence;
+import com.liferay.portlet.trash.service.persistence.TrashVersionPersistence;
 
 import java.io.Serializable;
 
@@ -1030,6 +1032,82 @@ public abstract class DLFileVersionLocalServiceBaseImpl
 		this.userFinder = userFinder;
 	}
 
+	/**
+	 * Returns the workflow instance link local service.
+	 *
+	 * @return the workflow instance link local service
+	 */
+	public com.liferay.portal.service.WorkflowInstanceLinkLocalService getWorkflowInstanceLinkLocalService() {
+		return workflowInstanceLinkLocalService;
+	}
+
+	/**
+	 * Sets the workflow instance link local service.
+	 *
+	 * @param workflowInstanceLinkLocalService the workflow instance link local service
+	 */
+	public void setWorkflowInstanceLinkLocalService(
+		com.liferay.portal.service.WorkflowInstanceLinkLocalService workflowInstanceLinkLocalService) {
+		this.workflowInstanceLinkLocalService = workflowInstanceLinkLocalService;
+	}
+
+	/**
+	 * Returns the workflow instance link persistence.
+	 *
+	 * @return the workflow instance link persistence
+	 */
+	public WorkflowInstanceLinkPersistence getWorkflowInstanceLinkPersistence() {
+		return workflowInstanceLinkPersistence;
+	}
+
+	/**
+	 * Sets the workflow instance link persistence.
+	 *
+	 * @param workflowInstanceLinkPersistence the workflow instance link persistence
+	 */
+	public void setWorkflowInstanceLinkPersistence(
+		WorkflowInstanceLinkPersistence workflowInstanceLinkPersistence) {
+		this.workflowInstanceLinkPersistence = workflowInstanceLinkPersistence;
+	}
+
+	/**
+	 * Returns the trash version local service.
+	 *
+	 * @return the trash version local service
+	 */
+	public com.liferay.portlet.trash.service.TrashVersionLocalService getTrashVersionLocalService() {
+		return trashVersionLocalService;
+	}
+
+	/**
+	 * Sets the trash version local service.
+	 *
+	 * @param trashVersionLocalService the trash version local service
+	 */
+	public void setTrashVersionLocalService(
+		com.liferay.portlet.trash.service.TrashVersionLocalService trashVersionLocalService) {
+		this.trashVersionLocalService = trashVersionLocalService;
+	}
+
+	/**
+	 * Returns the trash version persistence.
+	 *
+	 * @return the trash version persistence
+	 */
+	public TrashVersionPersistence getTrashVersionPersistence() {
+		return trashVersionPersistence;
+	}
+
+	/**
+	 * Sets the trash version persistence.
+	 *
+	 * @param trashVersionPersistence the trash version persistence
+	 */
+	public void setTrashVersionPersistence(
+		TrashVersionPersistence trashVersionPersistence) {
+		this.trashVersionPersistence = trashVersionPersistence;
+	}
+
 	public void afterPropertiesSet() {
 		persistedModelLocalServiceRegistry.register("com.liferay.portlet.documentlibrary.model.DLFileVersion",
 			dlFileVersionLocalService);
@@ -1159,6 +1237,14 @@ public abstract class DLFileVersionLocalServiceBaseImpl
 	protected UserPersistence userPersistence;
 	@BeanReference(type = UserFinder.class)
 	protected UserFinder userFinder;
+	@BeanReference(type = com.liferay.portal.service.WorkflowInstanceLinkLocalService.class)
+	protected com.liferay.portal.service.WorkflowInstanceLinkLocalService workflowInstanceLinkLocalService;
+	@BeanReference(type = WorkflowInstanceLinkPersistence.class)
+	protected WorkflowInstanceLinkPersistence workflowInstanceLinkPersistence;
+	@BeanReference(type = com.liferay.portlet.trash.service.TrashVersionLocalService.class)
+	protected com.liferay.portlet.trash.service.TrashVersionLocalService trashVersionLocalService;
+	@BeanReference(type = TrashVersionPersistence.class)
+	protected TrashVersionPersistence trashVersionPersistence;
 	@BeanReference(type = PersistedModelLocalServiceRegistry.class)
 	protected PersistedModelLocalServiceRegistry persistedModelLocalServiceRegistry;
 	private String _beanIdentifier;

@@ -442,10 +442,45 @@ public class DLFileShortcutLocalServiceUtil {
 				   .getFileShortcutsCount(groupId, folderId, active, status);
 	}
 
+	public static com.liferay.portlet.documentlibrary.model.DLFileShortcut moveFileShortcutToTrash(
+		long userId,
+		com.liferay.portlet.documentlibrary.model.DLFileShortcut dlFileShortcut,
+		com.liferay.portal.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getService()
+				   .moveFileShortcutToTrash(userId, dlFileShortcut,
+			serviceContext);
+	}
+
+	public static com.liferay.portlet.documentlibrary.model.DLFileShortcut moveFileShortcutToTrash(
+		long userId, long dlFileShortcutId)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getService().moveFileShortcutToTrash(userId, dlFileShortcutId);
+	}
+
 	public static void rebuildTree(long companyId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
 		getService().rebuildTree(companyId);
+	}
+
+	public static void restoreFileShortcutFromTrash(long userId,
+		com.liferay.portlet.documentlibrary.model.DLFileShortcut dlFileShortcut,
+		int status, com.liferay.portal.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		getService()
+			.restoreFileShortcutFromTrash(userId, dlFileShortcut, status,
+			serviceContext);
+	}
+
+	public static void restoreFileShortcutFromTrash(long userId,
+		long dlFileShortcutId)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		getService().restoreFileShortcutFromTrash(userId, dlFileShortcutId);
 	}
 
 	public static void updateAsset(long userId,

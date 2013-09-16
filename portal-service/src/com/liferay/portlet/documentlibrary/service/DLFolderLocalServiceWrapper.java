@@ -877,10 +877,46 @@ public class DLFolderLocalServiceWrapper implements DLFolderLocalService,
 	}
 
 	@Override
+	public com.liferay.portlet.documentlibrary.model.DLFolder moveFolderToTrash(
+		long userId,
+		com.liferay.portlet.documentlibrary.model.DLFolder dlFolder,
+		com.liferay.portal.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return _dlFolderLocalService.moveFolderToTrash(userId, dlFolder,
+			serviceContext);
+	}
+
+	@Override
+	public com.liferay.portlet.documentlibrary.model.DLFolder moveFolderToTrash(
+		long userId, long folderId)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return _dlFolderLocalService.moveFolderToTrash(userId, folderId);
+	}
+
+	@Override
 	public void rebuildTree(long companyId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
 		_dlFolderLocalService.rebuildTree(companyId);
+	}
+
+	@Override
+	public void restoreFolderFromTrash(long userId,
+		com.liferay.portlet.documentlibrary.model.DLFolder dlFolder,
+		int status, com.liferay.portal.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		_dlFolderLocalService.restoreFolderFromTrash(userId, dlFolder, status,
+			serviceContext);
+	}
+
+	@Override
+	public void restoreFolderFromTrash(long userId, long folderId)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		_dlFolderLocalService.restoreFolderFromTrash(userId, folderId);
 	}
 
 	@Override
@@ -950,6 +986,17 @@ public class DLFolderLocalServiceWrapper implements DLFolderLocalService,
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
 		_dlFolderLocalService.updateLastPostDate(folderId, lastPostDate);
+	}
+
+	@Override
+	public com.liferay.portlet.documentlibrary.model.DLFolder updateStatus(
+		long userId,
+		com.liferay.portlet.documentlibrary.model.DLFolder dlFolder,
+		int status, com.liferay.portal.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return _dlFolderLocalService.updateStatus(userId, dlFolder, status,
+			serviceContext);
 	}
 
 	@Override

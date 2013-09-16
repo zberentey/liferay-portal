@@ -801,10 +801,46 @@ public class DLFileEntryLocalServiceWrapper implements DLFileEntryLocalService,
 	}
 
 	@Override
+	public com.liferay.portlet.documentlibrary.model.DLFileEntry moveFileEntryToTrash(
+		long userId,
+		com.liferay.portlet.documentlibrary.model.DLFileEntry dlFileEntry,
+		com.liferay.portal.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return _dlFileEntryLocalService.moveFileEntryToTrash(userId,
+			dlFileEntry, serviceContext);
+	}
+
+	@Override
+	public com.liferay.portlet.documentlibrary.model.DLFileEntry moveFileEntryToTrash(
+		long userId, long fileEntryId)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return _dlFileEntryLocalService.moveFileEntryToTrash(userId, fileEntryId);
+	}
+
+	@Override
 	public void rebuildTree(long companyId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
 		_dlFileEntryLocalService.rebuildTree(companyId);
+	}
+
+	@Override
+	public void restoreFileEntryFromTrash(long userId,
+		com.liferay.portlet.documentlibrary.model.DLFileEntry dlFileEntry,
+		int status, com.liferay.portal.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		_dlFileEntryLocalService.restoreFileEntryFromTrash(userId, dlFileEntry,
+			status, serviceContext);
+	}
+
+	@Override
+	public void restoreFileEntryFromTrash(long userId, long fileEntryId)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		_dlFileEntryLocalService.restoreFileEntryFromTrash(userId, fileEntryId);
 	}
 
 	@Override
@@ -864,6 +900,20 @@ public class DLFileEntryLocalServiceWrapper implements DLFileEntryLocalService,
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
 		_dlFileEntryLocalService.updateSmallImage(smallImageId, largeImageId);
+	}
+
+	@Override
+	public com.liferay.portlet.documentlibrary.model.DLFileEntry updateStatus(
+		long userId,
+		com.liferay.portlet.documentlibrary.model.DLFileEntry dlFileEntry,
+		com.liferay.portlet.documentlibrary.model.DLFileVersion dlFileVersion,
+		int status,
+		java.util.Map<java.lang.String, java.io.Serializable> workflowContext,
+		com.liferay.portal.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return _dlFileEntryLocalService.updateStatus(userId, dlFileEntry,
+			dlFileVersion, status, workflowContext, serviceContext);
 	}
 
 	@Override

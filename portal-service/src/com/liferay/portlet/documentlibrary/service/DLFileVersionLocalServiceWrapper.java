@@ -405,10 +405,31 @@ public class DLFileVersionLocalServiceWrapper
 	}
 
 	@Override
+	public com.liferay.portlet.documentlibrary.model.DLFileVersion moveFileVersionToTrash(
+		long userId,
+		com.liferay.portlet.documentlibrary.model.DLFileVersion dlFileVersion,
+		com.liferay.portal.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return _dlFileVersionLocalService.moveFileVersionToTrash(userId,
+			dlFileVersion, serviceContext);
+	}
+
+	@Override
 	public void rebuildTree(long companyId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
 		_dlFileVersionLocalService.rebuildTree(companyId);
+	}
+
+	@Override
+	public void restoreFileVersionFromTrash(long userId,
+		com.liferay.portlet.documentlibrary.model.DLFileVersion fileVersion,
+		int status, com.liferay.portal.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		_dlFileVersionLocalService.restoreFileVersionFromTrash(userId,
+			fileVersion, status, serviceContext);
 	}
 
 	/**

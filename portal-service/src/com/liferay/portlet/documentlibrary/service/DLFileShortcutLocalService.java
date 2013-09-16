@@ -371,7 +371,29 @@ public interface DLFileShortcutLocalService extends BaseLocalService,
 		boolean active, int status)
 		throws com.liferay.portal.kernel.exception.SystemException;
 
+	public com.liferay.portlet.documentlibrary.model.DLFileShortcut moveFileShortcutToTrash(
+		long userId,
+		com.liferay.portlet.documentlibrary.model.DLFileShortcut dlFileShortcut,
+		com.liferay.portal.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException;
+
+	public com.liferay.portlet.documentlibrary.model.DLFileShortcut moveFileShortcutToTrash(
+		long userId, long dlFileShortcutId)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException;
+
 	public void rebuildTree(long companyId)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException;
+
+	public void restoreFileShortcutFromTrash(long userId,
+		com.liferay.portlet.documentlibrary.model.DLFileShortcut dlFileShortcut,
+		int status, com.liferay.portal.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException;
+
+	public void restoreFileShortcutFromTrash(long userId, long dlFileShortcutId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
 

@@ -1056,17 +1056,8 @@ public class DLFileVersionWrapper implements DLFileVersion,
 	}
 
 	@Override
-	public com.liferay.portlet.documentlibrary.model.DLFolder getTrashContainer()
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
-		return _dlFileVersion.getTrashContainer();
-	}
-
-	@Override
-	public boolean isInTrashContainer()
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
-		return _dlFileVersion.isInTrashContainer();
+	public boolean isInTrash() {
+		return _dlFileVersion.isInTrash();
 	}
 
 	@Override
