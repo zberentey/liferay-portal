@@ -23,6 +23,7 @@ import com.liferay.portal.kernel.trash.TrashActionKeys;
 import com.liferay.portal.kernel.trash.TrashRenderer;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.ContainerModel;
+import com.liferay.portal.model.TrashedModel;
 import com.liferay.portal.repository.liferayrepository.LiferayRepository;
 import com.liferay.portal.security.permission.ActionKeys;
 import com.liferay.portal.security.permission.PermissionChecker;
@@ -103,6 +104,15 @@ public class DLFolderTrashHandler extends DLBaseTrashHandler {
 	}
 
 	@Override
+	public ContainerModel getParentContainerModel(TrashedModel trashedModel)
+		throws PortalException, SystemException {
+
+		DLFolder dlFolder = (DLFolder)trashedModel;
+
+		return getParentContainerModel(dlFolder.getFolderId());
+	}
+
+	@Override
 	public String getRestoreContainedModelLink(
 			PortletRequest portletRequest, long classPK)
 		throws PortalException, SystemException {
@@ -137,6 +147,15 @@ public class DLFolderTrashHandler extends DLBaseTrashHandler {
 	@Override
 	public String getSystemEventClassName() {
 		return Folder.class.getName();
+	}
+
+	@Override
+	public TrashEntry getTrashEntry(long classPK)
+			throws PortalException, SystemException {
+
+		DLFolder dlFolder = getDLFolder(classPK);
+
+		return dlFolder.getTrashEntry();
 	}
 
 	@Override
