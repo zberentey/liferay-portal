@@ -903,6 +903,11 @@ public class MBThreadLocalServiceImpl extends MBThreadLocalServiceBaseImpl {
 		moveDependentsToTrash(
 			thread.getGroupId(), thread.getThreadId(), trashEntry.getEntryId());
 
+		// Statistics
+
+		MBUtil.updateCategoryStatistics(
+			thread.getCompanyId(), thread.getCategoryId());
+
 		// Social
 
 		MBMessage message = mbMessageLocalService.getMBMessage(
@@ -1006,6 +1011,11 @@ public class MBThreadLocalServiceImpl extends MBThreadLocalServiceBaseImpl {
 
 		restoreDependentsFromTrash(
 			thread.getGroupId(), threadId, trashEntry.getEntryId());
+
+		// Statistics
+
+		MBUtil.updateCategoryStatistics(
+			thread.getCompanyId(), thread.getCategoryId());
 
 		// Trash
 
