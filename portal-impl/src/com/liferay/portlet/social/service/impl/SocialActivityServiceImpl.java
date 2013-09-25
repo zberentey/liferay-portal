@@ -275,14 +275,12 @@ public class SocialActivityServiceImpl extends SocialActivityServiceBaseImpl {
 		SocialActivity activity = socialActivityLocalService.getActivity(
 			activityId);
 
-		List<SocialActivity> activities = new ArrayList<SocialActivity>();
+		List<SocialActivityInterpreter> activityInterpreters =
+			socialActivityInterpreterLocalService.getActivityInterpreters(
+				StringPool.BLANK);
 
-		activities.add(activity);
-
-		activities = filterActivities(activities, 0, 1);
-
-		if (!activities.isEmpty()) {
-			return activities.get(0);
+		if (hasPermission(activity, activityInterpreters)) {
+			return activity;
 		}
 
 		return null;
@@ -415,14 +413,12 @@ public class SocialActivityServiceImpl extends SocialActivityServiceBaseImpl {
 		SocialActivity activity = socialActivityLocalService.getMirrorActivity(
 			mirrorActivityId);
 
-		List<SocialActivity> activities = new ArrayList<SocialActivity>();
+		List<SocialActivityInterpreter> activityInterpreters =
+			socialActivityInterpreterLocalService.getActivityInterpreters(
+				StringPool.BLANK);
 
-		activities.add(activity);
-
-		activities = filterActivities(activities, 0, 1);
-
-		if (!activities.isEmpty()) {
-			return activities.get(0);
+		if (hasPermission(activity, activityInterpreters)) {
+			return activity;
 		}
 
 		return null;
@@ -834,10 +830,6 @@ public class SocialActivityServiceImpl extends SocialActivityServiceBaseImpl {
 			List<SocialActivity> activities, int start, int end)
 		throws PortalException {
 
-		PermissionChecker permissionChecker = getPermissionChecker();
-
-		ServiceContext serviceContext = new ServiceContext();
-
 		List<SocialActivityInterpreter> activityInterpreters =
 			socialActivityInterpreterLocalService.getActivityInterpreters(
 				StringPool.BLANK);
@@ -846,24 +838,10 @@ public class SocialActivityServiceImpl extends SocialActivityServiceBaseImpl {
 			new ArrayList<SocialActivity>();
 
 		for (SocialActivity activity : activities) {
-			for (int i = 0; i < activityInterpreters.size(); i++) {
-				SocialActivityInterpreterImpl activityInterpreter =
-					(SocialActivityInterpreterImpl)activityInterpreters.get(i);
+			if (hasPermission(activity, activityInterpreters)) {
+				filteredActivities.add(activity);
 
-				if (activityInterpreter.hasClassName(activity.getClassName())) {
-					try {
-						if (activityInterpreter.hasPermission(
-								permissionChecker, activity, ActionKeys.VIEW,
-								serviceContext)) {
-
-							filteredActivities.add(activity);
-
-							break;
-						}
-					}
-					catch (Exception e) {
-					}
-				}
+				break;
 			}
 
 			if ((end != QueryUtil.ALL_POS) &&
@@ -886,6 +864,36 @@ public class SocialActivityServiceImpl extends SocialActivityServiceBaseImpl {
 		}
 
 		return filteredActivities;
+	}
+
+	protected boolean hasPermission(
+			SocialActivity activity,
+			List<SocialActivityInterpreter> activityInterpreters)
+		throws PortalException {
+
+		ServiceContext serviceContext = new ServiceContext();
+
+		PermissionChecker permissionChecker = getPermissionChecker();
+
+		for (int i = 0; i < activityInterpreters.size(); i++) {
+			SocialActivityInterpreterImpl activityInterpreter =
+				(SocialActivityInterpreterImpl)activityInterpreters.get(i);
+
+			if (activityInterpreter.hasClassName(activity.getClassName())) {
+				try {
+					if (activityInterpreter.hasPermission(
+							permissionChecker, activity, ActionKeys.VIEW,
+							serviceContext)) {
+
+						return true;
+					}
+				}
+				catch (Exception e) {
+				}
+			}
+		}
+
+		return false;
 	}
 
 }
