@@ -18,6 +18,7 @@ import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.security.auth.PrincipalException;
 import com.liferay.portal.security.permission.ActionKeys;
 import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portal.service.ServiceContext;
@@ -280,10 +281,10 @@ public class SocialActivityServiceImpl extends SocialActivityServiceBaseImpl {
 				StringPool.BLANK);
 
 		if (hasPermission(activity, activityInterpreters)) {
-			return activity;
+			throw new PrincipalException();
 		}
 
-		return null;
+		return activity;
 	}
 
 	/**
@@ -417,11 +418,11 @@ public class SocialActivityServiceImpl extends SocialActivityServiceBaseImpl {
 			socialActivityInterpreterLocalService.getActivityInterpreters(
 				StringPool.BLANK);
 
-		if (hasPermission(activity, activityInterpreters)) {
-			return activity;
+		if (!hasPermission(activity, activityInterpreters)) {
+			throw new PrincipalException();
 		}
 
-		return null;
+		return activity;
 	}
 
 	/**
