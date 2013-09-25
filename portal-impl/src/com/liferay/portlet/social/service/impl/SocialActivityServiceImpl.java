@@ -318,7 +318,7 @@ public class SocialActivityServiceImpl extends SocialActivityServiceBaseImpl {
 		throws PortalException, SystemException {
 
 		List<SocialActivity> activities =
-			socialActivityFinder.findByGroupId(
+			socialActivityLocalService.getGroupActivities(
 				groupId, 0, end + PropsValues.ACTIVITY_FILTER_SEARCH_LIMIT);
 
 		return filterActivities(activities, start, end);
@@ -340,7 +340,7 @@ public class SocialActivityServiceImpl extends SocialActivityServiceBaseImpl {
 	public int getGroupActivitiesCount(long groupId)
 		throws PortalException, SystemException {
 
-		return socialActivityFinder.countByGroupId(groupId);
+		return socialActivityLocalService.getGroupActivitiesCount(groupId);
 	}
 
 	/**
@@ -374,7 +374,7 @@ public class SocialActivityServiceImpl extends SocialActivityServiceBaseImpl {
 		throws PortalException, SystemException {
 
 		List<SocialActivity> activities =
-			socialActivityFinder.findByGroupUsers(
+			socialActivityLocalService.getGroupUsersActivities(
 				groupId, 0, end + PropsValues.ACTIVITY_FILTER_SEARCH_LIMIT);
 
 		return filterActivities(activities, start, end);
@@ -397,7 +397,7 @@ public class SocialActivityServiceImpl extends SocialActivityServiceBaseImpl {
 	public int getGroupUsersActivitiesCount(long groupId)
 		throws PortalException, SystemException {
 
-		return socialActivityFinder.countByGroupUsers(groupId);
+		return socialActivityLocalService.getGroupUsersActivitiesCount(groupId);
 	}
 
 	/**
@@ -455,7 +455,7 @@ public class SocialActivityServiceImpl extends SocialActivityServiceBaseImpl {
 		throws PortalException, SystemException {
 
 		List<SocialActivity> activities =
-			socialActivityFinder.findByOrganizationId(
+			socialActivityLocalService.getOrganizationActivities(
 				organizationId, 0,
 				end + PropsValues.ACTIVITY_FILTER_SEARCH_LIMIT);
 
@@ -475,7 +475,8 @@ public class SocialActivityServiceImpl extends SocialActivityServiceBaseImpl {
 	public int getOrganizationActivitiesCount(long organizationId)
 		throws PortalException, SystemException {
 
-		return socialActivityFinder.countByOrganizationId(organizationId);
+		return socialActivityLocalService.getOrganizationActivitiesCount(
+			organizationId);
 	}
 
 	/**
@@ -505,7 +506,7 @@ public class SocialActivityServiceImpl extends SocialActivityServiceBaseImpl {
 		throws PortalException, SystemException {
 
 		List<SocialActivity> activities =
-			socialActivityFinder.findByOrganizationUsers(
+			socialActivityLocalService.getOrganizationUsersActivities(
 				organizationId, 0,
 				end + PropsValues.ACTIVITY_FILTER_SEARCH_LIMIT);
 
@@ -525,7 +526,8 @@ public class SocialActivityServiceImpl extends SocialActivityServiceBaseImpl {
 	public int getOrganizationUsersActivitiesCount(long organizationId)
 		throws PortalException, SystemException {
 
-		return socialActivityFinder.countByOrganizationUsers(organizationId);
+		return socialActivityLocalService.getOrganizationUsersActivitiesCount(
+			organizationId);
 	}
 
 	/**
@@ -555,7 +557,7 @@ public class SocialActivityServiceImpl extends SocialActivityServiceBaseImpl {
 		throws PortalException, SystemException {
 
 		List<SocialActivity> activities =
-			socialActivityFinder.findByRelation(
+			socialActivityLocalService.getRelationActivities(
 				userId, 0, end + PropsValues.ACTIVITY_FILTER_SEARCH_LIMIT);
 
 		return filterActivities(activities, start, end);
@@ -590,7 +592,7 @@ public class SocialActivityServiceImpl extends SocialActivityServiceBaseImpl {
 		throws PortalException, SystemException {
 
 		List<SocialActivity> activities =
-			socialActivityFinder.findByRelationType(
+			socialActivityLocalService.getRelationActivities(
 				userId, type, 0,
 				end + PropsValues.ACTIVITY_FILTER_SEARCH_LIMIT);
 
@@ -610,7 +612,7 @@ public class SocialActivityServiceImpl extends SocialActivityServiceBaseImpl {
 	public int getRelationActivitiesCount(long userId)
 		throws PortalException, SystemException {
 
-		return socialActivityFinder.countByRelation(userId);
+		return socialActivityLocalService.getRelationActivitiesCount(userId);
 	}
 
 	/**
@@ -628,7 +630,8 @@ public class SocialActivityServiceImpl extends SocialActivityServiceBaseImpl {
 	public int getRelationActivitiesCount(long userId, int type)
 		throws PortalException, SystemException {
 
-		return socialActivityFinder.countByRelationType(userId, type);
+		return socialActivityLocalService.getRelationActivitiesCount(
+			userId, type);
 	}
 
 	/**
@@ -705,7 +708,7 @@ public class SocialActivityServiceImpl extends SocialActivityServiceBaseImpl {
 		throws PortalException, SystemException {
 
 		List<SocialActivity> activities =
-			socialActivityFinder.findByUserGroups(
+			socialActivityLocalService.getUserGroupsActivities(
 				userId, 0, end + PropsValues.ACTIVITY_FILTER_SEARCH_LIMIT);
 
 		return filterActivities(activities, start, end);
@@ -724,7 +727,7 @@ public class SocialActivityServiceImpl extends SocialActivityServiceBaseImpl {
 	public int getUserGroupsActivitiesCount(long userId)
 		throws PortalException, SystemException {
 
-		return socialActivityFinder.countByUserGroups(userId);
+		return socialActivityLocalService.getUserGroupsActivitiesCount(userId);
 	}
 
 	/**
@@ -754,7 +757,7 @@ public class SocialActivityServiceImpl extends SocialActivityServiceBaseImpl {
 		throws PortalException, SystemException {
 
 		List<SocialActivity> activities =
-			socialActivityFinder.findByUserGroupsAndOrganizations(
+			socialActivityLocalService.getUserGroupsAndOrganizationsActivities(
 				userId, 0, end + PropsValues.ACTIVITY_FILTER_SEARCH_LIMIT);
 
 		return filterActivities(activities, start, end);
@@ -773,7 +776,8 @@ public class SocialActivityServiceImpl extends SocialActivityServiceBaseImpl {
 	public int getUserGroupsAndOrganizationsActivitiesCount(long userId)
 		throws PortalException, SystemException {
 
-		return socialActivityFinder.countByUserGroupsAndOrganizations(userId);
+		return socialActivityLocalService.
+			getUserGroupsAndOrganizationsActivitiesCount(userId);
 	}
 
 	/**
@@ -803,7 +807,7 @@ public class SocialActivityServiceImpl extends SocialActivityServiceBaseImpl {
 		throws PortalException, SystemException {
 
 		List<SocialActivity> activities =
-			socialActivityFinder.findByUserOrganizations(
+			socialActivityLocalService.getUserOrganizationsActivities(
 				userId, 0, end + PropsValues.ACTIVITY_FILTER_SEARCH_LIMIT);
 
 		return filterActivities(activities, start, end);
@@ -822,7 +826,8 @@ public class SocialActivityServiceImpl extends SocialActivityServiceBaseImpl {
 	public int getUserOrganizationsActivitiesCount(long userId)
 		throws PortalException, SystemException {
 
-		return socialActivityFinder.countByUserOrganizations(userId);
+		return socialActivityLocalService.getUserOrganizationsActivitiesCount(
+			userId);
 	}
 
 	protected List<SocialActivity> filterActivities(
