@@ -53,40 +53,31 @@ import org.junit.runner.RunWith;
  */
 @ExecutionTestListeners(
 	listeners = {
-		MainServletExecutionTestListener.class
+		MainServletExecutionTestListener.class,
 	})
 @RunWith(LiferayIntegrationJUnitTestRunner.class)
 public class SocialActivityServiceTest {
 
 	@Before
 	public void setUp() throws Exception {
-		_group = GroupTestUtil.addGroup();
+		group = GroupTestUtil.addGroup();
 
-		_regularUser = UserTestUtil.addUser(
-			"regularUser", TestPropsValues.getGroupId());
+		user = UserTestUtil.addUser();
 	}
 
 	@After
 	public void tearDown() throws Exception {
 		SocialActivityHierarchyEntryThreadLocal.clear();
 
-		if (_group != null) {
-			GroupLocalServiceUtil.deleteGroup(_group);
+		GroupLocalServiceUtil.deleteGroup(group);
 
-			_group = null;
-		}
-
-		if (_regularUser != null) {
-			UserLocalServiceUtil.deleteUser(_regularUser);
-
-			_regularUser = null;
-		}
+		UserLocalServiceUtil.deleteUser(user);
 	}
 
 	@Test
 	public void testFilterActivities() throws Exception {
 		FileEntry fileEntry = DLAppTestUtil.addFileEntry(
-			_group.getGroupId(), DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,
+			group.getGroupId(), DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,
 			ServiceTestUtil.randomString() + ".txt",
 			ServiceTestUtil.randomString(), true);
 
@@ -94,14 +85,14 @@ public class SocialActivityServiceTest {
 
 		List<SocialActivity> activities =
 			SocialActivityLocalServiceUtil.getGroupActivities(
-				_group.getGroupId(), QueryUtil.ALL_POS, QueryUtil.ALL_POS);
+				group.getGroupId(), QueryUtil.ALL_POS, QueryUtil.ALL_POS);
 
 		Assert.assertEquals(1, activities.size());
 
-		ServiceTestUtil.setUser(_regularUser);
+		ServiceTestUtil.setUser(user);
 
 		activities = SocialActivityServiceUtil.getGroupActivities(
-			_group.getGroupId(), QueryUtil.ALL_POS, QueryUtil.ALL_POS);
+			group.getGroupId(), QueryUtil.ALL_POS, QueryUtil.ALL_POS);
 
 		Assert.assertEquals(0, activities.size());
 
@@ -112,28 +103,28 @@ public class SocialActivityServiceTest {
 	public void testPagingFilterActivities() throws Exception {
 		for (int i = 0; i < 4; i++) {
 			DLAppTestUtil.addFileEntry(
-				_group.getGroupId(), DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,
+				group.getGroupId(), DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,
 				ServiceTestUtil.randomString() + ".txt", String.valueOf(i),
 				true);
 
 			FileEntry fileEntry = DLAppTestUtil.addFileEntry(
-				_group.getGroupId(), DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,
+				group.getGroupId(), DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,
 				ServiceTestUtil.randomString() + ".txt",
 				ServiceTestUtil.randomString(), true);
 
 			removeGuestPermission(fileEntry);
 		}
 
-		ServiceTestUtil.setUser(_regularUser);
+		ServiceTestUtil.setUser(user);
 
 		Assert.assertEquals(
 			8,
 			SocialActivityServiceUtil.getGroupActivitiesCount(
-				_group.getGroupId()));
+				group.getGroupId()));
 
 		List<SocialActivity> activities =
 			SocialActivityServiceUtil.getGroupActivities(
-				_group.getGroupId(), 0, 2);
+				group.getGroupId(), 0, 2);
 
 		int index = 3;
 
@@ -145,9 +136,8 @@ public class SocialActivityServiceTest {
 			index--;
 		}
 
-		activities =
-			SocialActivityServiceUtil.getGroupActivities(
-				_group.getGroupId(), 2, 4);
+		activities = SocialActivityServiceUtil.getGroupActivities(
+			group.getGroupId(), 2, 4);
 
 		for (SocialActivity activity : activities) {
 			String title = String.valueOf(index);
@@ -160,26 +150,26 @@ public class SocialActivityServiceTest {
 
 	protected void removeGuestPermission(FileEntry fileEntry) throws Exception {
 		Role role = RoleLocalServiceUtil.getRole(
-			_group.getCompanyId(), RoleConstants.GUEST);
+			group.getCompanyId(), RoleConstants.GUEST);
 
 		String resourceName = DLFileEntry.class.getName();
 
 		if (ResourceBlockLocalServiceUtil.isSupported(resourceName)) {
 			ResourceBlockLocalServiceUtil.setIndividualScopePermissions(
-				_group.getCompanyId(), _group.getGroupId(), resourceName,
+				group.getCompanyId(), group.getGroupId(), resourceName,
 				fileEntry.getFileEntryId(), role.getRoleId(),
 				new ArrayList<String>());
 		}
 		else {
 			ResourcePermissionLocalServiceUtil.setResourcePermissions(
-				_group.getCompanyId(), DLFileEntry.class.getName(),
+				group.getCompanyId(), DLFileEntry.class.getName(),
 				ResourceConstants.SCOPE_INDIVIDUAL,
 				String.valueOf(fileEntry.getFileEntryId()), role.getRoleId(),
 				new String[0]);
 		}
 	}
 
-	protected Group _group;
-	protected User _regularUser;
+	protected Group group;
+	protected User user;
 
 }
