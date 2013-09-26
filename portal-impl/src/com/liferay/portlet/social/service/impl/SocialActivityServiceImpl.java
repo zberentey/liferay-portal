@@ -280,7 +280,7 @@ public class SocialActivityServiceImpl extends SocialActivityServiceBaseImpl {
 			socialActivityInterpreterLocalService.getActivityInterpreters(
 				StringPool.BLANK);
 
-		if (hasPermission(activity, activityInterpreters)) {
+		if (!hasPermission(activity, activityInterpreters)) {
 			throw new PrincipalException();
 		}
 
@@ -841,8 +841,6 @@ public class SocialActivityServiceImpl extends SocialActivityServiceBaseImpl {
 		for (SocialActivity activity : activities) {
 			if (hasPermission(activity, activityInterpreters)) {
 				filteredActivities.add(activity);
-
-				break;
 			}
 
 			if ((end != QueryUtil.ALL_POS) &&
