@@ -78,7 +78,7 @@ public class TunnelUtil {
 				"the-tunneling-servlet-shared-secret-must-be-16,-32,-or-64-" +
 					"characters-long");
 
-			authException.setType(AuthException.NO_SHARED_SECRET);
+			authException.setType(AuthException.INVALID_SHARED_SECRET);
 
 			throw authException;
 		}
