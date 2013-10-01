@@ -58,7 +58,7 @@ public class SocialActivityServiceImpl extends SocialActivityServiceBaseImpl {
 	@Override
 	public List<SocialActivity> getActivities(
 			long classNameId, int start, int end)
-		throws SystemException {
+		throws PortalException, SystemException {
 
 		return socialActivityPersistence.findByClassNameId(
 			classNameId, start, end);
@@ -91,7 +91,7 @@ public class SocialActivityServiceImpl extends SocialActivityServiceBaseImpl {
 	public List<SocialActivity> getActivities(
 			long mirrorActivityId, long classNameId, long classPK, int start,
 			int end)
-		throws SystemException {
+		throws PortalException, SystemException {
 
 		return socialActivityPersistence.findByM_C_C(
 			mirrorActivityId, classNameId, classPK, start, end);
@@ -124,7 +124,7 @@ public class SocialActivityServiceImpl extends SocialActivityServiceBaseImpl {
 	public List<SocialActivity> getActivities(
 			long mirrorActivityId, String className, long classPK, int start,
 			int end)
-		throws SystemException {
+		throws PortalException, SystemException {
 
 		long classNameId = PortalUtil.getClassNameId(className);
 
@@ -155,7 +155,7 @@ public class SocialActivityServiceImpl extends SocialActivityServiceBaseImpl {
 	@Override
 	public List<SocialActivity> getActivities(
 			String className, int start, int end)
-		throws SystemException {
+		throws PortalException, SystemException {
 
 		long classNameId = PortalUtil.getClassNameId(className);
 
@@ -248,7 +248,7 @@ public class SocialActivityServiceImpl extends SocialActivityServiceBaseImpl {
 	@Override
 	public List<SocialActivity> getActivitySetActivities(
 			long activitySetId, int start, int end)
-		throws SystemException {
+		throws PortalException, SystemException {
 
 		return socialActivityPersistence.findByActivitySetId(
 			activitySetId, start, end);
@@ -280,7 +280,7 @@ public class SocialActivityServiceImpl extends SocialActivityServiceBaseImpl {
 	@Override
 	public List<SocialActivity> getGroupActivities(
 			long groupId, int start, int end)
-		throws SystemException {
+		throws PortalException, SystemException {
 
 		return socialActivityFinder.findByGroupId(groupId, start, end);
 	}
@@ -328,7 +328,7 @@ public class SocialActivityServiceImpl extends SocialActivityServiceBaseImpl {
 	@Override
 	public List<SocialActivity> getGroupUsersActivities(
 			long groupId, int start, int end)
-		throws SystemException {
+		throws PortalException, SystemException {
 
 		return socialActivityFinder.findByGroupUsers(groupId, start, end);
 	}
@@ -391,7 +391,7 @@ public class SocialActivityServiceImpl extends SocialActivityServiceBaseImpl {
 	@Override
 	public List<SocialActivity> getOrganizationActivities(
 			long organizationId, int start, int end)
-		throws SystemException {
+		throws PortalException, SystemException {
 
 		return socialActivityFinder.findByOrganizationId(
 			organizationId, start, end);
@@ -435,7 +435,7 @@ public class SocialActivityServiceImpl extends SocialActivityServiceBaseImpl {
 	@Override
 	public List<SocialActivity> getOrganizationUsersActivities(
 			long organizationId, int start, int end)
-		throws SystemException {
+		throws PortalException, SystemException {
 
 		return socialActivityFinder.findByOrganizationUsers(
 			organizationId, start, end);
@@ -479,7 +479,7 @@ public class SocialActivityServiceImpl extends SocialActivityServiceBaseImpl {
 	@Override
 	public List<SocialActivity> getRelationActivities(
 			long userId, int start, int end)
-		throws SystemException {
+		throws PortalException, SystemException {
 
 		return socialActivityFinder.findByRelation(userId, start, end);
 	}
@@ -509,7 +509,7 @@ public class SocialActivityServiceImpl extends SocialActivityServiceBaseImpl {
 	@Override
 	public List<SocialActivity> getRelationActivities(
 			long userId, int type, int start, int end)
-		throws SystemException {
+		throws PortalException, SystemException {
 
 		return socialActivityFinder.findByRelationType(
 			userId, type, start, end);
@@ -567,7 +567,7 @@ public class SocialActivityServiceImpl extends SocialActivityServiceBaseImpl {
 	@Override
 	public List<SocialActivity> getUserActivities(
 			long userId, int start, int end)
-		throws SystemException {
+		throws PortalException, SystemException {
 
 		return socialActivityPersistence.findByUserId(userId, start, end);
 	}
@@ -607,7 +607,7 @@ public class SocialActivityServiceImpl extends SocialActivityServiceBaseImpl {
 	@Override
 	public List<SocialActivity> getUserGroupsActivities(
 			long userId, int start, int end)
-		throws SystemException {
+		throws PortalException, SystemException {
 
 		return socialActivityFinder.findByUserGroups(userId, start, end);
 	}
@@ -650,7 +650,7 @@ public class SocialActivityServiceImpl extends SocialActivityServiceBaseImpl {
 	@Override
 	public List<SocialActivity> getUserGroupsAndOrganizationsActivities(
 			long userId, int start, int end)
-		throws SystemException {
+		throws PortalException, SystemException {
 
 		return socialActivityFinder.findByUserGroupsAndOrganizations(
 			userId, start, end);
@@ -694,7 +694,7 @@ public class SocialActivityServiceImpl extends SocialActivityServiceBaseImpl {
 	@Override
 	public List<SocialActivity> getUserOrganizationsActivities(
 			long userId, int start, int end)
-		throws SystemException {
+		throws PortalException, SystemException {
 
 		return socialActivityFinder.findByUserOrganizations(userId, start, end);
 	}
