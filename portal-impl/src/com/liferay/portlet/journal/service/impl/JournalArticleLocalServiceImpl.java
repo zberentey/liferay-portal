@@ -5328,7 +5328,14 @@ public class JournalArticleLocalServiceImpl
 						article.getGroupId(), article.getArticleId(),
 						article.getDisplayDate(), article.getExpirationDate());
 
-					Date displayDate = dateInterval[0];
+					Date publishDate = dateInterval[0];
+
+					if ((oldStatus != WorkflowConstants.STATUS_APPROVED) &&
+						publishDate.before(now)) {
+
+						publishDate = now;
+					}
+
 					Date expirationDate = dateInterval[1];
 
 					if (neverExpire) {
@@ -5337,7 +5344,7 @@ public class JournalArticleLocalServiceImpl
 
 					assetEntryLocalService.updateEntry(
 						JournalArticle.class.getName(),
-						article.getResourcePrimKey(), displayDate,
+						article.getResourcePrimKey(), publishDate,
 						expirationDate, true);
 				}
 
