@@ -46,6 +46,7 @@ import javax.naming.directory.Attributes;
 import javax.naming.directory.BasicAttribute;
 import javax.naming.directory.BasicAttributes;
 import javax.naming.directory.DirContext;
+import javax.naming.directory.ModificationItem;
 
 import org.apache.commons.beanutils.PropertyUtils;
 
@@ -185,7 +186,8 @@ public class DefaultPortalToLDAPConverter implements PortalToLDAPConverter {
 
 	@Override
 	public Attributes getLDAPUserAttributes(
-			long ldapServerId, User user, Properties userMappings)
+			long ldapServerId, User user, Properties userMappings,
+			Properties userExpandoMappings)
 		throws SystemException {
 
 		Attributes attributes = new BasicAttributes(true);
@@ -238,6 +240,20 @@ public class DefaultPortalToLDAPConverter implements PortalToLDAPConverter {
 		addAttributeMapping(
 			userMappings.getProperty(UserConverterKeys.STATUS),
 			String.valueOf(user.getStatus()), attributes);
+
+		Modifications modifications = Modifications.getInstance();
+
+		ExpandoBridge expandoBridge = user.getExpandoBridge();
+
+		populateCustomAttributeModifications(
+			user, expandoBridge, expandoBridge.getAttributes(),
+			userExpandoMappings, modifications);
+
+		for (ModificationItem item : modifications.getItems()) {
+			Attribute attribute = item.getAttribute();
+
+			attributes.put(attribute);
+		}
 
 		return attributes;
 	}

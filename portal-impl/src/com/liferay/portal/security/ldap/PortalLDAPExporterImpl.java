@@ -98,9 +98,13 @@ public class PortalLDAPExporterImpl implements PortalLDAPExporter {
 			if (binding == null) {
 				Properties userMappings = LDAPSettingsUtil.getUserMappings(
 					ldapServerId, companyId);
+				Properties userExpandoMappings =
+					LDAPSettingsUtil.getUserExpandoMappings(
+						ldapServerId, companyId);
 
 				binding = addUser(
-					ldapServerId, ldapContext, user, userMappings);
+					ldapServerId, ldapContext, user, userMappings,
+					userExpandoMappings);
 			}
 
 			Name name = new CompositeName();
@@ -218,9 +222,7 @@ public class PortalLDAPExporterImpl implements PortalLDAPExporter {
 			User user, Map<String, Serializable> userExpandoAttributes)
 		throws Exception {
 
-		if (user.isDefaultUser() ||
-			(user.getStatus() != WorkflowConstants.STATUS_APPROVED)) {
-
+		if (user.isDefaultUser()) {
 			return;
 		}
 
@@ -255,7 +257,8 @@ public class PortalLDAPExporterImpl implements PortalLDAPExporter {
 
 			if (binding == null) {
 				binding = addUser(
-					ldapServerId, ldapContext, user, userMappings);
+					ldapServerId, ldapContext, user, userMappings,
+					userExpandoMappings);
 			}
 
 			Name name = new CompositeName();
@@ -399,7 +402,7 @@ public class PortalLDAPExporterImpl implements PortalLDAPExporter {
 
 	protected Binding addUser(
 			long ldapServerId, LdapContext ldapContext, User user,
-			Properties userMappings)
+			Properties userMappings, Properties userExpandoMappings)
 		throws Exception {
 
 		Name name = new CompositeName();
@@ -409,7 +412,7 @@ public class PortalLDAPExporterImpl implements PortalLDAPExporter {
 				ldapServerId, user, userMappings));
 
 		Attributes attributes = _portalToLDAPConverter.getLDAPUserAttributes(
-			ldapServerId, user, userMappings);
+			ldapServerId, user, userMappings, userExpandoMappings);
 
 		ldapContext.bind(name, new PortalLDAPContext(attributes));
 

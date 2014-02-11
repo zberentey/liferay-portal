@@ -55,7 +55,8 @@ public interface PortalToLDAPConverter {
 		throws Exception;
 
 	public Attributes getLDAPUserAttributes(
-			long ldapServerId, User user, Properties userMappings)
+			long ldapServerId, User user, Properties userMappings,
+			Properties userExandoMappings)
 		throws Exception;
 
 	public Modifications getLDAPUserGroupModifications(
