@@ -39,4 +39,6 @@ public interface PortalLDAPExporter {
 			User user, Map<String, Serializable> userExpandoAttributes)
 		throws Exception;
 
+	public void removeFromLDAP(User user) throws Exception;
+
 }

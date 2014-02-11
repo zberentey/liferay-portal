@@ -60,6 +60,10 @@ public class PortalLDAPExporterUtil {
 		return _portalLDAPExporter;
 	}
 
+	public static void removeFromLDAP(User user) throws Exception {
+		getPortalLDAPExporter().removeFromLDAP(user);
+	}
+
 	public void setPortalLDAPExporter(PortalLDAPExporter portalLDAPExporter) {
 		PortalRuntimePermission.checkSetBeanProperty(getClass());
 

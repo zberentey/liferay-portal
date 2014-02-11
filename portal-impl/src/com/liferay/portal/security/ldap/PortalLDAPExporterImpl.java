@@ -317,6 +317,58 @@ public class PortalLDAPExporterImpl implements PortalLDAPExporter {
 		}
 	}
 
+	@Override
+	public void removeFromLDAP(User user) throws Exception {
+		if (user.isDefaultUser()) {
+			return;
+		}
+
+		long companyId = user.getCompanyId();
+
+		if (!AuthSettingsUtil.isLDAPAuthEnabled(companyId) ||
+			!LDAPSettingsUtil.isExportEnabled(companyId)) {
+
+			return;
+		}
+
+		long ldapServerId = PortalLDAPUtil.getLdapServerId(
+			companyId, user.getScreenName(), user.getEmailAddress());
+
+		LdapContext ldapContext = PortalLDAPUtil.getContext(
+			ldapServerId, companyId);
+
+		try {
+			if (ldapContext == null) {
+				return;
+			}
+
+			Properties userMappings = LDAPSettingsUtil.getUserMappings(
+				ldapServerId, companyId);
+
+			Name name = new CompositeName();
+
+			name.add(
+				_portalToLDAPConverter.getUserDNName(
+					ldapServerId, user, userMappings));
+
+			ldapContext.unbind(name);
+		}
+		catch (NameNotFoundException nnfe) {
+			if (PrefsPropsUtil.getBoolean(
+					companyId, PropsKeys.LDAP_AUTH_REQUIRED)) {
+
+				throw nnfe;
+			}
+
+			_log.error(nnfe, nnfe);
+		}
+		finally {
+			if (ldapContext != null) {
+				ldapContext.close();
+			}
+		}
+	}
+
 	public void setPortalToLDAPConverter(
 		PortalToLDAPConverter portalToLDAPConverter) {
 
