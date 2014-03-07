@@ -84,7 +84,7 @@ public class DocumentImpl implements Document {
 			return;
 		}
 
-		addKeyword(name, _dateFormat.format(value));
+		addDate(name, new Date[] {value});
 	}
 
 	@Override
@@ -98,6 +98,15 @@ public class DocumentImpl implements Document {
 		for (int i = 0; i < values.length; i++) {
 			dates[i] = _dateFormat.format(values[i]);
 		}
+
+		String sortableFieldName = getSortableFieldName(name);
+
+		Field field = new Field(sortableFieldName, dates);
+
+		field.setNumeric(true);
+		field.setNumericClass(Long.class);
+
+		_fields.put(sortableFieldName, field);
 
 		addKeyword(name, dates);
 	}
