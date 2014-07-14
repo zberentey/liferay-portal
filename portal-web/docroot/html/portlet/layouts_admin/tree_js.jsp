@@ -101,9 +101,6 @@ if (!selectableTree) {
 			loadingEl.hide();
 
 			<c:choose>
-				<c:when test="<%= saveState && selectableTree %>">
-					TreeUtil.restoreCheckedNode(rootNode);
-				</c:when>
 				<c:when test="<%= expandFirstNode %>">
 					rootNode.expand();
 				</c:when>
@@ -258,6 +255,10 @@ if (!selectableTree) {
 
 						<c:if test="<%= !saveState && defaultStateChecked %>">
 							checked: true,
+						</c:if>
+
+						<c:if test="<%= saveState && selectableTree %>">
+							checked: (AArray.indexOf(TreeUtil.CHECKED_NODES, String(node.plid)) > -1) ? true : false,
 						</c:if>
 
 						cssClasses: {
