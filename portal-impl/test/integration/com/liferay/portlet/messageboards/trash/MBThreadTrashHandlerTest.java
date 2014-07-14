@@ -15,7 +15,6 @@
 package com.liferay.portlet.messageboards.trash;
 
 import com.liferay.portal.kernel.test.ExecutionTestListeners;
-import com.liferay.portal.kernel.transaction.Transactional;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.model.BaseModel;
 import com.liferay.portal.model.ClassedModel;
@@ -59,7 +58,6 @@ import org.junit.runner.RunWith;
 public class MBThreadTrashHandlerTest extends BaseTrashHandlerTestCase {
 
 	@Test
-	@Transactional
 	public void testCategoryMessageCount() throws Exception {
 		ServiceContext serviceContext =
 			ServiceContextTestUtil.getServiceContext(group.getGroupId());
@@ -146,8 +144,8 @@ public class MBThreadTrashHandlerTest extends BaseTrashHandlerTestCase {
 		MBCategory category = (MBCategory)parentBaseModel;
 
 		MBMessage message = MBTestUtil.addMessage(
-			category.getCategoryId(), getSearchKeywords(), approved,
-			serviceContext);
+			category.getGroupId(), category.getCategoryId(),
+			getSearchKeywords(), approved, serviceContext);
 
 		return message.getThread();
 	}

@@ -76,10 +76,10 @@ if (Validator.isNotNull(historyKey)) {
 		<c:otherwise>
 
 			<%
-			String wrapperCssClass = "row-fluid";
+			String wrapperCssClass = StringPool.BLANK;
 
 			if (displayStyle.equals("steps")) {
-				wrapperCssClass = wrapperCssClass.concat(" form-steps");
+				wrapperCssClass = "form-steps";
 			}
 			%>
 
@@ -102,7 +102,7 @@ if (Validator.isNotNull(historyKey)) {
 					String contentCssClass = "form-navigator-content";
 
 					if (!displayStyle.equals("steps")) {
-						contentCssClass += " span8";
+						contentCssClass += " col-md-8";
 					}
 					%>
 
@@ -111,7 +111,7 @@ if (Validator.isNotNull(historyKey)) {
 					</div>
 				</liferay-util:buffer>
 
-				<ul class="form-navigator nav nav-list span4 well">
+				<ul class="col-md-4 form-navigator list-group nav">
 					<%= Validator.isNotNull(htmlTop) ? htmlTop : StringPool.BLANK %>
 
 					<%
@@ -133,7 +133,7 @@ if (Validator.isNotNull(historyKey)) {
 					%>
 
 							<c:if test="<%= Validator.isNotNull(category) %>">
-								<li class="nav-header"><liferay-ui:message key="<%= category %>" /></li>
+								<li class="list-group-item nav-header "><liferay-ui:message key="<%= category %>" /></li>
 							</c:if>
 
 							<%
@@ -154,7 +154,7 @@ if (Validator.isNotNull(historyKey)) {
 									continue;
 								}
 
-								String cssClass = "tab";
+								String cssClass = "list-group-item tab";
 
 								if (sectionId.equals(namespace + errorSection)) {
 									cssClass += " section-error";
@@ -411,35 +411,44 @@ if (Validator.isNotNull(historyKey)) {
 
 					formNode.on('autofields:update', updateSectionError);
 
-					Liferay.after(
-						'form:registered',
-						function(event) {
-							var form = event.form;
+					var updateSectionOnError = function(event) {
+						var form = event.form;
 
-							if (form.formNode.compareTo(formNode)) {
-								var validator = form.formValidator;
+						if (form.formNode.compareTo(formNode)) {
+							var validator = form.formValidator;
 
-								validator.on(
-									'submitError',
-									function() {
-										var errorClass = validator.get('errorClass');
+							validator.on(
+								'submitError',
+								function() {
+									var errorClass = validator.get('errorClass');
 
-										var errorField = formNode.one('.' + errorClass);
+									var errorField = formNode.one('.' + errorClass);
 
-										if (errorField) {
-											var errorSection = errorField.ancestor('.form-section');
+									if (errorField) {
+										var errorSection = errorField.ancestor('.form-section');
 
-											var errorSectionId = errorSection.attr('id');
+										var errorSectionId = errorSection.attr('id');
 
-											selectTabBySectionId(errorSectionId);
+										selectTabBySectionId(errorSectionId);
 
-											updateSectionError();
-										}
+										updateSectionError();
 									}
-								);
-							}
+								}
+							);
 						}
-					);
+					};
+
+					var detachUpdateSection = function(event) {
+						if (event.portletId === '<%= portletDisplay.getRootPortletId() %>') {
+							Liferay.detach('form:registered', updateSectionOnError);
+
+							Liferay.detach('destroyPortlet', detachUpdateSection);
+						}
+					};
+
+					Liferay.after('form:registered', updateSectionOnError);
+
+					Liferay.on('destroyPortlet', detachUpdateSection);
 				}
 			</aui:script>
 		</c:otherwise>

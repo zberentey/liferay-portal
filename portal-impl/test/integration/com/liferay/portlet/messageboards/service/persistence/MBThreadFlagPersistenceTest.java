@@ -34,7 +34,7 @@ import com.liferay.portal.model.ModelListener;
 import com.liferay.portal.service.persistence.BasePersistence;
 import com.liferay.portal.service.persistence.PersistenceExecutionTestListener;
 import com.liferay.portal.test.LiferayPersistenceIntegrationJUnitTestRunner;
-import com.liferay.portal.test.persistence.TransactionalPersistenceAdvice;
+import com.liferay.portal.test.persistence.test.TransactionalPersistenceAdvice;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.portal.util.test.RandomTestUtil;
 
@@ -52,6 +52,7 @@ import org.junit.runner.RunWith;
 
 import java.io.Serializable;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -289,7 +290,7 @@ public class MBThreadFlagPersistenceTest {
 		}
 	}
 
-	protected OrderByComparator getOrderByComparator() {
+	protected OrderByComparator<MBThreadFlag> getOrderByComparator() {
 		return OrderByComparatorFactoryUtil.create("MBThreadFlag", "uuid",
 			true, "threadFlagId", true, "groupId", true, "companyId", true,
 			"userId", true, "userName", true, "createDate", true,
@@ -312,6 +313,88 @@ public class MBThreadFlagPersistenceTest {
 		MBThreadFlag missingMBThreadFlag = _persistence.fetchByPrimaryKey(pk);
 
 		Assert.assertNull(missingMBThreadFlag);
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereAllPrimaryKeysExist()
+		throws Exception {
+		MBThreadFlag newMBThreadFlag1 = addMBThreadFlag();
+		MBThreadFlag newMBThreadFlag2 = addMBThreadFlag();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(newMBThreadFlag1.getPrimaryKey());
+		primaryKeys.add(newMBThreadFlag2.getPrimaryKey());
+
+		Map<Serializable, MBThreadFlag> mbThreadFlags = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertEquals(2, mbThreadFlags.size());
+		Assert.assertEquals(newMBThreadFlag1,
+			mbThreadFlags.get(newMBThreadFlag1.getPrimaryKey()));
+		Assert.assertEquals(newMBThreadFlag2,
+			mbThreadFlags.get(newMBThreadFlag2.getPrimaryKey()));
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereNoPrimaryKeysExist()
+		throws Exception {
+		long pk1 = RandomTestUtil.nextLong();
+
+		long pk2 = RandomTestUtil.nextLong();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(pk1);
+		primaryKeys.add(pk2);
+
+		Map<Serializable, MBThreadFlag> mbThreadFlags = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertTrue(mbThreadFlags.isEmpty());
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereSomePrimaryKeysExist()
+		throws Exception {
+		MBThreadFlag newMBThreadFlag = addMBThreadFlag();
+
+		long pk = RandomTestUtil.nextLong();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(newMBThreadFlag.getPrimaryKey());
+		primaryKeys.add(pk);
+
+		Map<Serializable, MBThreadFlag> mbThreadFlags = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertEquals(1, mbThreadFlags.size());
+		Assert.assertEquals(newMBThreadFlag,
+			mbThreadFlags.get(newMBThreadFlag.getPrimaryKey()));
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithNoPrimaryKeys()
+		throws Exception {
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		Map<Serializable, MBThreadFlag> mbThreadFlags = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertTrue(mbThreadFlags.isEmpty());
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithOnePrimaryKey()
+		throws Exception {
+		MBThreadFlag newMBThreadFlag = addMBThreadFlag();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(newMBThreadFlag.getPrimaryKey());
+
+		Map<Serializable, MBThreadFlag> mbThreadFlags = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertEquals(1, mbThreadFlags.size());
+		Assert.assertEquals(newMBThreadFlag,
+			mbThreadFlags.get(newMBThreadFlag.getPrimaryKey()));
 	}
 
 	@Test

@@ -14,18 +14,7 @@
  */
 --%>
 
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-
-<%@ page import="com.liferay.portal.kernel.language.LanguageUtil" %>
-<%@ page import="com.liferay.portal.kernel.parsers.bbcode.BBCodeTranslatorUtil" %>
-<%@ page import="com.liferay.portal.kernel.util.ContentTypes" %>
-<%@ page import="com.liferay.portal.kernel.util.HtmlUtil" %>
-<%@ page import="com.liferay.portal.kernel.util.LocaleUtil" %>
-<%@ page import="com.liferay.portal.kernel.util.ParamUtil" %>
-<%@ page import="com.liferay.portal.kernel.util.StringUtil" %>
-<%@ page import="com.liferay.portlet.messageboards.model.MBThreadConstants" %>
-
-<%@ page import="java.util.Locale" %>
+<%@ include file="/html/js/editor/ckeditor_init.jsp" %>
 
 <%
 String contentsLanguageId = ParamUtil.getString(request, "contentsLanguageId");
@@ -51,7 +40,7 @@ boolean resizable = ParamUtil.getBoolean(request, "resizable");
 response.setContentType(ContentTypes.TEXT_JAVASCRIPT);
 %>
 
-;(function() {
+;window['<%= HtmlUtil.escapeJS(name) %>Config'] = function() {
 	var config = CKEDITOR.instances['<%= HtmlUtil.escapeJS(name) %>'].config;
 
 	config.allowedContent = true;
@@ -149,4 +138,8 @@ response.setContentType(ContentTypes.TEXT_JAVASCRIPT);
 	config.smiley_path = '<%= HtmlUtil.escapeJS(emoticonsPath) %>' + '/';
 
 	config.smiley_symbols = ['<%= StringUtil.merge(BBCodeTranslatorUtil.getEmoticonSymbols(), "','") %>'];
-})();
+
+	<%@ include file="/html/js/editor/ckeditor/ckconfig_bbcode-ext.jsp" %>
+};
+
+window['<%= HtmlUtil.escapeJS(name) %>Config']();

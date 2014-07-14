@@ -45,7 +45,7 @@ if (folder != null) {
 }
 else {
 	modelResource= "com.liferay.portlet.journal";
-	modelResourceDescription = HtmlUtil.escape(themeDisplay.getScopeGroupName());
+	modelResourceDescription = themeDisplay.getScopeGroupName();
 	resourcePrimKey= String.valueOf(scopeGroupId);
 
 	hasPermissionsPermission = JournalPermission.contains(permissionChecker, scopeGroupId, ActionKeys.PERMISSIONS);
@@ -53,7 +53,7 @@ else {
 %>
 
 <span class="entry-action overlay">
-	<liferay-ui:icon-menu direction="down" extended="<%= false %>" icon="<%= StringPool.BLANK %>" message="<%= StringPool.BLANK %>" showWhenSingleIcon="<%= true %>" triggerCssClass="btn">
+	<liferay-ui:icon-menu direction="down" extended="<%= false %>" icon="<%= StringPool.BLANK %>" message="<%= StringPool.BLANK %>" showWhenSingleIcon="<%= true %>" triggerCssClass="btn btn-default">
 		<c:choose>
 			<c:when test="<%= folder != null %>">
 				<c:if test="<%= JournalFolderPermission.contains(permissionChecker, folder, ActionKeys.UPDATE) %>">
@@ -145,7 +145,7 @@ else {
 		<c:if test="<%= hasPermissionsPermission %>">
 			<liferay-security:permissionsURL
 				modelResource="<%= modelResource %>"
-				modelResourceDescription="<%= modelResourceDescription %>"
+				modelResourceDescription="<%= HtmlUtil.escape(modelResourceDescription) %>"
 				resourcePrimKey="<%= resourcePrimKey %>"
 				var="permissionsURL"
 				windowState="<%= LiferayWindowState.POP_UP.toString() %>"

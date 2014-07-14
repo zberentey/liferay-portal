@@ -1,9 +1,5 @@
 <definition>
 	<command name="assertClick">
-		<case locator-key1="ADD_NEW_MENULIST_BASIC_WEB_CONTENT">
-			<execute function="AssertClick#assertTextClickAtAndWait" />
-		</case>
-
 		<case locator-key1="ASSET_ABSTRACT_READ_MORE">
 			<execute function="AssertClick#assertPartialTextClickAtAndWait" />
 		</case>
@@ -33,6 +29,10 @@
 		</case>
 
 		<case locator-key1="METADATA_CATEGORY">
+			<execute function="AssertTextEquals#assertPartialText" />
+		</case>
+
+		<case locator-key1="METADATA_AUTHOR">
 			<execute function="AssertTextEquals#assertPartialText" />
 		</case>
 

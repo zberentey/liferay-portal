@@ -91,7 +91,7 @@ searchContainer.setTotal(total);
 String parentTitle = StringPool.BLANK;
 
 if (browseBy.equals("file-entry-type")) {
-	parentTitle = LanguageUtil.get(pageContext, "browse-by-type");
+	parentTitle = LanguageUtil.get(request, "browse-by-type");
 }
 else {
 	if ((folderId != rootFolderId) && (parentFolderId > 0) && (folder != null) && (!folder.isMountPoint() || expandFolder)) {
@@ -100,16 +100,16 @@ else {
 		parentTitle = grandparentFolder.getName();
 	}
 	else if (((folderId != rootFolderId) && (parentFolderId == 0)) || ((folderId == rootFolderId) && (parentFolderId == 0) && expandFolder)) {
-		parentTitle = LanguageUtil.get(pageContext, "home");
+		parentTitle = LanguageUtil.get(request, "home");
 	}
 }
 %>
 
 <div id="<portlet:namespace />listViewContainer">
 	<div id="<portlet:namespace />folderContainer">
-		<aui:nav cssClass="nav-list well">
+		<aui:nav cssClass="list-group">
 			<c:if test="<%= Validator.isNotNull(parentTitle) %>">
-				<li class="nav-header">
+				<li class="dropdown-header list-group-item">
 					<%= HtmlUtil.escape(parentTitle) %>
 				</li>
 			</c:if>
@@ -137,13 +137,13 @@ else {
 					dataView.put("folder", true);
 					dataView.put("folder-id", rootFolderId);
 					dataView.put("navigation", "home");
-					dataView.put("title", LanguageUtil.get(pageContext, "home"));
+					dataView.put("title", LanguageUtil.get(request, "home"));
 					%>
 
 					<liferay-ui:app-view-navigation-entry
 						actionJsp="/html/portlet/document_library/folder_action.jsp"
 						dataView="<%= dataView %>"
-						entryTitle='<%= LanguageUtil.get(pageContext, "home") %>'
+						entryTitle='<%= LanguageUtil.get(request, "home") %>'
 						iconImage="icon-home"
 						selected='<%= (navigation.equals("home") && (folderId == rootFolderId) && (fileEntryTypeId == -1)) %>'
 						viewURL="<%= viewDocumentsHomeURL.toString() %>"
@@ -169,7 +169,7 @@ else {
 
 						<liferay-ui:app-view-navigation-entry
 							dataView="<%= dataView %>"
-							entryTitle='<%= LanguageUtil.get(pageContext, "recent") %>'
+							entryTitle='<%= LanguageUtil.get(request, "recent") %>'
 							iconImage="icon-time"
 							selected='<%= navigation.equals("recent") %>'
 							viewURL="<%= viewRecentDocumentsURL.toString() %>"
@@ -195,7 +195,7 @@ else {
 
 							<liferay-ui:app-view-navigation-entry
 								dataView="<%= dataView %>"
-								entryTitle='<%= LanguageUtil.get(pageContext, "mine") %>'
+								entryTitle='<%= LanguageUtil.get(request, "mine") %>'
 								iconImage="icon-user"
 								selected='<%= navigation.equals("mine") %>'
 								viewURL="<%= viewMyDocumentsURL.toString() %>"
@@ -225,7 +225,7 @@ else {
 							<liferay-ui:app-view-navigation-entry
 								cssClass="folder file-entry-type"
 								dataView="<%= dataView %>"
-								entryTitle='<%= LanguageUtil.get(pageContext, "browse-by-type") %>'
+								entryTitle='<%= LanguageUtil.get(request, "browse-by-type") %>'
 								iconImage="icon-file"
 								selected='<%= browseBy.equals("file-entry-type") %>'
 								viewURL="<%= viewBasicFileEntryTypeURL.toString() %>"
@@ -283,7 +283,7 @@ else {
 								}
 						%>
 
-								<li class="app-view-navigation-entry error folder" title="<%= LanguageUtil.get(pageContext, errorMessage) %>">
+								<li class="app-view-navigation-entry error folder" title="<%= LanguageUtil.get(request, errorMessage) %>">
 
 									<%
 									request.removeAttribute(WebKeys.SEARCH_CONTAINER_RESULT_ROW);
@@ -292,7 +292,7 @@ else {
 									<liferay-util:include page="/html/portlet/document_library/folder_action.jsp" />
 
 									<span class="browse-folder">
-										<liferay-ui:icon alt="drive-error" image="drive_error" />
+										<liferay-ui:icon alt="drive-error" cssClass="drive-error" iconCssClass="icon-hdd" />
 
 										<span class="entry-title">
 											<%= HtmlUtil.escape(mountFolder.getName()) %>
@@ -328,7 +328,7 @@ else {
 
 					<liferay-ui:app-view-navigation-entry
 						dataView="<%= dataView %>"
-						entryTitle='<%= LanguageUtil.get(pageContext, "up") %>'
+						entryTitle='<%= LanguageUtil.get(request, "up") %>'
 						iconImage="icon-level-up"
 						viewURL="<%= viewURL.toString() %>"
 					/>
@@ -357,8 +357,8 @@ else {
 							<liferay-ui:app-view-navigation-entry
 								cssClass="folder file-entry-type"
 								dataView="<%= dataView %>"
-								entryTitle='<%= LanguageUtil.get(pageContext, "basic-document") %>'
-								iconImage="icon-file"
+								entryTitle='<%= LanguageUtil.get(request, "basic-document") %>'
+								iconImage="icon-file-alt"
 								selected="<%= (fileEntryTypeId == 0) %>"
 								viewURL="<%= viewBasicFileEntryTypeURL.toString() %>"
 							/>
@@ -374,6 +374,8 @@ else {
 
 							dataView.put("browse-by", "file-entry-type");
 							dataView.put("file-entry-type-id", fileEntryType.getFileEntryTypeId());
+
+							AssetRendererFactory assetRendererFactory = AssetRendererFactoryRegistryUtil.getAssetRendererFactoryByClassName(DLFileEntry.class.getName());
 						%>
 
 							<liferay-portlet:renderURL varImpl="viewFileEntryTypeURL">
@@ -391,7 +393,7 @@ else {
 								cssClass="folder file-entry-type"
 								dataView="<%= dataView %>"
 								entryTitle="<%= fileEntryType.getName(locale) %>"
-								iconImage="icon-file"
+								iconImage="<%= assetRendererFactory.getIconCssClass() %>"
 								selected="<%= (fileEntryTypeId == fileEntryType.getFileEntryTypeId()) %>"
 								viewURL="<%= viewFileEntryTypeURL.toString() %>"
 							/>
@@ -423,7 +425,7 @@ else {
 
 					<liferay-ui:app-view-navigation-entry
 						dataView="<%= dataView %>"
-						entryTitle='<%= LanguageUtil.get(pageContext, "up") %>'
+						entryTitle='<%= LanguageUtil.get(request, "up") %>'
 						iconImage="icon-level-up"
 						viewURL="<%= viewURL.toString() %>"
 					/>

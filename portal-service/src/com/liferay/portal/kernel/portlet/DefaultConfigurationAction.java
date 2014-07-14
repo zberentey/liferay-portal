@@ -45,13 +45,13 @@ public class DefaultConfigurationAction
 	protected void postProcess(
 			long companyId, PortletRequest portletRequest,
 			PortletPreferences portletPreferences)
-		throws PortalException, SystemException {
+		throws PortalException {
 	}
 
 	@Override
 	protected void postProcess(
 			long companyId, PortletRequest portletRequest, Settings settings)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		PortletPreferencesSettings portletPreferencesSettings =
 			(PortletPreferencesSettings)settings;
@@ -62,10 +62,8 @@ public class DefaultConfigurationAction
 	}
 
 	protected void removeDefaultValue(
-			PortletRequest portletRequest,
-			PortletPreferences portletPreferences, String key,
-			String defaultValue)
-		throws SystemException {
+		PortletRequest portletRequest, PortletPreferences portletPreferences,
+		String key, String defaultValue) {
 
 		String value = getParameter(portletRequest, key);
 
@@ -79,6 +77,15 @@ public class DefaultConfigurationAction
 				throw new SystemException(roe);
 			}
 		}
+	}
+
+	@Override
+	protected void updateMultiValuedKeys(ActionRequest actionRequest) {
+
+		// Legacy configuration actions that are not based on Settings must
+		// ignore this method to avoid failures due to multi valued keys not
+		// registering with SettingsConfigurationAction
+
 	}
 
 }

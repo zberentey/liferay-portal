@@ -147,7 +147,9 @@ public class PortletImporter {
 		PortletDataHandler portletDataHandler =
 			portlet.getPortletDataHandlerInstance();
 
-		if (portletDataHandler == null) {
+		if ((portletDataHandler == null) ||
+			portletDataHandler.isDataPortletInstanceLevel()) {
+
 			if (_log.isDebugEnabled()) {
 				_log.debug(
 					"Do not import portlet data for " + portletId +
@@ -412,7 +414,7 @@ public class PortletImporter {
 		portletDataContext.setManifestSummary(manifestSummary);
 
 		// Read asset tags, expando tables, locks and permissions to make them
-		// available to the data handlers through the context
+		// available to the data handlers through the portlet data context
 
 		Element rootElement = portletDataContext.getImportDataRootElement();
 
@@ -560,7 +562,7 @@ public class PortletImporter {
 	protected PortletPreferences getPortletPreferences(
 			long companyId, long ownerId, int ownerType, long plid,
 			String serviceName)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		PortletPreferences portletPreferences = null;
 
@@ -593,7 +595,7 @@ public class PortletImporter {
 	protected void importAssetTag(
 			PortletDataContext portletDataContext, Map<Long, Long> assetTagPKs,
 			Element assetTagElement, AssetTag assetTag)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		long userId = portletDataContext.getUserId(assetTag.getUserUuid());
 
@@ -875,7 +877,7 @@ public class PortletImporter {
 
 	protected void importServicePortletPreferences(
 			PortletDataContext portletDataContext, Element serviceElement)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		long ownerId = GetterUtil.getLong(
 			serviceElement.attributeValue("owner-id"));

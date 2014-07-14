@@ -37,7 +37,7 @@ import com.liferay.portal.service.UserNotificationDeliveryLocalServiceUtil;
 import com.liferay.portal.service.persistence.BasePersistence;
 import com.liferay.portal.service.persistence.PersistenceExecutionTestListener;
 import com.liferay.portal.test.LiferayPersistenceIntegrationJUnitTestRunner;
-import com.liferay.portal.test.persistence.TransactionalPersistenceAdvice;
+import com.liferay.portal.test.persistence.test.TransactionalPersistenceAdvice;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.portal.util.test.RandomTestUtil;
 
@@ -50,6 +50,7 @@ import org.junit.runner.RunWith;
 
 import java.io.Serializable;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -233,7 +234,7 @@ public class UserNotificationDeliveryPersistenceTest {
 		}
 	}
 
-	protected OrderByComparator getOrderByComparator() {
+	protected OrderByComparator<UserNotificationDelivery> getOrderByComparator() {
 		return OrderByComparatorFactoryUtil.create("UserNotificationDelivery",
 			"mvccVersion", true, "userNotificationDeliveryId", true,
 			"companyId", true, "userId", true, "portletId", true,
@@ -258,6 +259,92 @@ public class UserNotificationDeliveryPersistenceTest {
 		UserNotificationDelivery missingUserNotificationDelivery = _persistence.fetchByPrimaryKey(pk);
 
 		Assert.assertNull(missingUserNotificationDelivery);
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereAllPrimaryKeysExist()
+		throws Exception {
+		UserNotificationDelivery newUserNotificationDelivery1 = addUserNotificationDelivery();
+		UserNotificationDelivery newUserNotificationDelivery2 = addUserNotificationDelivery();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(newUserNotificationDelivery1.getPrimaryKey());
+		primaryKeys.add(newUserNotificationDelivery2.getPrimaryKey());
+
+		Map<Serializable, UserNotificationDelivery> userNotificationDeliveries = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertEquals(2, userNotificationDeliveries.size());
+		Assert.assertEquals(newUserNotificationDelivery1,
+			userNotificationDeliveries.get(
+				newUserNotificationDelivery1.getPrimaryKey()));
+		Assert.assertEquals(newUserNotificationDelivery2,
+			userNotificationDeliveries.get(
+				newUserNotificationDelivery2.getPrimaryKey()));
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereNoPrimaryKeysExist()
+		throws Exception {
+		long pk1 = RandomTestUtil.nextLong();
+
+		long pk2 = RandomTestUtil.nextLong();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(pk1);
+		primaryKeys.add(pk2);
+
+		Map<Serializable, UserNotificationDelivery> userNotificationDeliveries = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertTrue(userNotificationDeliveries.isEmpty());
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereSomePrimaryKeysExist()
+		throws Exception {
+		UserNotificationDelivery newUserNotificationDelivery = addUserNotificationDelivery();
+
+		long pk = RandomTestUtil.nextLong();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(newUserNotificationDelivery.getPrimaryKey());
+		primaryKeys.add(pk);
+
+		Map<Serializable, UserNotificationDelivery> userNotificationDeliveries = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertEquals(1, userNotificationDeliveries.size());
+		Assert.assertEquals(newUserNotificationDelivery,
+			userNotificationDeliveries.get(
+				newUserNotificationDelivery.getPrimaryKey()));
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithNoPrimaryKeys()
+		throws Exception {
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		Map<Serializable, UserNotificationDelivery> userNotificationDeliveries = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertTrue(userNotificationDeliveries.isEmpty());
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithOnePrimaryKey()
+		throws Exception {
+		UserNotificationDelivery newUserNotificationDelivery = addUserNotificationDelivery();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(newUserNotificationDelivery.getPrimaryKey());
+
+		Map<Serializable, UserNotificationDelivery> userNotificationDeliveries = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertEquals(1, userNotificationDeliveries.size());
+		Assert.assertEquals(newUserNotificationDelivery,
+			userNotificationDeliveries.get(
+				newUserNotificationDelivery.getPrimaryKey()));
 	}
 
 	@Test

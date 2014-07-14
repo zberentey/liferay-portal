@@ -14,12 +14,16 @@
 
 package com.liferay.portal.security.membershippolicy;
 
-import com.liferay.portal.kernel.dao.orm.FinderCacheUtil;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.User;
+import com.liferay.portal.test.DeleteAfterTestRun;
 import com.liferay.portal.util.test.GroupTestUtil;
 import com.liferay.portal.util.test.RandomTestUtil;
 import com.liferay.portal.util.test.UserTestUtil;
+import com.liferay.registry.ServiceRegistration;
+
+import java.util.HashSet;
+import java.util.Set;
 
 import org.junit.After;
 import org.junit.Before;
@@ -59,14 +63,18 @@ public abstract class BaseMembershipPolicyTestCase {
 
 	@Before
 	public void setUp() throws Exception {
-		FinderCacheUtil.clearCache();
-
 		group = GroupTestUtil.addGroup();
 	}
 
 	@After
 	public void tearDown() throws Exception {
-		group = null;
+		for (ServiceRegistration<?> serviceRegistration :
+				serviceRegistrations) {
+
+			serviceRegistration.unregister();
+		}
+
+		serviceRegistrations.clear();
 
 		_propagateMembership = false;
 		_propagateRoles = false;
@@ -88,7 +96,11 @@ public abstract class BaseMembershipPolicyTestCase {
 		return _userIds;
 	}
 
+	@DeleteAfterTestRun
 	protected Group group;
+
+	protected Set<ServiceRegistration<?>> serviceRegistrations =
+		new HashSet<ServiceRegistration<?>>();
 
 	private static boolean _propagateMembership;
 	private static boolean _propagateRoles;

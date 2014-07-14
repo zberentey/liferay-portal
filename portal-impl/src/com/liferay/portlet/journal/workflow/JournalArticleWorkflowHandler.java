@@ -15,7 +15,6 @@
 package com.liferay.portlet.journal.workflow;
 
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.workflow.BaseWorkflowHandler;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
@@ -45,7 +44,8 @@ import java.util.Map;
  * @author Juan Fernández
  * @author Julio Camarero
  */
-public class JournalArticleWorkflowHandler extends BaseWorkflowHandler {
+public class JournalArticleWorkflowHandler
+	extends BaseWorkflowHandler<JournalArticle> {
 
 	@Override
 	public String getClassName() {
@@ -60,7 +60,7 @@ public class JournalArticleWorkflowHandler extends BaseWorkflowHandler {
 	@Override
 	public WorkflowDefinitionLink getWorkflowDefinitionLink(
 			long companyId, long groupId, long classPK)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		JournalArticle article = JournalArticleLocalServiceUtil.getArticle(
 			classPK);
@@ -99,7 +99,7 @@ public class JournalArticleWorkflowHandler extends BaseWorkflowHandler {
 	@Override
 	public JournalArticle updateStatus(
 			int status, Map<String, Serializable> workflowContext)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		long userId = GetterUtil.getLong(
 			(String)workflowContext.get(WorkflowConstants.CONTEXT_USER_ID));

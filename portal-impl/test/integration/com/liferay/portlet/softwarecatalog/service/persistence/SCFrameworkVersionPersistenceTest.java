@@ -32,7 +32,7 @@ import com.liferay.portal.model.ModelListener;
 import com.liferay.portal.service.persistence.BasePersistence;
 import com.liferay.portal.service.persistence.PersistenceExecutionTestListener;
 import com.liferay.portal.test.LiferayPersistenceIntegrationJUnitTestRunner;
-import com.liferay.portal.test.persistence.TransactionalPersistenceAdvice;
+import com.liferay.portal.test.persistence.test.TransactionalPersistenceAdvice;
 import com.liferay.portal.util.test.RandomTestUtil;
 
 import com.liferay.portlet.softwarecatalog.NoSuchFrameworkVersionException;
@@ -48,6 +48,7 @@ import org.junit.runner.RunWith;
 
 import java.io.Serializable;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -260,7 +261,7 @@ public class SCFrameworkVersionPersistenceTest {
 		}
 	}
 
-	protected OrderByComparator getOrderByComparator() {
+	protected OrderByComparator<SCFrameworkVersion> getOrderByComparator() {
 		return OrderByComparatorFactoryUtil.create("SCFrameworkVersion",
 			"frameworkVersionId", true, "groupId", true, "companyId", true,
 			"userId", true, "userName", true, "createDate", true,
@@ -284,6 +285,88 @@ public class SCFrameworkVersionPersistenceTest {
 		SCFrameworkVersion missingSCFrameworkVersion = _persistence.fetchByPrimaryKey(pk);
 
 		Assert.assertNull(missingSCFrameworkVersion);
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereAllPrimaryKeysExist()
+		throws Exception {
+		SCFrameworkVersion newSCFrameworkVersion1 = addSCFrameworkVersion();
+		SCFrameworkVersion newSCFrameworkVersion2 = addSCFrameworkVersion();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(newSCFrameworkVersion1.getPrimaryKey());
+		primaryKeys.add(newSCFrameworkVersion2.getPrimaryKey());
+
+		Map<Serializable, SCFrameworkVersion> scFrameworkVersions = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertEquals(2, scFrameworkVersions.size());
+		Assert.assertEquals(newSCFrameworkVersion1,
+			scFrameworkVersions.get(newSCFrameworkVersion1.getPrimaryKey()));
+		Assert.assertEquals(newSCFrameworkVersion2,
+			scFrameworkVersions.get(newSCFrameworkVersion2.getPrimaryKey()));
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereNoPrimaryKeysExist()
+		throws Exception {
+		long pk1 = RandomTestUtil.nextLong();
+
+		long pk2 = RandomTestUtil.nextLong();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(pk1);
+		primaryKeys.add(pk2);
+
+		Map<Serializable, SCFrameworkVersion> scFrameworkVersions = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertTrue(scFrameworkVersions.isEmpty());
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereSomePrimaryKeysExist()
+		throws Exception {
+		SCFrameworkVersion newSCFrameworkVersion = addSCFrameworkVersion();
+
+		long pk = RandomTestUtil.nextLong();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(newSCFrameworkVersion.getPrimaryKey());
+		primaryKeys.add(pk);
+
+		Map<Serializable, SCFrameworkVersion> scFrameworkVersions = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertEquals(1, scFrameworkVersions.size());
+		Assert.assertEquals(newSCFrameworkVersion,
+			scFrameworkVersions.get(newSCFrameworkVersion.getPrimaryKey()));
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithNoPrimaryKeys()
+		throws Exception {
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		Map<Serializable, SCFrameworkVersion> scFrameworkVersions = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertTrue(scFrameworkVersions.isEmpty());
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithOnePrimaryKey()
+		throws Exception {
+		SCFrameworkVersion newSCFrameworkVersion = addSCFrameworkVersion();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(newSCFrameworkVersion.getPrimaryKey());
+
+		Map<Serializable, SCFrameworkVersion> scFrameworkVersions = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertEquals(1, scFrameworkVersions.size());
+		Assert.assertEquals(newSCFrameworkVersion,
+			scFrameworkVersions.get(newSCFrameworkVersion.getPrimaryKey()));
 	}
 
 	@Test

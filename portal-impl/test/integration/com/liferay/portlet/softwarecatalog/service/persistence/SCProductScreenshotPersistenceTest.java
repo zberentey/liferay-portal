@@ -31,7 +31,7 @@ import com.liferay.portal.model.ModelListener;
 import com.liferay.portal.service.persistence.BasePersistence;
 import com.liferay.portal.service.persistence.PersistenceExecutionTestListener;
 import com.liferay.portal.test.LiferayPersistenceIntegrationJUnitTestRunner;
-import com.liferay.portal.test.persistence.TransactionalPersistenceAdvice;
+import com.liferay.portal.test.persistence.test.TransactionalPersistenceAdvice;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.portal.util.test.RandomTestUtil;
 
@@ -49,6 +49,7 @@ import org.junit.runner.RunWith;
 
 import java.io.Serializable;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -244,7 +245,7 @@ public class SCProductScreenshotPersistenceTest {
 		}
 	}
 
-	protected OrderByComparator getOrderByComparator() {
+	protected OrderByComparator<SCProductScreenshot> getOrderByComparator() {
 		return OrderByComparatorFactoryUtil.create("SCProductScreenshot",
 			"productScreenshotId", true, "companyId", true, "groupId", true,
 			"productEntryId", true, "thumbnailId", true, "fullImageId", true,
@@ -267,6 +268,88 @@ public class SCProductScreenshotPersistenceTest {
 		SCProductScreenshot missingSCProductScreenshot = _persistence.fetchByPrimaryKey(pk);
 
 		Assert.assertNull(missingSCProductScreenshot);
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereAllPrimaryKeysExist()
+		throws Exception {
+		SCProductScreenshot newSCProductScreenshot1 = addSCProductScreenshot();
+		SCProductScreenshot newSCProductScreenshot2 = addSCProductScreenshot();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(newSCProductScreenshot1.getPrimaryKey());
+		primaryKeys.add(newSCProductScreenshot2.getPrimaryKey());
+
+		Map<Serializable, SCProductScreenshot> scProductScreenshots = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertEquals(2, scProductScreenshots.size());
+		Assert.assertEquals(newSCProductScreenshot1,
+			scProductScreenshots.get(newSCProductScreenshot1.getPrimaryKey()));
+		Assert.assertEquals(newSCProductScreenshot2,
+			scProductScreenshots.get(newSCProductScreenshot2.getPrimaryKey()));
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereNoPrimaryKeysExist()
+		throws Exception {
+		long pk1 = RandomTestUtil.nextLong();
+
+		long pk2 = RandomTestUtil.nextLong();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(pk1);
+		primaryKeys.add(pk2);
+
+		Map<Serializable, SCProductScreenshot> scProductScreenshots = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertTrue(scProductScreenshots.isEmpty());
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereSomePrimaryKeysExist()
+		throws Exception {
+		SCProductScreenshot newSCProductScreenshot = addSCProductScreenshot();
+
+		long pk = RandomTestUtil.nextLong();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(newSCProductScreenshot.getPrimaryKey());
+		primaryKeys.add(pk);
+
+		Map<Serializable, SCProductScreenshot> scProductScreenshots = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertEquals(1, scProductScreenshots.size());
+		Assert.assertEquals(newSCProductScreenshot,
+			scProductScreenshots.get(newSCProductScreenshot.getPrimaryKey()));
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithNoPrimaryKeys()
+		throws Exception {
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		Map<Serializable, SCProductScreenshot> scProductScreenshots = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertTrue(scProductScreenshots.isEmpty());
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithOnePrimaryKey()
+		throws Exception {
+		SCProductScreenshot newSCProductScreenshot = addSCProductScreenshot();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(newSCProductScreenshot.getPrimaryKey());
+
+		Map<Serializable, SCProductScreenshot> scProductScreenshots = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertEquals(1, scProductScreenshots.size());
+		Assert.assertEquals(newSCProductScreenshot,
+			scProductScreenshots.get(newSCProductScreenshot.getPrimaryKey()));
 	}
 
 	@Test

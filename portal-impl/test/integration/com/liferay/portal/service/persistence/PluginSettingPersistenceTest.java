@@ -37,7 +37,7 @@ import com.liferay.portal.service.PluginSettingLocalServiceUtil;
 import com.liferay.portal.service.persistence.BasePersistence;
 import com.liferay.portal.service.persistence.PersistenceExecutionTestListener;
 import com.liferay.portal.test.LiferayPersistenceIntegrationJUnitTestRunner;
-import com.liferay.portal.test.persistence.TransactionalPersistenceAdvice;
+import com.liferay.portal.test.persistence.test.TransactionalPersistenceAdvice;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.portal.util.test.RandomTestUtil;
 
@@ -50,6 +50,7 @@ import org.junit.runner.RunWith;
 
 import java.io.Serializable;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -223,7 +224,7 @@ public class PluginSettingPersistenceTest {
 		}
 	}
 
-	protected OrderByComparator getOrderByComparator() {
+	protected OrderByComparator<PluginSetting> getOrderByComparator() {
 		return OrderByComparatorFactoryUtil.create("PluginSetting",
 			"mvccVersion", true, "pluginSettingId", true, "companyId", true,
 			"pluginId", true, "pluginType", true, "roles", true, "active", true);
@@ -245,6 +246,88 @@ public class PluginSettingPersistenceTest {
 		PluginSetting missingPluginSetting = _persistence.fetchByPrimaryKey(pk);
 
 		Assert.assertNull(missingPluginSetting);
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereAllPrimaryKeysExist()
+		throws Exception {
+		PluginSetting newPluginSetting1 = addPluginSetting();
+		PluginSetting newPluginSetting2 = addPluginSetting();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(newPluginSetting1.getPrimaryKey());
+		primaryKeys.add(newPluginSetting2.getPrimaryKey());
+
+		Map<Serializable, PluginSetting> pluginSettings = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertEquals(2, pluginSettings.size());
+		Assert.assertEquals(newPluginSetting1,
+			pluginSettings.get(newPluginSetting1.getPrimaryKey()));
+		Assert.assertEquals(newPluginSetting2,
+			pluginSettings.get(newPluginSetting2.getPrimaryKey()));
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereNoPrimaryKeysExist()
+		throws Exception {
+		long pk1 = RandomTestUtil.nextLong();
+
+		long pk2 = RandomTestUtil.nextLong();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(pk1);
+		primaryKeys.add(pk2);
+
+		Map<Serializable, PluginSetting> pluginSettings = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertTrue(pluginSettings.isEmpty());
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereSomePrimaryKeysExist()
+		throws Exception {
+		PluginSetting newPluginSetting = addPluginSetting();
+
+		long pk = RandomTestUtil.nextLong();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(newPluginSetting.getPrimaryKey());
+		primaryKeys.add(pk);
+
+		Map<Serializable, PluginSetting> pluginSettings = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertEquals(1, pluginSettings.size());
+		Assert.assertEquals(newPluginSetting,
+			pluginSettings.get(newPluginSetting.getPrimaryKey()));
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithNoPrimaryKeys()
+		throws Exception {
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		Map<Serializable, PluginSetting> pluginSettings = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertTrue(pluginSettings.isEmpty());
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithOnePrimaryKey()
+		throws Exception {
+		PluginSetting newPluginSetting = addPluginSetting();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(newPluginSetting.getPrimaryKey());
+
+		Map<Serializable, PluginSetting> pluginSettings = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertEquals(1, pluginSettings.size());
+		Assert.assertEquals(newPluginSetting,
+			pluginSettings.get(newPluginSetting.getPrimaryKey()));
 	}
 
 	@Test

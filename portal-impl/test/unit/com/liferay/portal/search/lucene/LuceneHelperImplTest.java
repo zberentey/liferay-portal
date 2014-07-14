@@ -685,9 +685,7 @@ public class LuceneHelperImplTest {
 		}
 
 		@Override
-		public FutureClusterResponses execute(ClusterRequest clusterRequest)
-			throws SystemException {
-
+		public FutureClusterResponses execute(ClusterRequest clusterRequest) {
 			if (_throwException) {
 				throw new SystemException();
 			}
@@ -740,9 +738,8 @@ public class LuceneHelperImplTest {
 
 		@Override
 		public void execute(
-				ClusterRequest clusterRequest,
-				ClusterResponseCallback clusterResponseCallback)
-			throws SystemException {
+			ClusterRequest clusterRequest,
+			ClusterResponseCallback clusterResponseCallback) {
 
 			FutureClusterResponses futureClusterResponses = execute(
 				clusterRequest);
@@ -763,10 +760,9 @@ public class LuceneHelperImplTest {
 
 		@Override
 		public void execute(
-				ClusterRequest clusterRequest,
-				ClusterResponseCallback clusterResponseCallback, long timeout,
-				TimeUnit timeUnit)
-			throws SystemException {
+			ClusterRequest clusterRequest,
+			ClusterResponseCallback clusterResponseCallback, long timeout,
+			TimeUnit timeUnit) {
 
 			FutureClusterResponses futureClusterResponses = execute(
 				clusterRequest);
@@ -842,18 +838,18 @@ public class LuceneHelperImplTest {
 			_invokeMethodThrowException = invokeMethodThrowException;
 		}
 
+		public void setNodeNumber(int nodeNumber) {
+			for (int i = 0; i < nodeNumber; i++) {
+				_addresses.add(new AddressImpl(new MockAddress()));
+			}
+		}
+
 		public void setPort(int port) {
 			_port = port;
 		}
 
 		public void setPortalInetAddress(InetAddress portalInetAddress) {
 			_portalInetAddress = portalInetAddress;
-		}
-
-		public void setNodeNumber(int nodeNumber) {
-			for (int i = 0; i < nodeNumber; i++) {
-				_addresses.add(new AddressImpl(new MockAddress()));
-			}
 		}
 
 		public void setThrowException(boolean throwException) {
@@ -897,16 +893,16 @@ public class LuceneHelperImplTest {
 	private class MockIndexAccessor implements IndexAccessor {
 
 		@Override
+		public IndexSearcher acquireIndexSearcher() {
+			return null;
+		}
+
+		@Override
 		public void addDocument(Document document) {
 		}
 
 		@Override
 		public void addDocuments(Collection<Document> documents) {
-		}
-
-		@Override
-		public IndexSearcher acquireIndexSearcher() {
-			return null;
 		}
 
 		@Override
@@ -940,6 +936,10 @@ public class LuceneHelperImplTest {
 			return null;
 		}
 
+		public byte[] getResponseMessage() {
+			return _bytes;
+		}
+
 		@Override
 		public void invalidate() {
 		}
@@ -960,10 +960,6 @@ public class LuceneHelperImplTest {
 
 		@Override
 		public void updateDocument(Term term, Document document) {
-		}
-
-		public byte[] getResponseMessage() {
-			return _bytes;
 		}
 
 		private byte[] _bytes;

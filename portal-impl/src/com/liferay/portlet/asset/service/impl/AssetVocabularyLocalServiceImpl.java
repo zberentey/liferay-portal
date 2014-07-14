@@ -15,7 +15,6 @@
 package com.liferay.portlet.asset.service.impl;
 
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.search.BaseModelSearchResult;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.Hits;
@@ -39,6 +38,7 @@ import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.portlet.asset.DuplicateVocabularyException;
 import com.liferay.portlet.asset.VocabularyNameException;
+import com.liferay.portlet.asset.model.AssetCategoryConstants;
 import com.liferay.portlet.asset.model.AssetVocabulary;
 import com.liferay.portlet.asset.service.base.AssetVocabularyLocalServiceBaseImpl;
 import com.liferay.portlet.asset.util.AssetUtil;
@@ -65,7 +65,7 @@ public class AssetVocabularyLocalServiceImpl
 
 	@Override
 	public AssetVocabulary addDefaultVocabulary(long groupId)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		Group group = groupLocalService.getGroup(groupId);
 
@@ -95,7 +95,7 @@ public class AssetVocabularyLocalServiceImpl
 			long userId, Map<Locale, String> titleMap,
 			Map<Locale, String> descriptionMap, String settings,
 			ServiceContext serviceContext)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		return assetVocabularyLocalService.addVocabulary(
 			userId, StringPool.BLANK, titleMap, descriptionMap, settings,
@@ -108,7 +108,7 @@ public class AssetVocabularyLocalServiceImpl
 			long userId, String title, Map<Locale, String> titleMap,
 			Map<Locale, String> descriptionMap, String settings,
 			ServiceContext serviceContext)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		// Vocabulary
 
@@ -167,7 +167,7 @@ public class AssetVocabularyLocalServiceImpl
 	@Override
 	public AssetVocabulary addVocabulary(
 			long userId, String title, ServiceContext serviceContext)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		Map<Locale, String> titleMap = new HashMap<Locale, String>();
 
@@ -187,7 +187,7 @@ public class AssetVocabularyLocalServiceImpl
 	public void addVocabularyResources(
 			AssetVocabulary vocabulary, boolean addGroupPermissions,
 			boolean addGuestPermissions)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		resourceLocalService.addResources(
 			vocabulary.getCompanyId(), vocabulary.getGroupId(),
@@ -200,7 +200,7 @@ public class AssetVocabularyLocalServiceImpl
 	public void addVocabularyResources(
 			AssetVocabulary vocabulary, String[] groupPermissions,
 			String[] guestPermissions)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		resourceLocalService.addModelResources(
 			vocabulary.getCompanyId(), vocabulary.getGroupId(),
@@ -209,9 +209,7 @@ public class AssetVocabularyLocalServiceImpl
 	}
 
 	@Override
-	public void deleteVocabularies(long groupId)
-		throws PortalException, SystemException {
-
+	public void deleteVocabularies(long groupId) throws PortalException {
 		List<AssetVocabulary> vocabularies =
 			assetVocabularyPersistence.findByGroupId(groupId);
 
@@ -226,7 +224,7 @@ public class AssetVocabularyLocalServiceImpl
 		action = SystemEventConstants.ACTION_SKIP,
 		type = SystemEventConstants.TYPE_DELETE)
 	public void deleteVocabulary(AssetVocabulary vocabulary)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		// Vocabulary
 
@@ -245,9 +243,7 @@ public class AssetVocabularyLocalServiceImpl
 	}
 
 	@Override
-	public void deleteVocabulary(long vocabularyId)
-		throws PortalException, SystemException {
-
+	public void deleteVocabulary(long vocabularyId) throws PortalException {
 		AssetVocabulary vocabulary =
 			assetVocabularyPersistence.findByPrimaryKey(vocabularyId);
 
@@ -255,23 +251,26 @@ public class AssetVocabularyLocalServiceImpl
 	}
 
 	@Override
-	public List<AssetVocabulary> getCompanyVocabularies(long companyId)
-		throws SystemException {
-
+	public List<AssetVocabulary> getCompanyVocabularies(long companyId) {
 		return assetVocabularyPersistence.findByCompanyId(companyId);
 	}
 
 	@Override
-	public List<AssetVocabulary> getGroupsVocabularies(long[] groupIds)
-		throws SystemException {
-
+	public List<AssetVocabulary> getGroupsVocabularies(long[] groupIds) {
 		return getGroupsVocabularies(groupIds, null);
 	}
 
 	@Override
 	public List<AssetVocabulary> getGroupsVocabularies(
-			long[] groupIds, String className)
-		throws SystemException {
+		long[] groupIds, String className) {
+
+		return getGroupsVocabularies(
+			groupIds, className, AssetCategoryConstants.ALL_CLASS_TYPE_PK);
+	}
+
+	@Override
+	public List<AssetVocabulary> getGroupsVocabularies(
+		long[] groupIds, String className, long classTypePK) {
 
 		List<AssetVocabulary> vocabularies =
 			assetVocabularyPersistence.findByGroupId(groupIds);
@@ -280,12 +279,13 @@ public class AssetVocabularyLocalServiceImpl
 			return vocabularies;
 		}
 
-		return AssetUtil.filterVocabularies(vocabularies, className);
+		return AssetUtil.filterVocabularies(
+			vocabularies, className, classTypePK);
 	}
 
 	@Override
 	public List<AssetVocabulary> getGroupVocabularies(long groupId)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		return getGroupVocabularies(groupId, true);
 	}
@@ -293,7 +293,7 @@ public class AssetVocabularyLocalServiceImpl
 	@Override
 	public List<AssetVocabulary> getGroupVocabularies(
 			long groupId, boolean addDefaultVocabulary)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		List<AssetVocabulary> vocabularies =
 			assetVocabularyPersistence.findByGroupId(groupId);
@@ -313,37 +313,32 @@ public class AssetVocabularyLocalServiceImpl
 
 	@Override
 	public List<AssetVocabulary> getGroupVocabularies(
-			long groupId, String name, int start, int end,
-			OrderByComparator obc)
-		throws SystemException {
+		long groupId, String name, int start, int end,
+		OrderByComparator<AssetVocabulary> obc) {
 
 		return assetVocabularyFinder.findByG_N(groupId, name, start, end, obc);
 	}
 
 	@Override
-	public List<AssetVocabulary> getGroupVocabularies(long[] groupIds)
-		throws SystemException {
-
+	public List<AssetVocabulary> getGroupVocabularies(long[] groupIds) {
 		return assetVocabularyPersistence.findByGroupId(groupIds);
 	}
 
 	@Override
-	public int getGroupVocabulariesCount(long[] groupIds)
-		throws SystemException {
-
+	public int getGroupVocabulariesCount(long[] groupIds) {
 		return assetVocabularyPersistence.countByGroupId(groupIds);
 	}
 
 	@Override
 	public AssetVocabulary getGroupVocabulary(long groupId, String name)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		return assetVocabularyPersistence.findByG_N(groupId, name);
 	}
 
 	@Override
 	public List<AssetVocabulary> getVocabularies(long[] vocabularyIds)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		List<AssetVocabulary> vocabularies = new ArrayList<AssetVocabulary>();
 
@@ -358,7 +353,7 @@ public class AssetVocabularyLocalServiceImpl
 
 	@Override
 	public AssetVocabulary getVocabulary(long vocabularyId)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		return assetVocabularyPersistence.findByPrimaryKey(vocabularyId);
 	}
@@ -366,7 +361,7 @@ public class AssetVocabularyLocalServiceImpl
 	@Override
 	public BaseModelSearchResult<AssetVocabulary> searchVocabularies(
 			long companyId, long groupId, String title, int start, int end)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		SearchContext searchContext = buildSearchContext(
 			companyId, groupId, title, start, end);
@@ -383,7 +378,7 @@ public class AssetVocabularyLocalServiceImpl
 			long vocabularyId, Map<Locale, String> titleMap,
 			Map<Locale, String> descriptionMap, String settings,
 			ServiceContext serviceContext)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		return assetVocabularyLocalService.updateVocabulary(
 			vocabularyId, StringPool.BLANK, titleMap, descriptionMap, settings,
@@ -396,7 +391,7 @@ public class AssetVocabularyLocalServiceImpl
 			long vocabularyId, String title, Map<Locale, String> titleMap,
 			Map<Locale, String> descriptionMap, String settings,
 			ServiceContext serviceContext)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		long groupId = serviceContext.getScopeGroupId();
 		String name = titleMap.get(LocaleUtil.getSiteDefault());
@@ -433,6 +428,7 @@ public class AssetVocabularyLocalServiceImpl
 		searchContext.setCompanyId(companyId);
 		searchContext.setEnd(end);
 		searchContext.setGroupIds(new long[]{groupId});
+		searchContext.setKeywords(title);
 		searchContext.setStart(start);
 
 		QueryConfig queryConfig = searchContext.getQueryConfig();
@@ -443,9 +439,7 @@ public class AssetVocabularyLocalServiceImpl
 		return searchContext;
 	}
 
-	protected boolean hasVocabulary(long groupId, String name)
-		throws SystemException {
-
+	protected boolean hasVocabulary(long groupId, String name) {
 		if (assetVocabularyPersistence.countByG_N(groupId, name) == 0) {
 			return false;
 		}
@@ -456,7 +450,7 @@ public class AssetVocabularyLocalServiceImpl
 
 	protected BaseModelSearchResult<AssetVocabulary> searchVocabularies(
 			SearchContext searchContext)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		Indexer indexer = IndexerRegistryUtil.nullSafeGetIndexer(
 			AssetVocabulary.class);
@@ -477,9 +471,7 @@ public class AssetVocabularyLocalServiceImpl
 			"Unable to fix the search index after 10 attempts");
 	}
 
-	protected void validate(long groupId, String name)
-		throws PortalException, SystemException {
-
+	protected void validate(long groupId, String name) throws PortalException {
 		if (Validator.isNull(name)) {
 			throw new VocabularyNameException();
 		}

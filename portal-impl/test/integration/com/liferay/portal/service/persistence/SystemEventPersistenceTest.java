@@ -35,7 +35,7 @@ import com.liferay.portal.service.SystemEventLocalServiceUtil;
 import com.liferay.portal.service.persistence.BasePersistence;
 import com.liferay.portal.service.persistence.PersistenceExecutionTestListener;
 import com.liferay.portal.test.LiferayPersistenceIntegrationJUnitTestRunner;
-import com.liferay.portal.test.persistence.TransactionalPersistenceAdvice;
+import com.liferay.portal.test.persistence.test.TransactionalPersistenceAdvice;
 import com.liferay.portal.util.test.RandomTestUtil;
 
 import org.junit.After;
@@ -47,6 +47,7 @@ import org.junit.runner.RunWith;
 
 import java.io.Serializable;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -278,7 +279,7 @@ public class SystemEventPersistenceTest {
 		}
 	}
 
-	protected OrderByComparator getOrderByComparator() {
+	protected OrderByComparator<SystemEvent> getOrderByComparator() {
 		return OrderByComparatorFactoryUtil.create("SystemEvent",
 			"mvccVersion", true, "systemEventId", true, "groupId", true,
 			"companyId", true, "userId", true, "userName", true, "createDate",
@@ -303,6 +304,88 @@ public class SystemEventPersistenceTest {
 		SystemEvent missingSystemEvent = _persistence.fetchByPrimaryKey(pk);
 
 		Assert.assertNull(missingSystemEvent);
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereAllPrimaryKeysExist()
+		throws Exception {
+		SystemEvent newSystemEvent1 = addSystemEvent();
+		SystemEvent newSystemEvent2 = addSystemEvent();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(newSystemEvent1.getPrimaryKey());
+		primaryKeys.add(newSystemEvent2.getPrimaryKey());
+
+		Map<Serializable, SystemEvent> systemEvents = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertEquals(2, systemEvents.size());
+		Assert.assertEquals(newSystemEvent1,
+			systemEvents.get(newSystemEvent1.getPrimaryKey()));
+		Assert.assertEquals(newSystemEvent2,
+			systemEvents.get(newSystemEvent2.getPrimaryKey()));
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereNoPrimaryKeysExist()
+		throws Exception {
+		long pk1 = RandomTestUtil.nextLong();
+
+		long pk2 = RandomTestUtil.nextLong();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(pk1);
+		primaryKeys.add(pk2);
+
+		Map<Serializable, SystemEvent> systemEvents = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertTrue(systemEvents.isEmpty());
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereSomePrimaryKeysExist()
+		throws Exception {
+		SystemEvent newSystemEvent = addSystemEvent();
+
+		long pk = RandomTestUtil.nextLong();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(newSystemEvent.getPrimaryKey());
+		primaryKeys.add(pk);
+
+		Map<Serializable, SystemEvent> systemEvents = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertEquals(1, systemEvents.size());
+		Assert.assertEquals(newSystemEvent,
+			systemEvents.get(newSystemEvent.getPrimaryKey()));
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithNoPrimaryKeys()
+		throws Exception {
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		Map<Serializable, SystemEvent> systemEvents = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertTrue(systemEvents.isEmpty());
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithOnePrimaryKey()
+		throws Exception {
+		SystemEvent newSystemEvent = addSystemEvent();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(newSystemEvent.getPrimaryKey());
+
+		Map<Serializable, SystemEvent> systemEvents = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertEquals(1, systemEvents.size());
+		Assert.assertEquals(newSystemEvent,
+			systemEvents.get(newSystemEvent.getPrimaryKey()));
 	}
 
 	@Test

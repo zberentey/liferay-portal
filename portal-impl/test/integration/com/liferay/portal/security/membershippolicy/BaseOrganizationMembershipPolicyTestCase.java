@@ -15,8 +15,16 @@
 package com.liferay.portal.security.membershippolicy;
 
 import com.liferay.portal.model.Organization;
+import com.liferay.portal.security.membershippolicy.samples.TestOrganizationMembershipPolicy;
+import com.liferay.portal.test.DeleteAfterTestRun;
 import com.liferay.portal.util.test.OrganizationTestUtil;
 import com.liferay.portal.util.test.RoleTestUtil;
+import com.liferay.registry.Registry;
+import com.liferay.registry.RegistryUtil;
+import com.liferay.registry.ServiceRegistration;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import org.junit.After;
 import org.junit.Before;
@@ -56,6 +64,18 @@ public abstract class BaseOrganizationMembershipPolicyTestCase
 	public void setUp() throws Exception {
 		super.setUp();
 
+		Registry registry = RegistryUtil.getRegistry();
+
+		Map<String, Object> properties = new HashMap<String, Object>();
+
+		properties.put("service.ranking", 1);
+
+		ServiceRegistration<?> serviceRegistration = registry.registerService(
+			OrganizationMembershipPolicy.class,
+			new TestOrganizationMembershipPolicy(), properties);
+
+		serviceRegistrations.add(serviceRegistration);
+
 		organization = OrganizationTestUtil.addOrganization();
 	}
 
@@ -63,8 +83,6 @@ public abstract class BaseOrganizationMembershipPolicyTestCase
 	@Override
 	public void tearDown() throws Exception {
 		super.tearDown();
-
-		organization = null;
 
 		_forbiddenOrganizationIds = new long[2];
 		_forbiddenRoleIds = new long[2];
@@ -145,6 +163,7 @@ public abstract class BaseOrganizationMembershipPolicyTestCase
 		return _standardRoleIds;
 	}
 
+	@DeleteAfterTestRun
 	protected Organization organization;
 
 	private static long[] _forbiddenOrganizationIds = new long[2];

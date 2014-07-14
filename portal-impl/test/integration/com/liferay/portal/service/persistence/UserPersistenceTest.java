@@ -38,7 +38,7 @@ import com.liferay.portal.service.UserLocalServiceUtil;
 import com.liferay.portal.service.persistence.BasePersistence;
 import com.liferay.portal.service.persistence.PersistenceExecutionTestListener;
 import com.liferay.portal.test.LiferayPersistenceIntegrationJUnitTestRunner;
-import com.liferay.portal.test.persistence.TransactionalPersistenceAdvice;
+import com.liferay.portal.test.persistence.test.TransactionalPersistenceAdvice;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.portal.util.test.RandomTestUtil;
 
@@ -51,6 +51,7 @@ import org.junit.runner.RunWith;
 
 import java.io.Serializable;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -548,7 +549,7 @@ public class UserPersistenceTest {
 		}
 	}
 
-	protected OrderByComparator getOrderByComparator() {
+	protected OrderByComparator<User> getOrderByComparator() {
 		return OrderByComparatorFactoryUtil.create("User_", "mvccVersion",
 			true, "uuid", true, "userId", true, "companyId", true,
 			"createDate", true, "modifiedDate", true, "defaultUser", true,
@@ -583,6 +584,84 @@ public class UserPersistenceTest {
 		User missingUser = _persistence.fetchByPrimaryKey(pk);
 
 		Assert.assertNull(missingUser);
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereAllPrimaryKeysExist()
+		throws Exception {
+		User newUser1 = addUser();
+		User newUser2 = addUser();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(newUser1.getPrimaryKey());
+		primaryKeys.add(newUser2.getPrimaryKey());
+
+		Map<Serializable, User> users = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertEquals(2, users.size());
+		Assert.assertEquals(newUser1, users.get(newUser1.getPrimaryKey()));
+		Assert.assertEquals(newUser2, users.get(newUser2.getPrimaryKey()));
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereNoPrimaryKeysExist()
+		throws Exception {
+		long pk1 = RandomTestUtil.nextLong();
+
+		long pk2 = RandomTestUtil.nextLong();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(pk1);
+		primaryKeys.add(pk2);
+
+		Map<Serializable, User> users = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertTrue(users.isEmpty());
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereSomePrimaryKeysExist()
+		throws Exception {
+		User newUser = addUser();
+
+		long pk = RandomTestUtil.nextLong();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(newUser.getPrimaryKey());
+		primaryKeys.add(pk);
+
+		Map<Serializable, User> users = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertEquals(1, users.size());
+		Assert.assertEquals(newUser, users.get(newUser.getPrimaryKey()));
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithNoPrimaryKeys()
+		throws Exception {
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		Map<Serializable, User> users = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertTrue(users.isEmpty());
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithOnePrimaryKey()
+		throws Exception {
+		User newUser = addUser();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(newUser.getPrimaryKey());
+
+		Map<Serializable, User> users = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertEquals(1, users.size());
+		Assert.assertEquals(newUser, users.get(newUser.getPrimaryKey()));
 	}
 
 	@Test

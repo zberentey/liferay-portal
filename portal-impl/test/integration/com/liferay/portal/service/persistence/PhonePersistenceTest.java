@@ -36,7 +36,7 @@ import com.liferay.portal.service.PhoneLocalServiceUtil;
 import com.liferay.portal.service.persistence.BasePersistence;
 import com.liferay.portal.service.persistence.PersistenceExecutionTestListener;
 import com.liferay.portal.test.LiferayPersistenceIntegrationJUnitTestRunner;
-import com.liferay.portal.test.persistence.TransactionalPersistenceAdvice;
+import com.liferay.portal.test.persistence.test.TransactionalPersistenceAdvice;
 import com.liferay.portal.util.test.RandomTestUtil;
 
 import org.junit.After;
@@ -48,6 +48,7 @@ import org.junit.runner.RunWith;
 
 import java.io.Serializable;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -309,7 +310,7 @@ public class PhonePersistenceTest {
 		}
 	}
 
-	protected OrderByComparator getOrderByComparator() {
+	protected OrderByComparator<Phone> getOrderByComparator() {
 		return OrderByComparatorFactoryUtil.create("Phone", "mvccVersion",
 			true, "uuid", true, "phoneId", true, "companyId", true, "userId",
 			true, "userName", true, "createDate", true, "modifiedDate", true,
@@ -333,6 +334,84 @@ public class PhonePersistenceTest {
 		Phone missingPhone = _persistence.fetchByPrimaryKey(pk);
 
 		Assert.assertNull(missingPhone);
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereAllPrimaryKeysExist()
+		throws Exception {
+		Phone newPhone1 = addPhone();
+		Phone newPhone2 = addPhone();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(newPhone1.getPrimaryKey());
+		primaryKeys.add(newPhone2.getPrimaryKey());
+
+		Map<Serializable, Phone> phones = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertEquals(2, phones.size());
+		Assert.assertEquals(newPhone1, phones.get(newPhone1.getPrimaryKey()));
+		Assert.assertEquals(newPhone2, phones.get(newPhone2.getPrimaryKey()));
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereNoPrimaryKeysExist()
+		throws Exception {
+		long pk1 = RandomTestUtil.nextLong();
+
+		long pk2 = RandomTestUtil.nextLong();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(pk1);
+		primaryKeys.add(pk2);
+
+		Map<Serializable, Phone> phones = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertTrue(phones.isEmpty());
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereSomePrimaryKeysExist()
+		throws Exception {
+		Phone newPhone = addPhone();
+
+		long pk = RandomTestUtil.nextLong();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(newPhone.getPrimaryKey());
+		primaryKeys.add(pk);
+
+		Map<Serializable, Phone> phones = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertEquals(1, phones.size());
+		Assert.assertEquals(newPhone, phones.get(newPhone.getPrimaryKey()));
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithNoPrimaryKeys()
+		throws Exception {
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		Map<Serializable, Phone> phones = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertTrue(phones.isEmpty());
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithOnePrimaryKey()
+		throws Exception {
+		Phone newPhone = addPhone();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(newPhone.getPrimaryKey());
+
+		Map<Serializable, Phone> phones = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertEquals(1, phones.size());
+		Assert.assertEquals(newPhone, phones.get(newPhone.getPrimaryKey()));
 	}
 
 	@Test

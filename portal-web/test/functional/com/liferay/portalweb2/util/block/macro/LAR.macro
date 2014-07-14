@@ -41,6 +41,29 @@
 	</command>
 
 	<command name="exportSiteCmd">
+		<execute action="CPSitepagesExport#assertClick" locator-key1="EXPORT_BUTTON" value1="Export" />
+
+		<execute action="CPSitepagesExport#assertTextEquals" locator-key1="CURRENT_AND_PREVIOUS_STATUS" value1="Successful" />
+
+		<var method="selenium#getText(&quot;//tr/td[5]/span/a&quot;)" name="valueName" />
+
+		<echo message="value name ${valueName}" />
+
+		<var group="1" input="${valueName}"  name="larFileName" pattern="([a-zA-z0-9_.-]*)[(0-9k)]*" />
+
+		<echo message="import file name ${larFileName}" />
+
+		<execute action="CPSitepagesExport#click" locator-key1="CURRENT_AND_PREVIOUS_DOWNLOAD" />
+		<execute action="CPSitepagesExport#downloadTempFile" />
+	</command>
+
+	<command name="exportSiteCP">
+		<execute macro="LAR#gotoExportSiteCmd" />
+
+		<execute macro="LAR#exportSiteOptionsCmd" />
+	</command>
+
+	<command name="exportSiteOptionsCmd">
 		<if>
 			<equals arg1="${exportPermissions}" arg2="true" />
 			<then>
@@ -174,29 +197,6 @@
 		</if>
 	</command>
 
-	<command name="exportSiteCP">
-		<execute macro="LAR#gotoExportSiteCmd" />
-
-		<execute macro="LAR#exportSiteCmd" />
-	</command>
-
-	<command name="exportSiteExportcmd">
-		<execute action="CPSitepagesExport#assertClick" locator-key1="EXPORT_BUTTON" value1="Export" />
-
-		<execute action="CPSitepagesExport#assertTextEquals" locator-key1="CURRENT_AND_PREVIOUS_STATUS" value1="Successful" />
-
-		<var method="selenium#getText(&quot;//tr/td[5]/span/a&quot;)" name="valueName" />
-
-		<echo message="value name ${valueName}" />
-
-		<var group="1" input="${valueName}"  name="larFileName" pattern="([a-zA-z0-9_.-]*)[(0-9k)]*" />
-
-		<echo message="import file name ${larFileName}" />
-
-		<execute action="CPSitepagesExport#click" locator-key1="CURRENT_AND_PREVIOUS_DOWNLOAD" />
-		<execute action="CPSitepagesExport#downloadTempFile" />
-	</command>
-
 	<command name="exportUserGroups">
 		<execute macro="LAR#gotoExportImportCmd" />
 
@@ -324,7 +324,7 @@
 			<isset var="importValidationMissingItem" />
 			<then>
 				<execute action="CPSitepagesImport#assertTextEquals" locator-key1="VALIDATION_ERROR_MESSAGE_HEADER" value1="The file ${larFileName} cannot be imported." />
-				<execute action="CPSitepagesImport#assertTextEquals" locator-key1="VALIDATION_ERROR_MESSAGE" value1="There are missing references that could not be found in the current site. Please import another LAR file containing the following elements:" />
+				<execute action="CPSitepagesImport#assertTextEquals" locator-key1="VALIDATION_ERROR_MESSAGE" value1="There are missing references that could not be found in the current site. Please import the following elements first:" />
 				<execute action="CPSitepagesImport#assertTextEquals" locator-key1="VALIDATION_ERROR_LIST_ITEM" value1="${importValidationMissingItem}" />
 			</then>
 			<else>

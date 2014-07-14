@@ -16,7 +16,6 @@ package com.liferay.portlet.asset.util;
 
 import com.liferay.portal.NoSuchGroupException;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.service.ClassNameLocalServiceUtil;
@@ -37,9 +36,9 @@ public class BaseAssetEntryValidator implements AssetEntryValidator {
 
 	@Override
 	public void validate(
-			long groupId, String className, long[] categoryIds,
-			String[] entryNames)
-		throws PortalException, SystemException {
+			long groupId, String className, long classTypePK,
+			long[] categoryIds, String[] entryNames)
+		throws PortalException {
 
 		List<AssetVocabulary> vocabularies =
 			AssetVocabularyLocalServiceUtil.getGroupVocabularies(
@@ -65,7 +64,7 @@ public class BaseAssetEntryValidator implements AssetEntryValidator {
 		long classNameId = ClassNameLocalServiceUtil.getClassNameId(className);
 
 		for (AssetVocabulary vocabulary : vocabularies) {
-			validate(classNameId, categoryIds, vocabulary);
+			validate(classNameId, classTypePK, categoryIds, vocabulary);
 		}
 	}
 
@@ -86,11 +85,13 @@ public class BaseAssetEntryValidator implements AssetEntryValidator {
 	}
 
 	protected void validate(
-			long classNameId, final long[] categoryIds,
+			long classNameId, long classTypePK, final long[] categoryIds,
 			AssetVocabulary vocabulary)
-		throws PortalException, SystemException {
+		throws PortalException {
 
-		if (!vocabulary.isAssociatedToAssetRendererFactory(classNameId)) {
+		if (!vocabulary.isAssociatedToClassNameIdAndClassTypePK(
+				classNameId, classTypePK)) {
+
 			return;
 		}
 
@@ -98,7 +99,9 @@ public class BaseAssetEntryValidator implements AssetEntryValidator {
 			return;
 		}
 
-		if (vocabulary.isMissingRequiredCategory(classNameId, categoryIds)) {
+		if (vocabulary.isMissingRequiredCategory(
+				classNameId, classTypePK, categoryIds)) {
+
 			throw new AssetCategoryException(
 				vocabulary, AssetCategoryException.AT_LEAST_ONE_CATEGORY);
 		}

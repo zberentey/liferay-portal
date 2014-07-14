@@ -15,15 +15,14 @@
 package com.liferay.portlet.asset.util;
 
 import com.liferay.portal.kernel.test.ExecutionTestListeners;
-import com.liferay.portal.kernel.transaction.Transactional;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.model.Company;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.service.CompanyLocalServiceUtil;
 import com.liferay.portal.service.ServiceContext;
-import com.liferay.portal.test.EnvironmentExecutionTestListener;
+import com.liferay.portal.test.DeleteAfterTestRun;
 import com.liferay.portal.test.LiferayIntegrationJUnitTestRunner;
-import com.liferay.portal.test.TransactionalExecutionTestListener;
+import com.liferay.portal.test.MainServletExecutionTestListener;
 import com.liferay.portal.util.test.GroupTestUtil;
 import com.liferay.portal.util.test.ServiceContextTestUtil;
 import com.liferay.portal.util.test.TestPropsValues;
@@ -44,13 +43,8 @@ import org.junit.runner.RunWith;
 /**
  * @author Eduardo Garcia
  */
-@ExecutionTestListeners(
-	listeners = {
-		EnvironmentExecutionTestListener.class,
-		TransactionalExecutionTestListener.class
-	})
+@ExecutionTestListeners(listeners = {MainServletExecutionTestListener.class})
 @RunWith(LiferayIntegrationJUnitTestRunner.class)
-@Transactional
 public class AssetVocabularyUtilTest {
 
 	@Before
@@ -92,16 +86,16 @@ public class AssetVocabularyUtilTest {
 		vocabularies.add(_vocabulary);
 
 		String unambiguousCompanyVocabularyTitle =
-			AssetVocabularyUtil.getUnambiguousVocabularyTitle(
-				vocabularies, _companyVocabulary, _group.getGroupId(), _LOCALE);
+			_companyVocabulary.getUnambiguousTitle(
+				vocabularies, _group.getGroupId(), _LOCALE);
 
 		Assert.assertTrue(
 			unambiguousCompanyVocabularyTitle.contains(
 				_companyGroup.getDescriptiveName(_LOCALE)));
 
 		String unambiguousVocabularyTitle =
-			AssetVocabularyUtil.getUnambiguousVocabularyTitle(
-				vocabularies, _vocabulary, _group.getGroupId(), _LOCALE);
+			_vocabulary.getUnambiguousTitle(
+				vocabularies, _group.getGroupId(), _LOCALE);
 
 		Assert.assertEquals(_TITLE, unambiguousVocabularyTitle);
 	}
@@ -115,8 +109,8 @@ public class AssetVocabularyUtilTest {
 		vocabularies.add(_companyVocabulary);
 
 		String unambiguousCompanyVocabularyTitle =
-			AssetVocabularyUtil.getUnambiguousVocabularyTitle(
-				vocabularies, _companyVocabulary, _group.getGroupId(), _LOCALE);
+			_companyVocabulary.getUnambiguousTitle(
+				vocabularies, _group.getGroupId(), _LOCALE);
 
 		Assert.assertEquals(_TITLE, unambiguousCompanyVocabularyTitle);
 	}
@@ -126,8 +120,13 @@ public class AssetVocabularyUtilTest {
 	private static final String _TITLE = "Test Vocabulary";
 
 	private Group _companyGroup;
+
+	@DeleteAfterTestRun
 	private AssetVocabulary _companyVocabulary;
+
+	@DeleteAfterTestRun
 	private Group _group;
+
 	private AssetVocabulary _vocabulary;
 
 }

@@ -15,29 +15,23 @@
 package com.liferay.portal.util.test;
 
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.HttpUtil;
+import com.liferay.portal.kernel.util.PropsKeys;
+import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.Company;
-import com.liferay.portal.model.CompanyConstants;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.GroupConstants;
 import com.liferay.portal.model.Role;
 import com.liferay.portal.model.RoleConstants;
 import com.liferay.portal.model.User;
-import com.liferay.portal.security.auth.HttpPrincipal;
 import com.liferay.portal.service.CompanyLocalServiceUtil;
 import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portal.service.LayoutLocalServiceUtil;
 import com.liferay.portal.service.RoleLocalServiceUtil;
 import com.liferay.portal.service.UserLocalServiceUtil;
-import com.liferay.portal.util.PropsValues;
-
-import java.net.MalformedURLException;
-import java.net.URL;
 
 import java.util.List;
 
@@ -45,8 +39,12 @@ import java.util.List;
  * @author Brian Wing Shun Chan
  * @author Alexander Chow
  * @author Raymond Augé
+ * @author Manuel de la Peña
  */
 public class TestPropsValues {
+
+	public static final boolean ASSERT_LOGS = GetterUtil.getBoolean(
+		TestPropsUtil.get("assert.logs"));
 
 	public static final String COMPANY_WEB_ID;
 
@@ -63,7 +61,7 @@ public class TestPropsValues {
 	public static final String USER_PASSWORD = TestPropsUtil.get(
 		"user.password");
 
-	public static long getCompanyId() throws PortalException, SystemException {
+	public static long getCompanyId() throws PortalException {
 		if (_companyId > 0) {
 			return _companyId;
 		}
@@ -76,7 +74,7 @@ public class TestPropsValues {
 		return _companyId;
 	}
 
-	public static long getGroupId() throws PortalException, SystemException {
+	public static long getGroupId() throws PortalException {
 		if (_groupId > 0) {
 			return _groupId;
 		}
@@ -87,55 +85,6 @@ public class TestPropsValues {
 		_groupId = group.getGroupId();
 
 		return _groupId;
-	}
-
-	public static HttpPrincipal getHttpPrincipal() throws Exception {
-		return getHttpPrincipal(getLogin());
-	}
-
-	public static HttpPrincipal getHttpPrincipal(String login) {
-		return getHttpPrincipal(login, true);
-	}
-
-	public static HttpPrincipal getHttpPrincipal(
-		String login, boolean authenticated) {
-
-		HttpPrincipal httpPrincipal = null;
-
-		if (authenticated) {
-			httpPrincipal = new HttpPrincipal(PORTAL_URL, login, USER_PASSWORD);
-		}
-		else {
-			httpPrincipal = new HttpPrincipal(PORTAL_URL);
-		}
-
-		return httpPrincipal;
-	}
-
-	public static String getLogin() throws Exception {
-		return getLogin(true);
-	}
-
-	public static String getLogin(boolean encodeLogin) throws Exception {
-		String login = null;
-
-		String authType = PropsValues.COMPANY_SECURITY_AUTH_TYPE;
-
-		if (authType.equals(CompanyConstants.AUTH_TYPE_EA)) {
-			login = getUser().getEmailAddress();
-
-			if (encodeLogin) {
-				login = HttpUtil.encodeURL(login);
-			}
-		}
-		else if (authType.equals(CompanyConstants.AUTH_TYPE_SN)) {
-			login = getUser().getScreenName();
-		}
-		else if (authType.equals(CompanyConstants.AUTH_TYPE_ID)) {
-			login = Long.toString(getUserId());
-		}
-
-		return login;
 	}
 
 	public static long getPlid() throws Exception {
@@ -152,42 +101,7 @@ public class TestPropsValues {
 		return _plid;
 	}
 
-	public static URL getSoapURL(String serviceName) throws Exception {
-		return getSoapURL(getLogin(), serviceName);
-	}
-
-	public static URL getSoapURL(
-			String login, boolean authenticated, String serviceName)
-		throws MalformedURLException {
-
-		String url = PORTAL_URL;
-
-		if (authenticated) {
-			String password = USER_PASSWORD;
-
-			int pos = url.indexOf("://");
-
-			String protocol = url.substring(0, pos + 3);
-			String host = url.substring(pos + 3);
-
-			url =
-				protocol + login + ":" + password + "@" + host +
-					"/api/axis/" + serviceName;
-		}
-		else {
-			url += "/api/axis/" + serviceName;
-		}
-
-		return new URL(url);
-	}
-
-	public static URL getSoapURL(String login, String serviceName)
-		throws MalformedURLException {
-
-		return getSoapURL(login, true, serviceName);
-	}
-
-	public static User getUser() throws PortalException, SystemException {
+	public static User getUser() throws PortalException {
 		if (_user == null) {
 			Role role = RoleLocalServiceUtil.getRole(
 				getCompanyId(), RoleConstants.ADMINISTRATOR);
@@ -205,7 +119,7 @@ public class TestPropsValues {
 		return _user;
 	}
 
-	public static long getUserId() throws PortalException, SystemException {
+	public static long getUserId() throws PortalException {
 		if (_userId == 0) {
 			User user = getUser();
 
@@ -230,7 +144,8 @@ public class TestPropsValues {
 
 		try {
 			if (Validator.isNull(companyWebId)) {
-				companyWebId = PropsValues.COMPANY_DEFAULT_WEB_ID;
+				companyWebId = GetterUtil.getString(
+					PropsUtil.get(PropsKeys.COMPANY_DEFAULT_WEB_ID));
 
 				TestPropsUtil.set("company.web.id", companyWebId);
 			}

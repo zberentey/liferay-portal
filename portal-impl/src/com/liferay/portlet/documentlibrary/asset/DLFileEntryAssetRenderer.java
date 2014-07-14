@@ -15,7 +15,6 @@
 package com.liferay.portlet.documentlibrary.asset;
 
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.repository.model.FileEntry;
@@ -112,6 +111,11 @@ public class DLFileEntryAssetRenderer
 	@Override
 	public long getGroupId() {
 		return _fileEntry.getGroupId();
+	}
+
+	@Override
+	public String getIconCssClass() {
+		return _fileEntry.getIconCssClass();
 	}
 
 	@Override
@@ -298,7 +302,7 @@ public class DLFileEntryAssetRenderer
 	}
 
 	public boolean hasDeletePermission(PermissionChecker permissionChecker)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		return DLFileEntryPermission.contains(
 			permissionChecker, _fileEntry.getFileEntryId(), ActionKeys.DELETE);
@@ -306,7 +310,7 @@ public class DLFileEntryAssetRenderer
 
 	@Override
 	public boolean hasEditPermission(PermissionChecker permissionChecker)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		return DLFileEntryPermission.contains(
 			permissionChecker, _fileEntry.getFileEntryId(), ActionKeys.UPDATE);
@@ -314,7 +318,7 @@ public class DLFileEntryAssetRenderer
 
 	@Override
 	public boolean hasViewPermission(PermissionChecker permissionChecker)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		return DLFileEntryPermission.contains(
 			permissionChecker, _fileEntry.getFileEntryId(), ActionKeys.VIEW);

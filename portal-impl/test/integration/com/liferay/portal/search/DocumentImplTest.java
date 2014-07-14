@@ -32,9 +32,9 @@ import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.User;
-import com.liferay.portal.service.GroupLocalServiceUtil;
-import com.liferay.portal.test.EnvironmentExecutionTestListener;
+import com.liferay.portal.test.DeleteAfterTestRun;
 import com.liferay.portal.test.LiferayIntegrationJUnitTestRunner;
+import com.liferay.portal.test.MainServletExecutionTestListener;
 import com.liferay.portal.test.Sync;
 import com.liferay.portal.test.SynchronousDestinationExecutionTestListener;
 import com.liferay.portal.util.test.GroupTestUtil;
@@ -59,7 +59,7 @@ import org.junit.runner.RunWith;
  */
 @ExecutionTestListeners(
 	listeners = {
-		EnvironmentExecutionTestListener.class,
+		MainServletExecutionTestListener.class,
 		SynchronousDestinationExecutionTestListener.class
 	})
 @RunWith(LiferayIntegrationJUnitTestRunner.class)
@@ -114,8 +114,6 @@ public class DocumentImplTest {
 	@After
 	public void tearDown() throws Exception {
 		_indexer.unregisterIndexerPostProcessor(_indexerPostProcessor);
-
-		GroupLocalServiceUtil.deleteGroup(_group);
 	}
 
 	@Test
@@ -501,7 +499,10 @@ public class DocumentImplTest {
 	private Map<String, Double> _doubles = new HashMap<String, Double>();
 	private Map<String, Float[]> _floatArrays = new HashMap<String, Float[]>();
 	private Map<String, Float> _floats = new HashMap<String, Float>();
+
+	@DeleteAfterTestRun
 	private Group _group;
+
 	private Indexer _indexer;
 	private IndexerPostProcessor _indexerPostProcessor;
 	private Map<String, Integer[]> _integerArrays =

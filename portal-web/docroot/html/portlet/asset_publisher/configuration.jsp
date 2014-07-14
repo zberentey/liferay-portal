@@ -21,7 +21,7 @@ String tabs2 = ParamUtil.getString(request, "tabs2");
 
 String redirect = ParamUtil.getString(request, "redirect");
 
-String eventName = "_" + HtmlUtil.escapeJS(portletResource) + "_selectSite";
+String eventName = "_" + HtmlUtil.escapeJS(assetPublisherDisplayContext.getPortletResource()) + "_selectSite";
 
 List<AssetRendererFactory> classTypesAssetRendererFactories = new ArrayList<AssetRendererFactory>();
 %>
@@ -41,13 +41,9 @@ List<AssetRendererFactory> classTypesAssetRendererFactories = new ArrayList<Asse
 	<aui:input name="assetEntryType" type="hidden" />
 	<aui:input name="scopeId" type="hidden" />
 
-	<%
-	String rootPortletId = PortletConstants.getRootPortletId(portletResource);
-	%>
-
 	<liferay-util:buffer var="selectStyle">
 		<c:choose>
-			<c:when test="<%= rootPortletId.equals(PortletKeys.HIGHEST_RATED_ASSETS) || rootPortletId.equals(PortletKeys.MOST_VIEWED_ASSETS) || rootPortletId.equals(PortletKeys.RELATED_ASSETS) %>">
+			<c:when test="<%= !assetPublisherDisplayContext.isSelectionStyleEnabled() %>">
 				<aui:input name="preferences--selectionStyle--" type="hidden" value="dynamic" />
 			</c:when>
 			<c:otherwise>
@@ -101,7 +97,7 @@ List<AssetRendererFactory> classTypesAssetRendererFactories = new ArrayList<Asse
 
 					<liferay-ui:search-container-column-text
 						name="type"
-						value="<%= LanguageUtil.get(pageContext, group.getScopeLabel(themeDisplay)) %>"
+						value="<%= LanguageUtil.get(request, group.getScopeLabel(themeDisplay)) %>"
 					/>
 
 					<liferay-ui:search-container-column-text
@@ -171,7 +167,7 @@ List<AssetRendererFactory> classTypesAssetRendererFactories = new ArrayList<Asse
 						data = new HashMap<String, Object>();
 
 						data.put("href", layoutSiteBrowserURLString);
-						data.put("title", LanguageUtil.get(pageContext, "pages"));
+						data.put("title", LanguageUtil.get(request, "pages"));
 						%>
 
 						<liferay-ui:icon
@@ -179,7 +175,7 @@ List<AssetRendererFactory> classTypesAssetRendererFactories = new ArrayList<Asse
 							data="<%= data %>"
 							iconCssClass="icon-plus"
 							id="selectGroup"
-							message='<%= LanguageUtil.get(pageContext, "pages") + StringPool.TRIPLE_PERIOD %>'
+							message='<%= LanguageUtil.get(request, "pages") + StringPool.TRIPLE_PERIOD %>'
 							method="get"
 							url="javascript:;"
 						/>
@@ -222,7 +218,7 @@ List<AssetRendererFactory> classTypesAssetRendererFactories = new ArrayList<Asse
 						data = new HashMap<String, Object>();
 
 						data.put("href", siteBrowserURLString);
-						data.put("title", LanguageUtil.get(pageContext, "sites"));
+						data.put("title", LanguageUtil.get(request, "sites"));
 						%>
 
 						<liferay-ui:icon
@@ -230,7 +226,7 @@ List<AssetRendererFactory> classTypesAssetRendererFactories = new ArrayList<Asse
 							data="<%= data %>"
 							iconCssClass="icon-plus"
 							id="selectManageableGroup"
-							message='<%= LanguageUtil.get(pageContext, "other-site") + StringPool.TRIPLE_PERIOD %>'
+							message='<%= LanguageUtil.get(request, "other-site") + StringPool.TRIPLE_PERIOD %>'
 							method="get"
 							url="javascript:;"
 						/>
@@ -244,7 +240,6 @@ List<AssetRendererFactory> classTypesAssetRendererFactories = new ArrayList<Asse
 	request.setAttribute("configuration.jsp-classTypesAssetRendererFactories", classTypesAssetRendererFactories);
 	request.setAttribute("configuration.jsp-configurationRenderURL", configurationRenderURL);
 	request.setAttribute("configuration.jsp-redirect", redirect);
-	request.setAttribute("configuration.jsp-rootPortletId", rootPortletId);
 	request.setAttribute("configuration.jsp-selectScope", selectScope);
 	request.setAttribute("configuration.jsp-selectStyle", selectStyle);
 	%>

@@ -45,7 +45,7 @@
 </tr>
 <tr>
 	<td>TITLE_FIELD_LOCALIZED</td>
-	<td>//input[@id='_15_title__${key_languageKey}']</td>
+	<td>//input[contains(@id,'_15_title__${key_lowercaseLanguageCode}')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -70,7 +70,7 @@
 </tr>
 <tr>
 	<td>SEARCHABLE_CHECKBOX</td>
-	<td>//input[@id='_15_indexableCheckbox']</td>
+	<td>//input[@id='_15_indexable']</td>
 	<td></td>
 </tr>
 <tr>
@@ -100,7 +100,7 @@
 </tr>
 <tr>
 	<td>CANCEL_BUTTON</td>
-	<td>//button[contains(.,'Cancel')]</td>
+	<td>//a[contains(@class,'btn-cancel')]</td>
 	<td></td>
 </tr>
 <tr>

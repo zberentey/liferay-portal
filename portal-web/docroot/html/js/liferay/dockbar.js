@@ -122,7 +122,7 @@ AUI.add(
 
 							BODY.prepend(panelNode);
 
-							panelNode.set('id', panelSidebarId);
+							panelNode.attr('id', panelSidebarId);
 
 							panel.node = panelNode;
 						}
@@ -130,12 +130,6 @@ AUI.add(
 				}
 
 				return panelNode;
-			},
-
-			togglePreviewPanel: function() {
-				var instance = this;
-
-				Dockbar._togglePanel(STR_PREVIEW_PANEL);
 			},
 
 			toggleAddPanel: function() {
@@ -150,6 +144,12 @@ AUI.add(
 				Dockbar._togglePanel(STR_EDIT_LAYOUT_PANEL);
 			},
 
+			togglePreviewPanel: function() {
+				var instance = this;
+
+				Dockbar._togglePanel(STR_PREVIEW_PANEL);
+			},
+
 			_registerPanels: function() {
 				var instance = this;
 
@@ -157,7 +157,7 @@ AUI.add(
 
 				AObject.each(
 					DOCKBAR_PANELS,
-					function(item, index, collection) {
+					function(item, index) {
 						var panelId = item.id;
 
 						var panelTrigger = A.one('#' + namespace + panelId);
@@ -226,7 +226,7 @@ AUI.add(
 
 				AObject.each(
 					DOCKBAR_PANELS,
-					function(item, index, collection) {
+					function(item, index) {
 						if (item.id !== panelId) {
 							BODY.removeClass(item.css);
 
@@ -314,7 +314,7 @@ AUI.add(
 						if (panelId === STR_ADD_PANEL) {
 							A.Array.each(
 								ADD_PANEL_COMPONENTS,
-								function(item, index, collection) {
+								function(item, index) {
 									var componentName = Liferay.Util.ns(namespace, item);
 
 									var component = Liferay.component(componentName);
@@ -404,7 +404,7 @@ AUI.add(
 					}
 				}
 				else if (themeDisplay.isSignedIn() && navAddControls) {
-					var brand = dockBar.one('.brand');
+					var brand = dockBar.one('.navbar-brand');
 
 					if (brand) {
 						brand.all('a').get('parentNode').addClass(CSS_DOCKBAR_ITEM);

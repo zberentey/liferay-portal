@@ -29,9 +29,9 @@ import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.User;
 import com.liferay.portal.service.ServiceContext;
-import com.liferay.portal.test.EnvironmentExecutionTestListener;
+import com.liferay.portal.test.DeleteAfterTestRun;
 import com.liferay.portal.test.LiferayIntegrationJUnitTestRunner;
-import com.liferay.portal.test.ResetDatabaseExecutionTestListener;
+import com.liferay.portal.test.MainServletExecutionTestListener;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.test.GroupTestUtil;
 import com.liferay.portal.util.test.RandomTestUtil;
@@ -47,7 +47,6 @@ import com.liferay.portlet.dynamicdatamapping.util.test.DDMStructureTestUtil;
 import java.util.List;
 import java.util.Locale;
 
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -56,11 +55,7 @@ import org.junit.runner.RunWith;
 /**
  * @author Alexander Chow
  */
-@ExecutionTestListeners(
-	listeners = {
-		EnvironmentExecutionTestListener.class,
-		ResetDatabaseExecutionTestListener.class
-	})
+@ExecutionTestListeners(listeners = {MainServletExecutionTestListener.class})
 @RunWith(LiferayIntegrationJUnitTestRunner.class)
 public class DLFileEntryTypeServiceTest {
 
@@ -106,11 +101,6 @@ public class DLFileEntryTypeServiceTest {
 		}
 	}
 
-	@After
-	public void tearDown() throws Exception {
-		DLAppLocalServiceUtil.deleteFolder(_folder.getFolderId());
-	}
-
 	@Test
 	public void testAddFileEntryType() throws Exception {
 		ServiceContext serviceContext = new ServiceContext();
@@ -118,7 +108,7 @@ public class DLFileEntryTypeServiceTest {
 		byte[] testFileBytes = FileUtil.getBytes(
 			getClass(), _TEST_DDM_STRUCTURE);
 
-		serviceContext.setAttribute("xsd", new String(testFileBytes));
+		serviceContext.setAttribute("definition", new String(testFileBytes));
 
 		User user = TestPropsValues.getUser();
 
@@ -326,7 +316,10 @@ public class DLFileEntryTypeServiceTest {
 	private DLFileEntryType _contractDLFileEntryType;
 	private List<DLFileEntryType> _dlFileEntryTypes;
 	private Folder _folder;
+
+	@DeleteAfterTestRun
 	private Group _group;
+
 	private DLFileEntryType _marketingBannerDLFileEntryType;
 	private Folder _subfolder;
 

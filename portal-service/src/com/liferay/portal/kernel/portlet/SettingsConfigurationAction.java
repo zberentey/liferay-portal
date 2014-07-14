@@ -15,10 +15,11 @@
 package com.liferay.portal.kernel.portlet;
 
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.servlet.SessionMessages;
+import com.liferay.portal.kernel.settings.ModifiableSettings;
 import com.liferay.portal.kernel.settings.Settings;
+import com.liferay.portal.kernel.settings.SettingsFactory;
 import com.liferay.portal.kernel.settings.SettingsFactoryUtil;
 import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -40,8 +41,6 @@ import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portlet.PortletConfigFactoryUtil;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -122,6 +121,9 @@ public class SettingsConfigurationAction
 
 		Settings settings = getSettings(actionRequest);
 
+		ModifiableSettings modifiableSettings =
+			settings.getModifiableSettings();
+
 		for (Map.Entry<String, String> entry : properties.entrySet()) {
 			String name = entry.getKey();
 			String value = entry.getValue();
@@ -129,7 +131,7 @@ public class SettingsConfigurationAction
 			String oldValue = settings.getValue(name, null);
 
 			if (!StringUtil.equalsIgnoreBreakLine(value, oldValue)) {
-				settings.setValue(name, value);
+				modifiableSettings.setValue(name, value);
 			}
 		}
 
@@ -147,7 +149,7 @@ public class SettingsConfigurationAction
 				String[] oldValues = settings.getValues(name, null);
 
 				if (!Validator.equals(values, oldValues)) {
-					settings.setValues(name, values);
+					modifiableSettings.setValues(name, values);
 				}
 			}
 		}
@@ -156,7 +158,7 @@ public class SettingsConfigurationAction
 
 		if (SessionErrors.isEmpty(actionRequest)) {
 			try {
-				settings.store();
+				modifiableSettings.store();
 			}
 			catch (ValidatorException ve) {
 				SessionErrors.add(
@@ -239,13 +241,7 @@ public class SettingsConfigurationAction
 		portletPreferencesMap.put(name, values);
 	}
 
-	protected void addMultiValuedKeys(String... multiValuedKeys) {
-		Collections.addAll(_multiValuedKeys, multiValuedKeys);
-	}
-
-	protected PortletConfig getSelPortletConfig(PortletRequest portletRequest)
-		throws SystemException {
-
+	protected PortletConfig getSelPortletConfig(PortletRequest portletRequest) {
 		ThemeDisplay themeDisplay = (ThemeDisplay)portletRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 
@@ -265,7 +261,7 @@ public class SettingsConfigurationAction
 	}
 
 	protected Settings getSettings(ActionRequest actionRequest)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
@@ -295,10 +291,23 @@ public class SettingsConfigurationAction
 			"Invalid settings scope " + settingsScope);
 	}
 
+	protected String getSettingsId(ActionRequest actionRequest) {
+		String settingsId = ParamUtil.getString(actionRequest, "serviceName");
+
+		String settingsScope = ParamUtil.getString(
+			actionRequest, "settingsScope");
+
+		if (settingsScope.equals("portletInstance")) {
+			settingsId = ParamUtil.getString(actionRequest, "portletResource");
+		}
+
+		return settingsId;
+	}
+
 	@SuppressWarnings("unused")
 	protected void postProcess(
 			long companyId, PortletRequest portletRequest, Settings settings)
-		throws PortalException, SystemException {
+		throws PortalException {
 	}
 
 	protected void setParameterNamePrefix(String parameterNamePrefix) {
@@ -306,7 +315,20 @@ public class SettingsConfigurationAction
 	}
 
 	protected void updateMultiValuedKeys(ActionRequest actionRequest) {
-		for (String multiValuedKey : _multiValuedKeys) {
+		String settingsId = getSettingsId(actionRequest);
+
+		SettingsFactory settingsFactory =
+			SettingsFactoryUtil.getSettingsFactory();
+
+		List<String> multiValuedKeys = settingsFactory.getMultiValuedKeys(
+			settingsId);
+
+		if (multiValuedKeys == null) {
+			throw new IllegalStateException(
+				"No multi valued keys found for settings ID " + settingsId);
+		}
+
+		for (String multiValuedKey : multiValuedKeys) {
 			String multiValuedValue = getParameter(
 				actionRequest, multiValuedKey);
 
@@ -359,7 +381,6 @@ public class SettingsConfigurationAction
 		}
 	}
 
-	private List<String> _multiValuedKeys = new ArrayList<String>();
 	private String _parameterNamePrefix;
 
 }

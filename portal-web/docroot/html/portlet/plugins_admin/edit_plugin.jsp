@@ -95,7 +95,7 @@ if (pluginType.equals(Plugin.TYPE_PORTLET)) {
 
 					<c:if test="<%= rolesCount > maxNumberOfRolesChecked %>">
 						<div class="alert alert-block">
-							<%= LanguageUtil.format(pageContext, "the-portal-has-more-roles-than-the-maximum-that-can-be-checked-x", maxNumberOfRolesChecked, false) %>
+							<%= LanguageUtil.format(request, "the-portal-has-more-roles-than-the-maximum-that-can-be-checked-x", maxNumberOfRolesChecked, false) %>
 						</div>
 					</c:if>
 
@@ -114,13 +114,15 @@ if (pluginType.equals(Plugin.TYPE_PORTLET)) {
 									modelVar="role"
 
 								>
-									<liferay-util:param name="className" value="<%= RolesAdminUtil.getCssClassName(role) %>" />
-									<liferay-util:param name="classHoverName" value="<%= RolesAdminUtil.getCssClassName(role) %>" />
-
 									<liferay-ui:search-container-column-text
-										name="name"
-										property="name"
-									/>
+										name="role"
+									>
+										<liferay-ui:icon
+											iconCssClass="<%= RolesAdminUtil.getIconCssClass(role) %>"
+											label="<%= true %>"
+											message="<%= HtmlUtil.escape(role.getTitle(locale)) %>"
+										/>
+									</liferay-ui:search-container-column-text>
 
 									<liferay-ui:search-container-column-text
 										align="right"
@@ -133,7 +135,7 @@ if (pluginType.equals(Plugin.TYPE_PORTLET)) {
 											<portlet:param name="portletResource" value="<%= portlet.getPortletId() %>" />
 										</liferay-portlet:renderURL>
 
-										<liferay-ui:icon image="edit" label="<%= true %>" message="change" url="<%= editURL %>" />
+										<liferay-ui:icon iconCssClass="icon-edit" label="<%= true %>" message="change" url="<%= editURL %>" />
 									</liferay-ui:search-container-column-text>
 								</liferay-ui:search-container-row>
 
@@ -156,13 +158,15 @@ if (pluginType.equals(Plugin.TYPE_PORTLET)) {
 									keyProperty="name"
 									modelVar="role"
 								>
-									<liferay-util:param name="className" value="<%= RolesAdminUtil.getCssClassName(role) %>" />
-									<liferay-util:param name="classHoverName" value="<%= RolesAdminUtil.getCssClassName(role) %>" />
-
 									<liferay-ui:search-container-column-text
-										name="name"
-										property="name"
-									/>
+										name="role"
+									>
+										<liferay-ui:icon
+											iconCssClass="<%= RolesAdminUtil.getIconCssClass(role) %>"
+											label="<%= true %>"
+											message="<%= HtmlUtil.escape(role.getTitle(locale)) %>"
+										/>
+									</liferay-ui:search-container-column-text>
 
 									<liferay-ui:search-container-column-text
 										align="right"
@@ -175,7 +179,7 @@ if (pluginType.equals(Plugin.TYPE_PORTLET)) {
 											<portlet:param name="portletResource" value="<%= portlet.getPortletId() %>" />
 										</liferay-portlet:renderURL>
 
-										<liferay-ui:icon image="edit" label="<%= true %>" message="change" url="<%= editURL %>" />
+										<liferay-ui:icon iconCssClass="icon-edit" label="<%= true %>" message="change" url="<%= editURL %>" />
 									</liferay-ui:search-container-column-text>
 								</liferay-ui:search-container-row>
 

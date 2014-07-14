@@ -55,9 +55,14 @@ import java.util.Map;
 public class LayoutRemoteStagingBackgroundTaskExecutor
 	extends BaseStagingBackgroundTaskExecutor {
 
+	public LayoutRemoteStagingBackgroundTaskExecutor() {
+		setBackgroundTaskStatusMessageTranslator(
+			new LayoutStagingBackgroundTaskStatusMessageTranslator());
+	}
+
 	@Override
 	public BackgroundTaskResult execute(BackgroundTask backgroundTask)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		Map<String, Serializable> taskContextMap =
 			backgroundTask.getTaskContextMap();
@@ -81,7 +86,8 @@ public class LayoutRemoteStagingBackgroundTaskExecutor
 			(Map<String, String[]>)settingsMap.get("parameterMap");
 		long remoteGroupId = MapUtil.getLong(settingsMap, "remoteGroupId");
 		DateRange dateRange = ExportImportDateUtil.getDateRange(
-			exportImportConfiguration);
+			exportImportConfiguration,
+			ExportImportDateUtil.RANGE_FROM_LAST_PUBLISH_DATE);
 		HttpPrincipal httpPrincipal = (HttpPrincipal)taskContextMap.get(
 			"httpPrincipal");
 
@@ -110,20 +116,28 @@ public class LayoutRemoteStagingBackgroundTaskExecutor
 				new byte[PropsValues.STAGING_REMOTE_TRANSFER_BUFFER_SIZE];
 
 			int i = 0;
+			int j = 0;
+
+			String numberFormat = String.format(
+				"%%0%dd",
+				String.valueOf(
+					(int)(file.length() / bytes.length)).length() + 1);
 
 			while ((i = fileInputStream.read(bytes)) >= 0) {
+				String fileName =
+					file.getName() + String.format(numberFormat, j++);
+
 				if (i < PropsValues.STAGING_REMOTE_TRANSFER_BUFFER_SIZE) {
 					byte[] tempBytes = new byte[i];
 
 					System.arraycopy(bytes, 0, tempBytes, 0, i);
 
 					StagingServiceHttp.updateStagingRequest(
-						httpPrincipal, stagingRequestId, file.getName(),
-						tempBytes);
+						httpPrincipal, stagingRequestId, fileName, tempBytes);
 				}
 				else {
 					StagingServiceHttp.updateStagingRequest(
-						httpPrincipal, stagingRequestId, file.getName(), bytes);
+						httpPrincipal, stagingRequestId, fileName, bytes);
 				}
 
 				bytes =
@@ -173,7 +187,7 @@ public class LayoutRemoteStagingBackgroundTaskExecutor
 			Map<Long, Boolean> layoutIdMap, Map<String, String[]> parameterMap,
 			long remoteGroupId, Date startDate, Date endDate,
 			HttpPrincipal httpPrincipal)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		if ((layoutIdMap == null) || layoutIdMap.isEmpty()) {
 			return LayoutLocalServiceUtil.exportLayoutsAsFile(
@@ -230,7 +244,7 @@ public class LayoutRemoteStagingBackgroundTaskExecutor
 	 */
 	protected List<Layout> getMissingRemoteParentLayouts(
 			HttpPrincipal httpPrincipal, Layout layout, long remoteGroupId)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		List<Layout> missingRemoteParentLayouts = new ArrayList<Layout>();
 

@@ -56,54 +56,53 @@ public class MVCCEhcachePortalCache<K extends Serializable, V extends MVCCModel>
 	}
 
 	protected void doPut(K key, V value, boolean quiet, int timeToLive) {
-		Element newElement = null;
+		boolean replicate = false;
 
-		if (timeToLive >= 0) {
-			newElement = new Element(key, value, timeToLive);
+		if (quiet) {
+			replicate = ClusterReplicationThreadLocal.isReplicate();
+
+			ClusterReplicationThreadLocal.setReplicate(false);
 		}
-		else {
-			newElement = new Element(key, value);
-		}
 
-		Ehcache ehcache = getEhcache();
+		try {
+			Element newElement = null;
 
-		while (true) {
-			Element oldElement = ehcache.get(key);
+			if (timeToLive >= 0) {
+				newElement = new Element(key, value, timeToLive);
+			}
+			else {
+				newElement = new Element(key, value);
+			}
 
-			if (oldElement == null) {
-				oldElement = ehcache.putIfAbsent(newElement, quiet);
+			Ehcache ehcache = getEhcache();
+
+			while (true) {
+				Element oldElement = ehcache.get(key);
 
 				if (oldElement == null) {
-					return;
-				}
-			}
+					oldElement = ehcache.putIfAbsent(newElement);
 
-			V oldValue = (V)oldElement.getObjectValue();
-
-			if ((oldValue != null) &&
-				(value.getMvccVersion() <= oldValue.getMvccVersion())) {
-
-				return;
-			}
-
-			if (quiet) {
-				boolean replicateUpdate =
-					ClusterReplicationThreadLocal.isReplicateUpdate();
-
-				ClusterReplicationThreadLocal.setReplicateUpdate(false);
-
-				try {
-					if (ehcache.replace(oldElement, newElement)) {
+					if (oldElement == null) {
 						return;
 					}
 				}
-				finally {
-					ClusterReplicationThreadLocal.setReplicateUpdate(
-						replicateUpdate);
+
+				V oldValue = (V)oldElement.getObjectValue();
+
+				if ((oldValue != null) &&
+					(value.getMvccVersion() <= oldValue.getMvccVersion())) {
+
+					return;
+				}
+
+				if (ehcache.replace(oldElement, newElement)) {
+					return;
 				}
 			}
-			else if (ehcache.replace(oldElement, newElement)) {
-				return;
+		}
+		finally {
+			if (quiet) {
+				ClusterReplicationThreadLocal.setReplicate(replicate);
 			}
 		}
 	}

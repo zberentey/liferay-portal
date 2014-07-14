@@ -24,12 +24,6 @@
 					<encoding>UTF-8</encoding>
 				</source-folder>
 				<source-folder>
-					<label>modules\core\registry-impl\src</label>
-					<type>java</type>
-					<location>modules/core/registry-impl/src</location>
-					<encoding>UTF-8</encoding>
-				</source-folder>
-				<source-folder>
 					<label>portal-impl\src</label>
 					<type>java</type>
 					<location>portal-impl/src</location>
@@ -160,10 +154,6 @@
 						<location>modules/core/registry/registry-api/src</location>
 					</source-folder>
 					<source-folder style="packages">
-						<label>modules\core\registry\registry-impl\src</label>
-						<location>modules/core/registry/registry-impl/src</location>
-					</source-folder>
-					<source-folder style="packages">
 						<label>portal-impl\src</label>
 						<location>portal-impl/src</location>
 					</source-folder>
@@ -263,6 +253,7 @@
 				<classpath mode="compile">lib/development/ant-ext.jar</classpath>
 				<classpath mode="compile">lib/development/ant-installer.jar</classpath>
 				<classpath mode="compile">lib/development/antelope.jar</classpath>
+				<classpath mode="compile">lib/development/appium.jar</classpath>
 				<classpath mode="compile">lib/development/catalina.jar</classpath>
 				<classpath mode="compile">lib/development/cobertura.jar</classpath>
 				<classpath mode="compile">lib/development/com.liferay.ant.bnd.jar</classpath>
@@ -293,6 +284,7 @@
 				<classpath mode="compile">lib/development/jndi.jar</classpath>
 				<classpath mode="compile">lib/development/jsch.jar</classpath>
 				<classpath mode="compile">lib/development/jserrorcollector.jar</classpath>
+				<classpath mode="compile">lib/development/jsonassert.jar</classpath>
 				<classpath mode="compile">lib/development/jsp-api.jar</classpath>
 				<classpath mode="compile">lib/development/jta.jar</classpath>
 				<classpath mode="compile">lib/development/jtds.jar</classpath>
@@ -536,7 +528,7 @@
 				<classpath mode="compile">lib/portal/tomcat-juli.jar</classpath>
 				<classpath mode="compile">lib/portal/truezip.jar</classpath>
 				<classpath mode="compile">lib/portal/unoil.jar</classpath>
-				<classpath mode="compile">lib/portal/urlrewrite.jar</classpath>
+				<classpath mode="compile">lib/portal/urlrewritefilter.jar</classpath>
 				<classpath mode="compile">lib/portal/vaadin.jar</classpath>
 				<classpath mode="compile">lib/portal/velocity-tools.jar</classpath>
 				<classpath mode="compile">lib/portal/velocity.jar</classpath>

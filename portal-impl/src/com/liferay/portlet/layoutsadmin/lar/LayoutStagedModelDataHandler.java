@@ -16,6 +16,7 @@ package com.liferay.portlet.layoutsadmin.lar;
 
 import com.liferay.counter.service.CounterLocalServiceUtil;
 import com.liferay.portal.NoSuchLayoutException;
+import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
@@ -66,6 +67,7 @@ import com.liferay.portal.service.PortletLocalServiceUtil;
 import com.liferay.portal.service.ResourceLocalServiceUtil;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.ServiceContextThreadLocal;
+import com.liferay.portal.service.impl.LayoutLocalServiceHelper;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.portlet.journal.NoSuchArticleException;
 import com.liferay.portlet.journal.model.JournalArticle;
@@ -91,7 +93,7 @@ public class LayoutStagedModelDataHandler
 	@Override
 	public void deleteStagedModel(
 			String uuid, long groupId, String className, String extraData)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		JSONObject extraDataJSONObject = JSONFactoryUtil.createJSONObject(
 			extraData);
@@ -580,7 +582,13 @@ public class LayoutStagedModelDataHandler
 			ImageLocalServiceUtil.deleteImage(importedLayout.getIconImageId());
 		}
 
-		importedLayout.setPriority(layout.getPriority());
+		if (existingLayout == null) {
+			int priority = _layoutLocalServiceHelper.getNextPriority(
+				groupId, privateLayout, parentLayoutId, null, -1);
+
+			importedLayout.setPriority(priority);
+		}
+
 		importedLayout.setLayoutPrototypeUuid(layout.getLayoutPrototypeUuid());
 		importedLayout.setLayoutPrototypeLinkEnabled(
 			layout.isLayoutPrototypeLinkEnabled());
@@ -837,9 +845,8 @@ public class LayoutStagedModelDataHandler
 	}
 
 	protected String getUniqueFriendlyURL(
-			PortletDataContext portletDataContext, Layout existingLayout,
-			String friendlyURL)
-		throws SystemException {
+		PortletDataContext portletDataContext, Layout existingLayout,
+		String friendlyURL) {
 
 		for (int i = 1;; i++) {
 			Layout duplicateFriendlyURLLayout =
@@ -1196,6 +1203,8 @@ public class LayoutStagedModelDataHandler
 		layoutElement.addAttribute("layout-uuid", layout.getUuid());
 		layoutElement.addAttribute(
 			"layout-id", String.valueOf(layout.getLayoutId()));
+		layoutElement.addAttribute(
+			"layout-priority", String.valueOf(layout.getPriority()));
 
 		String layoutPrototypeUuid = layout.getLayoutPrototypeUuid();
 
@@ -1214,7 +1223,7 @@ public class LayoutStagedModelDataHandler
 	}
 
 	protected void updateTypeSettings(Layout importedLayout, Layout layout)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		long groupId = layout.getGroupId();
 
@@ -1253,5 +1262,9 @@ public class LayoutStagedModelDataHandler
 
 	private static Log _log = LogFactoryUtil.getLog(
 		LayoutStagedModelDataHandler.class);
+
+	private LayoutLocalServiceHelper _layoutLocalServiceHelper =
+		(LayoutLocalServiceHelper)PortalBeanLocatorUtil.locate(
+			LayoutLocalServiceHelper.class.getName());
 
 }

@@ -17,7 +17,6 @@ package com.liferay.portal.security.auth;
 import com.liferay.portal.events.EventsProcessorUtil;
 import com.liferay.portal.kernel.events.Action;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.security.jaas.PortalPrincipal;
 import com.liferay.portal.kernel.security.jaas.PortalRole;
 import com.liferay.portal.kernel.servlet.HttpMethods;
@@ -31,7 +30,6 @@ import com.liferay.portal.model.User;
 import com.liferay.portal.security.jaas.JAASHelper;
 import com.liferay.portal.service.UserLocalServiceUtil;
 import com.liferay.portal.servlet.MainServlet;
-import com.liferay.portal.test.EnvironmentExecutionTestListener;
 import com.liferay.portal.test.LiferayIntegrationJUnitTestRunner;
 import com.liferay.portal.test.MainServletExecutionTestListener;
 import com.liferay.portal.util.PropsValues;
@@ -77,7 +75,7 @@ import org.springframework.mock.web.MockServletContext;
 /**
  * @author Raymond Augé
  */
-@ExecutionTestListeners(listeners = {EnvironmentExecutionTestListener.class})
+@ExecutionTestListeners(listeners = {MainServletExecutionTestListener.class})
 @RunWith(LiferayIntegrationJUnitTestRunner.class)
 public class JAASTest extends MainServletExecutionTestListener {
 
@@ -316,7 +314,7 @@ public class JAASTest extends MainServletExecutionTestListener {
 
 				@Override
 				protected long doGetJaasUserId(long companyId, String name)
-					throws PortalException, SystemException {
+					throws PortalException {
 
 					try {
 						return super.doGetJaasUserId(companyId, name);
@@ -429,15 +427,15 @@ public class JAASTest extends MainServletExecutionTestListener {
 
 	private class JAASAction extends Action {
 
+		public boolean isRan() {
+			return _ran;
+		}
+
 		@Override
 		public void run(
 			HttpServletRequest request, HttpServletResponse response) {
 
 			_ran = true;
-		}
-
-		public boolean isRan() {
-			return _ran;
 		}
 
 		private boolean _ran;

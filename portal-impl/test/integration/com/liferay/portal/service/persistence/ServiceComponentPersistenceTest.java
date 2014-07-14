@@ -37,7 +37,7 @@ import com.liferay.portal.service.ServiceComponentLocalServiceUtil;
 import com.liferay.portal.service.persistence.BasePersistence;
 import com.liferay.portal.service.persistence.PersistenceExecutionTestListener;
 import com.liferay.portal.test.LiferayPersistenceIntegrationJUnitTestRunner;
-import com.liferay.portal.test.persistence.TransactionalPersistenceAdvice;
+import com.liferay.portal.test.persistence.test.TransactionalPersistenceAdvice;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.portal.util.test.RandomTestUtil;
 
@@ -50,6 +50,7 @@ import org.junit.runner.RunWith;
 
 import java.io.Serializable;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -221,7 +222,7 @@ public class ServiceComponentPersistenceTest {
 		}
 	}
 
-	protected OrderByComparator getOrderByComparator() {
+	protected OrderByComparator<ServiceComponent> getOrderByComparator() {
 		return OrderByComparatorFactoryUtil.create("ServiceComponent",
 			"mvccVersion", true, "serviceComponentId", true, "buildNamespace",
 			true, "buildNumber", true, "buildDate", true, "data", true);
@@ -243,6 +244,88 @@ public class ServiceComponentPersistenceTest {
 		ServiceComponent missingServiceComponent = _persistence.fetchByPrimaryKey(pk);
 
 		Assert.assertNull(missingServiceComponent);
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereAllPrimaryKeysExist()
+		throws Exception {
+		ServiceComponent newServiceComponent1 = addServiceComponent();
+		ServiceComponent newServiceComponent2 = addServiceComponent();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(newServiceComponent1.getPrimaryKey());
+		primaryKeys.add(newServiceComponent2.getPrimaryKey());
+
+		Map<Serializable, ServiceComponent> serviceComponents = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertEquals(2, serviceComponents.size());
+		Assert.assertEquals(newServiceComponent1,
+			serviceComponents.get(newServiceComponent1.getPrimaryKey()));
+		Assert.assertEquals(newServiceComponent2,
+			serviceComponents.get(newServiceComponent2.getPrimaryKey()));
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereNoPrimaryKeysExist()
+		throws Exception {
+		long pk1 = RandomTestUtil.nextLong();
+
+		long pk2 = RandomTestUtil.nextLong();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(pk1);
+		primaryKeys.add(pk2);
+
+		Map<Serializable, ServiceComponent> serviceComponents = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertTrue(serviceComponents.isEmpty());
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereSomePrimaryKeysExist()
+		throws Exception {
+		ServiceComponent newServiceComponent = addServiceComponent();
+
+		long pk = RandomTestUtil.nextLong();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(newServiceComponent.getPrimaryKey());
+		primaryKeys.add(pk);
+
+		Map<Serializable, ServiceComponent> serviceComponents = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertEquals(1, serviceComponents.size());
+		Assert.assertEquals(newServiceComponent,
+			serviceComponents.get(newServiceComponent.getPrimaryKey()));
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithNoPrimaryKeys()
+		throws Exception {
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		Map<Serializable, ServiceComponent> serviceComponents = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertTrue(serviceComponents.isEmpty());
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithOnePrimaryKey()
+		throws Exception {
+		ServiceComponent newServiceComponent = addServiceComponent();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(newServiceComponent.getPrimaryKey());
+
+		Map<Serializable, ServiceComponent> serviceComponents = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertEquals(1, serviceComponents.size());
+		Assert.assertEquals(newServiceComponent,
+			serviceComponents.get(newServiceComponent.getPrimaryKey()));
 	}
 
 	@Test

@@ -14,12 +14,13 @@
 
 package com.liferay.portal.kernel.servlet.taglib.ui;
 
-import aQute.bnd.annotation.ProviderType;
-
 import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.CookieKeys;
 import com.liferay.portal.kernel.util.HttpUtil;
+import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.model.Account;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.GroupConstants;
@@ -33,8 +34,10 @@ import com.liferay.portal.service.LayoutLocalServiceUtil;
 import com.liferay.portal.service.LayoutSetLocalServiceUtil;
 import com.liferay.portal.service.OrganizationLocalServiceUtil;
 import com.liferay.portal.service.UserLocalServiceUtil;
+import com.liferay.portal.theme.PortletDisplay;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortalUtil;
+import com.liferay.portal.util.PortletKeys;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -46,8 +49,65 @@ import javax.servlet.http.HttpSession;
 /**
  * @author José Manuel Navarro
  */
-@ProviderType
 public class BreadcrumbUtil {
+
+	public static final int ENTRY_TYPE_ANY = 0;
+
+	public static final int ENTRY_TYPE_CURRENT_GROUP = 1;
+
+	public static final int ENTRY_TYPE_GUEST_GROUP = 2;
+
+	public static final int ENTRY_TYPE_LAYOUT = 3;
+
+	public static final int ENTRY_TYPE_PARENT_GROUP = 4;
+
+	public static final int ENTRY_TYPE_PORTLET = 5;
+
+	public static List<BreadcrumbEntry> getBreadcrumbEntries(
+			HttpServletRequest request, int[] types)
+		throws Exception {
+
+		ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(
+			WebKeys.THEME_DISPLAY);
+
+		List<BreadcrumbEntry> breadcrumbEntries =
+			new ArrayList<BreadcrumbEntry>();
+
+		boolean hasAll = ArrayUtil.contains(types, ENTRY_TYPE_ANY);
+
+		if (hasAll || ArrayUtil.contains(types, ENTRY_TYPE_GUEST_GROUP)) {
+			BreadcrumbEntry breadcrumbEntry = getGuestGroupBreadcrumbEntry(
+				themeDisplay);
+
+			if (breadcrumbEntry != null) {
+				breadcrumbEntries.add(breadcrumbEntry);
+			}
+		}
+
+		if (hasAll || ArrayUtil.contains(types, ENTRY_TYPE_PARENT_GROUP)) {
+			breadcrumbEntries.addAll(
+				getParentGroupBreadcrumbEntries(themeDisplay));
+		}
+
+		if (hasAll || ArrayUtil.contains(types, ENTRY_TYPE_CURRENT_GROUP)) {
+			BreadcrumbEntry breadcrumbEntry = getScopeGroupBreadcrumbEntry(
+				themeDisplay);
+
+			if (breadcrumbEntry != null) {
+				breadcrumbEntries.add(breadcrumbEntry);
+			}
+		}
+
+		if (hasAll || ArrayUtil.contains(types, ENTRY_TYPE_LAYOUT)) {
+			breadcrumbEntries.addAll(getLayoutBreadcrumbEntries(themeDisplay));
+		}
+
+		if (hasAll || ArrayUtil.contains(types, ENTRY_TYPE_PORTLET)) {
+			breadcrumbEntries.addAll(getPortletBreadcrumbEntries(request));
+		}
+
+		return breadcrumbEntries;
+	}
 
 	public static BreadcrumbEntry getGuestGroupBreadcrumbEntry(
 			ThemeDisplay themeDisplay)
@@ -123,44 +183,45 @@ public class BreadcrumbUtil {
 	public static List<BreadcrumbEntry> getPortletBreadcrumbEntries(
 		HttpServletRequest request) {
 
+		ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(
+			WebKeys.THEME_DISPLAY);
+
+		PortletDisplay portletDisplay = themeDisplay.getPortletDisplay();
+
+		String portletName = portletDisplay.getPortletName();
+
+		String name = WebKeys.PORTLET_BREADCRUMBS;
+
+		if (Validator.isNotNull(portletDisplay.getId()) &&
+			!portletName.equals(PortletKeys.BREADCRUMB) &&
+			!portletDisplay.isFocused()) {
+
+			name = name.concat(
+				StringPool.UNDERLINE.concat(portletDisplay.getId()));
+		}
+
 		List<BreadcrumbEntry> portletBreadcrumbEntries =
-			PortalUtil.getPortletBreadcrumbs(request);
+			(List<BreadcrumbEntry>)request.getAttribute(name);
 
 		if (portletBreadcrumbEntries == null) {
 			return Collections.emptyList();
 		}
 
-		List<BreadcrumbEntry> breadcrumbEntries =
-			new ArrayList<BreadcrumbEntry>();
-
-		for (int i = 0; i < portletBreadcrumbEntries.size(); i++) {
+		for (int i = 0; i < portletBreadcrumbEntries.size() - 1; i++) {
 			BreadcrumbEntry portletBreadcrumbEntry =
 				portletBreadcrumbEntries.get(i);
 
-			BreadcrumbEntry breadcrumbEntry = new BreadcrumbEntry();
-
-			breadcrumbEntry.setBaseModel(portletBreadcrumbEntry.getBaseModel());
-			breadcrumbEntry.setData(portletBreadcrumbEntry.getData());
-			breadcrumbEntry.setTitle(portletBreadcrumbEntry.getTitle());
-
 			String url = portletBreadcrumbEntry.getURL();
 
-			if (Validator.isNotNull(url) &&
-				((i + 1) < portletBreadcrumbEntries.size())) {
+			if (Validator.isNotNull(url) && !CookieKeys.hasSessionId(request)) {
+				HttpSession session = request.getSession();
 
-				if (!CookieKeys.hasSessionId(request)) {
-					HttpSession session = request.getSession();
-
-					url = PortalUtil.getURLWithSessionId(url, session.getId());
-				}
-
-				breadcrumbEntry.setURL(url);
+				portletBreadcrumbEntry.setURL(
+					PortalUtil.getURLWithSessionId(url, session.getId()));
 			}
-
-			breadcrumbEntries.add(breadcrumbEntry);
 		}
 
-		return breadcrumbEntries;
+		return portletBreadcrumbEntries;
 	}
 
 	public static BreadcrumbEntry getScopeGroupBreadcrumbEntry(

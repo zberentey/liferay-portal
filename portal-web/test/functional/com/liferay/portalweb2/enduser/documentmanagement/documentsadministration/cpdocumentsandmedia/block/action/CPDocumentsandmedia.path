@@ -13,7 +13,6 @@
 	<td></td>
 	<td>CPDocumentsandmedia</td>
 </tr>
-<!---->
 <tr>
 	<td>PORTLET_TITLE</td>
 	<td>//h2[@id='cpPortletTitle']/span[@class='portlet-title-text']</td>
@@ -21,7 +20,7 @@
 </tr>
 <tr>
 	<td>NAVBAR_CONTAINER</td>
-	<td>//div[@class='navbar ']//div[@class='container']</td>
+	<td>//div[@class='navbar ' or contains(@class,'navbar-default')]//div[contains(@class,'container')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -31,7 +30,7 @@
 </tr>
 <tr>
 	<td>TOOLBAR_SELECT_ALL_ROWS_CHECKBOX</td>
-	<td>//input[@id='_199_allRowIdsCheckbox']</td>
+	<td>//input[contains(@id,'allRowIds')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -95,6 +94,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>CONFIRMATION</td>
+	<td></td>
+	<td></td>
+</tr>
+<tr>
 	<td></td>
 	<td></td>
 	<td></td>
@@ -139,6 +143,11 @@
 <tr>
 	<td>ACTIONS_MENULIST_MOVE_TO_THE_RECYCLE_BIN</td>
 	<td>//li[@id='_199_moveToTrashAction']/a</td>
+	<td></td>
+</tr>
+<tr>
+	<td>ACTIONS_MENULIST_DELETE</td>
+	<td>//li[@id='_199_deleteAction']/a</td>
 	<td></td>
 </tr>
 <tr>
@@ -289,6 +298,52 @@
 	<td></td>
 </tr>
 <tr>
+	<td>FILTER_REPOSITORY</td>
+	<td>//li[contains(@class,'app-view-navigation-entry') and contains(@class,'folder')]/a[contains(.,'${key_dmRepositoryName}')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>FILTER_REPOSITORY_GENERIC</td>
+	<td>xpath=(//li[contains(@class,'app-view-navigation-entry') and contains(@class,'folder')]/a)[5]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>FILTER_REPOSITORY_ACTIONS</td>
+	<td>//a[contains(.,'${key_dmNavigationEntry}')]/../span[contains(@class,'entry-action') and contains(@class,'overlay')]/div/a</td>
+	<td></td>
+</tr>
+<tr>
+	<td>FILTER_REPOSITORY_ACTIONS_GENERIC</td>
+	<td>xpath=(//span[contains(@class,'entry-action') and contains(@class,'overlay')]/div/a)[2]</td>
+	<td></td>
+</tr>
+<tr>
+	<td></td>
+	<td></td>
+	<td></td>
+</tr>
+<!--FILTER_MENULIST-->
+<tr>
+	<td>FILTER_MENULIST_DOWNLOAD</td>
+	<td>//a[@role='menuitem' and contains(.,'Download')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>FILTER_MENULIST_EDIT</td>
+	<td>//a[@role='menuitem' and contains(.,'Edit')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>FILTER_MENULIST_PERMISSIONS</td>
+	<td>//a[@role='menuitem' and contains(.,'Permissions')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>FILTER_MENULIST_DELETE</td>
+	<td>//a[@role='menuitem' and contains(.,'Delete')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td></td>
 	<td></td>
 	<td></td>
@@ -301,7 +356,7 @@
 </tr>
 <tr>
 	<td>BREADCRUMB_LAST</td>
-	<td>//div[@id='_199_breadcrumbContainer']//li[contains(.,'${key_dmFolderName}')]</td>
+	<td>//div[contains(@id,'breadcrumbContainer')]//li[contains(.,'${key_dmFolderName}')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -312,27 +367,27 @@
 <!--DOCUMENT_CONTAINER_DOCUMENT-->
 <tr>
 	<td>DOCUMENT_CONTAINER_DOCUMENT_GENERIC</td>
-	<td>//div[@id='_199_entriesContainer']//div[@class='entry-thumbnail']</td>
+	<td>//div[contains(@id,'entriesContainer')]//div[@class='entry-thumbnail']</td>
 	<td></td>
 </tr>
 <tr>
 	<td>DOCUMENT_CONTAINER_DOCUMENT</td>
-	<td>//div[@id='_199_entriesContainer']//div[contains(.,'${key_dmDocumentTitle}')]</td>
+	<td>//div[contains(@id,'entriesContainer')]//div[contains(.,'${key_dmDocumentTitle}')]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>DOCUMENT_CONTAINER_DOCUMENT_CHECKBOX</td>
-	<td>//div[@id='_199_entriesContainer']//div[contains(.,'${key_dmDocumentTitle}')]/input[contains(@name,'_199_rowIdsFileEntryCheckbox')]</td>
+	<td>//div[contains(@id,'entriesContainer')]//div[contains(.,'${key_dmDocumentTitle}')]/input[contains(@name,'_199_rowIdsFileEntry')]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>DOCUMENT_CONTAINER_DOCUMENT_DROPDOWN</td>
-	<td>//div[@id='_199_entriesContainer']//div[contains(.,'${key_dmDocumentTitle}')]/span/div/a</td>
+	<td>//div[contains(@id,'entriesContainer')]//div[contains(.,'${key_dmDocumentTitle}')]/span/div/a</td>
 	<td></td>
 </tr>
 <tr>
 	<td>DOCUMENT_CONTAINER_DOCUMENT_TITLE</td>
-	<td>//div[@id='_199_entriesContainer']//div[contains(.,'${key_dmDocumentTitle}')]/a/span/span</td>
+	<td>//div[contains(@id,'entriesContainer')]//div[contains(.,'${key_dmDocumentTitle}')]/a/span/span</td>
 	<td></td>
 </tr>
 <tr>
@@ -343,22 +398,22 @@
 <!--DOCUMENT_CONTAINER_FOLDER-->
 <tr>
 	<td>DOCUMENT_CONTAINER_FOLDER</td>
-	<td>//div[@id='_199_entriesContainer']//div[contains(.,'${key_dmFolderName}')]/a</td>
+	<td>//div[contains(@id,'entriesContainer')]//div[contains(.,'${key_dmFolderName}')]/a</td>
 	<td></td>
 </tr>
 <tr>
 	<td>DOCUMENT_CONTAINER_FOLDER_CHECKBOX</td>
-	<td>//div[@id='_199_entriesContainer']//div[contains(.,'${key_dmFolderName}')]/input[contains(@name,'_199_rowIdsFolderCheckbox')]</td>
+	<td>//div[contains(@id,'entriesContainer')]//div[contains(.,'${key_dmFolderName}')]/input[contains(@name,'_199_rowIdsFolder')]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>DOCUMENT_CONTAINER_FOLDER_DROPDOWN</td>
-	<td>//div[@id='_199_entriesContainer']//div[contains(.,'${key_dmFolderName}')]/span/div/a</td>
+	<td>//div[contains(@id,'entriesContainer')]//div[contains(.,'${key_dmFolderName}')]/span/div/a</td>
 	<td></td>
 </tr>
 <tr>
 	<td>DOCUMENT_CONTAINER_FOLDER_TITLE</td>
-	<td>//div[@id='_199_entriesContainer']//div[contains(.,'${key_dmFolderName}')]/a/span/span</td>
+	<td>//div[contains(@id,'entriesContainer')]//div[contains(.,'${key_dmFolderName}')]/a/span/span</td>
 	<td></td>
 </tr>
 <tr>
@@ -369,22 +424,22 @@
 <!--FOLDER_VIEW-->
 <tr>
 	<td>FOLDER_VIEW_FOLDER</td>
-	<td>//div[@id='_199_entriesContainer']//div[contains(.,'${key_dmFolderName}')]/a</td>
+	<td>//div[contains(@id,'entriesContainer')]//div[contains(.,'${key_dmFolderName}')]/a</td>
 	<td></td>
 </tr>
 <tr>
 	<td>FOLDER_VIEW_FOLDER_TITLE</td>
-	<td>//div[@id='_199_entriesContainer']//div[contains(.,'${key_dmFolderName}')]/a/span/span</td>
+	<td>//div[contains(@id,'entriesContainer')]//div[contains(.,'${key_dmFolderName}')]/a/span/span</td>
 	<td></td>
 </tr>
 <tr>
 	<td>FOLDER_VIEW_DOCUMENT</td>
-	<td>//div[@id='_199_entriesContainer']//div[contains(.,'${key_dmDocumentTitle}')]/a</td>
+	<td>//div[contains(@id,'entriesContainer')]//div[contains(.,'${key_dmDocumentTitle}')]/a</td>
 	<td></td>
 </tr>
 <tr>
 	<td>FOLDER_VIEW_DOCUMENT_TITLE</td>
-	<td>//div[@id='_199_entriesContainer']//div[contains(.,'${key_dmDocumentTitle}')]/a/span/span</td>
+	<td>//div[contains(@id,'entriesContainer')]//div[contains(.,'${key_dmDocumentTitle}')]/a/span/span</td>
 	<td></td>
 </tr>
 <tr>

@@ -14,14 +14,12 @@
 
 package com.liferay.portlet.blogs;
 
-import com.liferay.portal.kernel.dao.orm.FinderCacheUtil;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.test.ExecutionTestListeners;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.User;
-import com.liferay.portal.service.GroupLocalServiceUtil;
-import com.liferay.portal.service.UserLocalServiceUtil;
+import com.liferay.portal.test.DeleteAfterTestRun;
 import com.liferay.portal.test.LiferayIntegrationJUnitTestRunner;
 import com.liferay.portal.test.MainServletExecutionTestListener;
 import com.liferay.portal.test.Sync;
@@ -45,7 +43,6 @@ import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -65,21 +62,12 @@ public class BlogsEntryStatusTransitionTest extends BaseBlogsEntryTestCase {
 
 	@Before
 	public void setUp() throws Exception {
-		FinderCacheUtil.clearCache();
-
 		group = GroupTestUtil.addGroup();
 
 		user = UserTestUtil.addUser(
 			RandomTestUtil.randomString(), group.getGroupId());
 
 		entry = BlogsTestUtil.addEntry(user.getUserId(), group, false);
-	}
-
-	@After
-	public void tearDown() throws Exception {
-		GroupLocalServiceUtil.deleteGroup(group);
-
-		UserLocalServiceUtil.deleteUser(user);
 	}
 
 	@Test
@@ -347,7 +335,11 @@ public class BlogsEntryStatusTransitionTest extends BaseBlogsEntryTestCase {
 	protected static final int ACTIVITY_KEY_ANY = -1;
 
 	protected BlogsEntry entry;
+
+	@DeleteAfterTestRun
 	protected Group group;
+
+	@DeleteAfterTestRun
 	protected User user;
 
 }

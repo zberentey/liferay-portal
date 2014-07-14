@@ -61,7 +61,7 @@ public class AssetEntryFinderImpl
 		AssetEntryFinder.class.getName() + ".findByAndTagIds";
 
 	@Override
-	public int countEntries(AssetEntryQuery entryQuery) throws SystemException {
+	public int countEntries(AssetEntryQuery entryQuery) {
 		Session session = null;
 
 		try {
@@ -90,9 +90,7 @@ public class AssetEntryFinderImpl
 	}
 
 	@Override
-	public List<AssetEntry> findEntries(AssetEntryQuery entryQuery)
-		throws SystemException {
-
+	public List<AssetEntry> findEntries(AssetEntryQuery entryQuery) {
 		Session session = null;
 
 		try {
@@ -111,9 +109,7 @@ public class AssetEntryFinderImpl
 		}
 	}
 
-	protected void buildAllCategoriesSQL(long[] categoryIds, StringBundler sb)
-		throws SystemException {
-
+	protected void buildAllCategoriesSQL(long[] categoryIds, StringBundler sb) {
 		String findByAndCategoryIdsSQL = CustomSQLUtil.get(
 			FIND_BY_AND_CATEGORY_IDS);
 
@@ -172,9 +168,7 @@ public class AssetEntryFinderImpl
 		sb.append(StringPool.CLOSE_PARENTHESIS);
 	}
 
-	protected void buildAnyCategoriesSQL(long[] categoryIds, StringBundler sb)
-		throws SystemException {
-
+	protected void buildAnyCategoriesSQL(long[] categoryIds, StringBundler sb) {
 		String sql = CustomSQLUtil.get(FIND_BY_AND_CATEGORY_IDS);
 
 		String categoryIdsString = null;
@@ -220,8 +214,7 @@ public class AssetEntryFinderImpl
 	}
 
 	protected SQLQuery buildAssetQuerySQL(
-			AssetEntryQuery entryQuery, boolean count, Session session)
-		throws SystemException {
+		AssetEntryQuery entryQuery, boolean count, Session session) {
 
 		StringBundler sb = new StringBundler(64);
 
@@ -230,7 +223,9 @@ public class AssetEntryFinderImpl
 				"SELECT COUNT(DISTINCT AssetEntry.entryId) AS COUNT_VALUE ");
 		}
 		else {
-			sb.append("SELECT DISTINCT {AssetEntry.*} ");
+			sb.append("SELECT {AssetEntry.*} ");
+
+			boolean selectRatings = false;
 
 			String orderByCol1 = entryQuery.getOrderByCol1();
 			String orderByCol2 = entryQuery.getOrderByCol2();
@@ -238,6 +233,14 @@ public class AssetEntryFinderImpl
 			if (orderByCol1.equals("ratings") ||
 				orderByCol2.equals("ratings")) {
 
+				selectRatings = true;
+
+				sb.append(", TEMP_TABLE.averageScore ");
+			}
+
+			sb.append("FROM (SELECT DISTINCT AssetEntry.entryId ");
+
+			if (selectRatings) {
 				sb.append(", RatingsStats.averageScore ");
 			}
 		}
@@ -364,10 +367,15 @@ public class AssetEntryFinderImpl
 		sb.append(getClassNameIds(entryQuery.getClassNameIds()));
 
 		if (!count) {
+			sb.append(") TEMP_TABLE ");
+			sb.append("INNER JOIN ");
+			sb.append("AssetEntry AssetEntry ON ");
+			sb.append("TEMP_TABLE.entryId = AssetEntry.entryId");
+
 			sb.append(" ORDER BY ");
 
 			if (entryQuery.getOrderByCol1().equals("ratings")) {
-				sb.append("RatingsStats.averageScore");
+				sb.append("TEMP_TABLE.averageScore");
 			}
 			else {
 				sb.append("AssetEntry.");
@@ -382,7 +390,7 @@ public class AssetEntryFinderImpl
 					entryQuery.getOrderByCol2())) {
 
 				if (entryQuery.getOrderByCol2().equals("ratings")) {
-					sb.append(", RatingsStats.averageScore");
+					sb.append(", TEMP_TABLE.averageScore");
 				}
 				else {
 					sb.append(", AssetEntry.");
@@ -469,8 +477,7 @@ public class AssetEntryFinderImpl
 	}
 
 	protected void buildNotAllCategoriesSQL(
-			long[] categoryIds, StringBundler sb)
-		throws SystemException {
+		long[] categoryIds, StringBundler sb) {
 
 		String findByAndCategoryIdsSQL = CustomSQLUtil.get(
 			FIND_BY_AND_CATEGORY_IDS);
@@ -530,8 +537,7 @@ public class AssetEntryFinderImpl
 	}
 
 	protected void buildNotAnyCategoriesSQL(
-			long[] notCategoryIds, StringBundler sb)
-		throws SystemException {
+		long[] notCategoryIds, StringBundler sb) {
 
 		sb.append(" AND (NOT ");
 
@@ -632,9 +638,7 @@ public class AssetEntryFinderImpl
 		return sb.toString();
 	}
 
-	protected List<Long> getSubcategoryIds(long parentCategoryId)
-		throws SystemException {
-
+	protected List<Long> getSubcategoryIds(long parentCategoryId) {
 		AssetCategory parentAssetCategory = AssetCategoryUtil.fetchByPrimaryKey(
 			parentCategoryId);
 

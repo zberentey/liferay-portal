@@ -37,7 +37,7 @@ import com.liferay.portal.service.CompanyLocalServiceUtil;
 import com.liferay.portal.service.persistence.BasePersistence;
 import com.liferay.portal.service.persistence.PersistenceExecutionTestListener;
 import com.liferay.portal.test.LiferayPersistenceIntegrationJUnitTestRunner;
-import com.liferay.portal.test.persistence.TransactionalPersistenceAdvice;
+import com.liferay.portal.test.persistence.test.TransactionalPersistenceAdvice;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.portal.util.test.RandomTestUtil;
 
@@ -50,6 +50,7 @@ import org.junit.runner.RunWith;
 
 import java.io.Serializable;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -257,7 +258,7 @@ public class CompanyPersistenceTest {
 		}
 	}
 
-	protected OrderByComparator getOrderByComparator() {
+	protected OrderByComparator<Company> getOrderByComparator() {
 		return OrderByComparatorFactoryUtil.create("Company", "mvccVersion",
 			true, "companyId", true, "accountId", true, "webId", true, "key",
 			true, "mx", true, "homeURL", true, "logoId", true, "system", true,
@@ -280,6 +281,88 @@ public class CompanyPersistenceTest {
 		Company missingCompany = _persistence.fetchByPrimaryKey(pk);
 
 		Assert.assertNull(missingCompany);
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereAllPrimaryKeysExist()
+		throws Exception {
+		Company newCompany1 = addCompany();
+		Company newCompany2 = addCompany();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(newCompany1.getPrimaryKey());
+		primaryKeys.add(newCompany2.getPrimaryKey());
+
+		Map<Serializable, Company> companies = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertEquals(2, companies.size());
+		Assert.assertEquals(newCompany1,
+			companies.get(newCompany1.getPrimaryKey()));
+		Assert.assertEquals(newCompany2,
+			companies.get(newCompany2.getPrimaryKey()));
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereNoPrimaryKeysExist()
+		throws Exception {
+		long pk1 = RandomTestUtil.nextLong();
+
+		long pk2 = RandomTestUtil.nextLong();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(pk1);
+		primaryKeys.add(pk2);
+
+		Map<Serializable, Company> companies = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertTrue(companies.isEmpty());
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereSomePrimaryKeysExist()
+		throws Exception {
+		Company newCompany = addCompany();
+
+		long pk = RandomTestUtil.nextLong();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(newCompany.getPrimaryKey());
+		primaryKeys.add(pk);
+
+		Map<Serializable, Company> companies = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertEquals(1, companies.size());
+		Assert.assertEquals(newCompany,
+			companies.get(newCompany.getPrimaryKey()));
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithNoPrimaryKeys()
+		throws Exception {
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		Map<Serializable, Company> companies = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertTrue(companies.isEmpty());
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithOnePrimaryKey()
+		throws Exception {
+		Company newCompany = addCompany();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(newCompany.getPrimaryKey());
+
+		Map<Serializable, Company> companies = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertEquals(1, companies.size());
+		Assert.assertEquals(newCompany,
+			companies.get(newCompany.getPrimaryKey()));
 	}
 
 	@Test

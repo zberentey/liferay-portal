@@ -21,7 +21,7 @@
 <liferay-ui:panel-container extended="<%= true %>" id="bookmarksSettingsPanelContainer" persistState="<%= true %>">
 	<liferay-ui:panel collapsible="<%= true %>" extended="<%= true %>" id="bookmarksFoldersListingPanel" persistState="<%= true %>" title="folders-listing">
 		<aui:fieldset>
-			<div class="control-group">
+			<div class="form-group">
 				<aui:input label="root-folder" name="rootFolderName" type="resource" value="<%= rootFolderName %>" />
 
 				<aui:button name="selectFolderButton" value="select" />
@@ -33,9 +33,9 @@
 				<aui:button disabled="<%= rootFolderId <= 0 %>" name="removeFolderButton" onClick="<%= taglibRemoveFolder %>" value="remove" />
 			</div>
 
-			<aui:input label="show-search" name="preferences--showFoldersSearch--" type="checkbox" value="<%= bookmarksSettings.getShowFoldersSearch() %>" />
+			<aui:input label="show-search" name="preferences--showFoldersSearch--" type="checkbox" value="<%= bookmarksSettings.isShowFoldersSearch() %>" />
 
-			<aui:input name="preferences--showSubfolders--" type="checkbox" value="<%= bookmarksSettings.getShowSubfolders() %>" />
+			<aui:input name="preferences--showSubfolders--" type="checkbox" value="<%= bookmarksSettings.isShowSubfolders() %>" />
 
 			<aui:input name="preferences--foldersPerPage--" size="2" type="text" value="<%= bookmarksSettings.getFoldersPerPage() %>" />
 
@@ -49,7 +49,7 @@
 				List leftList = new ArrayList();
 
 				for (String folderColumn : folderColumns) {
-					leftList.add(new KeyValuePair(folderColumn, LanguageUtil.get(pageContext, folderColumn)));
+					leftList.add(new KeyValuePair(folderColumn, LanguageUtil.get(request, folderColumn)));
 				}
 
 				// Right list
@@ -60,7 +60,7 @@
 
 				for (String folderColumn : availableFolderColumns) {
 					if (Arrays.binarySearch(folderColumns, folderColumn) < 0) {
-						rightList.add(new KeyValuePair(folderColumn, LanguageUtil.get(pageContext, folderColumn)));
+						rightList.add(new KeyValuePair(folderColumn, LanguageUtil.get(request, folderColumn)));
 					}
 				}
 
@@ -82,7 +82,7 @@
 
 	<liferay-ui:panel collapsible="<%= true %>" extended="<%= true %>" id="bookmarksListingPanel" persistState="<%= true %>" title="bookmarks-listing">
 		<aui:fieldset>
-			<aui:input name="preferences--enableRelatedAssets--" type="checkbox" value="<%= bookmarksSettings.getEnableRelatedAssets() %>" />
+			<aui:input name="preferences--enableRelatedAssets--" type="checkbox" value="<%= bookmarksSettings.isEnableRelatedAssets() %>" />
 
 			<aui:input label="documents-per-page" name="preferences--entriesPerPage--" size="2" type="text" value="<%= bookmarksSettings.getEntriesPerPage() %>" />
 
@@ -98,7 +98,7 @@
 				for (int i = 0; i < entryColumns.length; i++) {
 					String entryColumn = entryColumns[i];
 
-					leftList.add(new KeyValuePair(entryColumn, LanguageUtil.get(pageContext, entryColumn)));
+					leftList.add(new KeyValuePair(entryColumn, LanguageUtil.get(request, entryColumn)));
 				}
 
 				// Right list
@@ -109,7 +109,7 @@
 
 				for (String entryColumn : availableEntryColumns) {
 					if (Arrays.binarySearch(entryColumns, entryColumn) < 0) {
-						rightList.add(new KeyValuePair(entryColumn, LanguageUtil.get(pageContext, entryColumn)));
+						rightList.add(new KeyValuePair(entryColumn, LanguageUtil.get(request, entryColumn)));
 					}
 				}
 

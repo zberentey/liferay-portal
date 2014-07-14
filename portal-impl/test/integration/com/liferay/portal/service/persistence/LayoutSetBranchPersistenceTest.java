@@ -38,7 +38,7 @@ import com.liferay.portal.service.LayoutSetBranchLocalServiceUtil;
 import com.liferay.portal.service.persistence.BasePersistence;
 import com.liferay.portal.service.persistence.PersistenceExecutionTestListener;
 import com.liferay.portal.test.LiferayPersistenceIntegrationJUnitTestRunner;
-import com.liferay.portal.test.persistence.TransactionalPersistenceAdvice;
+import com.liferay.portal.test.persistence.test.TransactionalPersistenceAdvice;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.portal.util.test.RandomTestUtil;
 
@@ -51,6 +51,7 @@ import org.junit.runner.RunWith;
 
 import java.io.Serializable;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -322,7 +323,7 @@ public class LayoutSetBranchPersistenceTest {
 		}
 	}
 
-	protected OrderByComparator getOrderByComparator() {
+	protected OrderByComparator<LayoutSetBranch> getOrderByComparator() {
 		return OrderByComparatorFactoryUtil.create("LayoutSetBranch",
 			"mvccVersion", true, "layoutSetBranchId", true, "groupId", true,
 			"companyId", true, "userId", true, "userName", true, "createDate",
@@ -350,6 +351,88 @@ public class LayoutSetBranchPersistenceTest {
 		LayoutSetBranch missingLayoutSetBranch = _persistence.fetchByPrimaryKey(pk);
 
 		Assert.assertNull(missingLayoutSetBranch);
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereAllPrimaryKeysExist()
+		throws Exception {
+		LayoutSetBranch newLayoutSetBranch1 = addLayoutSetBranch();
+		LayoutSetBranch newLayoutSetBranch2 = addLayoutSetBranch();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(newLayoutSetBranch1.getPrimaryKey());
+		primaryKeys.add(newLayoutSetBranch2.getPrimaryKey());
+
+		Map<Serializable, LayoutSetBranch> layoutSetBranchs = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertEquals(2, layoutSetBranchs.size());
+		Assert.assertEquals(newLayoutSetBranch1,
+			layoutSetBranchs.get(newLayoutSetBranch1.getPrimaryKey()));
+		Assert.assertEquals(newLayoutSetBranch2,
+			layoutSetBranchs.get(newLayoutSetBranch2.getPrimaryKey()));
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereNoPrimaryKeysExist()
+		throws Exception {
+		long pk1 = RandomTestUtil.nextLong();
+
+		long pk2 = RandomTestUtil.nextLong();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(pk1);
+		primaryKeys.add(pk2);
+
+		Map<Serializable, LayoutSetBranch> layoutSetBranchs = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertTrue(layoutSetBranchs.isEmpty());
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereSomePrimaryKeysExist()
+		throws Exception {
+		LayoutSetBranch newLayoutSetBranch = addLayoutSetBranch();
+
+		long pk = RandomTestUtil.nextLong();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(newLayoutSetBranch.getPrimaryKey());
+		primaryKeys.add(pk);
+
+		Map<Serializable, LayoutSetBranch> layoutSetBranchs = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertEquals(1, layoutSetBranchs.size());
+		Assert.assertEquals(newLayoutSetBranch,
+			layoutSetBranchs.get(newLayoutSetBranch.getPrimaryKey()));
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithNoPrimaryKeys()
+		throws Exception {
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		Map<Serializable, LayoutSetBranch> layoutSetBranchs = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertTrue(layoutSetBranchs.isEmpty());
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithOnePrimaryKey()
+		throws Exception {
+		LayoutSetBranch newLayoutSetBranch = addLayoutSetBranch();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(newLayoutSetBranch.getPrimaryKey());
+
+		Map<Serializable, LayoutSetBranch> layoutSetBranchs = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertEquals(1, layoutSetBranchs.size());
+		Assert.assertEquals(newLayoutSetBranch,
+			layoutSetBranchs.get(newLayoutSetBranch.getPrimaryKey()));
 	}
 
 	@Test

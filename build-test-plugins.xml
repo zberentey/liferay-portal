@@ -104,10 +104,31 @@ security-manager-enabled=true</echo>
 				</for>
 			</then>
 			<else>
-				<ant dir="${lp.plugins.dir}/${plugin.types}" inheritAll="false">
-					<target name="clean" />
-					<target name="deploy" />
-				</ant>
+				<if>
+					<isset property="plugin.types" />
+					<then>
+						<ant-execute
+							ant.dir="${lp.plugins.dir}/${plugin.types}"
+							ant.target="clean"
+						/>
+
+						<ant-execute
+							ant.dir="${lp.plugins.dir}/${plugin.types}"
+							ant.target="deploy"
+						/>
+					</then>
+					<else>
+						<ant-execute
+							ant.dir="${lp.plugins.dir}"
+							ant.target="clean"
+						/>
+
+						<ant-execute
+							ant.dir="${lp.plugins.dir}"
+							ant.target="deploy"
+						/>
+					</else>
+				</if>
 			</else>
 		</if>
 

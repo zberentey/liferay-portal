@@ -19,7 +19,6 @@ import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Property;
 import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.parsers.bbcode.BBCodeTranslatorUtil;
@@ -28,9 +27,7 @@ import com.liferay.portal.kernel.search.BooleanClauseOccur;
 import com.liferay.portal.kernel.search.BooleanQuery;
 import com.liferay.portal.kernel.search.BooleanQueryFactoryUtil;
 import com.liferay.portal.kernel.search.Document;
-import com.liferay.portal.kernel.search.DocumentImpl;
 import com.liferay.portal.kernel.search.Field;
-import com.liferay.portal.kernel.search.Hits;
 import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.IndexerRegistryUtil;
 import com.liferay.portal.kernel.search.SearchContext;
@@ -49,7 +46,6 @@ import com.liferay.portlet.messageboards.NoSuchDiscussionException;
 import com.liferay.portlet.messageboards.model.MBCategory;
 import com.liferay.portlet.messageboards.model.MBCategoryConstants;
 import com.liferay.portlet.messageboards.model.MBMessage;
-import com.liferay.portlet.messageboards.model.MBThread;
 import com.liferay.portlet.messageboards.service.MBCategoryLocalServiceUtil;
 import com.liferay.portlet.messageboards.service.MBCategoryServiceUtil;
 import com.liferay.portlet.messageboards.service.MBDiscussionLocalServiceUtil;
@@ -208,70 +204,19 @@ public class MBMessageIndexer extends BaseIndexer {
 	}
 
 	@Override
+	public void updateFullQuery(SearchContext searchContext) {
+		if (searchContext.isIncludeDiscussions()) {
+			searchContext.addFullQueryEntryClassName(MBMessage.class.getName());
+
+			searchContext.setAttribute("discussion", Boolean.TRUE);
+		}
+	}
+
+	@Override
 	protected void doDelete(Object obj) throws Exception {
-		SearchContext searchContext = new SearchContext();
+		MBMessage message = (MBMessage)obj;
 
-		searchContext.setSearchEngineId(getSearchEngineId());
-
-		if (obj instanceof MBCategory) {
-			MBCategory category = (MBCategory)obj;
-
-			searchContext.setCompanyId(category.getCompanyId());
-
-			BooleanQuery booleanQuery = BooleanQueryFactoryUtil.create(
-				searchContext);
-
-			booleanQuery.addRequiredTerm(Field.PORTLET_ID, PORTLET_ID);
-
-			booleanQuery.addRequiredTerm(
-				"categoryId", category.getCategoryId());
-
-			Hits hits = SearchEngineUtil.search(searchContext, booleanQuery);
-
-			for (int i = 0; i < hits.getLength(); i++) {
-				Document document = hits.doc(i);
-
-				SearchEngineUtil.deleteDocument(
-					getSearchEngineId(), category.getCompanyId(),
-					document.get(Field.UID));
-			}
-		}
-		else if (obj instanceof MBMessage) {
-			MBMessage message = (MBMessage)obj;
-
-			Document document = new DocumentImpl();
-
-			document.addUID(PORTLET_ID, message.getMessageId());
-
-			SearchEngineUtil.deleteDocument(
-				getSearchEngineId(), message.getCompanyId(),
-				document.get(Field.UID));
-		}
-		else if (obj instanceof MBThread) {
-			MBThread thread = (MBThread)obj;
-
-			searchContext.setCompanyId(thread.getCompanyId());
-
-			MBMessage message = MBMessageLocalServiceUtil.getMessage(
-				thread.getRootMessageId());
-
-			BooleanQuery booleanQuery = BooleanQueryFactoryUtil.create(
-				searchContext);
-
-			booleanQuery.addRequiredTerm(Field.PORTLET_ID, PORTLET_ID);
-
-			booleanQuery.addRequiredTerm("threadId", thread.getThreadId());
-
-			Hits hits = SearchEngineUtil.search(searchContext, booleanQuery);
-
-			for (int i = 0; i < hits.getLength(); i++) {
-				Document document = hits.doc(i);
-
-				SearchEngineUtil.deleteDocument(
-					getSearchEngineId(), message.getCompanyId(),
-					document.get(Field.UID));
-			}
-		}
+		deleteDocument(message.getCompanyId(), message.getMessageId());
 	}
 
 	@Override
@@ -407,7 +352,7 @@ public class MBMessageIndexer extends BaseIndexer {
 	}
 
 	protected void reindexCategories(final long companyId)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		ActionableDynamicQuery actionableDynamicQuery =
 			MBCategoryLocalServiceUtil.getActionableDynamicQuery();
@@ -418,7 +363,7 @@ public class MBMessageIndexer extends BaseIndexer {
 
 				@Override
 				public void performAction(Object object)
-					throws PortalException, SystemException {
+					throws PortalException {
 
 					MBCategory category = (MBCategory)object;
 
@@ -433,7 +378,7 @@ public class MBMessageIndexer extends BaseIndexer {
 	}
 
 	protected void reindexDiscussions(final long companyId)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		ActionableDynamicQuery actionableDynamicQuery =
 			GroupLocalServiceUtil.getActionableDynamicQuery();
@@ -444,7 +389,7 @@ public class MBMessageIndexer extends BaseIndexer {
 
 				@Override
 				public void performAction(Object object)
-					throws PortalException, SystemException {
+					throws PortalException {
 
 					Group group = (Group)object;
 
@@ -460,7 +405,7 @@ public class MBMessageIndexer extends BaseIndexer {
 
 	protected void reindexMessages(
 			long companyId, long groupId, final long categoryId)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		final ActionableDynamicQuery actionableDynamicQuery =
 			MBMessageLocalServiceUtil.getActionableDynamicQuery();
@@ -513,9 +458,7 @@ public class MBMessageIndexer extends BaseIndexer {
 		actionableDynamicQuery.performActions();
 	}
 
-	protected void reindexRoot(final long companyId)
-		throws PortalException, SystemException {
-
+	protected void reindexRoot(final long companyId) throws PortalException {
 		ActionableDynamicQuery actionableDynamicQuery =
 			GroupLocalServiceUtil.getActionableDynamicQuery();
 
@@ -525,7 +468,7 @@ public class MBMessageIndexer extends BaseIndexer {
 
 				@Override
 				public void performAction(Object object)
-					throws PortalException, SystemException {
+					throws PortalException {
 
 					Group group = (Group)object;
 

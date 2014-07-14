@@ -27,6 +27,7 @@ import java.io.Reader;
 
 import java.util.Collections;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -48,22 +49,18 @@ public class PropertiesUtil {
 		}
 	}
 
-	public static Properties fromMap(Map<String, String> map) {
+	public static Properties fromMap(Map<String, ?> map) {
 		Properties properties = new Properties();
 
-		for (Map.Entry<String, String> entry : map.entrySet()) {
+		for (Map.Entry<String, ?> entry : map.entrySet()) {
 			String key = entry.getKey();
-			String value = entry.getValue();
+			Object value = entry.getValue();
 
-			if (value != null) {
-				properties.setProperty(key, value);
+			if ((value != null) && (value instanceof String)) {
+				properties.setProperty(key, (String)value);
 			}
 		}
 
-		return properties;
-	}
-
-	public static Properties fromMap(Properties properties) {
 		return properties;
 	}
 
@@ -197,6 +194,22 @@ public class PropertiesUtil {
 
 			properties1.setProperty(key, value);
 		}
+	}
+
+	@SuppressWarnings("rawtypes")
+	public static Map toMap(Properties properties) {
+		Map<String, String> propertiesMap = new HashMap<String, String>();
+
+		Enumeration<?> enumeration = properties.propertyNames();
+
+		while (enumeration.hasMoreElements()) {
+			String key = (String)enumeration.nextElement();
+			String value = properties.getProperty(key);
+
+			propertiesMap.put(key, value);
+		}
+
+		return propertiesMap;
 	}
 
 	public static String toString(Properties properties) {

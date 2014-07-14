@@ -22,19 +22,27 @@ import com.liferay.portal.kernel.cache.ThreadLocalCacheManager;
 import com.liferay.portal.kernel.test.AbstractExecutionTestListener;
 import com.liferay.portal.kernel.test.TestContext;
 import com.liferay.portal.kernel.util.FileUtil;
+import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.SystemProperties;
-import com.liferay.portal.log.test.Log4JLoggerTestUtil;
+import com.liferay.portal.log.Log4JLoggerTestUtil;
 import com.liferay.portal.search.lucene.LuceneHelperUtil;
 import com.liferay.portal.test.jdbc.ResetDatabaseUtil;
 import com.liferay.portal.upgrade.util.Table;
 import com.liferay.portal.util.PortalInstances;
+import com.liferay.portal.util.PropsUtil;
+import com.liferay.portal.util.PropsValues;
 import com.liferay.portal.util.test.TestPropsValues;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
+import java.util.Queue;
 
 import org.apache.log4j.Level;
 
@@ -46,7 +54,8 @@ public class ResetDatabaseExecutionTestListener
 
 	@Override
 	public void runAfterTest(TestContext testContext) {
-		reloadLuceneStores();
+		restoreDLStores(false);
+		restoreLuceneStores(false);
 
 		ResetDatabaseUtil.resetModifiedTables();
 
@@ -60,55 +69,245 @@ public class ResetDatabaseExecutionTestListener
 	}
 
 	@Override
+	public void runBeforeClass(TestContext testContext) {
+		_level = Log4JLoggerTestUtil.setLoggerLevel(
+			Table.class.getName(), Level.WARN);
+
+		try {
+			if (ResetDatabaseUtil.initialize()) {
+				backupDLStores(true);
+				backupLuceneStores(true);
+			}
+			else {
+				restoreDLStores(true);
+				restoreLuceneStores(true);
+			}
+		}
+		finally {
+			Log4JLoggerTestUtil.setLoggerLevel(Table.class.getName(), _level);
+		}
+	}
+
+	@Override
 	public void runBeforeTest(TestContext testContext) {
 		_level = Log4JLoggerTestUtil.setLoggerLevel(
 			Table.class.getName(), Level.WARN);
 
 		ResetDatabaseUtil.startRecording();
 
-		dumpLuceneStores();
+		backupDLStores(false);
+		backupLuceneStores(false);
 	}
 
-	protected void dumpLuceneStores() {
-		for (long companyId : PortalInstances.getCompanyIds()) {
-			String luceneDumpFileName =
+	protected void backupDLStores(boolean initialize) {
+		String dlFileSystemStoreDirName = null;
+
+		if (initialize) {
+			dlFileSystemStoreDirName =
 				SystemProperties.get(SystemProperties.TMP_DIR) +
-					"/temp-lucene-" + companyId + "-" +
-						System.currentTimeMillis();
+					"/temp-init-dl-file-system-" + System.currentTimeMillis();
+
+			_initializedDLFileSystemStoreDirName = dlFileSystemStoreDirName;
+
+			Runtime runtime = Runtime.getRuntime();
+
+			runtime.addShutdownHook(
+				new DeleteFileShutdownHook(dlFileSystemStoreDirName));
+		}
+		else {
+			dlFileSystemStoreDirName =
+				SystemProperties.get(SystemProperties.TMP_DIR) +
+					"/temp-dl-file-system-" + System.currentTimeMillis();
+
+			_dlFileSystemStoreDirName = dlFileSystemStoreDirName;
+		}
+
+		try {
+			FileUtil.copyDirectory(
+				new File(PropsValues.DL_STORE_FILE_SYSTEM_ROOT_DIR),
+				new File(dlFileSystemStoreDirName));
+		}
+		catch (IOException ioe) {
+			throw new RuntimeException(ioe);
+		}
+
+		String dlJCRStoreDirName = null;
+
+		if (initialize) {
+			dlJCRStoreDirName =
+				SystemProperties.get(SystemProperties.TMP_DIR) +
+					"/temp-init-dl-jcr-" + System.currentTimeMillis();
+
+			_initializedDLJCRStoreDirName = dlJCRStoreDirName;
+
+			Runtime runtime = Runtime.getRuntime();
+
+			runtime.addShutdownHook(
+				new DeleteFileShutdownHook(dlJCRStoreDirName));
+		}
+		else {
+			dlJCRStoreDirName =
+				SystemProperties.get(SystemProperties.TMP_DIR) +
+					"/temp-dl-jcr-" + System.currentTimeMillis();
+
+			_dlJCRStoreDirName = dlJCRStoreDirName;
+		}
+
+		try {
+			FileUtil.copyDirectory(
+				new File(
+					PropsUtil.get(PropsKeys.JCR_JACKRABBIT_REPOSITORY_ROOT)),
+				new File(dlJCRStoreDirName));
+		}
+		catch (IOException ioe) {
+			throw new RuntimeException(ioe);
+		}
+	}
+
+	protected void backupLuceneStores(boolean initialize) {
+		for (long companyId : PortalInstances.getCompanyIds()) {
+			String fileName = null;
+
+			if (initialize) {
+				fileName =
+					SystemProperties.get(SystemProperties.TMP_DIR) +
+						"/temp-init-lucene-" + companyId + "-" +
+							System.currentTimeMillis();
+
+				Runtime runtime = Runtime.getRuntime();
+
+				runtime.addShutdownHook(new DeleteFileShutdownHook(fileName));
+			}
+			else {
+				fileName =
+					SystemProperties.get(SystemProperties.TMP_DIR) +
+						"/temp-lucene-" + companyId + "-" +
+							System.currentTimeMillis();
+			}
 
 			try {
 				LuceneHelperUtil.dumpIndex(
 					TestPropsValues.getCompanyId(),
-					new FileOutputStream(luceneDumpFileName));
+					new FileOutputStream(fileName));
 			}
 			catch (Exception e) {
 				throw new RuntimeException(e);
 			}
 			finally {
-				_luceneDumpFileNames.put(companyId, luceneDumpFileName);
+				if (initialize) {
+					_initializedLuceneFileNames.put(companyId, fileName);
+				}
+				else {
+					_luceneFileNames.put(companyId, fileName);
+				}
 			}
 		}
 	}
 
-	protected void reloadLuceneStores() {
-		for (Map.Entry<Long, String> entry : _luceneDumpFileNames.entrySet()) {
-			String luceneDumpFileName = entry.getValue();
+	protected void restoreDLStores(boolean initialize) {
+		FileUtil.deltree(PropsValues.DL_STORE_FILE_SYSTEM_ROOT_DIR);
+
+		String dlFileSystemStoreDirName = _initializedDLFileSystemStoreDirName;
+
+		if (!initialize) {
+			dlFileSystemStoreDirName = _dlFileSystemStoreDirName;
+
+			_dlFileSystemStoreDirName = null;
+		}
+
+		FileUtil.move(
+			new File(dlFileSystemStoreDirName),
+			new File(PropsValues.DL_STORE_FILE_SYSTEM_ROOT_DIR));
+
+		FileUtil.deltree(
+			PropsUtil.get(PropsKeys.JCR_JACKRABBIT_REPOSITORY_ROOT));
+
+		String dlJCRStoreDirName = _initializedDLJCRStoreDirName;
+
+		if (!initialize) {
+			dlJCRStoreDirName = _dlJCRStoreDirName;
+
+			_dlJCRStoreDirName = null;
+		}
+
+		FileUtil.move(
+			new File(dlJCRStoreDirName),
+			new File(PropsUtil.get(PropsKeys.JCR_JACKRABBIT_REPOSITORY_ROOT)));
+	}
+
+	protected void restoreLuceneStores(boolean initialize) {
+		Map<Long, String> luceneFileNames = _luceneFileNames;
+
+		if (initialize) {
+			luceneFileNames = _initializedLuceneFileNames;
+		}
+
+		for (Map.Entry<Long, String> entry : luceneFileNames.entrySet()) {
+			String fileName = entry.getValue();
 
 			try {
 				LuceneHelperUtil.loadIndex(
-					entry.getKey(), new FileInputStream(luceneDumpFileName));
+					entry.getKey(), new FileInputStream(fileName));
 			}
 			catch (Exception e) {
 				throw new RuntimeException(e);
 			}
 			finally {
-				FileUtil.delete(luceneDumpFileName);
+				if (!initialize) {
+					FileUtil.delete(fileName);
+				}
 			}
+		}
+
+		if (!initialize) {
+			luceneFileNames.clear();
 		}
 	}
 
-	private Level _level;
-	private Map<Long, String> _luceneDumpFileNames =
+	private static String _initializedDLFileSystemStoreDirName;
+	private static String _initializedDLJCRStoreDirName;
+	private static Map<Long, String> _initializedLuceneFileNames =
 		new HashMap<Long, String>();
+
+	private String _dlFileSystemStoreDirName;
+	private String _dlJCRStoreDirName;
+	private Level _level;
+	private Map<Long, String> _luceneFileNames = new HashMap<Long, String>();
+
+	private class DeleteFileShutdownHook extends Thread {
+
+		public DeleteFileShutdownHook(String fileName) {
+			_fileName = fileName;
+		}
+
+		@Override
+		public void run() {
+			File file = new File(_fileName);
+
+			Queue<File> queue = new LinkedList<File>();
+
+			queue.offer(file);
+
+			while ((file = queue.poll()) != null) {
+				if (file.isFile()) {
+					file.delete();
+				}
+				else if (file.isDirectory()) {
+					File[] files = file.listFiles();
+
+					if (files.length == 0) {
+						file.delete();
+					}
+					else {
+						queue.addAll(Arrays.asList(files));
+						queue.add(file);
+					}
+				}
+			}
+		}
+
+		private String _fileName;
+
+	}
 
 }

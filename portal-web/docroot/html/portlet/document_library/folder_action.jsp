@@ -114,13 +114,31 @@ String iconMenuId = null;
 %>
 
 <liferay-util:buffer var="iconMenu">
-	<liferay-ui:icon-menu direction='<%= dlActionsDisplayContext.isShowMinimalActionsButton() ? "down" : "left" %>' extended="<%= dlActionsDisplayContext.isShowMinimalActionsButton() ? false : true %>" icon="<%= dlActionsDisplayContext.isShowMinimalActionsButton() ? StringPool.BLANK : null %>" message='<%= dlActionsDisplayContext.isShowMinimalActionsButton() ? StringPool.BLANK : "actions" %>' showExpanded="<%= view %>" showWhenSingleIcon="<%= showWhenSingleIcon %>" triggerCssClass="btn">
+	<liferay-ui:icon-menu direction='<%= dlActionsDisplayContext.isShowMinimalActionsButton() ? "down" : "left" %>' extended="<%= dlActionsDisplayContext.isShowMinimalActionsButton() ? false : true %>" icon="<%= dlActionsDisplayContext.isShowMinimalActionsButton() ? StringPool.BLANK : null %>" message='<%= dlActionsDisplayContext.isShowMinimalActionsButton() ? StringPool.BLANK : "actions" %>' showExpanded="<%= view %>" showWhenSingleIcon="<%= showWhenSingleIcon %>" triggerCssClass="btn btn-default">
+
+		<%
+		boolean hasViewPermission = DLFolderPermission.contains(permissionChecker, scopeGroupId, folderId, ActionKeys.VIEW);
+		%>
+
 		<c:if test="<%= dlActionsDisplayContext.isShowActions() %>">
+			<c:if test="<%= hasViewPermission %>">
+				<portlet:resourceURL var="downloadURL">
+					<portlet:param name="struts_action" value="/document_library/edit_folder" />
+					<portlet:param name="folderId" value="<%= String.valueOf(folderId) %>" />
+					<portlet:param name="repositoryId" value="<%= String.valueOf(repositoryId) %>" />
+				</portlet:resourceURL>
+
+				<liferay-ui:icon
+					iconCssClass="icon-download"
+					message="download"
+					url="<%= downloadURL %>"
+				/>
+			</c:if>
+
 			<c:choose>
 				<c:when test="<%= folder != null %>">
 
 					<%
-					boolean hasDeletePermission = DLFolderPermission.contains(permissionChecker, scopeGroupId, folderId, ActionKeys.DELETE);
 					boolean hasUpdatePermission = DLFolderPermission.contains(permissionChecker, scopeGroupId, folderId, ActionKeys.UPDATE);
 					%>
 
@@ -133,7 +151,8 @@ String iconMenuId = null;
 						</portlet:renderURL>
 
 						<liferay-ui:icon
-							image="edit"
+							iconCssClass="icon-edit"
+							message="edit"
 							url="<%= editURL %>"
 						/>
 					</c:if>
@@ -147,7 +166,8 @@ String iconMenuId = null;
 						</portlet:renderURL>
 
 						<liferay-ui:icon
-							image="edit"
+							iconCssClass="icon-edit"
+							message="edit"
 							url="<%= editURL %>"
 						/>
 					</c:if>
@@ -161,7 +181,7 @@ String iconMenuId = null;
 						</portlet:renderURL>
 
 						<liferay-ui:icon
-							image="submit"
+							iconCssClass="icon-move"
 							message="move"
 							url="<%= moveURL %>"
 						/>
@@ -177,43 +197,12 @@ String iconMenuId = null;
 						/>
 
 						<liferay-ui:icon
-							image="permissions"
+							iconCssClass="icon-lock"
+							message="permissions"
 							method="get"
 							url="<%= permissionsURL %>"
 							useDialog="<%= true %>"
 						/>
-					</c:if>
-
-					<c:if test="<%= hasDeletePermission && !folder.isMountPoint() %>">
-						<portlet:renderURL var="redirectURL">
-							<portlet:param name="struts_action" value="/document_library/view" />
-							<portlet:param name="folderId" value="<%= String.valueOf(folder.getParentFolderId()) %>" />
-						</portlet:renderURL>
-
-						<portlet:actionURL var="deleteURL">
-							<portlet:param name="struts_action" value="/document_library/edit_folder" />
-							<portlet:param name="<%= Constants.CMD %>" value="<%= ((folder.getModel() instanceof DLFolder) && TrashUtil.isTrashEnabled(scopeGroupId)) ? Constants.MOVE_TO_TRASH : Constants.DELETE %>" />
-							<portlet:param name="redirect" value="<%= (view || folderSelected) ? redirectURL : redirect %>" />
-							<portlet:param name="folderId" value="<%= String.valueOf(folderId) %>" />
-						</portlet:actionURL>
-
-						<liferay-ui:icon-delete trash="<%= ((folder.getModel() instanceof DLFolder) && TrashUtil.isTrashEnabled(scopeGroupId)) %>" url="<%= deleteURL %>" />
-					</c:if>
-
-					<c:if test="<%= hasDeletePermission && folder.isMountPoint() %>">
-						<portlet:renderURL var="redirectURL">
-							<portlet:param name="struts_action" value="/document_library/view" />
-							<portlet:param name="folderId" value="<%= String.valueOf(folder.getParentFolderId()) %>" />
-						</portlet:renderURL>
-
-						<portlet:actionURL var="deleteURL">
-							<portlet:param name="struts_action" value="/document_library/edit_repository" />
-							<portlet:param name="<%= Constants.CMD %>" value="<%= Constants.DELETE %>" />
-							<portlet:param name="redirect" value="<%= (view || folderSelected) ? redirectURL : redirect %>" />
-							<portlet:param name="repositoryId" value="<%= String.valueOf(repositoryId) %>" />
-						</portlet:actionURL>
-
-						<liferay-ui:icon-delete url="<%= deleteURL %>" />
 					</c:if>
 
 					<c:if test="<%= DLFolderPermission.contains(permissionChecker, scopeGroupId, folderId, ActionKeys.ADD_FOLDER) && !folder.isMountPoint() %>">
@@ -225,7 +214,7 @@ String iconMenuId = null;
 						</portlet:renderURL>
 
 						<liferay-ui:icon
-							image="add_folder"
+							iconCssClass="icon-plus"
 							message="add-subfolder"
 							url="<%= addFolderURL %>"
 						/>
@@ -247,7 +236,8 @@ String iconMenuId = null;
 						</portlet:renderURL>
 
 						<liferay-ui:icon
-							image="edit"
+							iconCssClass="icon-edit"
+							message="edit"
 							url="<%= editURL %>"
 						/>
 					</c:if>
@@ -262,7 +252,8 @@ String iconMenuId = null;
 						/>
 
 						<liferay-ui:icon
-							image="permissions"
+							iconCssClass="icon-lock"
+							message="permissions"
 							method="get"
 							url="<%= permissionsURL %>"
 							useDialog="<%= true %>"
@@ -278,7 +269,7 @@ String iconMenuId = null;
 						</portlet:renderURL>
 
 						<liferay-ui:icon
-							image="add_folder"
+							iconCssClass="icon-plus"
 							message='<%= (folder != null) ? "add-subfolder" : "add-folder" %>'
 							url="<%= addFolderURL %>"
 						/>
@@ -292,7 +283,7 @@ String iconMenuId = null;
 						</portlet:renderURL>
 
 						<liferay-ui:icon
-							image="add_drive"
+							iconCssClass="icon-plus"
 							message="add-repository"
 							url="<%= addRepositoryURL %>"
 						/>
@@ -300,10 +291,6 @@ String iconMenuId = null;
 				</c:otherwise>
 			</c:choose>
 		</c:if>
-
-		<%
-		boolean hasViewPermission = DLFolderPermission.contains(permissionChecker, scopeGroupId, folderId, ActionKeys.VIEW);
-		%>
 
 		<c:choose>
 			<c:when test="<%= portletName.equals(PortletKeys.DOCUMENT_LIBRARY_DISPLAY) || portletName.equals(PortletKeys.MEDIA_GALLERY_DISPLAY) %>">
@@ -319,7 +306,7 @@ String iconMenuId = null;
 
 						<liferay-ui:icon
 							cssClass="hide upload-multiple-documents"
-							image="../document_library/add_multiple_documents"
+							iconCssClass="icon-copy"
 							message='<%= portletName.equals(PortletKeys.MEDIA_GALLERY_DISPLAY) ? "multiple-media" : "multiple-documents" %>'
 							url="<%= editFileEntryURL %>"
 						/>
@@ -338,11 +325,11 @@ String iconMenuId = null;
 					</liferay-portlet:renderURL>
 
 					<%
-					String taglibEditURL = "javascript:Liferay.Util.openWindow({id: '" + renderResponse.getNamespace() + "selectFileEntryType', title: '" + HtmlUtil.escapeJS(LanguageUtil.get(pageContext, portletName.equals(PortletKeys.MEDIA_GALLERY_DISPLAY) ? "select-media-type" : "select-document-type")) + "', uri:'" + HtmlUtil.escapeJS(editFileEntryURL.toString()) + "'});";
+					String taglibEditURL = "javascript:Liferay.Util.openWindow({id: '" + renderResponse.getNamespace() + "selectFileEntryType', title: '" + HtmlUtil.escapeJS(LanguageUtil.get(request, portletName.equals(PortletKeys.MEDIA_GALLERY_DISPLAY) ? "select-media-type" : "select-document-type")) + "', uri:'" + HtmlUtil.escapeJS(editFileEntryURL.toString()) + "'});";
 					%>
 
 					<liferay-ui:icon
-						image="../document_library/add_document"
+						iconCssClass="icon-plus"
 						message='<%= portletName.equals(PortletKeys.MEDIA_GALLERY_DISPLAY) ? "add-media" : "add-document" %>'
 						url="<%= (((folder == null) || folder.isSupportsMetadata()) && (fileEntryTypesCount > 0)) ? taglibEditURL : editFileEntryURL %>"
 					/>
@@ -351,7 +338,7 @@ String iconMenuId = null;
 				<c:if test="<%= hasViewPermission && portletName.equals(PortletKeys.MEDIA_GALLERY_DISPLAY) && (DLAppServiceUtil.getFileEntriesAndFileShortcutsCount(repositoryId, folderId, status) > 0) %>">
 					<liferay-ui:icon
 						cssClass='<%= randomNamespace + "-slide-show" %>'
-						image="../image_gallery_display/slide_show"
+						iconCssClass="icon-search"
 						message="view-slide-show"
 						url="javascript:;"
 					/>
@@ -366,7 +353,7 @@ String iconMenuId = null;
 					</portlet:renderURL>
 
 					<liferay-ui:icon
-						image="add_instance"
+						iconCssClass="icon-plus"
 						message="add-shortcut"
 						url="<%= editFileShortcutURL %>"
 					/>
@@ -382,10 +369,49 @@ String iconMenuId = null;
 
 			<liferay-ui:icon
 				cssClass='<%= randomNamespace + "-webdav-action" %>'
-				image="desktop"
+				iconCssClass="icon-desktop"
 				message="access-from-desktop"
 				url="javascript:;"
 			/>
+		</c:if>
+
+		<c:if test="<%= dlActionsDisplayContext.isShowActions() && (folder != null) %>">
+
+			<%
+			boolean hasDeletePermission = DLFolderPermission.contains(permissionChecker, scopeGroupId, folderId, ActionKeys.DELETE);
+			%>
+
+			<c:if test="<%= hasDeletePermission && !folder.isMountPoint() %>">
+				<portlet:renderURL var="redirectURL">
+					<portlet:param name="struts_action" value="/document_library/view" />
+					<portlet:param name="folderId" value="<%= String.valueOf(folder.getParentFolderId()) %>" />
+				</portlet:renderURL>
+
+				<portlet:actionURL var="deleteURL">
+					<portlet:param name="struts_action" value="/document_library/edit_folder" />
+					<portlet:param name="<%= Constants.CMD %>" value="<%= ((folder.getModel() instanceof DLFolder) && TrashUtil.isTrashEnabled(scopeGroupId)) ? Constants.MOVE_TO_TRASH : Constants.DELETE %>" />
+					<portlet:param name="redirect" value="<%= (view || folderSelected) ? redirectURL : redirect %>" />
+					<portlet:param name="folderId" value="<%= String.valueOf(folderId) %>" />
+				</portlet:actionURL>
+
+				<liferay-ui:icon-delete trash="<%= ((folder.getModel() instanceof DLFolder) && TrashUtil.isTrashEnabled(scopeGroupId)) %>" url="<%= deleteURL %>" />
+			</c:if>
+
+			<c:if test="<%= hasDeletePermission && folder.isMountPoint() %>">
+				<portlet:renderURL var="redirectURL">
+					<portlet:param name="struts_action" value="/document_library/view" />
+					<portlet:param name="folderId" value="<%= String.valueOf(folder.getParentFolderId()) %>" />
+				</portlet:renderURL>
+
+				<portlet:actionURL var="deleteURL">
+					<portlet:param name="struts_action" value="/document_library/edit_repository" />
+					<portlet:param name="<%= Constants.CMD %>" value="<%= Constants.DELETE %>" />
+					<portlet:param name="redirect" value="<%= (view || folderSelected) ? redirectURL : redirect %>" />
+					<portlet:param name="repositoryId" value="<%= String.valueOf(repositoryId) %>" />
+				</portlet:actionURL>
+
+				<liferay-ui:icon-delete url="<%= deleteURL %>" />
+			</c:if>
 		</c:if>
 	</liferay-ui:icon-menu>
 </liferay-util:buffer>
@@ -412,10 +438,10 @@ String iconMenuId = null;
 		String webDavHelpMessage = null;
 
 		if (BrowserSnifferUtil.isWindows(request)) {
-			webDavHelpMessage = LanguageUtil.format(pageContext, "webdav-windows-help", new Object[] {"http://www.microsoft.com/downloads/details.aspx?FamilyId=17C36612-632E-4C04-9382-987622ED1D64", "http://www.liferay.com/web/guest/community/wiki/-/wiki/Main/WebDAV"}, false);
+			webDavHelpMessage = LanguageUtil.format(request, "webdav-windows-help", new Object[] {"http://www.microsoft.com/downloads/details.aspx?FamilyId=17C36612-632E-4C04-9382-987622ED1D64", "http://www.liferay.com/web/guest/community/wiki/-/wiki/Main/WebDAV"}, false);
 		}
 		else {
-			webDavHelpMessage = LanguageUtil.format(pageContext, "webdav-help", "http://www.liferay.com/web/guest/community/wiki/-/wiki/Main/WebDAV", false);
+			webDavHelpMessage = LanguageUtil.format(request, "webdav-help", "http://www.liferay.com/web/guest/community/wiki/-/wiki/Main/WebDAV", false);
 		}
 		%>
 
@@ -466,7 +492,7 @@ String iconMenuId = null;
 							bodyContent: A.one('#<%= randomNamespace %>webDav').html(),
 							destroyOnHide: true
 						},
-						title: '<%= UnicodeLanguageUtil.get(pageContext, "access-from-desktop") %>'
+						title: '<%= UnicodeLanguageUtil.get(request, "access-from-desktop") %>'
 					}
 				);
 

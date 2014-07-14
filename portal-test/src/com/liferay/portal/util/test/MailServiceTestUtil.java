@@ -15,11 +15,14 @@
 package com.liferay.portal.util.test;
 
 import com.dumbster.smtp.MailMessage;
-import com.dumbster.smtp.ServerOptions;
 import com.dumbster.smtp.SmtpServer;
 import com.dumbster.smtp.SmtpServerFactory;
+import com.dumbster.smtp.mailstores.RollingMailStore;
 
-import com.liferay.portal.util.PropsValues;
+import com.liferay.portal.kernel.test.ReflectionTestUtil;
+import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.PropsKeys;
+import com.liferay.portal.kernel.util.PropsUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,6 +32,10 @@ import java.util.List;
  * @author José Manuel Navarro
  */
 public class MailServiceTestUtil {
+
+	public static void clearMessages() {
+		_smtpServer.clearMessages();
+	}
 
 	public static int getInboxSize() {
 		return _smtpServer.getEmailCount();
@@ -67,10 +74,43 @@ public class MailServiceTestUtil {
 			throw new IllegalStateException("Server is already running");
 		}
 
-		ServerOptions opts = new ServerOptions();
-		opts.port = PropsValues.MAIL_SESSION_MAIL_SMTP_PORT;
+		_smtpServer = new SmtpServer();
 
-		_smtpServer = SmtpServerFactory.startServer(opts);
+		_smtpServer.setMailStore(
+			new RollingMailStore() {
+
+				@Override
+				public void addMessage(MailMessage message) {
+					try {
+						List<MailMessage> receivedMail =
+							(List<MailMessage>)ReflectionTestUtil.getFieldValue(
+								this, "receivedMail");
+
+						receivedMail.add(message);
+
+						if (getEmailCount() > 100) {
+							receivedMail.remove(0);
+						}
+					}
+					catch (Exception e) {
+						throw new RuntimeException(e);
+					}
+				}
+
+			});
+		_smtpServer.setPort(
+			GetterUtil.getInteger(
+				PropsUtil.get(PropsKeys.MAIL_SESSION_MAIL_SMTP_PORT)));
+		_smtpServer.setThreaded(false);
+
+		try {
+			ReflectionTestUtil.invoke(
+				SmtpServerFactory.class, "startServerThread",
+				new Class<?>[] {SmtpServer.class}, _smtpServer);
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	public static void stop() {

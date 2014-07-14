@@ -33,7 +33,7 @@ import com.liferay.portal.model.ModelListener;
 import com.liferay.portal.service.persistence.BasePersistence;
 import com.liferay.portal.service.persistence.PersistenceExecutionTestListener;
 import com.liferay.portal.test.LiferayPersistenceIntegrationJUnitTestRunner;
-import com.liferay.portal.test.persistence.TransactionalPersistenceAdvice;
+import com.liferay.portal.test.persistence.test.TransactionalPersistenceAdvice;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.portal.util.test.RandomTestUtil;
 
@@ -51,6 +51,7 @@ import org.junit.runner.RunWith;
 
 import java.io.Serializable;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -319,7 +320,7 @@ public class JournalContentSearchPersistenceTest {
 		}
 	}
 
-	protected OrderByComparator getOrderByComparator() {
+	protected OrderByComparator<JournalContentSearch> getOrderByComparator() {
 		return OrderByComparatorFactoryUtil.create("JournalContentSearch",
 			"contentSearchId", true, "groupId", true, "companyId", true,
 			"privateLayout", true, "layoutId", true, "portletId", true,
@@ -343,6 +344,88 @@ public class JournalContentSearchPersistenceTest {
 		JournalContentSearch missingJournalContentSearch = _persistence.fetchByPrimaryKey(pk);
 
 		Assert.assertNull(missingJournalContentSearch);
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereAllPrimaryKeysExist()
+		throws Exception {
+		JournalContentSearch newJournalContentSearch1 = addJournalContentSearch();
+		JournalContentSearch newJournalContentSearch2 = addJournalContentSearch();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(newJournalContentSearch1.getPrimaryKey());
+		primaryKeys.add(newJournalContentSearch2.getPrimaryKey());
+
+		Map<Serializable, JournalContentSearch> journalContentSearchs = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertEquals(2, journalContentSearchs.size());
+		Assert.assertEquals(newJournalContentSearch1,
+			journalContentSearchs.get(newJournalContentSearch1.getPrimaryKey()));
+		Assert.assertEquals(newJournalContentSearch2,
+			journalContentSearchs.get(newJournalContentSearch2.getPrimaryKey()));
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereNoPrimaryKeysExist()
+		throws Exception {
+		long pk1 = RandomTestUtil.nextLong();
+
+		long pk2 = RandomTestUtil.nextLong();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(pk1);
+		primaryKeys.add(pk2);
+
+		Map<Serializable, JournalContentSearch> journalContentSearchs = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertTrue(journalContentSearchs.isEmpty());
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereSomePrimaryKeysExist()
+		throws Exception {
+		JournalContentSearch newJournalContentSearch = addJournalContentSearch();
+
+		long pk = RandomTestUtil.nextLong();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(newJournalContentSearch.getPrimaryKey());
+		primaryKeys.add(pk);
+
+		Map<Serializable, JournalContentSearch> journalContentSearchs = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertEquals(1, journalContentSearchs.size());
+		Assert.assertEquals(newJournalContentSearch,
+			journalContentSearchs.get(newJournalContentSearch.getPrimaryKey()));
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithNoPrimaryKeys()
+		throws Exception {
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		Map<Serializable, JournalContentSearch> journalContentSearchs = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertTrue(journalContentSearchs.isEmpty());
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithOnePrimaryKey()
+		throws Exception {
+		JournalContentSearch newJournalContentSearch = addJournalContentSearch();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(newJournalContentSearch.getPrimaryKey());
+
+		Map<Serializable, JournalContentSearch> journalContentSearchs = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertEquals(1, journalContentSearchs.size());
+		Assert.assertEquals(newJournalContentSearch,
+			journalContentSearchs.get(newJournalContentSearch.getPrimaryKey()));
 	}
 
 	@Test
