@@ -34,7 +34,7 @@ import com.liferay.portal.model.ModelListener;
 import com.liferay.portal.service.persistence.BasePersistence;
 import com.liferay.portal.service.persistence.PersistenceExecutionTestListener;
 import com.liferay.portal.test.LiferayPersistenceIntegrationJUnitTestRunner;
-import com.liferay.portal.test.persistence.TransactionalPersistenceAdvice;
+import com.liferay.portal.test.persistence.test.TransactionalPersistenceAdvice;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.portal.util.test.RandomTestUtil;
 
@@ -52,6 +52,7 @@ import org.junit.runner.RunWith;
 
 import java.io.Serializable;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -156,7 +157,7 @@ public class DDMStructurePersistenceTest {
 
 		newDDMStructure.setDescription(RandomTestUtil.randomString());
 
-		newDDMStructure.setXsd(RandomTestUtil.randomString());
+		newDDMStructure.setDefinition(RandomTestUtil.randomString());
 
 		newDDMStructure.setStorageType(RandomTestUtil.randomString());
 
@@ -194,8 +195,8 @@ public class DDMStructurePersistenceTest {
 			newDDMStructure.getName());
 		Assert.assertEquals(existingDDMStructure.getDescription(),
 			newDDMStructure.getDescription());
-		Assert.assertEquals(existingDDMStructure.getXsd(),
-			newDDMStructure.getXsd());
+		Assert.assertEquals(existingDDMStructure.getDefinition(),
+			newDDMStructure.getDefinition());
 		Assert.assertEquals(existingDDMStructure.getStorageType(),
 			newDDMStructure.getStorageType());
 		Assert.assertEquals(existingDDMStructure.getType(),
@@ -430,13 +431,13 @@ public class DDMStructurePersistenceTest {
 		}
 	}
 
-	protected OrderByComparator getOrderByComparator() {
+	protected OrderByComparator<DDMStructure> getOrderByComparator() {
 		return OrderByComparatorFactoryUtil.create("DDMStructure", "uuid",
 			true, "structureId", true, "groupId", true, "companyId", true,
 			"userId", true, "userName", true, "createDate", true,
 			"modifiedDate", true, "parentStructureId", true, "classNameId",
 			true, "structureKey", true, "name", true, "description", true,
-			"xsd", true, "storageType", true, "type", true);
+			"definition", true, "storageType", true, "type", true);
 	}
 
 	@Test
@@ -455,6 +456,88 @@ public class DDMStructurePersistenceTest {
 		DDMStructure missingDDMStructure = _persistence.fetchByPrimaryKey(pk);
 
 		Assert.assertNull(missingDDMStructure);
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereAllPrimaryKeysExist()
+		throws Exception {
+		DDMStructure newDDMStructure1 = addDDMStructure();
+		DDMStructure newDDMStructure2 = addDDMStructure();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(newDDMStructure1.getPrimaryKey());
+		primaryKeys.add(newDDMStructure2.getPrimaryKey());
+
+		Map<Serializable, DDMStructure> ddmStructures = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertEquals(2, ddmStructures.size());
+		Assert.assertEquals(newDDMStructure1,
+			ddmStructures.get(newDDMStructure1.getPrimaryKey()));
+		Assert.assertEquals(newDDMStructure2,
+			ddmStructures.get(newDDMStructure2.getPrimaryKey()));
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereNoPrimaryKeysExist()
+		throws Exception {
+		long pk1 = RandomTestUtil.nextLong();
+
+		long pk2 = RandomTestUtil.nextLong();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(pk1);
+		primaryKeys.add(pk2);
+
+		Map<Serializable, DDMStructure> ddmStructures = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertTrue(ddmStructures.isEmpty());
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereSomePrimaryKeysExist()
+		throws Exception {
+		DDMStructure newDDMStructure = addDDMStructure();
+
+		long pk = RandomTestUtil.nextLong();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(newDDMStructure.getPrimaryKey());
+		primaryKeys.add(pk);
+
+		Map<Serializable, DDMStructure> ddmStructures = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertEquals(1, ddmStructures.size());
+		Assert.assertEquals(newDDMStructure,
+			ddmStructures.get(newDDMStructure.getPrimaryKey()));
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithNoPrimaryKeys()
+		throws Exception {
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		Map<Serializable, DDMStructure> ddmStructures = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertTrue(ddmStructures.isEmpty());
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithOnePrimaryKey()
+		throws Exception {
+		DDMStructure newDDMStructure = addDDMStructure();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(newDDMStructure.getPrimaryKey());
+
+		Map<Serializable, DDMStructure> ddmStructures = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertEquals(1, ddmStructures.size());
+		Assert.assertEquals(newDDMStructure,
+			ddmStructures.get(newDDMStructure.getPrimaryKey()));
 	}
 
 	@Test
@@ -607,7 +690,7 @@ public class DDMStructurePersistenceTest {
 
 		ddmStructure.setDescription(RandomTestUtil.randomString());
 
-		ddmStructure.setXsd(RandomTestUtil.randomString());
+		ddmStructure.setDefinition(RandomTestUtil.randomString());
 
 		ddmStructure.setStorageType(RandomTestUtil.randomString());
 

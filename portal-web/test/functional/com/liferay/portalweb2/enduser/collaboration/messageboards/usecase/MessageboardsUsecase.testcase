@@ -51,11 +51,16 @@
 			<var name="pageName" value="Message Boards Page" />
 		</execute>
 
-		<execute macro="MessageboardsThread#viewPG">
+		<execute macro="MessageboardsThread#gotoPG">
 			<var name="postCount" value="1" />
 			<var name="threadBody" value="Message Boards Subject" />
 			<var name="threadSubject" value="Message Boards Subject" />
 			<var name="userName" value="Test Test" />
+		</execute>
+
+		<execute macro="MessageboardsThread#viewPG">
+			<var name="threadBody" value="Message Boards Subject" />
+			<var name="threadSubject" value="Message Boards Subject" />
 		</execute>
 	</command>
 
@@ -143,12 +148,14 @@
 		</execute>
 
 		<execute macro="MessageboardsThread#splitThreadPG">
+			<var name="postCount" value="2" />
 			<var name="threadBody" value="${threadBody}" />
 			<var name="threadReplyBody" value="${threadReplyBody}" />
 			<var name="threadReplySubject" value="${threadReplySubject}" />
 			<var name="threadSplitReplyBody" value="${threadSplitReplyBody}" />
 			<var name="threadSplitSubject" value="${threadSplitSubject}" />
 			<var name="threadSubject" value="${threadSubject}" />
+			<var name="userName" value="Test Test" />
 		</execute>
 
 		<execute macro="Page#gotoPG">
@@ -259,8 +266,14 @@
 			<var name="pageName" value="${pageName}" />
 		</execute>
 
-		<execute macro="MessageboardsThread#viewPG">
+		<execute macro="MessageboardsThread#gotoPG">
 			<var name="postCount" value="1" />
+			<var name="threadBody" value="MB Root Thread Message Body" />
+			<var name="threadSubject" value="MB Root Thread Message Subject" />
+			<var name="userName" value="Test Test" />
+		</execute>
+
+		<execute macro="MessageboardsThread#viewPG">
 			<var name="threadBody" value="MB Root Thread Message Body" />
 			<var name="threadSubject" value="MB Root Thread Message Subject" />
 		</execute>
@@ -325,8 +338,14 @@
 			<var name="categoryName" value="MB Category1 Name" />
 		</execute>
 
-		<execute macro="MessageboardsThread#viewPG">
+		<execute macro="MessageboardsThread#gotoPG">
 			<var name="postCount" value="1" />
+			<var name="threadBody" value="MB Thread1 Message Body" />
+			<var name="threadSubject" value="MB Thread1 Message Subject" />
+			<var name="userName" value="Test Test" />
+		</execute>
+
+		<execute macro="MessageboardsThread#viewPG">
 			<var name="threadBody" value="MB Thread1 Message Body" />
 			<var name="threadSubject" value="MB Thread1 Message Subject" />
 		</execute>
@@ -341,8 +360,14 @@
 			<var name="categoryName" value="MB Category2 Name" />
 		</execute>
 
-		<execute macro="MessageboardsThread#viewPG">
+		<execute macro="MessageboardsThread#gotoPG">
 			<var name="postCount" value="1" />
+			<var name="threadBody" value="MB Thread2 Message Body" />
+			<var name="threadSubject" value="MB Thread2 Message Subject" />
+			<var name="userName" value="Test Test" />
+		</execute>
+
+		<execute macro="MessageboardsThread#viewPG">
 			<var name="threadBody" value="MB Thread2 Message Body" />
 			<var name="threadSubject" value="MB Thread2 Message Subject" />
 		</execute>
@@ -380,8 +405,14 @@
 			<var name="pageName" value="Message Boards Page 2" />
 		</execute>
 
-		<execute macro="MessageboardsThread#viewPG">
+		<execute macro="MessageboardsThread#gotoPG">
 			<var name="postCount" value="1" />
+			<var name="threadBody" value="MB Root Thread2 Message Body" />
+			<var name="threadSubject" value="MB Root Thread2 Message Subject" />
+			<var name="userName" value="Test Test" />
+		</execute>
+
+		<execute macro="MessageboardsThread#viewPG">
 			<var name="threadBody" value="MB Root Thread2 Message Body" />
 			<var name="threadSubject" value="MB Root Thread2 Message Subject" />
 		</execute>
@@ -446,8 +477,14 @@
 			<var name="categoryName" value="MB Category3 Name" />
 		</execute>
 
-		<execute macro="MessageboardsThread#viewPG">
+		<execute macro="MessageboardsThread#gotoPG">
 			<var name="postCount" value="1" />
+			<var name="threadBody" value="MB Thread3 Message Body" />
+			<var name="threadSubject" value="MB Thread3 Message Subject" />
+			<var name="userName" value="Test Test" />
+		</execute>
+
+		<execute macro="MessageboardsThread#viewPG">
 			<var name="threadBody" value="MB Thread3 Message Body" />
 			<var name="threadSubject" value="MB Thread3 Message Subject" />
 		</execute>
@@ -462,8 +499,14 @@
 			<var name="categoryName" value="MB Category4 Name" />
 		</execute>
 
-		<execute macro="MessageboardsThread#viewPG">
+		<execute macro="MessageboardsThread#gotoPG">
 			<var name="postCount" value="1" />
+			<var name="threadBody" value="MB Thread4 Message Body" />
+			<var name="threadSubject" value="MB Thread4 Message Subject" />
+			<var name="userName" value="Test Test" />
+		</execute>
+
+		<execute macro="MessageboardsThread#viewPG">
 			<var name="threadBody" value="MB Thread4 Message Body" />
 			<var name="threadSubject" value="MB Thread4 Message Subject" />
 		</execute>
@@ -472,8 +515,14 @@
 			<var name="pageName" value="Message Boards Page 3" />
 		</execute>
 
-		<execute macro="MessageboardsThread#viewPG">
+		<execute macro="MessageboardsThread#gotoPG">
 			<var name="postCount" value="1" />
+			<var name="threadBody" value="MB Root Thread2 Message Body" />
+			<var name="threadSubject" value="MB Root Thread2 Message Subject" />
+			<var name="userName" value="Test Test" />
+		</execute>
+
+		<execute macro="MessageboardsThread#viewPG">
 			<var name="threadBody" value="MB Root Thread2 Message Body" />
 			<var name="threadSubject" value="MB Root Thread2 Message Subject" />
 		</execute>
@@ -510,8 +559,14 @@
 			<var name="categoryName" value="MB Category3 Name" />
 		</execute>
 
-		<execute macro="MessageboardsThread#viewPG">
+		<execute macro="MessageboardsThread#gotoPG">
 			<var name="postCount" value="1" />
+			<var name="threadBody" value="MB Thread3 Message Body" />
+			<var name="threadSubject" value="MB Thread3 Message Subject" />
+			<var name="userName" value="Test Test" />
+		</execute>
+
+		<execute macro="MessageboardsThread#viewPG">
 			<var name="threadBody" value="MB Thread3 Message Body" />
 			<var name="threadSubject" value="MB Thread3 Message Subject" />
 		</execute>
@@ -526,8 +581,14 @@
 			<var name="categoryName" value="MB Category4 Name" />
 		</execute>
 
-		<execute macro="MessageboardsThread#viewPG">
+		<execute macro="MessageboardsThread#gotoPG">
 			<var name="postCount" value="1" />
+			<var name="threadBody" value="MB Thread4 Message Body" />
+			<var name="threadSubject" value="MB Thread4 Message Subject" />
+			<var name="userName" value="Test Test" />
+		</execute>
+
+		<execute macro="MessageboardsThread#viewPG">
 			<var name="threadBody" value="MB Thread4 Message Body" />
 			<var name="threadSubject" value="MB Thread4 Message Subject" />
 		</execute>
@@ -891,6 +952,13 @@
 			<var name="pageName" value="${pageName}" />
 		</execute>
 
+		<execute macro="MessageboardsThread#gotoPG">
+			<var name="postCount" value="1" />
+			<var name="threadBody" value="MB Thread Message Body" />
+			<var name="threadSubject" value="MB Thread Message Subject" />
+			<var name="userName" value="Test Test" />
+		</execute>
+
 		<execute macro="MessageboardsThread#banUser">
 			<var name="threadSubject" value="MB Thread Message Subject" />
 			<var name="userName" value="userfn1 userln1" />
@@ -898,6 +966,13 @@
 
 		<execute macro="Page#gotoPG">
 			<var name="pageName" value="${pageName}" />
+		</execute>
+
+		<execute macro="MessageboardsThread#gotoPG">
+			<var name="postCount" value="1" />
+			<var name="threadBody" value="MB Thread Message Body" />
+			<var name="threadSubject" value="MB Thread Message Subject" />
+			<var name="userName" value="Test Test" />
 		</execute>
 
 		<execute macro="MessageboardsThread#banUser">
@@ -962,6 +1037,13 @@
 
 		<execute macro="Page#gotoPG">
 			<var name="pageName" value="${pageName}" />
+		</execute>
+
+		<execute macro="MessageboardsThread#gotoPG">
+			<var name="postCount" value="1" />
+			<var name="threadBody" value="${threadBody}" />
+			<var name="threadSubject" value="${threadSubject}" />
+			<var name="userName" value="Test Test" />
 		</execute>
 
 		<execute macro="MessageboardsThread#editPG">
@@ -1096,7 +1178,7 @@
 		<var name="key_threadSubject" value="${threadSubject}" />
 
 		<execute action="PGMessageboards#assertTextEquals" locator-key1="SUBSCRIBE_LINK" value1="Subscribe" />
-		<execute action="PGMessageboards#assertClick" locator-key1="CATEGORY_TABLE_ACTIONS" value1="Actions" />
+		<execute action="PGMessageboards#click" locator-key1="CATEGORY_TABLE_ACTIONS" />
 		<execute action="PGMessageboards#assertTextEquals" locator-key1="CATEGORY_MENULIST_SUBSCRIBE" value1="Subscribe" />
 		<execute action="PGMessageboards#assertClick" locator-key1="CATEGORY_TABLE_CATEGORY" value1="${categoryName}" />
 		<execute action="PGMessageboardsCategory#assertTextEquals" locator-key1="SUBSCRIBE_LINK" value1="Subscribe" />
@@ -1105,7 +1187,7 @@
 			<var name="pageName" value="${pageName}" />
 		</execute>
 
-		<execute action="PGMessageboards#assertClick" locator-key1="THREAD_TABLE_ACTIONS" value1="Actions" />
+		<execute action="PGMessageboards#click" locator-key1="THREAD_TABLE_ACTIONS" />
 		<execute action="PGMessageboards#assertTextEquals" locator-key1="THREAD_MENULIST_UNSUBSCRIBE" value1="Unsubscribe" />
 		<execute action="PGMessageboards#assertClick" locator-key1="THREAD_TABLE_THREAD" value1="${threadSubject}" />
 		<execute action="PGMessageboardsThread#assertTextEquals" locator-key1="THREAD_ACTIONS_UNSUBSCRIBE" value1="Unsubscribe" />
@@ -1131,7 +1213,7 @@
 		</execute>
 
 		<execute action="PGMessageboards#assertElementNotPresent" locator-key1="SUBSCRIBE_LINK" />
-		<execute action="PGMessageboards#assertClick" locator-key1="CATEGORY_TABLE_ACTIONS" value1="Actions" />
+		<execute action="PGMessageboards#click" locator-key1="CATEGORY_TABLE_ACTIONS" />
 		<execute action="PGMessageboards#assertElementNotPresent" locator-key1="CATEGORY_MENULIST_SUBSCRIBE" />
 		<execute action="PGMessageboards#assertClick" locator-key1="CATEGORY_TABLE_CATEGORY" value1="${categoryName}" />
 		<execute action="PGMessageboardsCategory#assertElementNotPresent" locator-key1="SUBSCRIBE_LINK" value1="Subscribe" />
@@ -1140,7 +1222,7 @@
 			<var name="pageName" value="${pageName}" />
 		</execute>
 
-		<execute action="PGMessageboards#assertClick" locator-key1="THREAD_TABLE_ACTIONS" value1="Actions" />
+		<execute action="PGMessageboards#click" locator-key1="THREAD_TABLE_ACTIONS" />
 		<execute action="PGMessageboards#assertElementNotPresent" locator-key1="THREAD_MENULIST_UNSUBSCRIBE" />
 		<execute action="PGMessageboards#assertClick" locator-key1="THREAD_TABLE_THREAD" value1="${threadSubject}" />
 		<execute action="PGMessageboardsThread#assertElementNotPresent" locator-key1="THREAD_ACTIONS_UNSUBSCRIBE" value1="Unsubscribe" />
@@ -1187,11 +1269,13 @@
 		</execute>
 
 		<execute macro="MessageboardsThread#splitThreadPG">
+			<var name="postCount" value="2" />
 			<var name="threadReplyBody" value="MB Thread Split Reply Body" />
 			<var name="threadSplitReplyBody" value="Split Reply Thread Body" />
 			<var name="threadSplitReplySubject" value="Split Reply Thread Subject" />
 			<var name="threadSplitSubject" value="MB Thread Split Subject" />
 			<var name="threadSubject" value="MB Thread Message Subject" />
+			<var name="userName" value="Test Test" />
 		</execute>
 
 		<execute macro="Page#gotoPG">

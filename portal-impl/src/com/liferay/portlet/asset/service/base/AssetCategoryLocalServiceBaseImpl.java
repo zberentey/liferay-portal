@@ -89,12 +89,10 @@ public abstract class AssetCategoryLocalServiceBaseImpl
 	 *
 	 * @param assetCategory the asset category
 	 * @return the asset category that was added
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Indexable(type = IndexableType.REINDEX)
 	@Override
-	public AssetCategory addAssetCategory(AssetCategory assetCategory)
-		throws SystemException {
+	public AssetCategory addAssetCategory(AssetCategory assetCategory) {
 		assetCategory.setNew(true);
 
 		return assetCategoryPersistence.update(assetCategory);
@@ -117,12 +115,11 @@ public abstract class AssetCategoryLocalServiceBaseImpl
 	 * @param categoryId the primary key of the asset category
 	 * @return the asset category that was removed
 	 * @throws PortalException if a asset category with the primary key could not be found
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Indexable(type = IndexableType.DELETE)
 	@Override
 	public AssetCategory deleteAssetCategory(long categoryId)
-		throws PortalException, SystemException {
+		throws PortalException {
 		return assetCategoryPersistence.remove(categoryId);
 	}
 
@@ -131,12 +128,10 @@ public abstract class AssetCategoryLocalServiceBaseImpl
 	 *
 	 * @param assetCategory the asset category
 	 * @return the asset category that was removed
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Indexable(type = IndexableType.DELETE)
 	@Override
-	public AssetCategory deleteAssetCategory(AssetCategory assetCategory)
-		throws SystemException {
+	public AssetCategory deleteAssetCategory(AssetCategory assetCategory) {
 		return assetCategoryPersistence.remove(assetCategory);
 	}
 
@@ -153,12 +148,9 @@ public abstract class AssetCategoryLocalServiceBaseImpl
 	 *
 	 * @param dynamicQuery the dynamic query
 	 * @return the matching rows
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	@SuppressWarnings("rawtypes")
-	public List dynamicQuery(DynamicQuery dynamicQuery)
-		throws SystemException {
+	public <T> List<T> dynamicQuery(DynamicQuery dynamicQuery) {
 		return assetCategoryPersistence.findWithDynamicQuery(dynamicQuery);
 	}
 
@@ -173,12 +165,10 @@ public abstract class AssetCategoryLocalServiceBaseImpl
 	 * @param start the lower bound of the range of model instances
 	 * @param end the upper bound of the range of model instances (not inclusive)
 	 * @return the range of matching rows
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	@SuppressWarnings("rawtypes")
-	public List dynamicQuery(DynamicQuery dynamicQuery, int start, int end)
-		throws SystemException {
+	public <T> List<T> dynamicQuery(DynamicQuery dynamicQuery, int start,
+		int end) {
 		return assetCategoryPersistence.findWithDynamicQuery(dynamicQuery,
 			start, end);
 	}
@@ -195,12 +185,10 @@ public abstract class AssetCategoryLocalServiceBaseImpl
 	 * @param end the upper bound of the range of model instances (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	 * @return the ordered range of matching rows
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	@SuppressWarnings("rawtypes")
-	public List dynamicQuery(DynamicQuery dynamicQuery, int start, int end,
-		OrderByComparator orderByComparator) throws SystemException {
+	public <T> List<T> dynamicQuery(DynamicQuery dynamicQuery, int start,
+		int end, OrderByComparator<T> orderByComparator) {
 		return assetCategoryPersistence.findWithDynamicQuery(dynamicQuery,
 			start, end, orderByComparator);
 	}
@@ -210,11 +198,9 @@ public abstract class AssetCategoryLocalServiceBaseImpl
 	 *
 	 * @param dynamicQuery the dynamic query
 	 * @return the number of rows that match the dynamic query
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public long dynamicQueryCount(DynamicQuery dynamicQuery)
-		throws SystemException {
+	public long dynamicQueryCount(DynamicQuery dynamicQuery) {
 		return assetCategoryPersistence.countWithDynamicQuery(dynamicQuery);
 	}
 
@@ -224,34 +210,17 @@ public abstract class AssetCategoryLocalServiceBaseImpl
 	 * @param dynamicQuery the dynamic query
 	 * @param projection the projection to apply to the query
 	 * @return the number of rows that match the dynamic query
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public long dynamicQueryCount(DynamicQuery dynamicQuery,
-		Projection projection) throws SystemException {
+		Projection projection) {
 		return assetCategoryPersistence.countWithDynamicQuery(dynamicQuery,
 			projection);
 	}
 
 	@Override
-	public AssetCategory fetchAssetCategory(long categoryId)
-		throws SystemException {
+	public AssetCategory fetchAssetCategory(long categoryId) {
 		return assetCategoryPersistence.fetchByPrimaryKey(categoryId);
-	}
-
-	/**
-	 * Returns the asset category with the matching UUID and company.
-	 *
-	 * @param uuid the asset category's UUID
-	 * @param  companyId the primary key of the company
-	 * @return the matching asset category, or <code>null</code> if a matching asset category could not be found
-	 * @throws SystemException if a system exception occurred
-	 */
-	@Override
-	public AssetCategory fetchAssetCategoryByUuidAndCompanyId(String uuid,
-		long companyId) throws SystemException {
-		return assetCategoryPersistence.fetchByUuid_C_First(uuid, companyId,
-			null);
 	}
 
 	/**
@@ -260,11 +229,10 @@ public abstract class AssetCategoryLocalServiceBaseImpl
 	 * @param uuid the asset category's UUID
 	 * @param groupId the primary key of the group
 	 * @return the matching asset category, or <code>null</code> if a matching asset category could not be found
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public AssetCategory fetchAssetCategoryByUuidAndGroupId(String uuid,
-		long groupId) throws SystemException {
+		long groupId) {
 		return assetCategoryPersistence.fetchByUUID_G(uuid, groupId);
 	}
 
@@ -274,17 +242,15 @@ public abstract class AssetCategoryLocalServiceBaseImpl
 	 * @param categoryId the primary key of the asset category
 	 * @return the asset category
 	 * @throws PortalException if a asset category with the primary key could not be found
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public AssetCategory getAssetCategory(long categoryId)
-		throws PortalException, SystemException {
+		throws PortalException {
 		return assetCategoryPersistence.findByPrimaryKey(categoryId);
 	}
 
 	@Override
-	public ActionableDynamicQuery getActionableDynamicQuery()
-		throws SystemException {
+	public ActionableDynamicQuery getActionableDynamicQuery() {
 		ActionableDynamicQuery actionableDynamicQuery = new DefaultActionableDynamicQuery();
 
 		actionableDynamicQuery.setBaseLocalService(com.liferay.portlet.asset.service.AssetCategoryLocalServiceUtil.getService());
@@ -297,8 +263,7 @@ public abstract class AssetCategoryLocalServiceBaseImpl
 	}
 
 	protected void initActionableDynamicQuery(
-		ActionableDynamicQuery actionableDynamicQuery)
-		throws SystemException {
+		ActionableDynamicQuery actionableDynamicQuery) {
 		actionableDynamicQuery.setBaseLocalService(com.liferay.portlet.asset.service.AssetCategoryLocalServiceUtil.getService());
 		actionableDynamicQuery.setClass(AssetCategory.class);
 		actionableDynamicQuery.setClassLoader(getClassLoader());
@@ -308,11 +273,10 @@ public abstract class AssetCategoryLocalServiceBaseImpl
 
 	@Override
 	public ExportActionableDynamicQuery getExportActionableDynamicQuery(
-		final PortletDataContext portletDataContext) throws SystemException {
+		final PortletDataContext portletDataContext) {
 		final ExportActionableDynamicQuery exportActionableDynamicQuery = new ExportActionableDynamicQuery() {
 				@Override
-				public long performCount()
-					throws PortalException, SystemException {
+				public long performCount() throws PortalException {
 					ManifestSummary manifestSummary = portletDataContext.getManifestSummary();
 
 					StagedModelType stagedModelType = getStagedModelType();
@@ -348,9 +312,8 @@ public abstract class AssetCategoryLocalServiceBaseImpl
 
 		exportActionableDynamicQuery.setPerformActionMethod(new ActionableDynamicQuery.PerformActionMethod() {
 				@Override
-				@SuppressWarnings("unused")
 				public void performAction(Object object)
-					throws PortalException, SystemException {
+					throws PortalException {
 					AssetCategory stagedModel = (AssetCategory)object;
 
 					StagedModelDataHandlerUtil.exportStagedModel(portletDataContext,
@@ -363,25 +326,33 @@ public abstract class AssetCategoryLocalServiceBaseImpl
 		return exportActionableDynamicQuery;
 	}
 
+	/**
+	 * @throws PortalException
+	 */
+	@Override
+	public PersistedModel deletePersistedModel(PersistedModel persistedModel)
+		throws PortalException {
+		return assetCategoryLocalService.deleteAssetCategory((AssetCategory)persistedModel);
+	}
+
 	@Override
 	public PersistedModel getPersistedModel(Serializable primaryKeyObj)
-		throws PortalException, SystemException {
+		throws PortalException {
 		return assetCategoryPersistence.findByPrimaryKey(primaryKeyObj);
 	}
 
-	/**
-	 * Returns the asset category with the matching UUID and company.
-	 *
-	 * @param uuid the asset category's UUID
-	 * @param  companyId the primary key of the company
-	 * @return the matching asset category
-	 * @throws PortalException if a matching asset category could not be found
-	 * @throws SystemException if a system exception occurred
-	 */
 	@Override
-	public AssetCategory getAssetCategoryByUuidAndCompanyId(String uuid,
-		long companyId) throws PortalException, SystemException {
-		return assetCategoryPersistence.findByUuid_C_First(uuid, companyId, null);
+	public List<AssetCategory> getAssetCategoriesByUuidAndCompanyId(
+		String uuid, long companyId) {
+		return assetCategoryPersistence.findByUuid_C(uuid, companyId);
+	}
+
+	@Override
+	public List<AssetCategory> getAssetCategoriesByUuidAndCompanyId(
+		String uuid, long companyId, int start, int end,
+		OrderByComparator<AssetCategory> orderByComparator) {
+		return assetCategoryPersistence.findByUuid_C(uuid, companyId, start,
+			end, orderByComparator);
 	}
 
 	/**
@@ -391,11 +362,10 @@ public abstract class AssetCategoryLocalServiceBaseImpl
 	 * @param groupId the primary key of the group
 	 * @return the matching asset category
 	 * @throws PortalException if a matching asset category could not be found
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public AssetCategory getAssetCategoryByUuidAndGroupId(String uuid,
-		long groupId) throws PortalException, SystemException {
+		long groupId) throws PortalException {
 		return assetCategoryPersistence.findByUUID_G(uuid, groupId);
 	}
 
@@ -409,11 +379,9 @@ public abstract class AssetCategoryLocalServiceBaseImpl
 	 * @param start the lower bound of the range of asset categories
 	 * @param end the upper bound of the range of asset categories (not inclusive)
 	 * @return the range of asset categories
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public List<AssetCategory> getAssetCategories(int start, int end)
-		throws SystemException {
+	public List<AssetCategory> getAssetCategories(int start, int end) {
 		return assetCategoryPersistence.findAll(start, end);
 	}
 
@@ -421,10 +389,9 @@ public abstract class AssetCategoryLocalServiceBaseImpl
 	 * Returns the number of asset categories.
 	 *
 	 * @return the number of asset categories
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public int getAssetCategoriesCount() throws SystemException {
+	public int getAssetCategoriesCount() {
 		return assetCategoryPersistence.countAll();
 	}
 
@@ -433,158 +400,140 @@ public abstract class AssetCategoryLocalServiceBaseImpl
 	 *
 	 * @param assetCategory the asset category
 	 * @return the asset category that was updated
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Indexable(type = IndexableType.REINDEX)
 	@Override
-	public AssetCategory updateAssetCategory(AssetCategory assetCategory)
-		throws SystemException {
+	public AssetCategory updateAssetCategory(AssetCategory assetCategory) {
 		return assetCategoryPersistence.update(assetCategory);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public void addAssetEntryAssetCategory(long entryId, long categoryId)
-		throws SystemException {
+	public void addAssetEntryAssetCategory(long entryId, long categoryId) {
 		assetEntryPersistence.addAssetCategory(entryId, categoryId);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public void addAssetEntryAssetCategory(long entryId,
-		AssetCategory assetCategory) throws SystemException {
+		AssetCategory assetCategory) {
 		assetEntryPersistence.addAssetCategory(entryId, assetCategory);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public void addAssetEntryAssetCategories(long entryId, long[] categoryIds)
-		throws SystemException {
+	public void addAssetEntryAssetCategories(long entryId, long[] categoryIds) {
 		assetEntryPersistence.addAssetCategories(entryId, categoryIds);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public void addAssetEntryAssetCategories(long entryId,
-		List<AssetCategory> AssetCategories) throws SystemException {
+		List<AssetCategory> AssetCategories) {
 		assetEntryPersistence.addAssetCategories(entryId, AssetCategories);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public void clearAssetEntryAssetCategories(long entryId)
-		throws SystemException {
+	public void clearAssetEntryAssetCategories(long entryId) {
 		assetEntryPersistence.clearAssetCategories(entryId);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public void deleteAssetEntryAssetCategory(long entryId, long categoryId)
-		throws SystemException {
+	public void deleteAssetEntryAssetCategory(long entryId, long categoryId) {
 		assetEntryPersistence.removeAssetCategory(entryId, categoryId);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public void deleteAssetEntryAssetCategory(long entryId,
-		AssetCategory assetCategory) throws SystemException {
+		AssetCategory assetCategory) {
 		assetEntryPersistence.removeAssetCategory(entryId, assetCategory);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public void deleteAssetEntryAssetCategories(long entryId, long[] categoryIds)
-		throws SystemException {
+	public void deleteAssetEntryAssetCategories(long entryId, long[] categoryIds) {
 		assetEntryPersistence.removeAssetCategories(entryId, categoryIds);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public void deleteAssetEntryAssetCategories(long entryId,
-		List<AssetCategory> AssetCategories) throws SystemException {
+		List<AssetCategory> AssetCategories) {
 		assetEntryPersistence.removeAssetCategories(entryId, AssetCategories);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
+	 * Returns the entryIds of the asset entries associated with the asset category.
+	 *
+	 * @param categoryId the categoryId of the asset category
+	 * @return long[] the entryIds of asset entries associated with the asset category
 	 */
 	@Override
-	public List<AssetCategory> getAssetEntryAssetCategories(long entryId)
-		throws SystemException {
+	public long[] getAssetEntryPrimaryKeys(long categoryId) {
+		return assetCategoryPersistence.getAssetEntryPrimaryKeys(categoryId);
+	}
+
+	/**
+	 */
+	@Override
+	public List<AssetCategory> getAssetEntryAssetCategories(long entryId) {
 		return assetEntryPersistence.getAssetCategories(entryId);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public List<AssetCategory> getAssetEntryAssetCategories(long entryId,
-		int start, int end) throws SystemException {
+		int start, int end) {
 		return assetEntryPersistence.getAssetCategories(entryId, start, end);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public List<AssetCategory> getAssetEntryAssetCategories(long entryId,
-		int start, int end, OrderByComparator orderByComparator)
-		throws SystemException {
+		int start, int end, OrderByComparator<AssetCategory> orderByComparator) {
 		return assetEntryPersistence.getAssetCategories(entryId, start, end,
 			orderByComparator);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public int getAssetEntryAssetCategoriesCount(long entryId)
-		throws SystemException {
+	public int getAssetEntryAssetCategoriesCount(long entryId) {
 		return assetEntryPersistence.getAssetCategoriesSize(entryId);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public boolean hasAssetEntryAssetCategory(long entryId, long categoryId)
-		throws SystemException {
+	public boolean hasAssetEntryAssetCategory(long entryId, long categoryId) {
 		return assetEntryPersistence.containsAssetCategory(entryId, categoryId);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public boolean hasAssetEntryAssetCategories(long entryId)
-		throws SystemException {
+	public boolean hasAssetEntryAssetCategories(long entryId) {
 		return assetEntryPersistence.containsAssetCategories(entryId);
 	}
 
 	/**
-	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
-	public void setAssetEntryAssetCategories(long entryId, long[] categoryIds)
-		throws SystemException {
+	public void setAssetEntryAssetCategories(long entryId, long[] categoryIds) {
 		assetEntryPersistence.setAssetCategories(entryId, categoryIds);
 	}
 
@@ -1176,7 +1125,7 @@ public abstract class AssetCategoryLocalServiceBaseImpl
 	 *
 	 * @param sql the sql query
 	 */
-	protected void runSQL(String sql) throws SystemException {
+	protected void runSQL(String sql) {
 		try {
 			DataSource dataSource = assetCategoryPersistence.getDataSource();
 

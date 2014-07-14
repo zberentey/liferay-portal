@@ -72,7 +72,7 @@ request.setAttribute("edit_layout_prototype.jsp-redirect", redirect);
 				</liferay-portlet:actionURL>
 
 				<liferay-ui:icon
-					image="view"
+					iconCssClass="icon-search"
 					label="<%= true %>"
 					message="open-page-template"
 					method="get"
@@ -101,9 +101,9 @@ request.setAttribute("edit_layout_prototype.jsp-redirect", redirect);
 <%
 if (!layoutPrototype.isNew()) {
 	PortalUtil.addPortletBreadcrumbEntry(request, layoutPrototype.getName(locale), currentURL);
-	PortalUtil.addPortletBreadcrumbEntry(request, LanguageUtil.get(pageContext, "edit"), currentURL);
+	PortalUtil.addPortletBreadcrumbEntry(request, LanguageUtil.get(request, "edit"), currentURL);
 }
 else {
-	PortalUtil.addPortletBreadcrumbEntry(request, LanguageUtil.get(pageContext, "add-page"), currentURL);
+	PortalUtil.addPortletBreadcrumbEntry(request, LanguageUtil.get(request, "add-page"), currentURL);
 }
 %>

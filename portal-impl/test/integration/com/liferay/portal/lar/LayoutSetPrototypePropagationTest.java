@@ -17,9 +17,9 @@ package com.liferay.portal.lar;
 import com.liferay.portal.LayoutParentLayoutIdException;
 import com.liferay.portal.kernel.staging.MergeLayoutPrototypesThreadLocal;
 import com.liferay.portal.kernel.test.ExecutionTestListeners;
-import com.liferay.portal.kernel.transaction.Transactional;
 import com.liferay.portal.kernel.util.LocalizationUtil;
 import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.kernel.util.Time;
 import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.Layout;
@@ -39,9 +39,9 @@ import com.liferay.portal.service.RoleLocalServiceUtil;
 import com.liferay.portal.servlet.filters.cache.CacheUtil;
 import com.liferay.portal.test.LiferayIntegrationJUnitTestRunner;
 import com.liferay.portal.test.MainServletExecutionTestListener;
+import com.liferay.portal.test.ResetDatabaseExecutionTestListener;
 import com.liferay.portal.test.Sync;
 import com.liferay.portal.test.SynchronousDestinationExecutionTestListener;
-import com.liferay.portal.test.TransactionalCallbackAwareExecutionTestListener;
 import com.liferay.portal.util.PortletKeys;
 import com.liferay.portal.util.test.LayoutTestUtil;
 import com.liferay.portal.util.test.RandomTestUtil;
@@ -72,12 +72,11 @@ import org.junit.runner.RunWith;
 @ExecutionTestListeners(
 	listeners = {
 		MainServletExecutionTestListener.class,
-		SynchronousDestinationExecutionTestListener.class,
-		TransactionalCallbackAwareExecutionTestListener.class
+		ResetDatabaseExecutionTestListener.class,
+		SynchronousDestinationExecutionTestListener.class
 	})
 @RunWith(LiferayIntegrationJUnitTestRunner.class)
 @Sync
-@Transactional
 public class LayoutSetPrototypePropagationTest
 	extends BasePrototypePropagationTestCase {
 
@@ -134,9 +133,9 @@ public class LayoutSetPrototypePropagationTest
 			String.valueOf(prototypeLayout.getPrimaryKey()), role.getRoleId(),
 			new String[] {ActionKeys.CUSTOMIZE});
 
-		prototypeLayout.setModifiedDate(new Date());
-
-		LayoutLocalServiceUtil.updateLayout(prototypeLayout);
+		prototypeLayout = updateModifiedDate(
+			prototypeLayout,
+			new Date(System.currentTimeMillis() + Time.MINUTE));
 
 		CacheUtil.clearCache(prototypeLayout.getCompanyId());
 
@@ -199,8 +198,7 @@ public class LayoutSetPrototypePropagationTest
 	}
 
 	@Test
-	public void
-			testPortletPreferencesPropagationWithPreferencesUniquePerLayoutEnabled()
+	public void testPortletPreferencesPropagationWithPreferencesUniquePerLayoutEnabled()
 		throws Exception {
 
 		Portlet portlet = PortletLocalServiceUtil.getPortletById(
@@ -369,10 +367,9 @@ public class LayoutSetPrototypePropagationTest
 			_layoutSetPrototypeGroup.getGroupId(), "Test Article",
 			"Test Content");
 
-		journalContentPortletId =
-			addJournalContentPortletToLayout(
-				TestPropsValues.getUserId(), prototypeLayout,
-				_layoutSetPrototypeJournalArticle, "column-1");
+		journalContentPortletId = addJournalContentPortletToLayout(
+			TestPropsValues.getUserId(), prototypeLayout,
+			_layoutSetPrototypeJournalArticle, "column-1");
 
 		_prototypeLayout = LayoutTestUtil.addLayout(
 			_layoutSetPrototypeGroup.getGroupId(),
@@ -381,14 +378,12 @@ public class LayoutSetPrototypePropagationTest
 		LayoutTestUtil.updateLayoutTemplateId(
 			_prototypeLayout, initialLayoutTemplateId);
 
-		_journalContentPortletId =
-			addJournalContentPortletToLayout(
-				TestPropsValues.getUserId(), _prototypeLayout,
-				_layoutSetPrototypeJournalArticle, "column-1");
+		_journalContentPortletId = addJournalContentPortletToLayout(
+			TestPropsValues.getUserId(), _prototypeLayout,
+			_layoutSetPrototypeJournalArticle, "column-1");
 
-		_initialPrototypeLayoutCount =
-			LayoutLocalServiceUtil.getLayoutsCount(
-				_layoutSetPrototypeGroup, true);
+		_initialPrototypeLayoutCount = LayoutLocalServiceUtil.getLayoutsCount(
+			_layoutSetPrototypeGroup, true);
 
 		// Group
 
@@ -404,15 +399,17 @@ public class LayoutSetPrototypePropagationTest
 
 		_initialLayoutCount = getGroupLayoutCount();
 
-		journalArticle =
-			JournalArticleLocalServiceUtil.getArticleByUrlTitle(
-				group.getGroupId(),
-				_layoutSetPrototypeJournalArticle.getUrlTitle());
+		journalArticle = JournalArticleLocalServiceUtil.getArticleByUrlTitle(
+			group.getGroupId(),
+			_layoutSetPrototypeJournalArticle.getUrlTitle());
 	}
 
 	protected void doTestIsLayoutUpdateable() throws Exception {
 		Assert.assertTrue(SitesUtil.isLayoutUpdateable(layout));
 		Assert.assertTrue(SitesUtil.isLayoutUpdateable(_layout));
+
+		prototypeLayout = LayoutLocalServiceUtil.getLayout(
+			prototypeLayout.getPlid());
 
 		setLayoutUpdateable(prototypeLayout, false);
 
@@ -602,10 +599,6 @@ public class LayoutSetPrototypePropagationTest
 
 	@Override
 	protected void setLinkEnabled(boolean linkEnabled) throws Exception {
-		SitesUtil.updateLayoutSetPrototypesLinks(
-			group, _layoutSetPrototype.getLayoutSetPrototypeId(), 0,
-			linkEnabled, linkEnabled);
-
 		if ((layout != null) && (_layout != null)) {
 			layout = LayoutLocalServiceUtil.getLayout(layout.getPlid());
 
@@ -619,6 +612,10 @@ public class LayoutSetPrototypePropagationTest
 
 			LayoutLocalServiceUtil.updateLayout(_layout);
 		}
+
+		SitesUtil.updateLayoutSetPrototypesLinks(
+			group, _layoutSetPrototype.getLayoutSetPrototypeId(), 0,
+			linkEnabled, linkEnabled);
 	}
 
 	protected void testAddChildLayout(boolean layoutSetPrototypeLinkEnabled)

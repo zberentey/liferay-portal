@@ -33,12 +33,14 @@ boolean privateLayout = ParamUtil.getBoolean(request, "privateLayout");
 
 String treeId = ParamUtil.getString(request, "treeId");
 
+String layoutIdsString = ParamUtil.getString(request, "layoutIdsString");
+
 long[] selectedLayoutIds = StringUtil.split(ParamUtil.getString(request, "selectedLayoutIds"), 0L);
 
 Map<String, String[]> parameterMap = (Map<String, String[]>)GetterUtil.getObject(request.getAttribute("select_pages.jsp-parameterMap"), Collections.emptyMap());
 %>
 
-<aui:input name="layoutIds" type="hidden" />
+<aui:input name="layoutIds" type="hidden" value="<%= layoutIdsString %>" />
 
 <span class="selected-labels" id="<portlet:namespace />selectedPages"></span>
 

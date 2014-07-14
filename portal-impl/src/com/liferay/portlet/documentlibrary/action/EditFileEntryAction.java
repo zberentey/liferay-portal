@@ -17,7 +17,6 @@ package com.liferay.portlet.documentlibrary.action;
 import com.liferay.portal.DuplicateLockException;
 import com.liferay.portal.NoSuchRepositoryEntryException;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
@@ -26,6 +25,7 @@ import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.Folder;
 import com.liferay.portal.kernel.servlet.ServletResponseConstants;
 import com.liferay.portal.kernel.servlet.SessionErrors;
+import com.liferay.portal.kernel.upload.LiferayFileItemException;
 import com.liferay.portal.kernel.upload.UploadException;
 import com.liferay.portal.kernel.upload.UploadPortletRequest;
 import com.liferay.portal.kernel.util.Constants;
@@ -77,7 +77,6 @@ import com.liferay.portlet.documentlibrary.antivirus.AntivirusScannerException;
 import com.liferay.portlet.documentlibrary.model.DLFileEntry;
 import com.liferay.portlet.documentlibrary.service.DLAppLocalServiceUtil;
 import com.liferay.portlet.documentlibrary.service.DLAppServiceUtil;
-import com.liferay.portlet.documentlibrary.util.DLUtil;
 import com.liferay.portlet.dynamicdatamapping.StorageFieldRequiredException;
 import com.liferay.portlet.trash.util.TrashUtil;
 
@@ -138,7 +137,10 @@ public class EditFileEntryAction extends PortletAction {
 					WebKeys.UPLOAD_EXCEPTION);
 
 			if (uploadException != null) {
-				if (uploadException.isExceededSizeLimit()) {
+				if (uploadException.isExceededLiferayFileItemSizeLimit()) {
+					throw new LiferayFileItemException();
+				}
+				else if (uploadException.isExceededSizeLimit()) {
 					throw new FileSizeException(uploadException.getCause());
 				}
 
@@ -305,7 +307,7 @@ public class EditFileEntryAction extends PortletAction {
 		List<KeyValuePair> invalidFileNameKVPs = new ArrayList<KeyValuePair>();
 
 		String[] selectedFileNames = ParamUtil.getParameterValues(
-			actionRequest, "selectedFileName");
+			actionRequest, "selectedFileName", new String[0], false);
 
 		for (String selectedFileName : selectedFileNames) {
 			addMultipleFileEntries(
@@ -370,16 +372,18 @@ public class EditFileEntryAction extends PortletAction {
 				selectedFileName, _TEMP_FOLDER_NAME);
 
 			String mimeType = tempFileEntry.getMimeType();
-			InputStream inputStream = tempFileEntry.getContentStream();
-			long size = tempFileEntry.getSize();
 
-			ServiceContext serviceContext = ServiceContextFactory.getInstance(
-				DLFileEntry.class.getName(), actionRequest);
+			String extension = FileUtil.getExtension(selectedFileName);
 
-			int pos = selectedFileName.indexOf(TEMP_RANDOM_SUFFIX);
+			int pos = selectedFileName.lastIndexOf(TEMP_RANDOM_SUFFIX);
 
 			if (pos != -1) {
 				selectedFileName = selectedFileName.substring(0, pos);
+
+				if (Validator.isNotNull(extension)) {
+					selectedFileName =
+						selectedFileName + StringPool.PERIOD + extension;
+				}
 			}
 
 			while (true) {
@@ -393,8 +397,11 @@ public class EditFileEntryAction extends PortletAction {
 					sb.append(FileUtil.stripExtension(selectedFileName));
 					sb.append(StringPool.DASH);
 					sb.append(StringUtil.randomString());
-					sb.append(StringPool.PERIOD);
-					sb.append(FileUtil.getExtension(selectedFileName));
+
+					if (Validator.isNotNull(extension)) {
+						sb.append(StringPool.PERIOD);
+						sb.append(extension);
+					}
 
 					selectedFileName = sb.toString();
 				}
@@ -402,6 +409,12 @@ public class EditFileEntryAction extends PortletAction {
 					break;
 				}
 			}
+
+			InputStream inputStream = tempFileEntry.getContentStream();
+			long size = tempFileEntry.getSize();
+
+			ServiceContext serviceContext = ServiceContextFactory.getInstance(
+				DLFileEntry.class.getName(), actionRequest);
 
 			FileEntry fileEntry = DLAppServiceUtil.addFileEntry(
 				repositoryId, folderId, selectedFileName, mimeType,
@@ -447,10 +460,22 @@ public class EditFileEntryAction extends PortletAction {
 		long folderId = ParamUtil.getLong(uploadPortletRequest, "folderId");
 		String sourceFileName = uploadPortletRequest.getFileName("file");
 
-		String title = sourceFileName;
+		StringBundler sb = new StringBundler(5);
 
-		sourceFileName = sourceFileName.concat(
-			TEMP_RANDOM_SUFFIX).concat(StringUtil.randomString());
+		sb.append(FileUtil.stripExtension(sourceFileName));
+		sb.append(TEMP_RANDOM_SUFFIX);
+		sb.append(StringUtil.randomString());
+
+		String extension = FileUtil.getExtension(sourceFileName);
+
+		if (Validator.isNotNull(extension)) {
+			sb.append(StringPool.PERIOD);
+			sb.append(extension);
+		}
+
+		sourceFileName = sb.toString();
+
+		String title = sourceFileName;
 
 		InputStream inputStream = null;
 
@@ -708,7 +733,7 @@ public class EditFileEntryAction extends PortletAction {
 	protected String[] getAllowedFileExtensions(
 			PortletConfig portletConfig, PortletRequest portletRequest,
 			PortletResponse portletResponse)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		String portletName = portletConfig.getPortletName();
 
@@ -723,7 +748,7 @@ public class EditFileEntryAction extends PortletAction {
 			PortletDisplay portletDisplay = themeDisplay.getPortletDisplay();
 
 			DLPortletInstanceSettings dlPortletInstanceSettings =
-				DLUtil.getDLPortletInstanceSettings(
+				DLPortletInstanceSettings.getInstance(
 					themeDisplay.getLayout(), portletDisplay.getId());
 
 			Set<String> extensions = new HashSet<String>();
@@ -785,6 +810,7 @@ public class EditFileEntryAction extends PortletAction {
 		else if (e instanceof AntivirusScannerException ||
 				 e instanceof DuplicateFileException ||
 				 e instanceof DuplicateFolderNameException ||
+				 e instanceof LiferayFileItemException ||
 				 e instanceof FileExtensionException ||
 				 e instanceof FileMimeTypeException ||
 				 e instanceof FileNameException ||
@@ -998,7 +1024,7 @@ public class EditFileEntryAction extends PortletAction {
 						themeDisplay.getPortletDisplay();
 
 					DLPortletInstanceSettings dlPortletInstanceSettings =
-						DLUtil.getDLPortletInstanceSettings(
+						DLPortletInstanceSettings.getInstance(
 							themeDisplay.getLayout(), portletDisplay.getId());
 
 					String[] mimeTypes =
@@ -1067,10 +1093,13 @@ public class EditFileEntryAction extends PortletAction {
 				(UploadException)actionRequest.getAttribute(
 					WebKeys.UPLOAD_EXCEPTION);
 
-			if ((uploadException != null) &&
-				uploadException.isExceededSizeLimit()) {
-
-				throw new FileSizeException(uploadException.getCause());
+			if (uploadException != null) {
+				if (uploadException.isExceededLiferayFileItemSizeLimit()) {
+					throw new LiferayFileItemException();
+				}
+				else if (uploadException.isExceededSizeLimit()) {
+					throw new FileSizeException(uploadException.getCause());
+				}
 			}
 
 			throw e;

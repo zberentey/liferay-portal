@@ -19,7 +19,7 @@ SearchContainer mainSearchSearchContainer = new SearchContainer(renderRequest, n
 
 SearchContext searchContext = SearchContextFactory.getInstance(request);
 
-mainSearchSearchContainer.setEmptyResultsMessage(LanguageUtil.format(pageContext, "no-results-were-found-that-matched-the-keywords-x", "<strong>" + HtmlUtil.escape(searchContext.getKeywords()) + "</strong>", false));
+mainSearchSearchContainer.setEmptyResultsMessage(LanguageUtil.format(request, "no-results-were-found-that-matched-the-keywords-x", "<strong>" + HtmlUtil.escape(searchContext.getKeywords()) + "</strong>", false));
 
 searchContext.setAttribute("paginationType", "more");
 searchContext.setEnd(mainSearchSearchContainer.getEnd());
@@ -54,6 +54,10 @@ List<FacetConfiguration> facetConfigurations = FacetConfigurationUtil.load(searc
 
 for (FacetConfiguration facetConfiguration : facetConfigurations) {
 	Facet facet = FacetFactoryUtil.create(searchContext, facetConfiguration);
+
+	if (facet == null) {
+		continue;
+	}
 
 	searchContext.addFacet(facet);
 }

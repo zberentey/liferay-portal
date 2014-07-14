@@ -15,16 +15,15 @@
 package com.liferay.portal.lar;
 
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.lar.PortletDataHandlerBoolean;
 import com.liferay.portal.kernel.lar.PortletDataHandlerKeys;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.Layout;
 import com.liferay.portal.model.StagedModel;
-import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portal.service.LayoutLocalServiceUtil;
 import com.liferay.portal.service.ServiceContext;
+import com.liferay.portal.test.DeleteAfterTestRun;
 import com.liferay.portal.util.test.GroupTestUtil;
 import com.liferay.portal.util.test.LayoutTestUtil;
 import com.liferay.portal.util.test.RandomTestUtil;
@@ -61,10 +60,6 @@ public class BaseExportImportTestCase {
 
 	@After
 	public void tearDown() throws Exception {
-		GroupLocalServiceUtil.deleteGroup(group);
-
-		GroupLocalServiceUtil.deleteGroup(importedGroup);
-
 		if ((larFile != null) && larFile.exists()) {
 			FileUtil.delete(larFile);
 		}
@@ -148,20 +143,24 @@ public class BaseExportImportTestCase {
 
 	@SuppressWarnings("unused")
 	protected StagedModel getStagedModel(String uuid, long groupId)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		return null;
 	}
 
 	@SuppressWarnings("unused")
 	protected String getStagedModelUuid(StagedModel stagedModel)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		return stagedModel.getUuid();
 	}
 
+	@DeleteAfterTestRun
 	protected Group group;
+
+	@DeleteAfterTestRun
 	protected Group importedGroup;
+
 	protected Layout importedLayout;
 	protected File larFile;
 	protected Layout layout;

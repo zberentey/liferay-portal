@@ -152,7 +152,7 @@ public class ListUtil {
 
 	@SuppressWarnings("rawtypes")
 	public static <E> List<E> fromCollection(Collection<? extends E> c) {
-		if ((c != null) && List.class.isAssignableFrom(c.getClass())) {
+		if ((c != null) && (c instanceof List)) {
 			return (List)c;
 		}
 
@@ -253,7 +253,7 @@ public class ListUtil {
 	}
 
 	public static boolean isUnmodifiableList(List<?> list) {
-		return _unmodifiableListClass.isAssignableFrom(list.getClass());
+		return _unmodifiableListClass.isInstance(list);
 	}
 
 	/**
@@ -408,6 +408,16 @@ public class ListUtil {
 		}
 
 		return aList;
+	}
+
+	public static <T, V extends T> List<T> toList(List<V> vlist) {
+		List<T> tList = new ArrayList<T>(vlist);
+
+		for (V v : vlist) {
+			tList.add(v);
+		}
+
+		return tList;
 	}
 
 	public static List<Long> toList(long[] array) {

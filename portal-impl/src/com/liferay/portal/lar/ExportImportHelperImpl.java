@@ -96,13 +96,13 @@ import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.PortletKeys;
 import com.liferay.portal.util.PropsValues;
+import com.liferay.portal.util.SessionTreeJSClicks;
 import com.liferay.portlet.asset.model.AssetCategory;
 import com.liferay.portlet.asset.model.AssetVocabulary;
 import com.liferay.portlet.asset.service.AssetCategoryLocalServiceUtil;
 import com.liferay.portlet.asset.service.AssetVocabularyLocalServiceUtil;
 import com.liferay.portlet.asset.service.persistence.AssetCategoryUtil;
 import com.liferay.portlet.asset.service.persistence.AssetVocabularyUtil;
-import com.liferay.portlet.documentlibrary.lar.FileEntryUtil;
 import com.liferay.portlet.documentlibrary.model.DLFileEntry;
 import com.liferay.portlet.documentlibrary.model.DLFileEntryType;
 import com.liferay.portlet.documentlibrary.service.DLAppLocalServiceUtil;
@@ -133,8 +133,9 @@ import java.util.regex.Pattern;
 import javax.portlet.PortletPreferences;
 import javax.portlet.PortletRequest;
 
-import org.apache.xerces.parsers.SAXParser;
+import javax.servlet.http.HttpServletRequest;
 
+import org.apache.xerces.parsers.SAXParser;
 import org.xml.sax.InputSource;
 
 /**
@@ -179,7 +180,7 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 
 	@Override
 	public Layout getExportableLayout(ThemeDisplay themeDisplay)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		Layout layout = themeDisplay.getLayout();
 
@@ -398,7 +399,7 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 
 	@Override
 	public long[] getLayoutIds(Map<Long, Boolean> layoutIdMap)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		return getLayoutIds(layoutIdMap, GroupConstants.DEFAULT_LIVE_GROUP_ID);
 	}
@@ -406,7 +407,7 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 	@Override
 	public long[] getLayoutIds(
 			Map<Long, Boolean> layoutIdMap, long targetGroupId)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		if (MapUtil.isEmpty(layoutIdMap)) {
 			return new long[0];
@@ -450,7 +451,7 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 
 	@Override
 	public long[] getLayoutIds(PortletRequest portletRequest)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		return getLayoutIds(
 			getLayoutIdMap(portletRequest),
@@ -460,7 +461,7 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 	@Override
 	public long[] getLayoutIds(
 			PortletRequest portletRequest, long targetGroupId)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		return getLayoutIds(getLayoutIdMap(portletRequest), targetGroupId);
 	}
@@ -555,7 +556,7 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 	 */
 	@Override
 	public List<Layout> getMissingParentLayouts(Layout layout, long liveGroupId)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		List<Layout> missingParentLayouts = new ArrayList<Layout>();
 
@@ -590,7 +591,7 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 	public long getModelDeletionCount(
 			final PortletDataContext portletDataContext,
 			final StagedModelType stagedModelType)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		ActionableDynamicQuery actionableDynamicQuery =
 			SystemEventLocalServiceUtil.getActionableDynamicQuery();
@@ -611,9 +612,37 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 	}
 
 	@Override
+	public String getSelectedLayoutsJSON(
+		HttpServletRequest request, long groupId, boolean privateLayout,
+		String treeId) {
+
+		String selectedNodes =
+			SessionTreeJSClicks.getOpenNodes(request, treeId);
+
+		String[] layoutIds = StringUtil.split(selectedNodes);
+
+		long[] nodeList = new long[layoutIds.length];
+
+		for (int i = 0; i < layoutIds.length; i++) {  
+			nodeList[i] = Long.valueOf(layoutIds[i]);  
+		}
+
+		JSONArray jsonArray = JSONFactoryUtil.createJSONArray();
+
+		List<Layout> layoutList = LayoutLocalServiceUtil.getLayouts(
+			groupId, privateLayout, 0);
+
+		for (Layout layout: layoutList) {
+			createLayoutsJSON(layout, jsonArray, nodeList);
+		}
+
+		return jsonArray.toString();
+	}
+
+	@Override
 	public FileEntry getTempFileEntry(
 			long groupId, long userId, String folderName)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		String[] tempFileEntryNames = LayoutServiceUtil.getTempFileEntryNames(
 			groupId, folderName);
@@ -628,7 +657,7 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 
 	@Override
 	public UserIdStrategy getUserIdStrategy(long userId, String userIdStrategy)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		User user = UserLocalServiceUtil.getUserById(userId);
 
@@ -1236,10 +1265,21 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 			long importGroupId = MapUtil.getLong(
 				groupIds, groupId, portletDataContext.getScopeGroupId());
 
-			FileEntry importedFileEntry = FileEntryUtil.fetchByUUID_R(
-				uuid, importGroupId);
+			FileEntry importedFileEntry = null;
 
-			if (importedFileEntry == null) {
+			try {
+				importedFileEntry =
+					DLAppLocalServiceUtil.getFileEntryByUuidAndGroupId(
+						uuid, importGroupId);
+			}
+			catch (PortalException pe) {
+				if (_log.isDebugEnabled()) {
+					_log.debug(pe, pe);
+				}
+				else if (_log.isWarnEnabled()) {
+					_log.warn(pe.getMessage());
+				}
+
 				continue;
 			}
 
@@ -1719,6 +1759,53 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 		dynamicQuery.add(createDateProperty.le(endDate));
 	}
 
+	protected boolean createLayoutsJSON(
+		Layout layout, JSONArray parentJSONArray, long[] layoutIds) {
+
+		boolean checked = true;
+		JSONArray childrenJSONArray = null;
+
+		List<Layout> children = layout.getChildren();
+
+		if (children.size() > 0) {
+			childrenJSONArray = JSONFactoryUtil.createJSONArray();
+
+			for (Layout childLayout: layout.getChildren()) {
+				if (!createLayoutsJSON(
+						childLayout, childrenJSONArray, layoutIds)) {
+
+					checked = false;
+				}
+			}
+		}
+
+		JSONObject layoutJSON = null;
+
+		if (!checked && (childrenJSONArray != null)) {
+			for (int i = 0; i < childrenJSONArray.length(); i++) {
+				parentJSONArray.put(childrenJSONArray.getJSONObject(i));
+			}
+		}
+
+		if (ArrayUtil.contains(layoutIds, layout.getLayoutId())) {
+			layoutJSON = JSONFactoryUtil.createJSONObject();
+
+			layoutJSON.put("includeChildren", true);
+			layoutJSON.put("plid", layout.getPlid());
+
+			if (!checked) {
+				layoutJSON.put("includeChildren", false);
+			}
+
+			parentJSONArray.put(layoutJSON);
+		}
+		else {
+			checked = false;
+		}
+
+		return checked;
+	}
+
 	protected void deleteTimestampParameters(StringBuilder sb, int beginPos) {
 		beginPos = sb.indexOf(StringPool.CLOSE_BRACKET, beginPos);
 
@@ -1807,6 +1894,10 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 
 		if (!legacyURL) {
 			String[] pathArray = dlReference.split(StringPool.SLASH);
+
+			if (pathArray.length < 3) {
+				return map;
+			}
 
 			map.put("groupId", new String[] {pathArray[2]});
 
@@ -2054,7 +2145,7 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 	}
 
 	protected FileEntry getFileEntry(Map<String, String[]> map) {
-		if (map == null) {
+		if (MapUtil.isEmpty(map)) {
 			return null;
 		}
 
@@ -2129,7 +2220,7 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 			_log.debug("Import all portlet data " + importPortletDataAll);
 		}
 
-		if (!importPortletData || (portletDataElement == null)) {
+		if (!importPortletData) {
 			return false;
 		}
 
@@ -2143,7 +2234,10 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 		PortletDataHandler portletDataHandler =
 			portlet.getPortletDataHandlerInstance();
 
-		if (portletDataHandler == null) {
+		if ((portletDataHandler == null) ||
+			((portletDataElement == null) &&
+			 !portletDataHandler.isDisplayPortlet())) {
+
 			return false;
 		}
 
@@ -2353,7 +2447,7 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 	protected String replaceExportHostname(
 			PortletDataContext portletDataContext, String url,
 			StringBundler urlSB)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		if (!HttpUtil.hasProtocol(url)) {
 			return url;
@@ -2456,7 +2550,19 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 		if (!stagedModelDataHandler.validateReference(
 				portletDataContext, element)) {
 
-			return new MissingReference(element);
+			MissingReference missingReference = new MissingReference(element);
+
+			Map<Long, Long> groupIds =
+				(Map<Long, Long>)portletDataContext.getNewPrimaryKeysMap(
+					Group.class);
+
+			long groupId = MapUtil.getLong(
+				groupIds,
+				GetterUtil.getLong(element.attributeValue("group-id")));
+
+			missingReference.setGroupId(groupId);
+
+			return missingReference;
 		}
 
 		return null;

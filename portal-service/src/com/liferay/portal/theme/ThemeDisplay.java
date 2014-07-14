@@ -17,7 +17,6 @@ package com.liferay.portal.theme;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.json.JSON;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
@@ -25,6 +24,7 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.mobile.device.Device;
 import com.liferay.portal.kernel.staging.StagingUtil;
 import com.liferay.portal.kernel.util.Http;
+import com.liferay.portal.kernel.util.HttpUtil;
 import com.liferay.portal.kernel.util.LocaleThreadLocal;
 import com.liferay.portal.kernel.util.Mergeable;
 import com.liferay.portal.kernel.util.StringPool;
@@ -264,9 +264,8 @@ public class ThemeDisplay
 	 *
 	 * @return the portal instance's default user
 	 * @throws PortalException if a portal exception occurred
-	 * @throws SystemException if a system exception occurred
 	 */
-	public User getDefaultUser() throws PortalException, SystemException {
+	public User getDefaultUser() throws PortalException {
 		if (_defaultUser == null) {
 			_defaultUser = _company.getDefaultUser();
 		}
@@ -279,9 +278,8 @@ public class ThemeDisplay
 	 *
 	 * @return the ID of the portal instance's default user
 	 * @throws PortalException if a portal exception occurred
-	 * @throws SystemException if a system exception occurred
 	 */
-	public long getDefaultUserId() throws PortalException, SystemException {
+	public long getDefaultUserId() throws PortalException {
 		return getDefaultUser().getUserId();
 	}
 
@@ -483,7 +481,7 @@ public class ThemeDisplay
 	 * @deprecated As of 6.2.0 renamed to {@link #getSiteGroupName}
 	 */
 	@Deprecated
-	public String getParentGroupName() throws PortalException, SystemException {
+	public String getParentGroupName() throws PortalException {
 		return getSiteGroupName();
 	}
 
@@ -683,6 +681,10 @@ public class ThemeDisplay
 		return _ppid;
 	}
 
+	public String getProtocol() {
+		return HttpUtil.getProtocol(_secure);
+	}
+
 	public String getRealCompanyLogo() {
 		return _realCompanyLogo;
 	}
@@ -757,9 +759,7 @@ public class ThemeDisplay
 	 * @deprecated As of 6.2.0 renamed to {@link #getSiteGroupIdOrLiveGroupId}
 	 */
 	@Deprecated
-	public long getScopeGroupIdOrLiveGroupId()
-		throws PortalException, SystemException {
-
+	public long getScopeGroupIdOrLiveGroupId() throws PortalException {
 		return getSiteGroupIdOrLiveGroupId();
 	}
 
@@ -768,9 +768,8 @@ public class ThemeDisplay
 	 *
 	 * @return the name of the scoped or sub-scoped active group
 	 * @throws PortalException if a portal exception occurred
-	 * @throws SystemException if a system exception occurred
 	 */
-	public String getScopeGroupName() throws PortalException, SystemException {
+	public String getScopeGroupName() throws PortalException {
 		if (_scopeGroup == null) {
 			return StringPool.BLANK;
 		}
@@ -778,7 +777,7 @@ public class ThemeDisplay
 		return _scopeGroup.getDescriptiveName();
 	}
 
-	public Layout getScopeLayout() throws PortalException, SystemException {
+	public Layout getScopeLayout() throws PortalException {
 		if (_layout.hasScopeGroup()) {
 			return _layout;
 		}
@@ -840,13 +839,11 @@ public class ThemeDisplay
 		return _siteGroupId;
 	}
 
-	public long getSiteGroupIdOrLiveGroupId()
-		throws PortalException, SystemException {
-
+	public long getSiteGroupIdOrLiveGroupId() throws PortalException {
 		return StagingUtil.getLiveGroupId(_siteGroupId);
 	}
 
-	public String getSiteGroupName() throws PortalException, SystemException {
+	public String getSiteGroupName() throws PortalException {
 		if (_siteGroup == null) {
 			return StringPool.BLANK;
 		}
@@ -1291,9 +1288,7 @@ public class ThemeDisplay
 		_cdnHost = cdnHost;
 	}
 
-	public void setCompany(Company company)
-		throws PortalException, SystemException {
-
+	public void setCompany(Company company) throws PortalException {
 		_company = company;
 		_companyGroupId = company.getGroupId();
 
@@ -1877,7 +1872,7 @@ public class ThemeDisplay
 		_urlUpdateManager = urlUpdateManager;
 	}
 
-	public void setUser(User user) throws PortalException, SystemException {
+	public void setUser(User user) throws PortalException {
 		_user = user;
 
 		setContact(user.getContact());

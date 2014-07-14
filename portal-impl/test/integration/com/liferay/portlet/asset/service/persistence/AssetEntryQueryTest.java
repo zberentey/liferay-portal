@@ -18,16 +18,14 @@ import com.liferay.portal.kernel.cache.Lifecycle;
 import com.liferay.portal.kernel.cache.ThreadLocalCache;
 import com.liferay.portal.kernel.cache.ThreadLocalCacheManager;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.test.ExecutionTestListeners;
-import com.liferay.portal.kernel.transaction.Transactional;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.service.ServiceContext;
-import com.liferay.portal.test.EnvironmentExecutionTestListener;
+import com.liferay.portal.test.DeleteAfterTestRun;
 import com.liferay.portal.test.LiferayIntegrationJUnitTestRunner;
-import com.liferay.portal.test.TransactionalExecutionTestListener;
+import com.liferay.portal.test.MainServletExecutionTestListener;
 import com.liferay.portal.util.test.GroupTestUtil;
 import com.liferay.portal.util.test.RandomTestUtil;
 import com.liferay.portal.util.test.ServiceContextTestUtil;
@@ -59,13 +57,8 @@ import org.junit.runner.RunWith;
 /**
  * @author Sergio González
  */
-@ExecutionTestListeners(
-	listeners = {
-		EnvironmentExecutionTestListener.class,
-		TransactionalExecutionTestListener.class
-	})
+@ExecutionTestListeners(listeners = {MainServletExecutionTestListener.class})
 @RunWith(LiferayIntegrationJUnitTestRunner.class)
-@Transactional
 public class AssetEntryQueryTest {
 
 	@Before
@@ -370,7 +363,7 @@ public class AssetEntryQueryTest {
 	protected AssetEntryQuery buildAssetEntryQuery(
 			long groupId, long[] assetCategoryIds, String[] assetTagNames,
 			boolean any, boolean not)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		AssetEntryQuery assetEntryQuery = new AssetEntryQuery();
 
@@ -415,7 +408,7 @@ public class AssetEntryQueryTest {
 	}
 
 	protected AssetEntryQuery buildAssetEntryQueryWithAssetTagIds(
-			AssetEntryQuery assetEntryQuery, long[] assetTagIds, boolean any,
+		AssetEntryQuery assetEntryQuery, long[] assetTagIds, boolean any,
 		boolean not) {
 
 		if (any && not) {
@@ -479,8 +472,9 @@ public class AssetEntryQueryTest {
 
 		BlogsEntryLocalServiceUtil.addEntry(
 			TestPropsValues.getUserId(), title1, StringPool.BLANK,
-			"This is a blog entry for testing purposes", 1, 1, 1965, 0, 0, true,
-			true, null, false, null, null, null, serviceContext);
+			StringPool.BLANK, "This is a blog entry for testing purposes", 1, 1,
+			1965, 0, 0, true, true, null, false, null, null, null,
+			serviceContext);
 
 		if (assetCategoryIds2 != null) {
 			serviceContext.setAssetCategoryIds(assetCategoryIds2);
@@ -492,8 +486,9 @@ public class AssetEntryQueryTest {
 
 		BlogsEntryLocalServiceUtil.addEntry(
 			TestPropsValues.getUserId(), title2, StringPool.BLANK,
-			"This is a blog entry for testing purposes", 1, 1, 1965, 0, 0, true,
-			true, null, false, null, null, null, serviceContext);
+			StringPool.BLANK, "This is a blog entry for testing purposes", 1, 1,
+			1965, 0, 0, true, true, null, false, null, null, null,
+			serviceContext);
 
 		// Clear the thread local cache which is populated in AssetPublisherUtil
 
@@ -613,7 +608,10 @@ public class AssetEntryQueryTest {
 	private long[] _assetCategoryIds2;
 	private long _fashionCategoryId;
 	private long _foodCategoryId;
+
+	@DeleteAfterTestRun
 	private Group _group;
+
 	private long _healthCategoryId;
 	private long _sportCategoryId;
 	private long _travelCategoryId;

@@ -33,7 +33,7 @@ import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
-import com.liferay.portal.kernel.util.ParamUtil;
+import com.liferay.portal.kernel.util.PropertiesParamUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.StreamUtil;
 import com.liferay.portal.kernel.util.UnicodeProperties;
@@ -63,6 +63,7 @@ import com.liferay.portal.util.PortletKeys;
 import com.liferay.portlet.documentlibrary.NoSuchFileEntryException;
 import com.liferay.portlet.documentlibrary.NoSuchFolderException;
 import com.liferay.portlet.documentlibrary.model.DLFolderConstants;
+import com.liferay.portlet.documentlibrary.util.comparator.RepositoryModelNameComparator;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -90,7 +91,7 @@ public class StagingLocalServiceImpl extends StagingLocalServiceBaseImpl {
 			long userId, Group liveGroup, boolean branchingPublic,
 			boolean branchingPrivate, boolean remote,
 			ServiceContext serviceContext)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		long targetGroupId = 0;
 
@@ -142,7 +143,7 @@ public class StagingLocalServiceImpl extends StagingLocalServiceBaseImpl {
 
 	@Override
 	public void cleanUpStagingRequest(long stagingRequestId)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		try {
 			PortletFileRepositoryUtil.deletePortletFolder(stagingRequestId);
@@ -158,7 +159,7 @@ public class StagingLocalServiceImpl extends StagingLocalServiceBaseImpl {
 
 	@Override
 	public long createStagingRequest(long userId, long groupId, String checksum)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		ServiceContext serviceContext = new ServiceContext();
 
@@ -175,7 +176,7 @@ public class StagingLocalServiceImpl extends StagingLocalServiceBaseImpl {
 
 	@Override
 	public void disableStaging(Group liveGroup, ServiceContext serviceContext)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		disableStaging((PortletRequest)null, liveGroup, serviceContext);
 	}
@@ -184,7 +185,7 @@ public class StagingLocalServiceImpl extends StagingLocalServiceBaseImpl {
 	public void disableStaging(
 			PortletRequest portletRequest, Group liveGroup,
 			ServiceContext serviceContext)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		UnicodeProperties typeSettingsProperties =
 			liveGroup.getTypeSettingsProperties();
@@ -247,7 +248,7 @@ public class StagingLocalServiceImpl extends StagingLocalServiceBaseImpl {
 	public void enableLocalStaging(
 			long userId, Group liveGroup, boolean branchingPublic,
 			boolean branchingPrivate, ServiceContext serviceContext)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		if (liveGroup.isStagedRemotely()) {
 			disableStaging(liveGroup, serviceContext);
@@ -305,7 +306,7 @@ public class StagingLocalServiceImpl extends StagingLocalServiceBaseImpl {
 			boolean branchingPrivate, String remoteAddress, int remotePort,
 			String remotePathContext, boolean secureConnection,
 			long remoteGroupId, ServiceContext serviceContext)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		StagingUtil.validateRemote(
 			liveGroup.getGroupId(), remoteAddress, remotePort,
@@ -379,7 +380,7 @@ public class StagingLocalServiceImpl extends StagingLocalServiceBaseImpl {
 	public void publishStagingRequest(
 			long userId, long stagingRequestId, boolean privateLayout,
 			Map<String, String[]> parameterMap)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		try {
 			ExportImportThreadLocal.setLayoutImportInProcess(true);
@@ -402,13 +403,10 @@ public class StagingLocalServiceImpl extends StagingLocalServiceBaseImpl {
 	@Override
 	public void updateStagingRequest(
 			long userId, long stagingRequestId, String fileName, byte[] bytes)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		Folder folder = PortletFileRepositoryUtil.getPortletFolder(
 			stagingRequestId);
-
-		fileName += PortletFileRepositoryUtil.getPortletFileEntriesCount(
-			folder.getGroupId(), folder.getFolderId());
 
 		PortletFileRepositoryUtil.addPortletFileEntry(
 			folder.getGroupId(), userId, Group.class.getName(),
@@ -421,7 +419,7 @@ public class StagingLocalServiceImpl extends StagingLocalServiceBaseImpl {
 	public MissingReferences validateStagingRequest(
 			long userId, long stagingRequestId, boolean privateLayout,
 			Map<String, String[]> parameterMap)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		try {
 			ExportImportThreadLocal.setLayoutValidationInProcess(true);
@@ -444,7 +442,7 @@ public class StagingLocalServiceImpl extends StagingLocalServiceBaseImpl {
 	protected void addDefaultLayoutSetBranch(
 			long userId, long groupId, String groupName, boolean privateLayout,
 			ServiceContext serviceContext)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		String masterBranchDescription =
 			LayoutSetBranchConstants.MASTER_BRANCH_DESCRIPTION_PUBLIC;
@@ -490,7 +488,7 @@ public class StagingLocalServiceImpl extends StagingLocalServiceBaseImpl {
 
 	protected Group addStagingGroup(
 			long userId, Group liveGroup, ServiceContext serviceContext)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		long parentGroupId = GroupConstants.DEFAULT_PARENT_GROUP_ID;
 
@@ -541,7 +539,7 @@ public class StagingLocalServiceImpl extends StagingLocalServiceBaseImpl {
 	}
 
 	protected void clearLastPublishDate(long groupId, boolean privateLayout)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		LayoutSet layoutSet = layoutSetLocalService.getLayoutSet(
 			groupId, privateLayout);
@@ -556,7 +554,7 @@ public class StagingLocalServiceImpl extends StagingLocalServiceBaseImpl {
 	}
 
 	protected void deleteLayoutSetBranches(long groupId, boolean privateLayout)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		// Find the latest layout revision for all the published layouts
 
@@ -630,12 +628,9 @@ public class StagingLocalServiceImpl extends StagingLocalServiceBaseImpl {
 			GroupServiceHttp.disableStaging(httpPrincipal, remoteGroupId);
 		}
 		catch (NoSuchGroupException nsge) {
-			RemoteExportException ree = new RemoteExportException(
-				RemoteExportException.NO_GROUP);
-
-			ree.setGroupId(remoteGroupId);
-
-			throw ree;
+			if (_log.isWarnEnabled()) {
+				_log.warn("Remote live group was already deleted", nsge);
+			}
 		}
 		catch (PrincipalException pe) {
 			RemoteExportException ree = new RemoteExportException(
@@ -708,7 +703,7 @@ public class StagingLocalServiceImpl extends StagingLocalServiceBaseImpl {
 
 	protected FileEntry fetchStagingRequestFileEntry(
 			long stagingRequestId, Folder folder)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		try {
 			return PortletFileRepositoryUtil.getPortletFileEntry(
@@ -727,7 +722,7 @@ public class StagingLocalServiceImpl extends StagingLocalServiceBaseImpl {
 
 	protected FileEntry getStagingRequestFileEntry(
 			long userId, long stagingRequestId, Folder folder)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		FileEntry stagingRequestFileEntry = fetchStagingRequestFileEntry(
 			stagingRequestId, folder);
@@ -747,7 +742,8 @@ public class StagingLocalServiceImpl extends StagingLocalServiceBaseImpl {
 
 			List<FileEntry> fileEntries =
 				PortletFileRepositoryUtil.getPortletFileEntries(
-					folder.getGroupId(), folder.getFolderId());
+					folder.getGroupId(), folder.getFolderId(),
+					new RepositoryModelNameComparator<FileEntry>(true));
 
 			for (FileEntry fileEntry : fileEntries) {
 				InputStream inputStream = fileEntry.getContentStream();
@@ -803,24 +799,13 @@ public class StagingLocalServiceImpl extends StagingLocalServiceBaseImpl {
 			return;
 		}
 
-		Set<String> parameterNames = serviceContext.getAttributes().keySet();
-
-		for (String parameterName : parameterNames) {
-			if (parameterName.startsWith(StagingConstants.STAGED_PORTLET) &&
-				!parameterName.endsWith("Checkbox")) {
-
-				boolean staged = ParamUtil.getBoolean(
-					serviceContext, parameterName);
-
-				typeSettingsProperties.setProperty(
-					parameterName, String.valueOf(staged));
-			}
-		}
+		typeSettingsProperties.putAll(
+			PropertiesParamUtil.getProperties(
+				serviceContext, StagingConstants.STAGED_PREFIX));
 	}
 
 	protected Layout updateLayoutWithLayoutRevision(
-			LayoutRevision layoutRevision)
-		throws SystemException {
+		LayoutRevision layoutRevision) {
 
 		Layout layout = layoutLocalService.fetchLayout(
 			layoutRevision.getPlid());

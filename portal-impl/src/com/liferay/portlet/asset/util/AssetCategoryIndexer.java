@@ -16,7 +16,6 @@ package com.liferay.portlet.asset.util;
 
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.search.BaseIndexer;
@@ -39,6 +38,8 @@ import com.liferay.portlet.asset.model.AssetCategory;
 import com.liferay.portlet.asset.service.AssetCategoryLocalServiceUtil;
 import com.liferay.portlet.asset.service.permission.AssetCategoryPermission;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 import javax.portlet.PortletRequest;
@@ -90,6 +91,22 @@ public class AssetCategoryIndexer extends BaseIndexer {
 			BooleanQuery contextQuery, SearchContext searchContext)
 		throws Exception {
 
+		long[] parentCategoryIds = (long[])searchContext.getAttribute(
+			Field.ASSET_PARENT_CATEGORY_IDS);
+
+		if (!ArrayUtil.isEmpty(parentCategoryIds)) {
+			BooleanQuery parentCategoryQuery = BooleanQueryFactoryUtil.create(
+				searchContext);
+
+			for (long parentCategoryId : parentCategoryIds) {
+				parentCategoryQuery.addTerm(
+					Field.ASSET_PARENT_CATEGORY_ID,
+					String.valueOf(parentCategoryId));
+			}
+
+			contextQuery.add(parentCategoryQuery, BooleanClauseOccur.MUST);
+		}
+
 		long[] vocabularyIds = (long[])searchContext.getAttribute(
 			Field.ASSET_VOCABULARY_IDS);
 
@@ -117,11 +134,13 @@ public class AssetCategoryIndexer extends BaseIndexer {
 			BooleanQuery localizedQuery = BooleanQueryFactoryUtil.create(
 				searchContext);
 
-			localizedQuery.addTerm(Field.TITLE, title, true);
-			localizedQuery.addTerm(
-				DocumentImpl.getLocalizedName(
-					searchContext.getLocale(), Field.TITLE),
-				title, true);
+			searchContext.setAttribute(Field.ASSET_CATEGORY_TITLE, title);
+
+			addSearchLocalizedTerm(
+				localizedQuery, searchContext, Field.ASSET_CATEGORY_TITLE,
+				true);
+			addSearchLocalizedTerm(
+				localizedQuery, searchContext, Field.TITLE, true);
 
 			searchQuery.add(localizedQuery, BooleanClauseOccur.SHOULD);
 		}
@@ -151,6 +170,16 @@ public class AssetCategoryIndexer extends BaseIndexer {
 		Document document = getBaseModelDocument(PORTLET_ID, category);
 
 		document.addKeyword(Field.ASSET_CATEGORY_ID, category.getCategoryId());
+
+		List<AssetCategory> categories = new ArrayList<AssetCategory>(1);
+
+		categories.add(category);
+
+		addSearchAssetCategoryTitles(
+			document, Field.ASSET_CATEGORY_TITLE, categories);
+
+		document.addKeyword(
+			Field.ASSET_PARENT_CATEGORY_ID, category.getParentCategoryId());
 		document.addKeyword(
 			Field.ASSET_VOCABULARY_ID, category.getVocabularyId());
 		document.addLocalizedText(
@@ -206,7 +235,7 @@ public class AssetCategoryIndexer extends BaseIndexer {
 	}
 
 	protected void reindexCategories(final long companyId)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		final ActionableDynamicQuery actionableDynamicQuery =
 			AssetCategoryLocalServiceUtil.getActionableDynamicQuery();

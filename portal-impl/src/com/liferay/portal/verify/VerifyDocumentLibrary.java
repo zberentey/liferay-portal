@@ -21,7 +21,6 @@ import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.repository.model.FileEntry;
@@ -71,9 +70,7 @@ import java.util.List;
  */
 public class VerifyDocumentLibrary extends VerifyProcess {
 
-	protected void addDLFileVersion(DLFileEntry dlFileEntry)
-		throws SystemException {
-
+	protected void addDLFileVersion(DLFileEntry dlFileEntry) {
 		long fileVersionId = CounterLocalServiceUtil.increment();
 
 		DLFileVersion dlFileVersion =
@@ -148,7 +145,7 @@ public class VerifyDocumentLibrary extends VerifyProcess {
 
 				@Override
 				public void performAction(Object object)
-					throws PortalException, SystemException {
+					throws PortalException {
 
 					DLFileEntry dlFileEntry = (DLFileEntry)object;
 
@@ -207,9 +204,7 @@ public class VerifyDocumentLibrary extends VerifyProcess {
 			new ActionableDynamicQuery.PerformActionMethod() {
 
 				@Override
-				public void performAction(Object object)
-					throws SystemException {
-
+				public void performAction(Object object) {
 					DLFileVersion dlFileVersion = (DLFileVersion)object;
 
 					InputStream inputStream = null;
@@ -351,7 +346,7 @@ public class VerifyDocumentLibrary extends VerifyProcess {
 	}
 
 	protected void copyDLFileEntry(DLFileEntry dlFileEntry)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		long companyId = dlFileEntry.getCompanyId();
 		long dataRepositoryId = dlFileEntry.getDataRepositoryId();

@@ -138,14 +138,14 @@ if (Validator.isNotNull(structureAvailableFields)) {
 		<liferay-ui:panel-container cssClass="lfr-structure-entry-details-container" extended="<%= false %>" id="templateDetailsPanelContainer" persistState="<%= true %>">
 			<liferay-ui:panel collapsible="<%= true %>" defaultState="closed" extended="<%= false %>" id="templateDetailsSectionPanel" persistState="<%= true %>" title="details">
 				<c:if test="<%= ddmDisplay.isShowStructureSelector() %>">
-					<div class="control-group">
+					<div class="form-group">
 						<aui:input helpMessage="structure-help" name="structure" type="resource" value="<%= (structure != null) ? structure.getName(locale) : StringPool.BLANK %>" />
 
 						<c:if test="<%= ((template == null) || (template.getClassPK() == 0)) %>">
 							<liferay-ui:icon
 								iconCssClass="icon-search"
 								label="<%= true %>"
-								linkCssClass="btn"
+								linkCssClass="btn btn-default"
 								message="select"
 								url='<%= "javascript:" + renderResponse.getNamespace() + "openDDMStructureSelector();" %>'
 							/>
@@ -160,7 +160,7 @@ if (Validator.isNotNull(structureAvailableFields)) {
 						for (String curLangType : ddmDisplay.getTemplateLanguageTypes()) {
 							StringBundler sb = new StringBundler(6);
 
-							sb.append(LanguageUtil.get(pageContext, curLangType + "[stands-for]"));
+							sb.append(LanguageUtil.get(request, curLangType + "[stands-for]"));
 							sb.append(StringPool.SPACE);
 							sb.append(StringPool.OPEN_PARENTHESIS);
 							sb.append(StringPool.PERIOD);
@@ -175,6 +175,10 @@ if (Validator.isNotNull(structureAvailableFields)) {
 						%>
 
 					</aui:select>
+				</c:if>
+
+				<c:if test="<%= !PropsValues.DYNAMIC_DATA_MAPPING_TEMPLATE_FORCE_AUTOGENERATE_KEY %>">
+					<aui:input disabled="<%= (template != null) ? true : false %>" name="templateKey" />
 				</c:if>
 
 				<aui:input name="description" />
@@ -206,7 +210,7 @@ if (Validator.isNotNull(structureAvailableFields)) {
 								<aui:row>
 									<c:if test="<%= smallImage && (template != null) %>">
 										<aui:col width="<%= 50 %>">
-											<img alt="<liferay-ui:message key="preview" />" class="lfr-ddm-small-image-preview" src="<%= Validator.isNotNull(template.getSmallImageURL()) ? HtmlUtil.escapeHREF(template.getSmallImageURL()) : themeDisplay.getPathImage() + "/template?img_id=" + template.getSmallImageId() + "&t=" + WebServerServletTokenUtil.getToken(template.getSmallImageId()) %>" />
+											<img alt="<liferay-ui:message escapeAttribute="<%= true %>" key="preview" />" class="lfr-ddm-small-image-preview" src='<%= Validator.isNotNull(template.getSmallImageURL()) ? HtmlUtil.escapeHREF(template.getSmallImageURL()) : themeDisplay.getPathImage() + "/template?img_id=" + template.getSmallImageId() + "&t=" + WebServerServletTokenUtil.getToken(template.getSmallImageId()) %>' />
 										</aui:col>
 									</c:if>
 
@@ -326,13 +330,13 @@ if (Validator.isNotNull(structureAvailableFields)) {
 			var values = container.all('.lfr-ddm-small-image-value');
 
 			var selectSmallImageType = function(index) {
-				types.set('checked', false);
+				types.attr('checked', false);
 
-				types.item(index).set('checked', true);
+				types.item(index).attr('checked', true);
 
-				values.set('disabled', true);
+				values.attr('disabled', true);
 
-				values.item(index).set('disabled', false);
+				values.item(index).attr('disabled', false);
 			};
 
 			container.delegate(
@@ -357,20 +361,19 @@ if (Validator.isNotNull(structureAvailableFields)) {
 
 							var expanded = !instance.get('expanded');
 
-							A.one('#<portlet:namespace />smallImage').set('value', expanded);
-							A.one('#<portlet:namespace />smallImageCheckbox').set('checked', expanded);
+							A.one('#<portlet:namespace />smallImage').attr('checked', expanded);
 
 							if (expanded) {
 								types.each(
-									function(item, index, collection) {
+									function(item, index) {
 										if (item.get('checked')) {
-											values.item(index).set('disabled', false);
+											values.item(index).attr('disabled', false);
 										}
 									}
 								);
 							}
 							else {
-								values.set('disabled', true);
+								values.attr('disabled', true);
 							}
 						}
 					}
@@ -395,10 +398,10 @@ if (Validator.isNotNull(structureAvailableFields)) {
 					refererPortletName: '<%= PortletKeys.JOURNAL %>',
 					showAncestorScopes: true,
 					struts_action: '/dynamic_data_mapping/select_structure',
-					title: '<%= UnicodeLanguageUtil.get(pageContext, "structures") %>'
+					title: '<%= UnicodeLanguageUtil.get(request, "structures") %>'
 				},
 				function(event) {
-					if (confirm('<%= UnicodeLanguageUtil.get(pageContext, "selecting-a-new-structure-will-change-the-available-input-fields-and-available-templates") %>') && (document.<portlet:namespace />fm.<portlet:namespace />classPK.value != event.ddmstructureid)) {
+					if (confirm('<%= UnicodeLanguageUtil.get(request, "selecting-a-new-structure-will-change-the-available-input-fields-and-available-templates") %>') && (document.<portlet:namespace />fm.<portlet:namespace />classPK.value != event.ddmstructureid)) {
 						document.<portlet:namespace />fm.<portlet:namespace />classPK.value = event.ddmstructureid;
 
 						Liferay.fire('<portlet:namespace />refreshEditor');
@@ -429,9 +432,9 @@ if (Validator.isNotNull(structureAvailableFields)) {
 	String taglibOnClick = "Liferay.fire('" + liferayPortletResponse.getNamespace() + "saveTemplate');";
 	%>
 
-	<aui:button onClick="<%= taglibOnClick %>" primary="<%= true %>" value='<%= LanguageUtil.get(pageContext, "save") %>' />
+	<aui:button onClick="<%= taglibOnClick %>" primary="<%= true %>" value='<%= LanguageUtil.get(request, "save") %>' />
 
-	<aui:button onClick='<%= renderResponse.getNamespace() + "saveAndContinueTemplate();" %>' value='<%= LanguageUtil.get(pageContext, "save-and-continue") %>' />
+	<aui:button onClick='<%= renderResponse.getNamespace() + "saveAndContinueTemplate();" %>' value='<%= LanguageUtil.get(request, "save-and-continue") %>' />
 
 	<aui:button href="<%= redirect %>" type="cancel" />
 </aui:button-row>

@@ -10,7 +10,6 @@
 	overflow-x: hidden;
 }
 
-
 .lfr-menu-list {
 	float: none;
 	overflow-y: auto;
@@ -28,6 +27,7 @@
 			> li > a {
 				font-size: 22px;
 				line-height: 40px;
+				white-space: normal;
 
 				img {
 					margin-bottom: 3px;
@@ -38,7 +38,7 @@
 		.search-panel {
 			margin-bottom: 0;
 
-			.control-group {
+			.form-group {
 				margin: 0 16px;
 			}
 

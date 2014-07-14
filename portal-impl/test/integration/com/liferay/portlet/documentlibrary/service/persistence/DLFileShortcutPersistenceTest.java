@@ -34,7 +34,7 @@ import com.liferay.portal.model.ModelListener;
 import com.liferay.portal.service.persistence.BasePersistence;
 import com.liferay.portal.service.persistence.PersistenceExecutionTestListener;
 import com.liferay.portal.test.LiferayPersistenceIntegrationJUnitTestRunner;
-import com.liferay.portal.test.persistence.TransactionalPersistenceAdvice;
+import com.liferay.portal.test.persistence.test.TransactionalPersistenceAdvice;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.portal.util.test.RandomTestUtil;
 
@@ -52,6 +52,7 @@ import org.junit.runner.RunWith;
 
 import java.io.Serializable;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -363,7 +364,7 @@ public class DLFileShortcutPersistenceTest {
 		}
 	}
 
-	protected OrderByComparator getOrderByComparator() {
+	protected OrderByComparator<DLFileShortcut> getOrderByComparator() {
 		return OrderByComparatorFactoryUtil.create("DLFileShortcut", "uuid",
 			true, "fileShortcutId", true, "groupId", true, "companyId", true,
 			"userId", true, "userName", true, "createDate", true,
@@ -389,6 +390,88 @@ public class DLFileShortcutPersistenceTest {
 		DLFileShortcut missingDLFileShortcut = _persistence.fetchByPrimaryKey(pk);
 
 		Assert.assertNull(missingDLFileShortcut);
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereAllPrimaryKeysExist()
+		throws Exception {
+		DLFileShortcut newDLFileShortcut1 = addDLFileShortcut();
+		DLFileShortcut newDLFileShortcut2 = addDLFileShortcut();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(newDLFileShortcut1.getPrimaryKey());
+		primaryKeys.add(newDLFileShortcut2.getPrimaryKey());
+
+		Map<Serializable, DLFileShortcut> dlFileShortcuts = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertEquals(2, dlFileShortcuts.size());
+		Assert.assertEquals(newDLFileShortcut1,
+			dlFileShortcuts.get(newDLFileShortcut1.getPrimaryKey()));
+		Assert.assertEquals(newDLFileShortcut2,
+			dlFileShortcuts.get(newDLFileShortcut2.getPrimaryKey()));
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereNoPrimaryKeysExist()
+		throws Exception {
+		long pk1 = RandomTestUtil.nextLong();
+
+		long pk2 = RandomTestUtil.nextLong();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(pk1);
+		primaryKeys.add(pk2);
+
+		Map<Serializable, DLFileShortcut> dlFileShortcuts = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertTrue(dlFileShortcuts.isEmpty());
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereSomePrimaryKeysExist()
+		throws Exception {
+		DLFileShortcut newDLFileShortcut = addDLFileShortcut();
+
+		long pk = RandomTestUtil.nextLong();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(newDLFileShortcut.getPrimaryKey());
+		primaryKeys.add(pk);
+
+		Map<Serializable, DLFileShortcut> dlFileShortcuts = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertEquals(1, dlFileShortcuts.size());
+		Assert.assertEquals(newDLFileShortcut,
+			dlFileShortcuts.get(newDLFileShortcut.getPrimaryKey()));
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithNoPrimaryKeys()
+		throws Exception {
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		Map<Serializable, DLFileShortcut> dlFileShortcuts = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertTrue(dlFileShortcuts.isEmpty());
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithOnePrimaryKey()
+		throws Exception {
+		DLFileShortcut newDLFileShortcut = addDLFileShortcut();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(newDLFileShortcut.getPrimaryKey());
+
+		Map<Serializable, DLFileShortcut> dlFileShortcuts = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertEquals(1, dlFileShortcuts.size());
+		Assert.assertEquals(newDLFileShortcut,
+			dlFileShortcuts.get(newDLFileShortcut.getPrimaryKey()));
 	}
 
 	@Test

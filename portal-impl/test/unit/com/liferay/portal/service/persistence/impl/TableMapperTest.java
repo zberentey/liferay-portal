@@ -124,7 +124,7 @@ public class TableMapperTest {
 	}
 
 	@Test
-	public void testAddTableMapping() throws SystemException {
+	public void testAddTableMapping() {
 
 		// Success, no model listener
 
@@ -286,7 +286,7 @@ public class TableMapperTest {
 	}
 
 	@Test
-	public void testContainsTableMapping() throws SystemException {
+	public void testContainsTableMapping() {
 
 		// Does not contain table mapping
 
@@ -312,7 +312,7 @@ public class TableMapperTest {
 	}
 
 	@Test
-	public void testDeleteLeftPrimaryKeyTableMappings() throws SystemException {
+	public void testDeleteLeftPrimaryKeyTableMappings() {
 
 		// Delete 0 entry
 
@@ -474,8 +474,7 @@ public class TableMapperTest {
 	}
 
 	@Test
-	public void testDeleteRightPrimaryKeyTableMappings()
-		throws SystemException {
+	public void testDeleteRightPrimaryKeyTableMappings() {
 
 		// Delete 0 entry
 
@@ -645,7 +644,7 @@ public class TableMapperTest {
 	}
 
 	@Test
-	public void testDeleteTableMapping() throws SystemException {
+	public void testDeleteTableMapping() {
 
 		// No such table mapping
 
@@ -798,7 +797,7 @@ public class TableMapperTest {
 	}
 
 	@Test
-	public void testGetLeftBaseModels() throws SystemException {
+	public void testGetLeftBaseModels() {
 
 		// Get 0 result
 
@@ -858,13 +857,10 @@ public class TableMapperTest {
 
 		lefts = _tableMapperImpl.getLeftBaseModels(
 			rightPrimaryKey, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
-			new OrderByComparator() {
+			new OrderByComparator<Left>() {
 
 				@Override
-				public int compare(Object obj1, Object obj2) {
-					Left left1 = (Left)obj1;
-					Left left2 = (Left)obj2;
-
+				public int compare(Left left1, Left left2) {
 					Long leftPrimaryKey1 = (Long)left1.getPrimaryKeyObj();
 					Long leftPrimaryKey2 = (Long)left2.getPrimaryKeyObj();
 
@@ -923,7 +919,7 @@ public class TableMapperTest {
 	}
 
 	@Test
-	public void testGetLeftPrimaryKeys() throws SystemException {
+	public void testGetLeftPrimaryKeys() {
 
 		// Get 0 result
 
@@ -987,7 +983,7 @@ public class TableMapperTest {
 	}
 
 	@Test
-	public void testGetRightBaseModels() throws SystemException {
+	public void testGetRightBaseModels() {
 
 		// Get 0 result
 
@@ -1048,13 +1044,10 @@ public class TableMapperTest {
 
 		rights = _tableMapperImpl.getRightBaseModels(
 			leftPrimaryKey, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
-			new OrderByComparator() {
+			new OrderByComparator<Right>() {
 
 				@Override
-				public int compare(Object obj1, Object obj2) {
-					Right right1 = (Right)obj1;
-					Right right2 = (Right)obj2;
-
+				public int compare(Right right1, Right right2) {
 					Long rightPrimaryKey1 = (Long)right1.getPrimaryKeyObj();
 					Long rightPrimaryKey2 = (Long)right2.getPrimaryKeyObj();
 
@@ -1114,7 +1107,7 @@ public class TableMapperTest {
 	}
 
 	@Test
-	public void testGetRightPrimaryKeys() throws SystemException {
+	public void testGetRightPrimaryKeys() {
 
 		// Get 0 result
 
@@ -1199,7 +1192,7 @@ public class TableMapperTest {
 	}
 
 	@Test
-	public void testReverseTableMapper() throws SystemException {
+	public void testReverseTableMapper() {
 		Class<?> clazz = TableMapper.class;
 
 		ClassLoader classLoader = clazz.getClassLoader();
@@ -1493,6 +1486,10 @@ public class TableMapperTest {
 			Assert.assertArrayEquals(new int[] {Types.BIGINT}, types);
 		}
 
+		public void setDatabaseError(boolean databaseError) {
+			_databaseError = databaseError;
+		}
+
 		@Override
 		public int update(Object... params) {
 			Assert.assertEquals(1, params.length);
@@ -1513,10 +1510,6 @@ public class TableMapperTest {
 			return rightPrimaryKeys.length;
 		}
 
-		public void setDatabaseError(boolean databaseError) {
-			_databaseError = databaseError;
-		}
-
 		private boolean _databaseError;
 
 	}
@@ -1534,6 +1527,10 @@ public class TableMapperTest {
 			Assert.assertArrayEquals(
 				new int[] {Types.BIGINT, Types.BIGINT},
 				types);
+		}
+
+		public void setDatabaseError(boolean databaseError) {
+			_databaseError = databaseError;
 		}
 
 		@Override
@@ -1567,10 +1564,6 @@ public class TableMapperTest {
 			return 0;
 		}
 
-		public void setDatabaseError(boolean databaseError) {
-			_databaseError = databaseError;
-		}
-
 		private boolean _databaseError;
 
 	}
@@ -1587,6 +1580,10 @@ public class TableMapperTest {
 					" = ?",
 				sql);
 			Assert.assertArrayEquals(new int[] {Types.BIGINT}, types);
+		}
+
+		public void setDatabaseError(boolean databaseError) {
+			_databaseError = databaseError;
 		}
 
 		@Override
@@ -1616,10 +1613,6 @@ public class TableMapperTest {
 			}
 
 			return count;
-		}
-
-		public void setDatabaseError(boolean databaseError) {
-			_databaseError = databaseError;
 		}
 
 		private boolean _databaseError;
@@ -1782,6 +1775,13 @@ public class TableMapperTest {
 			return getCache(name);
 		}
 
+		@Override
+		public PortalCacheManager
+			<? extends Serializable, ? extends Serializable> getCacheManager() {
+
+			return null;
+		}
+
 		public Map<String, PortalCache<?, ?>> getPortalCaches() {
 			return _portalCaches;
 		}
@@ -1789,13 +1789,6 @@ public class TableMapperTest {
 		@Override
 		public void removeCache(String name) {
 			_portalCaches.remove(name);
-		}
-
-		@Override
-		public PortalCacheManager
-			<? extends Serializable, ? extends Serializable> getCacheManager() {
-
-			return null;
 		}
 
 		private Map<String, PortalCache<?, ?>> _portalCaches =

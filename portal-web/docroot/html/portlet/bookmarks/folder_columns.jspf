@@ -48,6 +48,7 @@ for (int j = 0; j < folderColumns.length; j++) {
 
 			<liferay-ui:search-container-column-jsp
 				align="<%= align %>"
+				cssClass="entry-action"
 				path="/html/portlet/bookmarks/folder_action.jsp"
 			/>
 		</c:when>
@@ -71,7 +72,7 @@ for (int j = 0; j < folderColumns.length; j++) {
 					</c:if>
 				</a>
 
-				<c:if test="<%= bookmarksSettings.getShowSubfolders() %>">
+				<c:if test="<%= bookmarksSettings.isShowSubfolders() %>">
 
 					<%
 					List<BookmarksFolder> subfolders = BookmarksFolderServiceUtil.getFolders(scopeGroupId, curFolder.getFolderId(), 0, 5);
@@ -79,7 +80,7 @@ for (int j = 0; j < folderColumns.length; j++) {
 
 					<c:if test="<%= !subfolders.isEmpty() %>">
 						<br />
-						<span style="text-decoration: underline;"><%= LanguageUtil.get(pageContext, "subfolders") %></span>:
+						<span style="text-decoration: underline;"><%= LanguageUtil.get(request, "subfolders") %></span>:
 
 						<%
 						int subfoldersCount = BookmarksFolderServiceUtil.getFoldersCount(scopeGroupId, curFolder.getFolderId());
@@ -104,7 +105,7 @@ for (int j = 0; j < folderColumns.length; j++) {
 							rowURL.setParameter("folderId", String.valueOf(curFolder.getFolderId()));
 							%>
 
-							<a href="<%= rowURL %>"><%= LanguageUtil.get(pageContext, "more") %> &raquo;</a>
+							<a href="<%= rowURL %>"><%= LanguageUtil.get(request, "more") %> &raquo;</a>
 						</c:if>
 
 						<%

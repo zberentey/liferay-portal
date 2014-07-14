@@ -17,6 +17,7 @@ package com.liferay.portal.kernel.process;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.process.ProcessConfig.Builder;
 import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
 import com.liferay.portal.kernel.util.ServerDetector;
@@ -26,6 +27,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.URLCodec;
 
 import java.io.File;
+import java.io.FileFilter;
 
 import java.lang.reflect.Method;
 
@@ -102,6 +104,10 @@ public class ClassPathUtil {
 		return _portalClassPath;
 	}
 
+	public static ProcessConfig getPortalProcessConfig() {
+		return _portalProcessConfig;
+	}
+
 	public static void initializeClassPaths(ServletContext servletContext) {
 		ClassLoader classLoader = PortalClassLoaderUtil.getClassLoader();
 
@@ -135,6 +141,13 @@ public class ClassPathUtil {
 		sb.append("/WEB-INF/classes");
 
 		_portalClassPath = sb.toString();
+
+		Builder builder = new Builder();
+
+		builder.setBootstrapClassPath(_globalClassPath);
+		builder.setRuntimeClassPath(_portalClassPath);
+
+		_portalProcessConfig = builder.build();
 	}
 
 	private static String _buildClassPath(
@@ -251,7 +264,25 @@ public class ClassPathUtil {
 			return StringPool.BLANK;
 		}
 
-		File[] files = dir.listFiles();
+		File[] files = dir.listFiles(
+			new FileFilter() {
+
+				@Override
+				public boolean accept(File file) {
+					if (file.isDirectory()) {
+						return false;
+					}
+
+					String name = file.getName();
+
+					return name.endsWith(".jar");
+				}
+
+			});
+
+		if (files == null) {
+			return StringPool.BLANK;
+		}
 
 		Arrays.sort(files);
 
@@ -271,5 +302,6 @@ public class ClassPathUtil {
 
 	private static String _globalClassPath;
 	private static String _portalClassPath;
+	private static ProcessConfig _portalProcessConfig;
 
 }

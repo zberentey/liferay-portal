@@ -17,13 +17,14 @@
 
 	<propertycopy from="browser.${browser.type}.version" name="browser.version" />
 
-	<propertycopy from="database.${database.type}.version" name="database.version" />
+	<propertycopy from="database.${database.type}.version.build" name="database.version.build" />
 
-	<propertycopy from="database.${database.type}.${database.version}.host" name="database.host" />
-	<propertycopy from="database.${database.type}.${database.version}.password" name="database.password" />
-	<propertycopy from="database.${database.type}.${database.version}.schema" name="database.schema" />
-	<propertycopy from="database.${database.type}.${database.version}.username" name="database.username" />
-	<propertycopy from="database.${database.type}.${database.version}.url" name="database.url" />
+	<propertycopy from="database.${database.type}${database.version.build}.host" name="database.host" />
+	<propertycopy from="database.${database.type}${database.version.build}.password" name="database.password" />
+	<propertycopy from="database.${database.type}${database.version.build}.schema" name="database.schema" />
+	<propertycopy from="database.${database.type}${database.version.build}.username" name="database.username" />
+	<propertycopy from="database.${database.type}${database.version.build}.url" name="database.url" />
+	<propertycopy from="database.${database.type}${database.version.build}.version" name="database.version" />
 
 	<propertycopy from="java.jdk.${java.jdk.type}.version" name="java.jdk.version" />
 
@@ -36,6 +37,48 @@
 
 	<propertycopy from="testray.build.${testray.build.type}.name" name="testray.build.name" />
 	<propertycopy from="testray.product.${testray.product.type}.version" name="testray.product.version" />
+
+	<macrodef name="prepare-additional-bundles">
+		<sequential>
+			<if>
+				<isset property="app.server.bundle.count" />
+				<then>
+					<var name="bundle.count" value="1" />
+
+					<antelope:repeat count="${app.server.bundle.count}">
+						<delete dir="${app.server.parent.dir}-${bundle.count}" />
+
+						<copy todir="${app.server.parent.dir}-${bundle.count}/${app.server.type}-${app.server.version}">
+							<fileset dir="${app.server.dir}" />
+						</copy>
+
+						<if>
+	  					 	<available file="${liferay.home}/osgi" />
+							<then>
+								<copy todir="${app.server.parent.dir}-${bundle.count}/osgi">
+									<fileset dir="${liferay.home}/osgi" />
+								</copy>
+							</then>
+						</if>
+
+						<chmod perm="a+x">
+							<fileset dir="${app.server.parent.dir}-${bundle.count}/${app.server.type}-${app.server.version}/bin">
+								<include name="*.sh" />
+							</fileset>
+						</chmod>
+
+						<math
+							datatype="int"
+							operand1="${bundle.count}"
+							operand2="1"
+							operation="+"
+							result="bundle.count"
+						/>
+					</antelope:repeat>
+				</then>
+			</if>
+		</sequential>
+	</macrodef>
 
 	<macrodef name="prepare-fix-pack-bundle" >
 		<sequential>
@@ -116,48 +159,56 @@
 		</sequential>
 	</macrodef>
 
-	<macrodef name="prepare-test-cluster-bundle">
-		<sequential>
-			<copy todir="${app.server.parent.dir}-node-2">
-				<fileset
-					dir="${app.server.parent.dir}"
-				/>
-			</copy>
-
-			<prepare-test-cluster-properties />
-
-			<prepare-test-cluster-properties
-				app.server.parent.dir="${app.server.parent.dir}-node-2"
-				cluster.node.id="node-2"
-			/>
-		</sequential>
-	</macrodef>
-
 	<macrodef name="prepare-test-cluster-properties">
-		<attribute default="${app.server.parent.dir}" name="app.server.parent.dir" />
-		<attribute default="node-1" name="cluster.node.id" />
-
 		<sequential>
 			<if>
-				<equals arg1="${app.server.type}" arg2="tomcat" />
+				<not>
+					<equals arg1="${app.server.type}" arg2="tomcat" />
+				</not>
 				<then>
-					<if>
-						<equals arg1="@{cluster.node.id}" arg2="node-2" />
-						<then>
-							<replaceregexp
-								file="@{app.server.parent.dir}/tomcat-${app.server.tomcat.version}/conf/server.xml"
-								flags="g"
-								match="=&quot;8(\d\d\d)&quot;"
-								replace="=&quot;9\1&quot;"
-							/>
-						</then>
-					</if>
+					<fail>The public test clustering scripts are only available for Tomcat.</fail>
+				</then>
+			</if>
 
-					<replace
-						file="@{app.server.parent.dir}/tomcat-${app.server.tomcat.version}/conf/server.xml"
-						token="&lt;Engine name=&quot;Catalina&quot; defaultHost=&quot;localhost&quot;&gt;"
-						value="&lt;Engine name=&quot;Catalina&quot; defaultHost=&quot;localhost&quot; jvmRoute=&quot;@{cluster.node.id}&quot;&gt;"
-					/>
+			<replace
+				file="${app.server.tomcat.dir}/conf/server.xml"
+				token="&lt;Engine name=&quot;Catalina&quot; defaultHost=&quot;localhost&quot;&gt;"
+				value="&lt;Engine name=&quot;Catalina&quot; defaultHost=&quot;localhost&quot; jvmRoute=&quot;0&quot;&gt;"
+			/>
+
+			<if>
+				<isset property="app.server.bundle.count" />
+				<then>
+					<var name="bundle.count" value="1" />
+
+					<antelope:repeat count="${app.server.bundle.count}">
+						<replaceregexp
+							file="${app.server.parent.dir}-${bundle.count}/tomcat-${app.server.tomcat.version}/conf/server.xml"
+							flags="g"
+							match="=&quot;8(\d\d\d)&quot;"
+							replace="=&quot;${bundle.count}\1&quot;"
+						/>
+
+						<replace
+							file="${app.server.parent.dir}-${bundle.count}/tomcat-${app.server.tomcat.version}/conf/server.xml"
+							token="&lt;Engine name=&quot;Catalina&quot; defaultHost=&quot;localhost&quot;&gt;"
+							value="&lt;Engine name=&quot;Catalina&quot; defaultHost=&quot;localhost&quot; jvmRoute=&quot;${bundle.count}&quot;&gt;"
+						/>
+
+						<replace
+							file="${app.server.parent.dir}-${bundle.count}/tomcat-${app.server.tomcat.version}/webapps/ROOT/WEB-INF/classes/portal-ext.properties"
+							token="liferay.home=${liferay.home}"
+							value="liferay.home=${app.server.parent.dir}-${bundle.count}"
+						/>
+
+						<math
+							datatype="int"
+							operand1="${bundle.count}"
+							operand2="1"
+							operation="+"
+							result="bundle.count"
+						/>
+					</antelope:repeat>
 				</then>
 			</if>
 		</sequential>
@@ -173,8 +224,18 @@
 				replace="\1"
 			/>
 
+			<propertyregex
+				defaultValue="${app.server.major.version}"
+				global="true"
+				input="${app.server.major.version}"
+				override="true"
+				property="app.server.major.version.build"
+				regexp="\."
+				replace=""
+			/>
+
 			<propertycopy
-				from="env.option.app.server.${app.server.type}.${app.server.major.version}"
+				from="env.option.app.server.${app.server.type}${app.server.major.version.build}"
 				name="env.option.app.server"
 				override="true"
 			/>
@@ -191,8 +252,18 @@
 				replace="\1"
 			/>
 
+			<propertyregex
+				defaultValue="${browser.major.version}"
+				global="true"
+				input="${browser.major.version}"
+				override="true"
+				property="browser.major.version.build"
+				regexp="\."
+				replace=""
+			/>
+
 			<propertycopy
-				from="env.option.browser.${browser.type}.${browser.major.version}"
+				from="env.option.browser.${browser.type}${browser.major.version.build}"
 				name="env.option.browser"
 				override="true"
 			/>
@@ -209,8 +280,18 @@
 				replace="\1"
 			/>
 
+			<propertyregex
+				defaultValue="${database.major.version}"
+				global="true"
+				input="${database.major.version}"
+				override="true"
+				property="database.major.version.build"
+				regexp="\."
+				replace=""
+			/>
+
 			<propertycopy
-				from="env.option.database.${database.type}.${database.major.version}"
+				from="env.option.database.${database.type}${database.major.version.build}"
 				name="env.option.database"
 				override="true"
 			/>
@@ -243,8 +324,18 @@
 
 	<macrodef name="record-env-operating-system">
 		<sequential>
+			<propertyregex
+				defaultValue="${operating.system.version}"
+				global="true"
+				input="${operating.system.version}"
+				override="true"
+				property="operating.system.version.build"
+				regexp="\."
+				replace=""
+			/>
+
 			<propertycopy
-				from="env.option.operating.system.${operating.system.type}.${operating.system.version}"
+				from="env.option.operating.system.${operating.system.type}${operating.system.version.build}"
 				name="env.option.operating.system"
 				override="true"
 			/>
@@ -272,6 +363,126 @@
 					<property name="testray.component.names" value="${testray.main.component.name}" />
 				</then>
 			</if>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="start-additional-app-servers">
+		<sequential>
+			<if>
+				<isset property="app.server.bundle.count" />
+				<then>
+					<var name="bundle.count" value="1" />
+
+					<antelope:repeat count="${app.server.bundle.count}">
+						<start-app-server
+							app.server.bin.dir="${app.server.parent.dir}-${bundle.count}/${app.server.type}-${app.server.version}/bin"
+							app.server.http.url="http://localhost:${bundle.count}080/web/guest"
+							liferay.home="${app.server.parent.dir}-${bundle.count}"
+						/>
+
+						<math
+							datatype="int"
+							operand1="${bundle.count}"
+							operand2="1"
+							operation="+"
+							result="bundle.count"
+						/>
+					</antelope:repeat>
+				</then>
+			</if>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="start-app-server">
+		<attribute default="${app.server.bin.dir}" name="app.server.bin.dir" />
+		<attribute default="${liferay.home}" name="liferay.home" />
+		<attribute default="http://localhost:8080/web/guest" name="app.server.http.url" />
+
+		<sequential>
+			<if>
+				<equals arg1="${app.server.type}" arg2="jboss" />
+				<then>
+					<echo file="${app.server.deploy.dir}/ROOT.war.dodeploy"></echo>
+				</then>
+			</if>
+
+			<if>
+				<equals arg1="${test.ant.launched.by.selenium}" arg2="true" />
+				<then>
+					<exec dir="${app.server.bin.dir}" executable="${app.server.start.executable}" resolveexecutable="true">
+						<arg line="${app.server.start.executable.arg.line}" />
+					</exec>
+				</then>
+				<else>
+					<parallel>
+						<daemons>
+							<exec dir="@{app.server.bin.dir}" executable="${app.server.start.executable}" resolveexecutable="true">
+								<arg line="${app.server.start.executable.arg.line}" />
+							</exec>
+						</daemons>
+					</parallel>
+				</else>
+			</if>
+
+			<if>
+				<equals arg1="@{app.server.bin.dir}" arg2="${app.server.tcat.admin.bin.dir}" />
+				<then>
+					<waitfor maxwait="5" maxwaitunit="minute">
+						<http url="http://localhost:8180/console" />
+					</waitfor>
+				</then>
+				<elseif>
+					<equals arg1="@{app.server.bin.dir}" arg2="${app.server.tcat.agent.bin.dir}" />
+					<then>
+						<waitfor maxwait="1" maxwaitunit="minute">
+							<http url="http://localhost:8080" />
+						</waitfor>
+					</then>
+				</elseif>
+				<else>
+					<waitfor maxwait="5" maxwaitunit="minute">
+						<and>
+							<available file="@{liferay.home}/logs" />
+							<http url="@{app.server.http.url}" />
+						</and>
+					</waitfor>
+				</else>
+			</if>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="stop-additional-app-servers">
+		<sequential>
+			<if>
+				<isset property="app.server.bundle.count" />
+				<then>
+					<var name="bundle.count" value="1" />
+
+					<antelope:repeat count="${app.server.bundle.count}">
+						<stop-app-server
+							app.server.bin.dir="${app.server.parent.dir}-${bundle.count}/${app.server.type}-${app.server.version}/bin"
+						/>
+
+						<math
+							datatype="int"
+							operand1="${bundle.count}"
+							operand2="1"
+							operation="+"
+							result="bundle.count"
+						/>
+					</antelope:repeat>
+				</then>
+			</if>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="stop-app-server">
+		<attribute default="${app.server.bin.dir}" name="app.server.bin.dir" />
+
+		<sequential>
+			<exec dir="@{app.server.bin.dir}" executable="${app.server.stop.executable}" resolveexecutable="true">
+				<arg line="${app.server.stop.executable.arg.line}" />
+			</exec>
 		</sequential>
 	</macrodef>
 
@@ -606,6 +817,26 @@ create database lportal2 character set utf8;</echo>
 		</delete>
 	</target>
 
+	<target name="clean-up-android-emulator">
+		<exec executable="/bin/bash" os="${os.unix}">
+			<arg value="-c" />
+			<arg value="android" />
+			<arg value="delete" />
+			<arg value="avd" />
+			<arg value="-n" />
+			<arg value="${emulator.name}" />
+		</exec>
+
+		<exec executable="cmd.exe" os="${os.windows}">
+			<arg value="/c" />
+			<arg value="android" />
+			<arg value="delete" />
+			<arg value="avd" />
+			<arg value="-n" />
+			<arg value="${emulator.name}" />
+		</exec>
+	</target>
+
 	<target name="clean-up-bundles">
 		<delete file="test.${user.name}.properties" />
 
@@ -687,12 +918,14 @@ create database lportal2 character set utf8;</echo>
 					/>
 				</delete>
 
-				<copy todir="${todir}">
-					<fileset
-						dir="${jdbc.drivers.optional.dir}/db2/8.1.18"
-						includes="${jdbc.db2.driver}"
-					/>
-				</copy>
+				<for list="${jdbc.db2.driver}" param="jdbc.driver">
+					<sequential>
+						<get
+							dest="${todir}"
+							src="${test.jdbc.drivers.url}/db2/8.1.18/@{jdbc.driver}"
+						/>
+					</sequential>
+				</for>
 			</then>
 			<elseif>
 				<and>
@@ -1149,6 +1382,22 @@ create database lportal2 character set utf8;</echo>
 		<propertycopy from="mobile.device.user.agent[${mobile.device.type}]" name="mobile.device.user.agent" />
 	</target>
 
+	<target name="kill-spi">
+		<if>
+			<os family="unix" />
+			<then>
+				<execute>
+					kill -9 pgrep -n java
+				</execute>
+			</then>
+			<else>
+				<execute>
+					taskkill.exe /F /FI "imagename eq java.exe" /FI "memusage lt 700000" /FI "memusage gt 600000"
+				</execute>
+			</else>
+		</if>
+	</target>
+
 	<target name="merge-jenkins-test-results">
 		<property name="jenkins.test.results.dir" value="${env.JENKINS_HOME}/userContent/jobs/${env.BUILD_FLOW_JOB_NAME}/builds/${env.BUILD_FLOW_BUILD_NUMBER}/test-results" />
 
@@ -1277,6 +1526,47 @@ create database lportal2 character set utf8;</echo>
 			<then>
 				<property name="test.basedir" value="${basedir.unix}/portal-web" />
 			</then>
+		</if>
+	</target>
+
+	<target name="prepare-android-emulator">
+		<exec executable="/bin/bash" os="${os.unix}">
+			<arg value="-c" />
+			<arg value="echo" />
+			<arg value="no" />
+			<arg value="|" />
+			<arg value="android" />
+			<arg value="create" />
+			<arg value="avd" />
+			<arg value="-n" />
+			<arg value="${emulator.name}" />
+			<arg value="-t" />
+			<arg value="${emulator.target.number}" />
+		</exec>
+
+		<exec executable="cmd.exe" os="${os.windows}">
+			<arg value="/c" />
+			<arg value="android" />
+			<arg value="create" />
+			<arg value="avd" />
+			<arg value="-n" />
+			<arg value="${emulator.name}" />
+			<arg value="-t" />
+			<arg value="${emulator.target.number}" />
+		</exec>
+
+		<if>
+			<os family="unix" />
+			<then>
+				<echo file="/root/.android/avd/${emulator.name}.avd/config.ini" append="true">
+hw.keyboard=yes
+				</echo>
+			</then>
+			<else>
+				<echo file="${user.home}/.android/avd/${emulator.name}.avd/config.ini" append="true">
+hw.keyboard=yes
+				</echo>
+			</else>
 		</if>
 	</target>
 
@@ -1410,6 +1700,7 @@ ${custom.properties}</echo>
 							\
 							META-INF/audit-spring.xml,\
 							META-INF/cluster-spring.xml,\
+							META-INF/comment-spring.xml,\
 							META-INF/editor-spring.xml,\
 							META-INF/jcr-spring.xml,\
 							META-INF/ldap-spring.xml,\
@@ -1791,10 +2082,19 @@ tck.url=true</echo>
 		</if>
 
 		<if>
-			<isset property="ignore.error" />
+			<isset property="ignore.errors" />
 			<then>
 				<echo file="portal-web/test/test-portal-web-ext.properties" append="true">
-					ignore.error=${ignore.error}
+					ignore.errors=${ignore.errors}
+				</echo>
+			</then>
+		</if>
+
+		<if>
+			<isset property="ignore.errors.delimiter" />
+			<then>
+				<echo file="portal-web/test/test-portal-web-ext.properties" append="true">
+					ignore.errors.delimiter=${ignore.errors.delimiter}
 				</echo>
 			</then>
 		</if>
@@ -1991,6 +2291,18 @@ tck.url=true</echo>
 		</if>
 	</target>
 
+	<target name="prepare-so-plugins">
+		<property file="${lp.plugins.dir}/portlets/so-portlet/docroot/WEB-INF/liferay-releng.properties" />
+
+		<property name="plugins.includes" value="so-portlet,${dependent-apps}" />
+
+		<ant dir="${lp.plugins.dir}" target="clean" />
+
+		<ant dir="${lp.plugins.dir}" target="compile" />
+
+		<ant antfile="build-test-plugins.xml" target="deploy-simple-server-plugins" />
+	</target>
+
 	<target name="prepare-test-build">
 		<antcall target="record-git-commit-portal" inheritAll="false" />
 
@@ -2131,30 +2443,6 @@ tck.url=true</echo>
 		</if>
 
 		<if>
-			<equals arg1="${test.build.bundle.tcat}" arg2="true" />
-			<then>
-				<echo file="${lp.plugins.dir}/build.${user.name}.properties">app.server.tomcat.dir=${app.server.parent.dir}/tomcat-7.0.39
-
-plugins.includes=marketplace-portlet</echo>
-
-				<if>
-					<isset property="test.build.portal.war.url" />
-					<then>
-						<get
-							dest="dist/liferay-portal-${lp.version}.war"
-							src="${test.build.portal.war.url}"
-						/>
-					</then>
-					<else>
-						<ant antfile="build-dist.xml" target="zip-portal-war" inheritAll="false" />
-					</else>
-				</if>
-
-				<ant antfile="build-dist.xml" target="build-dist-tcat" inheritAll="false" />
-			</then>
-		</if>
-
-		<if>
 			<matches pattern="http" string="${test.build.bundle.tomcat.zip.url}" />
 			<then>
 				<antcall target="prepare-test-bundle">
@@ -2167,6 +2455,8 @@ plugins.includes=marketplace-portlet</echo>
 				<ant antfile="build-dist.xml" target="build-dist-tomcat" inheritAll="false" />
 			</else>
 		</if>
+
+		<antcall target="prepare-test-build-tomcat-dependents" inheritAll="false" />
 
 		<if>
 			<and>
@@ -2230,23 +2520,57 @@ plugins.includes=marketplace-portlet</echo>
 		<antcall target="record-test-package-names" inheritAll="false" />
 	</target>
 
+	<target name="prepare-test-build-tomcat-dependents">
+		<if>
+			<equals arg1="${test.build.bundle.tcat}" arg2="true" />
+			<then>
+				<echo file="${lp.plugins.dir}/build.${user.name}.properties">app.server.tomcat.dir=${app.server.parent.dir}/tomcat-7.0.39
+
+plugins.includes=marketplace-portlet</echo>
+
+				<if>
+					<isset property="test.build.portal.war.url" />
+					<then>
+						<mkdir dir="dist" />
+
+						<get
+							dest="dist/liferay-portal-${lp.version}.war"
+							src="${test.build.portal.war.url}"
+						/>
+					</then>
+					<else>
+						<ant antfile="build-dist.xml" target="zip-portal-war" inheritAll="false" />
+					</else>
+				</if>
+
+				<ant antfile="build-dist.xml" target="build-dist-tcat" inheritAll="false" />
+
+				<delete dir="dist" />
+
+				<delete file="${lp.plugins.dir}/build.${user.name}.properties" />
+			</then>
+		</if>
+	</target>
+
 	<target name="prepare-test-bundle">
 		<if>
 			<equals arg1="${app.server.type}" arg2="tcserver" />
 			<then>
 				<ant antfile="build-dist.xml" target="unzip-tcserver" inheritAll="false" />
 
+				<mkdir dir="dist" />
+
 				<get
-					dest="liferay-portal.war"
+					dest="dist/liferay-portal-${lp.version}.war"
 					src="${test.build.portal.war.url}"
 				/>
 
 				<unzip
 					dest="${app.server.tcserver.portal.dir}"
-					src="liferay-portal.war"
+					src="dist/liferay-portal-${lp.version}.war"
 				/>
 
-				<delete file="liferay-portal.war" />
+				<delete dir="dist" />
 
 				<get
 					dest="liferay-portal-dependencies.zip"
@@ -2285,17 +2609,19 @@ plugins.includes=marketplace-portlet</echo>
 				<then>
 					<ant antfile="build-dist.xml" target="unzip-weblogic" inheritAll="false" />
 
+					<mkdir dir="dist" />
+
 					<get
-						dest="liferay-portal.war"
+						dest="dist/liferay-portal-${lp.version}.war"
 						src="${test.build.portal.war.url}"
 					/>
 
 					<unzip
 						dest="${app.server.weblogic.portal.dir}"
-						src="liferay-portal.war"
+						src="dist/liferay-portal-${lp.version}.war"
 					/>
 
-					<delete file="liferay-portal.war" />
+					<delete dir="dist" />
 
 					<get
 						dest="liferay-portal-dependencies.zip"
@@ -2341,6 +2667,8 @@ plugins.includes=marketplace-portlet</echo>
 						type="regexp"
 					/>
 				</unzip>
+
+				<delete file="${tstamp.value}.zip" />
 
 				<chmod perm="a+x">
 					<fileset dir="${test.app.server.bin.dir}">
@@ -2460,13 +2788,22 @@ custom.sql.function.isnotnull=CONVERT(VARCHAR,?) IS NOT NULL</echo>
 				</if>
 
 				<if>
-					<equals arg1="${database.type}" arg2="hsql" />
+					<equals arg1="${database.type}" arg2="db2" />
 					<then>
-						<delete dir="${liferay.home}/data" includeemptydirs="true" />
-
-						<copy file="sql/${database.name}.properties" tofile="${liferay.home}/data/hsql/${database.name}.properties" />
-						<copy file="sql/${database.name}.script" tofile="${liferay.home}/data/hsql/${database.name}.script" />
+						<exec executable="${db2.executable}">
+							<arg value="-fcreate.sql" />
+							<arg value="-t" />
+						</exec>
 					</then>
+					<elseif>
+						<equals arg1="${database.type}" arg2="hsql" />
+						<then>
+							<delete dir="${liferay.home}/data" includeemptydirs="true" />
+
+							<copy file="sql/${database.name}.properties" tofile="${liferay.home}/data/hsql/${database.name}.properties" />
+							<copy file="sql/${database.name}.script" tofile="${liferay.home}/data/hsql/${database.name}.script" />
+						</then>
+					</elseif>
 					<elseif>
 						<equals arg1="${database.type}" arg2="mysql" />
 						<then>
@@ -2585,6 +2922,40 @@ custom.sql.function.isnotnull=CONVERT(VARCHAR,?) IS NOT NULL</echo>
 				</exec>
 			</then>
 		</if>
+	</target>
+
+	<target name="record-git-commit-bottom-test-jsp">
+		<exec dir="${project.dir}" executable="git" outputproperty="git.commit.portal.rev.parse">
+			<arg line="rev-parse HEAD" />
+		</exec>
+
+		<exec dir="${project.dir}" executable="git" outputproperty="git.commit.portal.current.date">
+			<arg line="log -1 --pretty=format:%cd HEAD" />
+		</exec>
+
+		<loadfile property="copyright.content" srcFile="${project.dir}/portal-impl/src/com/liferay/portal/tools/servicebuilder/dependencies/copyright.txt" />
+
+		<echo file="${app.server.dir}/webapps/ROOT/html/common/themes/bottom-test.jsp"><![CDATA[<%--
+${copyright.content}
+--%>
+
+<%@ page import="com.liferay.portal.kernel.util.ParamUtil" %>
+
+<%
+String ppstate = ParamUtil.getString(request, "p_p_state", "normal");
+
+if (ppstate.equals("normal")) {
+%>
+
+	<div class="alert alert-info" id="currentHead" style="margin: 2em">
+		Commit <a href="https://github.com/liferay/liferay-portal/commit/${git.commit.portal.rev.parse}" target="_blank">${git.commit.portal.rev.parse} - ${git.commit.portal.current.date}</a>
+	</div>
+
+<%
+}
+%>]]></echo>
+
+		<echo>Updated ${app.server.dir}/webapps/ROOT/html/common/themes/bottom-test.jsp.</echo>
 	</target>
 
 	<target name="record-test-package-names">
@@ -2782,7 +3153,20 @@ custom.sql.function.isnotnull=CONVERT(VARCHAR,?) IS NOT NULL</echo>
 		<if>
 			<equals arg1="${cluster.enabled}" arg2="true" />
 			<then>
-				<prepare-test-cluster-bundle />
+				<prepare-additional-bundles />
+
+				<prepare-test-cluster-properties />
+			</then>
+		</if>
+
+		<if>
+			<equals arg1="${mobile.device.enabled}" arg2="true" />
+			<then>
+				<antcall target="prepare-android-emulator" />
+
+				<antcall target="start-android-emulator" />
+
+				<antcall target="start-appium" />
 			</then>
 		</if>
 
@@ -2814,9 +3198,9 @@ custom.sql.function.isnotnull=CONVERT(VARCHAR,?) IS NOT NULL</echo>
 		<if>
 			<equals arg1="${app.server.type}" arg2="glassfish" />
 			<then>
-				<antcall target="start-app-server" />
+				<start-app-server />
 
-				<antcall target="stop-app-server" />
+				<stop-app-server />
 			</then>
 		</if>
 
@@ -2917,16 +3301,23 @@ custom.sql.function.isnotnull=CONVERT(VARCHAR,?) IS NOT NULL</echo>
 		<if>
 			<equals arg1="${tcat.enabled}" arg2="true" />
 			<then>
-				<antcall target="start-app-server" inheritAll="false">
-					<param name="app.server.bin.dir" value="${app.server.tcat.admin.bin.dir}" />
-				</antcall>
+				<start-app-server
+					app.server.bin.dir="${app.server.tcat.admin.bin.dir}"
+				/>
 
-				<antcall target="start-app-server" inheritAll="false">
-					<param name="app.server.bin.dir" value="${app.server.tcat.agent.bin.dir}" />
-				</antcall>
+				<start-app-server
+					app.server.bin.dir="${app.server.tcat.agent.bin.dir}"
+				/>
 			</then>
 			<else>
-				<antcall target="start-app-server" />
+				<start-app-server />
+
+				<if>
+					<equals arg1="${cluster.enabled}" arg2="true" />
+					<then>
+						<start-additional-app-servers />
+					</then>
+				</if>
 
 				<for param="log.file">
 					<path>
@@ -3006,17 +3397,35 @@ custom.sql.function.isnotnull=CONVERT(VARCHAR,?) IS NOT NULL</echo>
 		<if>
 			<equals arg1="${tcat.enabled}" arg2="true" />
 			<then>
-				<antcall target="stop-app-server" inheritAll="false">
-					<param name="app.server.bin.dir" value="${app.server.tcat.admin.bin.dir}" />
-				</antcall>
+				<stop-app-server
+					app.server.bin.dir="${app.server.tcat.admin.bin.dir}"
+				/>
 
-				<antcall target="stop-app-server" inheritAll="false">
-					<param name="app.server.bin.dir" value="${app.server.tcat.agent.bin.dir}" />
-				</antcall>
+				<stop-app-server
+					app.server.bin.dir="${app.server.tcat.agent.bin.dir}"
+				/>
 			</then>
 			<else>
-				<antcall target="stop-app-server" />
+				<stop-app-server />
 			</else>
+		</if>
+
+		<if>
+			<equals arg1="${cluster.enabled}" arg2="true" />
+			<then>
+				<stop-additional-app-servers />
+			</then>
+		</if>
+
+		<if>
+			<equals arg1="${mobile.device.enabled}" arg2="true" />
+			<then>
+				<antcall target="stop-android-emulator" />
+
+				<antcall target="clean-up-android-emulator" />
+
+				<antcall target="stop-appium" />
+			</then>
 		</if>
 
 		<antcall target="clean-up-sikuli-temp-files" />
@@ -3038,44 +3447,44 @@ custom.sql.function.isnotnull=CONVERT(VARCHAR,?) IS NOT NULL</echo>
 		</if>
 	</target>
 
+	<target name="start-android-emulator">
+		<exec executable="/bin/bash" os="${os.unix}" spawn="true">
+			<arg value="-c" />
+			<arg value="emulator" />
+			<arg value="-avd" />
+			<arg value="${emulator.name}" />
+			<arg value="-no-boot-anim" />
+		</exec>
+
+		<exec executable="cmd.exe" os="${os.windows}">
+			<arg value="/c" />
+			<arg value="emulator" />
+			<arg value="-avd" />
+			<arg value="${emulator.name}" />
+			<arg value="-no-boot-anim" />
+		</exec>
+
+		<sleep seconds="120" />
+	</target>
+
+	<target name="start-appium" >
+		<exec executable="gnome-terminal" os="${os.unix}" spawn="true">
+			<arg value="-e" />
+			<arg value="service" />
+			<arg value="appium" />
+			<arg value="start" />
+		</exec>
+
+		<exec dir="${appium.win32.dir}" executable="cmd.exe" os="${os.windows}">
+			<arg value="/c" />
+			<arg value="start" />
+			<arg value="node" />
+			<arg value="appium" />
+		</exec>
+	</target>
+
 	<target name="start-app-server">
-		<if>
-			<equals arg1="${app.server.type}" arg2="jboss" />
-			<then>
-				<echo file="${app.server.deploy.dir}/ROOT.war.dodeploy"></echo>
-			</then>
-		</if>
-
-		<forget>
-			<exec dir="${app.server.bin.dir}" executable="${app.server.start.executable}" resolveexecutable="true">
-				<arg line="${app.server.start.executable.arg.line}" />
-			</exec>
-		</forget>
-
-		<if>
-			<equals arg1="${app.server.bin.dir}" arg2="${app.server.tcat.admin.bin.dir}" />
-			<then>
-				<waitfor maxwait="5" maxwaitunit="minute">
-					<http url="http://localhost:8180/console" />
-				</waitfor>
-			</then>
-			<elseif>
-				<equals arg1="${app.server.bin.dir}" arg2="${app.server.tcat.agent.bin.dir}" />
-				<then>
-					<waitfor maxwait="1" maxwaitunit="minute">
-						<http url="http://localhost:8080" />
-					</waitfor>
-				</then>
-			</elseif>
-			<else>
-				<waitfor maxwait="5" maxwaitunit="minute">
-					<and>
-						<available file="${liferay.home}/logs" />
-						<http url="http://localhost:8080/web/guest" />
-					</and>
-				</waitfor>
-			</else>
-		</if>
+		<start-app-server />
 	</target>
 
 	<target name="start-chrome-driver">
@@ -3160,10 +3569,38 @@ Please set "ie.driver.zip" in test.properties to point to "IEDriverServer_x64_2.
 		</java>
 	</target>
 
-	<target name="stop-app-server">
-		<exec dir="${app.server.bin.dir}" executable="${app.server.stop.executable}" resolveexecutable="true">
-			<arg line="${app.server.stop.executable.arg.line}" />
+	<target name="stop-android-emulator">
+		<exec executable="/bin/bash" os="${os.unix}">
+			<arg value="-c" />
+			<arg value="adb" />
+			<arg value="emu" />
+			<arg value="kill" />
 		</exec>
+
+		<exec executable="cmd.exe" os="${os.windows}">
+			<arg value="/c" />
+			<arg value="adb" />
+			<arg value="emu" />
+			<arg value="kill" />
+		</exec>
+	</target>
+
+	<target name="stop-appium">
+		<exec executable="/bin/bash" os="${os.unix}" spawn="true" >
+			<arg value="-c" />
+			<arg value="killall" />
+			<arg value="node" />
+		</exec>
+
+		<exec executable="cmd.exe" os="${os.windows}" >
+			<arg value="/c" />
+			<arg value="tskill" />
+			<arg value="node" />
+		</exec>
+	</target>
+
+	<target name="stop-app-server">
+		<stop-app-server />
 	</target>
 
 	<target name="stop-chrome-driver">

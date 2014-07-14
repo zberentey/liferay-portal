@@ -39,6 +39,7 @@ cobertura.ser
 /test.*.properties
 /WEB-INF
 
+/.ivy/cache/com.liferay-*.xml
 /.ivy/cache/resolved-*
 
 /benchmarks/*.csv
@@ -153,7 +154,6 @@ cobertura.ser
 
 /portal-web/docroot/html/js/editor/ckeditor
 /portal-web/docroot/html/js/editor/codepress
-/portal-web/docroot/html/js/editor/fckeditor
 /portal-web/docroot/html/js/editor/tiny_mce
 
 /portal-web/docroot/html/themes/_unstyled/css/aui

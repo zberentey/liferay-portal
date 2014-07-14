@@ -34,7 +34,7 @@ import com.liferay.portal.model.ModelListener;
 import com.liferay.portal.service.persistence.BasePersistence;
 import com.liferay.portal.service.persistence.PersistenceExecutionTestListener;
 import com.liferay.portal.test.LiferayPersistenceIntegrationJUnitTestRunner;
-import com.liferay.portal.test.persistence.TransactionalPersistenceAdvice;
+import com.liferay.portal.test.persistence.test.TransactionalPersistenceAdvice;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.portal.util.test.RandomTestUtil;
 
@@ -52,6 +52,7 @@ import org.junit.runner.RunWith;
 
 import java.io.Serializable;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -148,6 +149,8 @@ public class BlogsEntryPersistenceTest {
 
 		newBlogsEntry.setTitle(RandomTestUtil.randomString());
 
+		newBlogsEntry.setDeckTitle(RandomTestUtil.randomString());
+
 		newBlogsEntry.setUrlTitle(RandomTestUtil.randomString());
 
 		newBlogsEntry.setDescription(RandomTestUtil.randomString());
@@ -200,6 +203,8 @@ public class BlogsEntryPersistenceTest {
 			Time.getShortTimestamp(newBlogsEntry.getModifiedDate()));
 		Assert.assertEquals(existingBlogsEntry.getTitle(),
 			newBlogsEntry.getTitle());
+		Assert.assertEquals(existingBlogsEntry.getDeckTitle(),
+			newBlogsEntry.getDeckTitle());
 		Assert.assertEquals(existingBlogsEntry.getUrlTitle(),
 			newBlogsEntry.getUrlTitle());
 		Assert.assertEquals(existingBlogsEntry.getDescription(),
@@ -608,12 +613,12 @@ public class BlogsEntryPersistenceTest {
 		}
 	}
 
-	protected OrderByComparator getOrderByComparator() {
+	protected OrderByComparator<BlogsEntry> getOrderByComparator() {
 		return OrderByComparatorFactoryUtil.create("BlogsEntry", "uuid", true,
 			"entryId", true, "groupId", true, "companyId", true, "userId",
 			true, "userName", true, "createDate", true, "modifiedDate", true,
-			"title", true, "urlTitle", true, "description", true, "content",
-			true, "displayDate", true, "allowPingbacks", true,
+			"title", true, "deckTitle", true, "urlTitle", true, "description",
+			true, "content", true, "displayDate", true, "allowPingbacks", true,
 			"allowTrackbacks", true, "trackbacks", true, "smallImage", true,
 			"smallImageId", true, "smallImageURL", true, "status", true,
 			"statusByUserId", true, "statusByUserName", true, "statusDate", true);
@@ -635,6 +640,88 @@ public class BlogsEntryPersistenceTest {
 		BlogsEntry missingBlogsEntry = _persistence.fetchByPrimaryKey(pk);
 
 		Assert.assertNull(missingBlogsEntry);
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereAllPrimaryKeysExist()
+		throws Exception {
+		BlogsEntry newBlogsEntry1 = addBlogsEntry();
+		BlogsEntry newBlogsEntry2 = addBlogsEntry();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(newBlogsEntry1.getPrimaryKey());
+		primaryKeys.add(newBlogsEntry2.getPrimaryKey());
+
+		Map<Serializable, BlogsEntry> blogsEntries = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertEquals(2, blogsEntries.size());
+		Assert.assertEquals(newBlogsEntry1,
+			blogsEntries.get(newBlogsEntry1.getPrimaryKey()));
+		Assert.assertEquals(newBlogsEntry2,
+			blogsEntries.get(newBlogsEntry2.getPrimaryKey()));
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereNoPrimaryKeysExist()
+		throws Exception {
+		long pk1 = RandomTestUtil.nextLong();
+
+		long pk2 = RandomTestUtil.nextLong();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(pk1);
+		primaryKeys.add(pk2);
+
+		Map<Serializable, BlogsEntry> blogsEntries = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertTrue(blogsEntries.isEmpty());
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereSomePrimaryKeysExist()
+		throws Exception {
+		BlogsEntry newBlogsEntry = addBlogsEntry();
+
+		long pk = RandomTestUtil.nextLong();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(newBlogsEntry.getPrimaryKey());
+		primaryKeys.add(pk);
+
+		Map<Serializable, BlogsEntry> blogsEntries = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertEquals(1, blogsEntries.size());
+		Assert.assertEquals(newBlogsEntry,
+			blogsEntries.get(newBlogsEntry.getPrimaryKey()));
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithNoPrimaryKeys()
+		throws Exception {
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		Map<Serializable, BlogsEntry> blogsEntries = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertTrue(blogsEntries.isEmpty());
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithOnePrimaryKey()
+		throws Exception {
+		BlogsEntry newBlogsEntry = addBlogsEntry();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(newBlogsEntry.getPrimaryKey());
+
+		Map<Serializable, BlogsEntry> blogsEntries = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertEquals(1, blogsEntries.size());
+		Assert.assertEquals(newBlogsEntry,
+			blogsEntries.get(newBlogsEntry.getPrimaryKey()));
 	}
 
 	@Test
@@ -776,6 +863,8 @@ public class BlogsEntryPersistenceTest {
 		blogsEntry.setModifiedDate(RandomTestUtil.nextDate());
 
 		blogsEntry.setTitle(RandomTestUtil.randomString());
+
+		blogsEntry.setDeckTitle(RandomTestUtil.randomString());
 
 		blogsEntry.setUrlTitle(RandomTestUtil.randomString());
 

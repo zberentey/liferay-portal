@@ -13,6 +13,7 @@ import java.io.ObjectInput;
 import java.io.ObjectOutput;
 
 import java.util.Date;
+import java.util.Map;
 
 /**
  * The cache model class for representing ${entity.name} in entity cache.
@@ -94,7 +95,7 @@ public class ${entity.name}CacheModel implements CacheModel<${entity.name}>, Ext
 		${entity.varName}Impl.resetOriginalValues();
 
 		<#list cacheFields as cacheField>
-			<#assign methodName = textFormatter.format(serviceBuilder.getVariableName(cacheField), 6)>
+			<#assign methodName = serviceBuilder.getCacheFieldMethodName(cacheField)>
 
 			${entity.varName}Impl.set${methodName}(${cacheField.name});
 		</#list>

@@ -54,6 +54,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>TASK_IFRAME</td>
+	<td>//iframe[contains(@id,'tasksportlet_Dialog_iframe')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td></td>
 	<td></td>
 	<td></td>
@@ -113,6 +118,16 @@
 <tr>
 	<td>TASK_ASSIGNEE</td>
 	<td>//tr[contains(.,'${key_taskDescription}')]//div[@class='result-data']/span[contains(.,'Assignee')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>TASK_DUE_DATE</td>
+	<td>//tr[contains(.,'${key_taskDescription}')]//div[@class='due-date']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>TASK_DUE_DATE_PAST_DUE</td>
+	<td>//tr[contains(.,'${key_taskDescription}')]//div[@class='due-date past-due']</td>
 	<td></td>
 </tr>
 <tr>

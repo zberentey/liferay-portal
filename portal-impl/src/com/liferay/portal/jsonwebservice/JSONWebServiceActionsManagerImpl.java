@@ -21,19 +21,19 @@ import com.liferay.portal.kernel.jsonwebservice.JSONWebServiceAction;
 import com.liferay.portal.kernel.jsonwebservice.JSONWebServiceActionMapping;
 import com.liferay.portal.kernel.jsonwebservice.JSONWebServiceActionsManager;
 import com.liferay.portal.kernel.jsonwebservice.JSONWebServiceNaming;
+import com.liferay.portal.kernel.jsonwebservice.NoSuchJSONWebServiceException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.security.pacl.DoPrivileged;
 import com.liferay.portal.kernel.servlet.HttpMethods;
-import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.BinarySearch;
-import com.liferay.portal.kernel.util.CamelCaseUtil;
 import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.ContextPathUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.MethodParameter;
 import com.liferay.portal.kernel.util.SortedArrayList;
 import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.spring.context.PortalContextLoaderListener;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.PropsValues;
@@ -75,7 +75,8 @@ public class JSONWebServiceActionsManagerImpl
 
 	@Override
 	public JSONWebServiceAction getJSONWebServiceAction(
-		HttpServletRequest request) {
+			HttpServletRequest request)
+		throws NoSuchJSONWebServiceException {
 
 		String path = GetterUtil.getString(request.getPathInfo());
 
@@ -130,7 +131,7 @@ public class JSONWebServiceActionsManagerImpl
 				jsonWebServiceActionParameters.getParameterNames());
 
 		if (jsonWebServiceActionConfigIndex == -1) {
-			throw new RuntimeException(
+			throw new NoSuchJSONWebServiceException(
 				"No JSON web service action associated with path " + path +
 					" and method " + method + " for /" + contextPath);
 		}
@@ -145,8 +146,9 @@ public class JSONWebServiceActionsManagerImpl
 
 	@Override
 	public JSONWebServiceAction getJSONWebServiceAction(
-		HttpServletRequest request, String path, String method,
-		Map<String, Object> parameterMap) {
+			HttpServletRequest request, String path, String method,
+			Map<String, Object> parameterMap)
+		throws NoSuchJSONWebServiceException {
 
 		JSONWebServiceActionParameters jsonWebServiceActionParameters =
 			new JSONWebServiceActionParameters();
@@ -174,7 +176,7 @@ public class JSONWebServiceActionsManagerImpl
 				contextPath, path, method, parameterNames);
 
 		if (jsonWebServiceActionConfigIndex == -1) {
-			throw new RuntimeException(
+			throw new NoSuchJSONWebServiceException(
 				"No JSON web service action with path " + path +
 					" and method " + method + " for /" + contextPath);
 		}
@@ -393,7 +395,7 @@ public class JSONWebServiceActionsManagerImpl
 		return unregisterJSONWebServiceActions(contextPath);
 	}
 
-	private int _countMatchedElements(
+	private int _countMatchedParameters(
 		String[] parameterNames, MethodParameter[] methodParameters) {
 
 		int matched = 0;
@@ -401,11 +403,14 @@ public class JSONWebServiceActionsManagerImpl
 		for (MethodParameter methodParameter : methodParameters) {
 			String methodParameterName = methodParameter.getName();
 
-			methodParameterName = CamelCaseUtil.normalizeCamelCase(
-				methodParameterName);
+			methodParameterName = StringUtil.toLowerCase(methodParameterName);
 
-			if (ArrayUtil.contains(parameterNames, methodParameterName)) {
-				matched++;
+			for (String parameterName : parameterNames) {
+				if (StringUtil.equalsIgnoreCase(
+						parameterName, methodParameterName)) {
+
+					matched++;
+				}
 			}
 		}
 
@@ -485,7 +490,7 @@ public class JSONWebServiceActionsManagerImpl
 				continue;
 			}
 
-			int count = _countMatchedElements(
+			int count = _countMatchedParameters(
 				parameterNames, jsonWebServiceActionConfigMethodParameters);
 
 			if (count > max) {

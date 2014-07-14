@@ -15,7 +15,6 @@
 package com.liferay.portlet.journal.util.test;
 
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.search.Hits;
 import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.IndexerRegistryUtil;
@@ -126,11 +125,11 @@ public class JournalTestUtil {
 		String content = DDMStructureTestUtil.getSampleStructuredContent(
 			contentMap, LocaleUtil.toLanguageId(defaultLocale));
 
-		String xsd = DDMStructureTestUtil.getSampleStructureXSD(
+		String definition = DDMStructureTestUtil.getSampleStructureDefinition(
 			_locales, defaultLocale);
 
 		DDMStructure ddmStructure = DDMStructureTestUtil.addStructure(
-			groupId, JournalArticle.class.getName(), xsd, defaultLocale);
+			groupId, JournalArticle.class.getName(), definition, defaultLocale);
 
 		DDMTemplate ddmTemplate = DDMTemplateTestUtil.addTemplate(
 			groupId, ddmStructure.getStructureId());
@@ -162,6 +161,15 @@ public class JournalTestUtil {
 			}
 		}
 
+		Calendar displayCal = CalendarFactoryUtil.getCalendar(
+			TestPropsValues.getUser().getTimeZone());
+
+		int displayDateDay = displayCal.get(Calendar.DATE);
+		int displayDateMonth = displayCal.get(Calendar.MONTH);
+		int displayDateYear = displayCal.get(Calendar.YEAR);
+		int displayDateHour = displayCal.get(Calendar.HOUR);
+		int displayDateMinute = displayCal.get(Calendar.MINUTE);
+
 		if (workflowEnabled) {
 			serviceContext = (ServiceContext)serviceContext.clone();
 
@@ -180,7 +188,8 @@ public class JournalTestUtil {
 			StringPool.BLANK, true, JournalArticleConstants.VERSION_DEFAULT,
 			titleMap, descriptionMap, content, "general",
 			ddmStructure.getStructureKey(), ddmTemplate.getTemplateKey(),
-			layoutUuid, 1, 1, 1965, 0, 0, expirationDateMonth,
+			layoutUuid, displayDateMonth, displayDateDay, displayDateYear,
+			displayDateHour, displayDateMinute, expirationDateMonth,
 			expirationDateDay, expirationDateYear, expirationDateHour,
 			expirationDateMinute, neverExpire, 0, 0, 0, 0, 0, true, true, false,
 			null, null, null, null, serviceContext);
@@ -618,7 +627,7 @@ public class JournalTestUtil {
 	}
 
 	public static void expireArticle(long groupId, JournalArticle article)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		JournalArticleLocalServiceUtil.expireArticle(
 			article.getUserId(), article.getGroupId(), article.getArticleId(),
@@ -627,7 +636,7 @@ public class JournalTestUtil {
 
 	public static JournalArticle expireArticle(
 			long groupId, JournalArticle article, double version)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		return JournalArticleLocalServiceUtil.expireArticle(
 			article.getUserId(), article.getGroupId(), article.getArticleId(),
@@ -817,9 +826,23 @@ public class JournalTestUtil {
 	private static Map<String, String> _getMap(Element dynamicElementElement) {
 		Map<String, String> map = new HashMap<String, String>();
 
+		Element parentElement = dynamicElementElement.getParent();
+
+		String parentType = parentElement.attributeValue("type");
+
 		// Attributes
 
 		for (Attribute attribute : dynamicElementElement.attributes()) {
+
+			// Option element should not contain index type atribute
+
+			if ((Validator.equals(parentType, "list") ||
+				 Validator.equals(parentType, "multi-list")) &&
+				Validator.equals(attribute.getName(), "index-type")) {
+
+				continue;
+			}
+
 			map.put(attribute.getName(), attribute.getValue());
 		}
 

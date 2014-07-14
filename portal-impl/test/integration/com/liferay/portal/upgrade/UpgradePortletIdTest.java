@@ -15,7 +15,6 @@
 package com.liferay.portal.upgrade;
 
 import com.liferay.portal.kernel.cache.CacheRegistryUtil;
-import com.liferay.portal.kernel.dao.orm.FinderCacheUtil;
 import com.liferay.portal.kernel.test.ExecutionTestListeners;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.Layout;
@@ -51,7 +50,6 @@ import java.util.Map;
 
 import org.junit.After;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -64,11 +62,6 @@ import org.junit.runner.RunWith;
 	})
 @RunWith(LiferayIntegrationJUnitTestRunner.class)
 public class UpgradePortletIdTest extends UpgradePortletId {
-
-	@Before
-	public void setUp() throws Exception {
-		FinderCacheUtil.clearCache();
-	}
 
 	@After
 	public void tearDown() throws Exception {
@@ -243,8 +236,7 @@ public class UpgradePortletIdTest extends UpgradePortletId {
 			return new String[][] {
 				new String[] {_PORTLET_IDS[0], _PORTLET_IDS[0] + "_test"},
 				new String[] {_PORTLET_IDS[1], _PORTLET_IDS[1] + "_test"},
-				new String[] {_PORTLET_IDS[2], _PORTLET_IDS[2] + "_test"},
-				new String[] {_PORTLET_IDS[3], _PORTLET_IDS[3] + "_test"}
+				new String[] {_PORTLET_IDS[2], _PORTLET_IDS[2] + "_test"}
 			};
 		}
 
@@ -262,9 +254,7 @@ public class UpgradePortletIdTest extends UpgradePortletId {
 
 	private static final String _INSTANCE_ID = "_INSTANCE_LhZwzy867qfr";
 
-	private static final String[] _PORTLET_IDS = {
-		"7", "20", "47", "71"
-	};
+	private static final String[] _PORTLET_IDS = {"20", "47", "71"};
 
 	private boolean _testInstanceable = true;
 

@@ -118,8 +118,8 @@
 		<execute action="CPDocumentsandmedia#mouseOver" locator-key1="DOCUMENT_CONTAINER_FOLDER" />
 		<execute action="CPDocumentsandmedia#assertElementPresent" locator-key1="DOCUMENT_CONTAINER_FOLDER_DROPDOWN" />
 		<execute action="CPDocumentsandmedia#click" locator-key1="DOCUMENT_CONTAINER_FOLDER_DROPDOWN" />
-		<execute action="CPDocumentsandmedia#assertElementPresent" locator-key1="FOLDER_MENULIST_EDIT" />
-		<execute action="CPDocumentsandmedia#assertClick" locator-key1="FOLDER_MENULIST_EDIT" value1="Edit" />
+		<execute action="CPDocumentsandmedia#assertElementPresent" locator-key1="FILTER_MENULIST_EDIT" />
+		<execute action="CPDocumentsandmedia#assertClick" locator-key1="FILTER_MENULIST_EDIT" value1="Edit" />
 
 		<execute action="CPDocumentsandmediaEditfolder#type" locator-key1="NAME_FIELD" value1="${dmFolderNameEdit}" />
 		<execute action="CPDocumentsandmediaEditfolder#type" locator-key1="DESCRIPTION_FIELD" value1="${dmFolderDescriptionEdit}" />
@@ -162,7 +162,7 @@
 	<command name="gotoCP">
 		<var name="key_dmFolderName" value="${dmFolderName}" />
 
-		<execute action="CPDocumentsandmedia#assertClick" locator-key1="DOCUMENT_CONTAINER_FOLDER" value1="${dmFolderName}" />
+		<execute action="CPDocumentsandmedia#assertClick" locator-key1="DOCUMENT_CONTAINER_FOLDER_TITLE" value1="${dmFolderName}" />
 	</command>
 
 	<command name="gotoPG">
@@ -273,6 +273,11 @@
 		<execute action="Permissions#selectFrame" value1="relative=top" />
 	</command>
 
+	<command name="subcribePG">
+		<execute action="PGDocumentsandmediaFolder#assertClick" locator-key1="SUBSCRIBE_LINK" value1="Subscribe" />
+		<execute action="PGDocumentsandmediaFolder#assertTextEquals" locator-key1="SUCCESS_MESSAGE" value1="Your request completed successfully." />
+	</command>
+
 	<command name="tearDownCP">
 		<execute macro="Page#gotoContentCP">
 			<var name="portletName" value="Documents and Media" />
@@ -378,5 +383,9 @@
 
 		<execute action="PGMediagallery#click" locator-key1="FOLDER_NAME" value1="${mgFolderName}" />
 		<execute action="PGMediagalleryFolder#assertTextEquals" locator-key1="FOLDER_HEADER_TITLE" value1="${mgFolderName}" />
+	</command>
+
+	<command name="viewSubcribedPG">
+		<execute action="PGDocumentsandmediaFolder#assertTextEquals" locator-key1="SUBSCRIBE_LINK" value1="Unsubscribe" />
 	</command>
 </definition>

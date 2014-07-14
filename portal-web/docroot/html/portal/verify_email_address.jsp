@@ -41,23 +41,23 @@ String ticketKey = ParamUtil.getString(request, "ticketKey");
 
 	<c:if test="<%= !SessionErrors.isEmpty(request) %>">
 		<c:choose>
-			<c:when test="<%= SessionErrors.contains(request, DuplicateUserEmailAddressException.class.getName()) %>">
-				<div class="alert alert-error">
-					<liferay-ui:message key="the-email-address-you-requested-is-already-taken" />
-				</div>
-			</c:when>
 			<c:when test="<%= SessionErrors.contains(request, ReservedUserEmailAddressException.class.getName()) %>">
-				<div class="alert alert-error">
+				<div class="alert alert-danger">
 					<liferay-ui:message key="the-email-address-you-requested-is-reserved" />
 				</div>
 			</c:when>
 			<c:when test="<%= SessionErrors.contains(request, UserEmailAddressException.class.getName()) %>">
-				<div class="alert alert-error">
+				<div class="alert alert-danger">
 					<liferay-ui:message key="please-enter-a-valid-email-address" />
 				</div>
 			</c:when>
+			<c:when test="<%= SessionErrors.contains(request, UserEmailAddressException.MustNotBeDuplicate.class.getName()) %>">
+				<div class="alert alert-danger">
+					<liferay-ui:message key="the-email-address-you-requested-is-already-taken" />
+				</div>
+			</c:when>
 			<c:otherwise>
-				<div class="alert alert-error">
+				<div class="alert alert-danger">
 					<liferay-ui:message key="please-enter-a-valid-verification-code" />
 				</div>
 			</c:otherwise>
@@ -70,9 +70,9 @@ String ticketKey = ParamUtil.getString(request, "ticketKey");
 		<aui:button type="submit" value="verify" />
 
 		<c:if test="<%= themeDisplay.isSignedIn() && !user.isEmailAddressVerified() %>">
-			<aui:button href='<%= themeDisplay.getPathMain() + "/portal/verify_email_address?cmd=" + Constants.SEND + "&referer=" + HttpUtil.encodeURL(referer) %>' value="send-new-verification-code" />
+			<aui:button href='<%= themeDisplay.getPathMain() + "/portal/verify_email_address?p_l_id=" + layout.getPlid() + "&cmd=" + Constants.SEND + "&referer=" + HttpUtil.encodeURL(referer) %>' value="send-new-verification-code" />
 
-			<aui:button href='<%= themeDisplay.getPathMain() + "/portal/update_email_address?referer=" + HttpUtil.encodeURL(referer) %>' value="change-email-address" />
+			<aui:button href='<%= themeDisplay.getPathMain() + "/portal/update_email_address?p_l_id=" + layout.getPlid() + "&referer=" + HttpUtil.encodeURL(referer) %>' value="change-email-address" />
 		</c:if>
 	</aui:button-row>
 </aui:form>

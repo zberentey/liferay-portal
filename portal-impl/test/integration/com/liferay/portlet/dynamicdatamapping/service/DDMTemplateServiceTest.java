@@ -16,13 +16,11 @@ package com.liferay.portlet.dynamicdatamapping.service;
 
 import com.liferay.portal.kernel.template.TemplateConstants;
 import com.liferay.portal.kernel.test.ExecutionTestListeners;
-import com.liferay.portal.kernel.transaction.Transactional;
 import com.liferay.portal.kernel.util.StringPool;
-import com.liferay.portal.test.EnvironmentExecutionTestListener;
 import com.liferay.portal.test.LiferayIntegrationJUnitTestRunner;
+import com.liferay.portal.test.MainServletExecutionTestListener;
 import com.liferay.portal.test.Sync;
 import com.liferay.portal.test.SynchronousDestinationExecutionTestListener;
-import com.liferay.portal.test.TransactionalExecutionTestListener;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.test.RandomTestUtil;
 import com.liferay.portal.util.test.ServiceContextTestUtil;
@@ -49,13 +47,11 @@ import org.junit.runner.RunWith;
  */
 @ExecutionTestListeners(
 	listeners = {
-		EnvironmentExecutionTestListener.class,
-		SynchronousDestinationExecutionTestListener.class,
-		TransactionalExecutionTestListener.class
+		MainServletExecutionTestListener.class,
+		SynchronousDestinationExecutionTestListener.class
 	})
 @RunWith(LiferayIntegrationJUnitTestRunner.class)
 @Sync
-@Transactional
 public class DDMTemplateServiceTest extends BaseDDMServiceTestCase {
 
 	@Test
@@ -115,12 +111,18 @@ public class DDMTemplateServiceTest extends BaseDDMServiceTestCase {
 
 	@Test
 	public void testCopyTemplates() throws Exception {
+		int initialCount = DDMTemplateLocalServiceUtil.getTemplatesCount(
+			group.getGroupId(), _classNameId, 0);
+
 		DDMTemplate template = addDisplayTemplate(
 			_classNameId, 0, "Test Template");
 
-		List<DDMTemplate> templates = copyTemplate(template);
+		copyTemplate(template);
 
-		Assert.assertTrue(templates.size() >= 1);
+		int count = DDMTemplateLocalServiceUtil.getTemplatesCount(
+			group.getGroupId(), _classNameId, 0);
+
+		Assert.assertEquals(initialCount + 2, count);
 	}
 
 	@Test
@@ -243,12 +245,9 @@ public class DDMTemplateServiceTest extends BaseDDMServiceTestCase {
 		Assert.assertEquals(initialCount + 1, count);
 	}
 
-	protected List<DDMTemplate> copyTemplate(DDMTemplate template)
-		throws Exception {
-
-		return DDMTemplateLocalServiceUtil.copyTemplates(
-			template.getUserId(), template.getClassNameId(),
-			template.getClassPK(), -1, template.getType(),
+	protected DDMTemplate copyTemplate(DDMTemplate template) throws Exception {
+		return DDMTemplateLocalServiceUtil.copyTemplate(
+			template.getUserId(), template.getTemplateId(),
 			ServiceContextTestUtil.getServiceContext(group.getGroupId()));
 	}
 

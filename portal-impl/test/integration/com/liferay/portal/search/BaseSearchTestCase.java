@@ -14,14 +14,14 @@
 
 package com.liferay.portal.search;
 
-import com.liferay.portal.kernel.dao.orm.FinderCacheUtil;
+import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.Hits;
 import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.IndexerRegistryUtil;
 import com.liferay.portal.kernel.search.SearchContext;
-import com.liferay.portal.kernel.transaction.Transactional;
 import com.liferay.portal.kernel.trash.TrashHandler;
 import com.liferay.portal.kernel.trash.TrashHandlerRegistryUtil;
+import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.kernel.workflow.WorkflowThreadLocal;
@@ -33,8 +33,8 @@ import com.liferay.portal.security.auth.PrincipalThreadLocal;
 import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portal.security.permission.PermissionCheckerFactoryUtil;
 import com.liferay.portal.security.permission.PermissionThreadLocal;
-import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portal.service.ServiceContext;
+import com.liferay.portal.test.DeleteAfterTestRun;
 import com.liferay.portal.util.test.GroupTestUtil;
 import com.liferay.portal.util.test.RandomTestUtil;
 import com.liferay.portal.util.test.SearchContextTestUtil;
@@ -44,38 +44,69 @@ import com.liferay.portal.util.test.UserTestUtil;
 import com.liferay.portlet.messageboards.model.MBMessage;
 import com.liferay.portlet.messageboards.service.MBMessageLocalServiceUtil;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 /**
  * @author Eudaldo Alonso
+ * @author Tibor Lipusz
  */
 public abstract class BaseSearchTestCase {
 
 	@Before
 	public void setUp() throws Exception {
-		FinderCacheUtil.clearCache();
-
 		group = GroupTestUtil.addGroup();
 	}
 
-	@After
-	public void tearDown() throws Exception {
-		GroupLocalServiceUtil.deleteGroup(group);
-	}
-
 	@Test
-	@Transactional
 	public void testBaseModelUserPermissions() throws Exception {
 		testUserPermissions(false, true);
 	}
 
 	@Test
-	@Transactional
+	public void testLocalizedSearch() throws Exception {
+		SearchContext searchContext = SearchContextTestUtil.getSearchContext(
+			group.getGroupId());
+
+		int initialBaseModelsSearchCount = searchBaseModelsCount(
+			getBaseModelClass(), group.getGroupId(), searchContext);
+
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(group.getGroupId());
+
+		BaseModel<?> parentBaseModel = getParentBaseModel(
+			group, serviceContext);
+
+		Map<Locale, String> keywordsMap = new HashMap<Locale, String>();
+
+		keywordsMap.put(LocaleUtil.getDefault(), "entity title");
+		keywordsMap.put(LocaleUtil.HUNGARY, "entitas neve");
+
+		baseModel = addBaseModelWithWorkflow(
+			parentBaseModel, true, keywordsMap, serviceContext);
+
+		Assert.assertEquals(
+			initialBaseModelsSearchCount + 1,
+			searchBaseModelsCount(
+				getBaseModelClass(), group.getGroupId(), searchContext));
+
+		searchContext.setAttribute(Field.TITLE, "nev");
+		searchContext.setKeywords("nev");
+		searchContext.setLocale(LocaleUtil.HUNGARY);
+
+		Assert.assertEquals(
+			initialBaseModelsSearchCount + 1,
+			searchBaseModelsCount(
+				getBaseModelClass(), group.getGroupId(), searchContext));
+	}
+
+	@Test
 	public void testParentBaseModelUserPermissions() throws Exception {
 		testUserPermissions(true, false);
 	}
@@ -101,55 +132,46 @@ public abstract class BaseSearchTestCase {
 	}
 
 	@Test
-	@Transactional
 	public void testSearchByKeywordsInsideParentBaseModel() throws Exception {
 		searchByKeywordsInsideParentBaseModel();
 	}
 
 	@Test
-	@Transactional
 	public void testSearchComments() throws Exception {
 		searchComments();
 	}
 
 	@Test
-	@Transactional
 	public void testSearchExpireAllVersions() throws Exception {
 		searchExpireVersions(false);
 	}
 
 	@Test
-	@Transactional
 	public void testSearchExpireLatestVersion() throws Exception {
 		searchExpireVersions(true);
 	}
 
 	@Test
-	@Transactional
 	public void testSearchMyEntries() throws Exception {
 		searchMyEntries();
 	}
 
 	@Test
-	@Transactional
 	public void testSearchRecentEntries() throws Exception {
 		searchRecentEntries();
 	}
 
 	@Test
-	@Transactional
 	public void testSearchStatus() throws Exception {
 		searchStatus();
 	}
 
 	@Test
-	@Transactional
 	public void testSearchVersions() throws Exception {
 		searchVersions();
 	}
 
 	@Test
-	@Transactional
 	public void testSearchWithinDDMStructure() throws Exception {
 		searchWithinDDMStructure();
 	}
@@ -183,6 +205,16 @@ public abstract class BaseSearchTestCase {
 		throws Exception {
 
 		return addBaseModel(parentBaseModel, true, keywords, serviceContext);
+	}
+
+	protected BaseModel<?> addBaseModelWithWorkflow(
+			BaseModel<?> parentBaseModel, boolean approved,
+			Map<Locale, String> keywordsMap, ServiceContext serviceContext)
+		throws Exception {
+
+		return addBaseModelWithWorkflow(
+			parentBaseModel, approved, keywordsMap.get(LocaleUtil.getDefault()),
+			serviceContext);
 	}
 
 	protected abstract BaseModel<?> addBaseModelWithWorkflow(
@@ -894,6 +926,8 @@ public abstract class BaseSearchTestCase {
 	protected final boolean CHECK_BASE_MODEL_PERMISSION = true;
 
 	protected BaseModel<?> baseModel;
+
+	@DeleteAfterTestRun
 	protected Group group;
 
 }

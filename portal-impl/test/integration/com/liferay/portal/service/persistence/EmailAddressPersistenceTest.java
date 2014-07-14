@@ -36,7 +36,7 @@ import com.liferay.portal.service.EmailAddressLocalServiceUtil;
 import com.liferay.portal.service.persistence.BasePersistence;
 import com.liferay.portal.service.persistence.PersistenceExecutionTestListener;
 import com.liferay.portal.test.LiferayPersistenceIntegrationJUnitTestRunner;
-import com.liferay.portal.test.persistence.TransactionalPersistenceAdvice;
+import com.liferay.portal.test.persistence.test.TransactionalPersistenceAdvice;
 import com.liferay.portal.util.test.RandomTestUtil;
 
 import org.junit.After;
@@ -48,6 +48,7 @@ import org.junit.runner.RunWith;
 
 import java.io.Serializable;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -314,7 +315,7 @@ public class EmailAddressPersistenceTest {
 		}
 	}
 
-	protected OrderByComparator getOrderByComparator() {
+	protected OrderByComparator<EmailAddress> getOrderByComparator() {
 		return OrderByComparatorFactoryUtil.create("EmailAddress",
 			"mvccVersion", true, "uuid", true, "emailAddressId", true,
 			"companyId", true, "userId", true, "userName", true, "createDate",
@@ -338,6 +339,88 @@ public class EmailAddressPersistenceTest {
 		EmailAddress missingEmailAddress = _persistence.fetchByPrimaryKey(pk);
 
 		Assert.assertNull(missingEmailAddress);
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereAllPrimaryKeysExist()
+		throws Exception {
+		EmailAddress newEmailAddress1 = addEmailAddress();
+		EmailAddress newEmailAddress2 = addEmailAddress();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(newEmailAddress1.getPrimaryKey());
+		primaryKeys.add(newEmailAddress2.getPrimaryKey());
+
+		Map<Serializable, EmailAddress> emailAddresses = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertEquals(2, emailAddresses.size());
+		Assert.assertEquals(newEmailAddress1,
+			emailAddresses.get(newEmailAddress1.getPrimaryKey()));
+		Assert.assertEquals(newEmailAddress2,
+			emailAddresses.get(newEmailAddress2.getPrimaryKey()));
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereNoPrimaryKeysExist()
+		throws Exception {
+		long pk1 = RandomTestUtil.nextLong();
+
+		long pk2 = RandomTestUtil.nextLong();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(pk1);
+		primaryKeys.add(pk2);
+
+		Map<Serializable, EmailAddress> emailAddresses = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertTrue(emailAddresses.isEmpty());
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereSomePrimaryKeysExist()
+		throws Exception {
+		EmailAddress newEmailAddress = addEmailAddress();
+
+		long pk = RandomTestUtil.nextLong();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(newEmailAddress.getPrimaryKey());
+		primaryKeys.add(pk);
+
+		Map<Serializable, EmailAddress> emailAddresses = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertEquals(1, emailAddresses.size());
+		Assert.assertEquals(newEmailAddress,
+			emailAddresses.get(newEmailAddress.getPrimaryKey()));
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithNoPrimaryKeys()
+		throws Exception {
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		Map<Serializable, EmailAddress> emailAddresses = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertTrue(emailAddresses.isEmpty());
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithOnePrimaryKey()
+		throws Exception {
+		EmailAddress newEmailAddress = addEmailAddress();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(newEmailAddress.getPrimaryKey());
+
+		Map<Serializable, EmailAddress> emailAddresses = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertEquals(1, emailAddresses.size());
+		Assert.assertEquals(newEmailAddress,
+			emailAddresses.get(newEmailAddress.getPrimaryKey()));
 	}
 
 	@Test

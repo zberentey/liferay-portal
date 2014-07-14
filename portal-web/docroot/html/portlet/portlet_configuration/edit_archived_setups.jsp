@@ -77,7 +77,7 @@ portletURL.setParameter("portletResource", portletResource);
 
 	searchContainer.setResults(results);
 
-	List<ResultRow> resultRows = searchContainer.getResultRows();
+	List resultRows = searchContainer.getResultRows();
 
 	for (int i = 0; i < results.size(); i++) {
 		ArchivedSettings archivedSettings = results.get(i);
@@ -98,7 +98,7 @@ portletURL.setParameter("portletResource", portletResource);
 
 		// Action
 
-		row.addJSP("right", SearchEntry.DEFAULT_VALIGN, "/html/portlet/portlet_configuration/archived_setup_action.jsp");
+		row.addJSP("/html/portlet/portlet_configuration/archived_setup_action.jsp", "entry-action");
 
 		// Add result row
 
@@ -118,5 +118,5 @@ portletURL.setParameter("portletResource", portletResource);
 </aui:form>
 
 <%
-PortalUtil.addPortletBreadcrumbEntry(request, LanguageUtil.get(pageContext, "archived"), currentURL);
+PortalUtil.addPortletBreadcrumbEntry(request, LanguageUtil.get(request, "archived"), currentURL);
 %>

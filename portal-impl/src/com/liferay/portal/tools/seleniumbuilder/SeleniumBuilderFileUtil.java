@@ -77,6 +77,9 @@ public class SeleniumBuilderFileUtil {
 
 		_componentNames = ListUtil.fromArray(
 			StringUtil.split(properties.getProperty("component.names")));
+		_testcaseAvailablePropertyNames = ListUtil.fromArray(
+			StringUtil.split(
+				properties.getProperty("testcase.available.property.names")));
 		_testrayAvailableComponentNames = ListUtil.fromArray(
 			StringUtil.split(
 				properties.getProperty("testray.available.component.names")));
@@ -573,6 +576,10 @@ public class SeleniumBuilderFileUtil {
 		else if (errorCode == 3002) {
 			throw new IllegalArgumentException(
 				prefix + "Missing property '" + string1 + "' for " + suffix);
+		}
+		else if (errorCode == 3003) {
+			throw new IllegalArgumentException(
+				prefix + "Invalid property " + string1 + " at " + suffix);
 		}
 		else {
 			throw new IllegalArgumentException(prefix + suffix);
@@ -1522,16 +1529,23 @@ public class SeleniumBuilderFileUtil {
 
 		String propertyName = propertyElement.attributeValue("name");
 
+		if (!_testcaseAvailablePropertyNames.contains(propertyName)) {
+			throwValidationException(
+				3003, fileName, propertyElement, propertyName);
+		}
+
 		if (propertyName.equals("ignore.errors")) {
 			String propertyDelimiter = propertyElement.attributeValue(
 				"delimiter");
 
-			if (Validator.isNull(propertyDelimiter)) {
-				throwValidationException(
-					1006, fileName, propertyElement, "delimiter");
-			}
-
 			String propertyValue = propertyElement.attributeValue("value");
+
+			if (propertyDelimiter != null) {
+				if (!propertyValue.contains(propertyDelimiter)) {
+					throwValidationException(
+						1006, fileName, propertyElement, "delimiter");
+				}
+			}
 
 			if (Validator.isNull(propertyValue)) {
 				throwValidationException(
@@ -1890,7 +1904,9 @@ public class SeleniumBuilderFileUtil {
 			}
 		}
 
-		if (!attributeMap.containsKey("value") && Validator.isNull(varText)) {
+		if (!attributeMap.containsKey("property-value") &&
+			!attributeMap.containsKey("value") && Validator.isNull(varText)) {
+
 			if (!attributeMap.containsKey("group") &&
 				!attributeMap.containsKey("input") &&
 				!attributeMap.containsKey("locator") &&
@@ -1959,7 +1975,8 @@ public class SeleniumBuilderFileUtil {
 	private static List<String> _allowedVarAttributes = ListUtil.fromArray(
 		new String[] {
 			"attribute", "group", "input", "line-number", "locator",
-			"locator-key", "method", "name", "path", "pattern", "value"
+			"locator-key", "method", "name", "path", "pattern",
+			"property-value", "value"
 		});
 	private static List<String> _componentNames;
 	private static List<String> _methodNames = ListUtil.fromArray(
@@ -1975,6 +1992,7 @@ public class SeleniumBuilderFileUtil {
 			"property", "set-up", "take-screenshot", "td", "tear-down", "then",
 			"tr", "while", "var"
 		});
+	private static List<String> _testcaseAvailablePropertyNames;
 	private static List<String> _testrayAvailableComponentNames;
 
 	private String _baseDirName;

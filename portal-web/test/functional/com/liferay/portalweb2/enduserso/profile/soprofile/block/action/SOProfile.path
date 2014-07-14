@@ -74,8 +74,28 @@
 	<td></td>
 </tr>
 <tr>
+	<td>VCARD_BUTTON</td>
+	<td>//span[contains(.,'vCard')]/a</td>
+	<td></td>
+</tr>
+<tr>
 	<td>PROFILE_CONTENT_INFO_MESSAGE</td>
 	<td>//p[@class='portlet-msg portlet-msg-info']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>WHATS_HAPPENING</td>
+	<td>//div[contains(@class,'microblogs-status-container')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>WHATS_HAPPENING_OPTIONS</td>
+	<td>//div[contains(@id,'microblogsportlet')]//span[contains(@class,'portlet-actions')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>WHATS_HAPPENING_OPTIONS_LINK</td>
+	<td>//div[contains(@id,'microblogsportlet')]//span[contains(@class,'portlet-actions')]//a[@title='Options']</td>
 	<td></td>
 </tr>
 <tr>

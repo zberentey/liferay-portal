@@ -14,16 +14,22 @@
 
 package com.liferay.portlet.dynamicdatamapping.util.test;
 
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
+import com.liferay.portal.kernel.util.PropsKeys;
+import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.kernel.xml.Attribute;
 import com.liferay.portal.kernel.xml.Document;
 import com.liferay.portal.kernel.xml.Element;
+import com.liferay.portal.kernel.xml.Node;
 import com.liferay.portal.kernel.xml.SAXReaderUtil;
+import com.liferay.portal.kernel.xml.XPath;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.util.PortalUtil;
-import com.liferay.portal.util.PropsValues;
 import com.liferay.portal.util.test.ServiceContextTestUtil;
 import com.liferay.portal.util.test.TestPropsValues;
 import com.liferay.portlet.dynamicdatamapping.model.DDMStructure;
@@ -31,6 +37,7 @@ import com.liferay.portlet.dynamicdatamapping.model.DDMStructureConstants;
 import com.liferay.portlet.dynamicdatamapping.service.DDMStructureLocalServiceUtil;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -43,7 +50,7 @@ public class DDMStructureTestUtil {
 		throws Exception {
 
 		return addStructure(
-			groupId, className, 0, getSampleStructureXSD(),
+			groupId, className, 0, getSampleStructureDefinition(),
 			LocaleUtil.getSiteDefault(),
 			ServiceContextTestUtil.getServiceContext());
 	}
@@ -53,8 +60,8 @@ public class DDMStructureTestUtil {
 		throws Exception {
 
 		return addStructure(
-			groupId, className, 0, getSampleStructureXSD(), defaultLocale,
-			ServiceContextTestUtil.getServiceContext());
+			groupId, className, 0, getSampleStructureDefinition(),
+			defaultLocale, ServiceContextTestUtil.getServiceContext());
 	}
 
 	public static DDMStructure addStructure(
@@ -62,52 +69,57 @@ public class DDMStructureTestUtil {
 		throws Exception {
 
 		return addStructure(
-			groupId, className, parentStructureId, getSampleStructureXSD(),
-			LocaleUtil.getSiteDefault(),
+			groupId, className, parentStructureId,
+			getSampleStructureDefinition(), LocaleUtil.getSiteDefault(),
 			ServiceContextTestUtil.getServiceContext());
 	}
 
 	public static DDMStructure addStructure(
-			long groupId, String className, long parentStructureId, String xsd,
-			Locale defaultLocale, ServiceContext serviceContext)
+			long groupId, String className, long parentStructureId,
+			String definition, Locale defaultLocale,
+			ServiceContext serviceContext)
 		throws Exception {
 
 		Map<Locale, String> nameMap = new HashMap<Locale, String>();
 
 		nameMap.put(defaultLocale, "Test Structure");
 
+		String ddlStorageType = GetterUtil.getString(
+			PropsUtil.get(PropsKeys.DYNAMIC_DATA_LISTS_STORAGE_TYPE));
+
 		serviceContext.setAddGroupPermissions(true);
 		serviceContext.setAddGuestPermissions(true);
 
 		return DDMStructureLocalServiceUtil.addStructure(
 			TestPropsValues.getUserId(), groupId, parentStructureId,
-			PortalUtil.getClassNameId(className), null, nameMap, null, xsd,
-			PropsValues.DYNAMIC_DATA_LISTS_STORAGE_TYPE,
-			DDMStructureConstants.TYPE_DEFAULT, serviceContext);
+			PortalUtil.getClassNameId(className), null, nameMap, null,
+			definition, ddlStorageType, DDMStructureConstants.TYPE_DEFAULT,
+			serviceContext);
 	}
 
 	public static DDMStructure addStructure(
-			long groupId, String className, String xsd)
+			long groupId, String className, String definition)
 		throws Exception {
 
 		return addStructure(
-			groupId, className, 0, xsd, LocaleUtil.getSiteDefault(),
+			groupId, className, 0, definition, LocaleUtil.getSiteDefault(),
 			ServiceContextTestUtil.getServiceContext());
 	}
 
 	public static DDMStructure addStructure(
-			long groupId, String className, String xsd, Locale defaultLocale)
+			long groupId, String className, String definition,
+			Locale defaultLocale)
 		throws Exception {
 
 		return addStructure(
-			groupId, className, 0, xsd, defaultLocale,
+			groupId, className, 0, definition, defaultLocale,
 			ServiceContextTestUtil.getServiceContext());
 	}
 
 	public static DDMStructure addStructure(String className) throws Exception {
 		return addStructure(
-			TestPropsValues.getGroupId(), className, 0, getSampleStructureXSD(),
-			LocaleUtil.getSiteDefault(),
+			TestPropsValues.getGroupId(), className, 0,
+			getSampleStructureDefinition(), LocaleUtil.getSiteDefault(),
 			ServiceContextTestUtil.getServiceContext());
 	}
 
@@ -117,7 +129,7 @@ public class DDMStructureTestUtil {
 
 		return addStructure(
 			TestPropsValues.getGroupId(), className, 0,
-			getSampleStructureXSD(
+			getSampleStructureDefinition(
 				"name", new Locale[] {LocaleUtil.US}, defaultLocale),
 			defaultLocale, ServiceContextTestUtil.getServiceContext());
 	}
@@ -128,26 +140,27 @@ public class DDMStructureTestUtil {
 
 		return addStructure(
 			TestPropsValues.getGroupId(), className, 0,
-			getSampleStructureXSD("name", availableLocales, defaultLocale),
+			getSampleStructureDefinition(
+				"name", availableLocales, defaultLocale),
 			defaultLocale, ServiceContextTestUtil.getServiceContext());
 	}
 
-	public static DDMStructure addStructure(String className, String xsd)
+	public static DDMStructure addStructure(String className, String definition)
 		throws Exception {
 
 		return addStructure(
-			TestPropsValues.getGroupId(), className, 0, xsd,
+			TestPropsValues.getGroupId(), className, 0, definition,
 			LocaleUtil.getSiteDefault(),
 			ServiceContextTestUtil.getServiceContext());
 	}
 
 	public static DDMStructure addStructure(
-			String className, String xsd, Locale defaultLocale)
+			String className, String definition, Locale defaultLocale)
 		throws Exception {
 
 		return addStructure(
-			TestPropsValues.getGroupId(), className, 0, xsd, defaultLocale,
-			ServiceContextTestUtil.getServiceContext());
+			TestPropsValues.getGroupId(), className, 0, definition,
+			defaultLocale, ServiceContextTestUtil.getServiceContext());
 	}
 
 	public static String getSampleStructuredContent() {
@@ -211,22 +224,23 @@ public class DDMStructureTestUtil {
 		return getSampleStructuredContent(name, contents, "en_US");
 	}
 
-	public static String getSampleStructureXSD() {
-		return getSampleStructureXSD("name");
+	public static String getSampleStructureDefinition() {
+		return getSampleStructureDefinition("name");
 	}
 
-	public static String getSampleStructureXSD(
+	public static String getSampleStructureDefinition(
 		Locale[] availableLocales, Locale defaultLocale) {
 
-		return getSampleStructureXSD("name", availableLocales, defaultLocale);
+		return getSampleStructureDefinition(
+			"name", availableLocales, defaultLocale);
 	}
 
-	public static String getSampleStructureXSD(String name) {
-		return getSampleStructureXSD(
+	public static String getSampleStructureDefinition(String name) {
+		return getSampleStructureDefinition(
 			name, new Locale[] {LocaleUtil.US}, LocaleUtil.US);
 	}
 
-	public static String getSampleStructureXSD(
+	public static String getSampleStructureDefinition(
 		String name, Locale[] availableLocales, Locale defaultLocale) {
 
 		Document document = createDocumentStructure(
@@ -257,6 +271,29 @@ public class DDMStructureTestUtil {
 		return document.asXML();
 	}
 
+	public static Map<String, Map<String, String>> getXSDMap(String xsd)
+		throws Exception {
+
+		Map<String, Map<String, String>> map =
+			new HashMap<String, Map<String, String>>();
+
+		Document document = SAXReaderUtil.read(xsd);
+
+		XPath xPathSelector = SAXReaderUtil.createXPath("//dynamic-element");
+
+		List<Node> nodes = xPathSelector.selectNodes(document);
+
+		for (Node node : nodes) {
+			Element dynamicElementElement = (Element)node;
+
+			String elementName = getElementName(dynamicElementElement);
+
+			map.put(elementName, getElementMap(dynamicElementElement));
+		}
+
+		return map;
+	}
+
 	protected static Document createDocumentContent(
 		String availableLocales, String defaultLocale) {
 
@@ -285,6 +322,64 @@ public class DDMStructureTestUtil {
 			"default-locale", LocaleUtil.toLanguageId(defaultLocale));
 
 		return document;
+	}
+
+	protected static Map<String, String> getElementMap(Element element) {
+		Map<String, String> elementMap = new HashMap<String, String>();
+
+		// Attributes
+
+		for (Attribute attribute : element.attributes()) {
+			elementMap.put(attribute.getName(), attribute.getValue());
+		}
+
+		// Metadata
+
+		for (Element metadadataElement : element.elements("meta-data")) {
+			String metadataLanguageId = metadadataElement.attributeValue(
+				"locale");
+
+			for (Element entryElement : metadadataElement.elements("entry")) {
+				String entryName = entryElement.attributeValue("name");
+
+				elementMap.put(
+					entryName.concat(metadataLanguageId),
+					entryElement.getText());
+			}
+		}
+
+		return elementMap;
+	}
+
+	protected static String getElementName(Element element) {
+		StringBuilder sb = new StringBuilder();
+
+		sb.append(element.attributeValue("name"));
+
+		Element parentElement = element.getParent();
+
+		while (true) {
+			if ((parentElement == null) ||
+				parentElement.getName().equals("root")) {
+
+				break;
+			}
+
+			sb.insert(
+				0, parentElement.attributeValue("name") + StringPool.SLASH);
+
+			parentElement = parentElement.getParent();
+		}
+
+		String type = element.attributeValue("type");
+
+		if (Validator.equals(type, "option")) {
+			sb.append(StringPool.SLASH);
+
+			sb.append(element.attributeValue("value"));
+		}
+
+		return sb.toString();
 	}
 
 }

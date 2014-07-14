@@ -38,12 +38,12 @@ import com.liferay.portal.kernel.scheduler.StorageType;
 import com.liferay.portal.kernel.scheduler.TriggerFactoryUtil;
 import com.liferay.portal.kernel.scheduler.TriggerState;
 import com.liferay.portal.kernel.scheduler.TriggerType;
+import com.liferay.portal.kernel.scheduler.messaging.ReceiverKey;
 import com.liferay.portal.kernel.scheduler.messaging.SchedulerEventMessageListenerWrapper;
 import com.liferay.portal.kernel.scheduler.messaging.SchedulerResponse;
 import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.ClassLoaderPool;
 import com.liferay.portal.kernel.util.ProxyUtil;
-import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.scheduler.job.MessageSenderJob;
 import com.liferay.portal.service.QuartzLocalService;
@@ -569,10 +569,6 @@ public class QuartzSchedulerEngine implements SchedulerEngine {
 		return argument;
 	}
 
-	protected String getFullName(String jobName, String groupName) {
-		return groupName.concat(StringPool.PERIOD).concat(jobName);
-	}
-
 	protected JobState getJobState(JobDataMap jobDataMap) {
 		Map<String, Object> jobStateMap = (Map<String, Object>)jobDataMap.get(
 			JOB_STATE);
@@ -748,7 +744,7 @@ public class QuartzSchedulerEngine implements SchedulerEngine {
 			message.put(PREVIOUS_FIRE_TIME, trigger.getPreviousFireTime());
 			message.put(START_TIME, trigger.getStartTime());
 
-			if (CronTrigger.class.isAssignableFrom(trigger.getClass())) {
+			if (trigger instanceof CronTrigger) {
 				CronTrigger cronTrigger = CronTrigger.class.cast(trigger);
 
 				schedulerResponse = new SchedulerResponse();
@@ -763,7 +759,7 @@ public class QuartzSchedulerEngine implements SchedulerEngine {
 						cronTrigger.getEndTime(),
 						cronTrigger.getCronExpression()));
 			}
-			else if (SimpleTrigger.class.isAssignableFrom(trigger.getClass())) {
+			else if (trigger instanceof SimpleTrigger) {
 				SimpleTrigger simpleTrigger = SimpleTrigger.class.cast(trigger);
 
 				schedulerResponse = new SchedulerResponse();
@@ -950,7 +946,7 @@ public class QuartzSchedulerEngine implements SchedulerEngine {
 			MESSAGE_LISTENER_UUID,
 			schedulerEventListenerWrapper.getMessageListenerUUID());
 
-		message.put(RECEIVER_KEY, getFullName(jobName, groupName));
+		message.put(RECEIVER_KEY, new ReceiverKey(jobName, groupName));
 	}
 
 	protected void schedule(
@@ -1020,6 +1016,10 @@ public class QuartzSchedulerEngine implements SchedulerEngine {
 		MessageBus messageBus = MessageBusUtil.getMessageBus();
 
 		Destination destination = messageBus.getDestination(destinationName);
+
+		if (destination == null) {
+			return;
+		}
 
 		Set<MessageListener> messageListeners =
 			destination.getMessageListeners();

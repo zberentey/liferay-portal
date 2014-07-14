@@ -16,7 +16,6 @@ package com.liferay.portal.kernel.lar;
 
 import com.liferay.portal.NoSuchModelException;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.trash.TrashHandler;
@@ -57,7 +56,7 @@ public abstract class BaseStagedModelDataHandler<T extends StagedModel>
 	@Override
 	public abstract void deleteStagedModel(
 			String uuid, long groupId, String className, String extraData)
-		throws PortalException, SystemException;
+		throws PortalException;
 
 	@Override
 	public void exportStagedModel(
@@ -321,7 +320,7 @@ public abstract class BaseStagedModelDataHandler<T extends StagedModel>
 
 	protected void exportAssetCategories(
 			PortletDataContext portletDataContext, T stagedModel)
-		throws PortletDataException, SystemException {
+		throws PortletDataException {
 
 		List<AssetCategory> assetCategories =
 			AssetCategoryLocalServiceUtil.getCategories(
@@ -337,7 +336,7 @@ public abstract class BaseStagedModelDataHandler<T extends StagedModel>
 
 	protected void exportComments(
 			PortletDataContext portletDataContext, T stagedModel)
-		throws PortletDataException, SystemException {
+		throws PortletDataException {
 
 		if (!MapUtil.getBoolean(
 				portletDataContext.getParameterMap(),
@@ -381,7 +380,7 @@ public abstract class BaseStagedModelDataHandler<T extends StagedModel>
 
 	protected void exportRatings(
 			PortletDataContext portletDataContext, T stagedModel)
-		throws PortletDataException, SystemException {
+		throws PortletDataException {
 
 		if (!MapUtil.getBoolean(
 				portletDataContext.getParameterMap(),
@@ -522,9 +521,11 @@ public abstract class BaseStagedModelDataHandler<T extends StagedModel>
 		TrashHandler trashHandler = TrashHandlerRegistryUtil.getTrashHandler(
 			stagedModelType.getClassName());
 
+		long classPK = 0;
+
 		if (trashHandler != null) {
 			try {
-				long classPK = (Long)stagedModel.getPrimaryKeyObj();
+				classPK = (Long)stagedModel.getPrimaryKeyObj();
 
 				if (trashHandler.isInTrash(classPK)) {
 					PortletDataException pde = new PortletDataException(
@@ -539,10 +540,14 @@ public abstract class BaseStagedModelDataHandler<T extends StagedModel>
 				throw pde;
 			}
 			catch (Exception e) {
-				if (_log.isWarnEnabled()) {
+				if (_log.isDebugEnabled()) {
+					_log.debug(e, e);
+				}
+				else if (_log.isWarnEnabled()) {
 					_log.warn(
 						"Unable to check trash status for " +
-							stagedModel.getModelClassName());
+							stagedModel.getModelClassName() +
+								" with primary key " + classPK);
 				}
 			}
 		}

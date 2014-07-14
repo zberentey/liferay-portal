@@ -126,7 +126,9 @@
 		<if>
 			<isset var="webContentLinkToPage" />
 			<then>
-				<execute action="CPWebcontentAddwebcontent#type" locator-key1="LINK_TO_PAGE_FIELD" value1="${webContentLinkToPage}" />
+				<var name="key_indexNumber" value="${indexNumber}" />
+
+				<execute action="CPWebcontentAddwebcontent#select" locator-key1="LINK_TO_PAGE_FIELD" value1="index=${key_indexNumber}" />
 			</then>
 		</if>
 
@@ -240,11 +242,26 @@
 		<execute action="CPWebcontentAddwebcontent#assertClick" locator-key1="PUBLISH_BUTTON" value1="Publish" />
 
 		<execute action="CPWebcontentAddwebcontent#assertTextEquals" locator-key1="ERROR_MESSAGE_FIELD_REQUIRED" value1="This field is required." />
+
+		<if>
+			<isset var="webContentContent" />
+			<then>
+				<execute action="CPWebcontentAddwebcontent#assertTextEquals" locator-key1="CONTENT_FIELD" value1="${webContentContent}" />
+			</then>
+		</if>
 	</command>
 
 	<command name="addPGViaAP">
-		<execute action="PGAssetpublisher#assertClick" locator-key1="ADD_NEW_DROPDOWN" value1="Add New" />
-		<execute action="PGAssetpublisher#assertClick" locator-key1="ADD_NEW_MENULIST_BASIC_WEB_CONTENT" value1="Basic Web Content" />
+		<if>
+			<equals arg1="${assetTypeConfigured}" arg2="true" />
+			<then>
+				<execute action="PGAssetpublisher#click" locator-key1="ADD_BASIC_WEB_CONTENT_BUTTON" />
+			</then>
+			<else>
+				<execute action="PGAssetpublisher#assertClick" locator-key1="ADD_NEW_DROPDOWN" value1="Add New" />
+				<execute action="PGAssetpublisher#assertClick" locator-key1="ADD_NEW_MENULIST_BASIC_WEB_CONTENT" value1="Basic Web Content" />
+			</else>
+		</if>
 
 		<execute action="PGAssetpublisherAddnewwebcontent#selectFrame" locator-key1="WEB_CONTENT_IFRAME" />
 		<execute action="PGAssetpublisherAddnewwebcontent#type" locator-key1="TITLE_FIELD" value1="${webContentTitle}" />
@@ -285,11 +302,15 @@
 	<command name="addPGViaWCD">
 		<execute action="PGWebcontentdisplay#click" locator-key1="ADD_WEB_CONTENT" />
 
-		<execute action="PGWebcontentdisplayAddwebcontent#selectFrame" locator-key1="WEB_CONTENT_IFRAME" />
-
 		<if>
 			<equals arg1="${localizedTitle}" arg2="true" />
 			<then>
+				<var name="key_localizedBasicWebContent" value="${localizedBasicWebContent}" />
+
+				<execute action="PGWebcontentdisplay#assertClick" locator-key1="ADD_BASIC_WEB_CONTENT_LOCALIZED" value1="${localizedBasicWebContent}" />
+
+				<execute action="PGWebcontentdisplayAddwebcontent#selectFrame" locator-key1="WEB_CONTENT_IFRAME" />
+
 				<var name="key_lowercaseLanguageCode" value="${lowercaseLanguageCode}" />
 
 				<execute action="PGWebcontentdisplayAddwebcontent#type" locator-key1="TITLE_FIELD_LOCALIZED" value1="${webContentTitle}" />
@@ -297,6 +318,10 @@
 				<execute action="PGWebcontentdisplayAddwebcontent#click" locator-key1="LOCALIZED_PUBLISH_BUTTON" />
 			</then>
 			<else>
+				<execute action="PGWebcontentdisplay#assertClick" locator-key1="ADD_BASIC_WEB_CONTENT" value1="Basic Web Content" />
+
+				<execute action="PGWebcontentdisplayAddwebcontent#selectFrame" locator-key1="WEB_CONTENT_IFRAME" />
+
 				<execute action="PGWebcontentdisplayAddwebcontent#type" locator-key1="TITLE_FIELD" value1="${webContentTitle}" />
 				<execute action="PGWebcontentdisplayAddwebcontent#type" locator-key1="CONTENT_FIELD" value1="${webContentContent}" />
 				<execute action="PGWebcontentdisplayAddwebcontent#click" locator-key1="PUBLISH_BUTTON" />
@@ -711,10 +736,19 @@
 	</command>
 
 	<command name="addWithWorkflowPGViaWCD">
-		<var name="key_selectStructureName" value="${selectStructureName}" />
+		<if>
+			<isset var="selectStructureName" />
+			<then>
+				<var name="key_selectStructureName" value="${selectStructureName}" />
 
-		<execute action="PGWebcontentdisplay#click" locator-key1="ADD_WEB_CONTENT" />
-		<execute action="PGWebcontentdisplay#assertClick" locator-key1="ADD_MENU_WEB_CONTENT_STRUCTURE" value1="${selectStructureName}" />
+				<execute action="PGWebcontentdisplay#click" locator-key1="ADD_WEB_CONTENT" />
+				<execute action="PGWebcontentdisplay#assertClick" locator-key1="ADD_MENU_WEB_CONTENT_STRUCTURE" value1="${selectStructureName}" />
+			</then>
+			<else>
+				<execute action="PGWebcontentdisplay#click" locator-key1="ADD_WEB_CONTENT" />
+				<execute action="PGWebcontentdisplay#click" locator-key1="ADD_BASIC_WEB_CONTENT" />
+			</else>
+		</if>
 
 		<execute action="PGWebcontentdisplayAddwebcontent#selectFrame" locator-key1="WEB_CONTENT_IFRAME" />
 		<execute action="PGWebcontentdisplayAddwebcontent#type" locator-key1="TITLE_FIELD" value1="${webContentTitle}" />
@@ -764,13 +798,9 @@
 	</command>
 
 	<command name="editCP">
-		<var name="key_webContentTitle" value="${webContentTitle}" />
-
-		<execute action="CPWebcontent#click" locator-key1="TOOLBAR_DISPLAY_STYLE_BUTTON" />
-		<execute action="CPWebcontent#assertClick" locator-key1="DISPLAY_STYLE_MENULIST_DESCRIPTIVE" value1="Descriptive" />
-		<execute action="CPWebcontent#assertTextEquals" locator-key1="ENTRY_DESCRIPTIVE_TITLE" value1="${webContentTitle}" />
-		<execute action="CPWebcontent#click" locator-key1="ENTRY_DESCRIPTIVE_MENULIST_ARROW" />
-		<execute action="CPWebcontent#assertClick" locator-key1="ENTRY_MENULIST_EDIT" value1="Edit" />
+		<execute macro="WebContent#gotoEditPG">
+			<var name="webContentTitle" value="${webContentTitle}" />
+		</execute>
 
 		<execute action="CPWebcontentEditwebcontent#type" locator-key1="TITLE_FIELD" value1="${webContentTitleEdit}" />
 		<execute action="CPWebcontentEditwebcontent#type" locator-key1="CONTENT_FIELD" value1="${webContentContentEdit}" />
@@ -797,6 +827,27 @@
 		</if>
 	</command>
 
+	<command name="editDisplayPageCP">
+		<execute macro="WebContent#gotoEditPG">
+			<var name="webContentTitle" value="${webContentTitle}" />
+		</execute>
+
+		<execute action="CPWebcontentAddwebcontent#assertClick" locator-key1="MENU_DISPLAY_PAGE" value1="Display Page" />
+		<execute action="CPWebcontentAddwebcontent#assertClick" locator-key1="DISPLAY_PAGE_SELECT" value1="Select" />
+
+		<var name="key_pageName" value="${pageName}" />
+
+		<execute action="CPWebcontentAddwebcontentDisplaypageConfiguration#assertClick" locator-key1="NAVIGATION_PUBLIC_PAGE" value1="Public Pages" />
+		<execute action="CPWebcontentAddwebcontentDisplaypageConfiguration#assertClick" locator-key1="PUBLIC_PAGES_SELECTION" value1="${pageName}" />
+		<execute action="CPWebcontentAddwebcontentDisplaypageConfiguration#assertTextEquals" locator-key1="SELECTED_PAGE_INFO_MESSAGE" value1="Public Pages > ${pageName}" />
+		<execute action="CPWebcontentAddwebcontentDisplaypageConfiguration#assertClick" locator-key1="OK_BUTTON" value1="OK" />
+
+		<execute action="CPWebcontentAddwebcontent#assertTextEquals" locator-key1="DISPLAY_PAGE_SELECTION" value1="Public Pages > ${pageName}" />
+		<execute action="CPWebcontentAddwebcontent#assertClick" locator-key1="PUBLISH_BUTTON" value1="Publish" />
+
+		<execute action="CPWebcontent#assertTextEquals" locator-key1="SUCCESS_MESSAGE" value1="Your request completed successfully." />
+	</command>
+
 	<command name="editDisplayPagePGViaAP">
 		<var name="key_assetTitle" value="${assetTitle}" />
 
@@ -814,7 +865,7 @@
 		<execute action="PGAssetpublisherAddnewwebcontent#assertClick" locator-key1="MENU_CONTENT" value1="Content" />
 		<execute action="PGAssetpublisherAddnewwebcontent#assertClick" locator-key1="PUBLISH_BUTTON" value1="Publish" />
 
-		<execute action="PGAssetpublisher#pause" locator1="5000" />
+		<execute action="PGAssetpublisher#pause" locator1="3000" />
 		<execute action="PGAssetpublisher#selectFrame" value1="relative=top" />
 	</command>
 
@@ -841,7 +892,9 @@
 	</command>
 
 	<command name="editPGViaAP">
-		<execute action="PGAssetpublisher#assertClick" locator-key1="DISPLAY_ICON_EDIT" value1="Edit" />
+		<var name="key_assetTitle" value="${assetTitle}" />
+
+		<execute action="PGAssetpublisher#click" locator-key1="ASSET_ABSTRACT_EDIT" />
 
 		<execute action="PGAssetpublisherAddnewwebcontent#selectFrame" locator-key1="WEB_CONTENT_IFRAME" />
 		<execute action="PGAssetpublisherAddnewwebcontent#type" locator-key1="TITLE_FIELD" value1="${webContentTitleEdit}" />
@@ -890,6 +943,21 @@
 		<execute action="CPWebcontent#assertClick" locator-key1="ACTION_MENULIST_EXPIRE" value1="Expire" />
 	</command>
 
+	<command name="expirePGViaWCD">
+		<var name="key_webContentTitle" value="${webContentTitle}" />
+
+		<execute action="PGWebcontentdisplay#click" locator-key1="EDIT_WEB_CONTENT" />
+
+		<execute action="PGWebcontentdisplayEditwebcontent#selectFrame" locator-key1="WEB_CONTENT_IFRAME" />
+		<execute action="PGWebcontentdisplayEditwebcontent#assertClick" locator-key1="TOOLBAR_VIEW_HISTORY" value1="View History" />
+
+		<var name="key_historyStatus" value="Expired" />
+
+		<execute action="PGWebcontentdisplayEditwebcontentViewhistory#click" locator-key1="VERSIONS_TABLE_ACTIONS" />
+		<execute action="PGWebcontentdisplayEditwebcontentViewhistory#assertClick" locator-key1="ACTIONS_MENULIST_EXPIRE" value1="Expire" />
+		<execute action="PGWebcontentdisplayEditwebcontentViewhistory#assertTextEquals" locator-key1="VERSIONS_TABLE_STATUS" value1="Expired" />
+	</command>
+
 	<command name="expireSpecificVersionCP">
 		<var name="key_webContentTitle" value="${webContentTitle}" />
 
@@ -911,6 +979,26 @@
 		<execute action="CPWebcontent#assertClick" locator-key1="DISPLAY_STYLE_MENULIST_DESCRIPTIVE" value1="Descriptive" />
 		<execute action="CPWebcontent#assertElementPresent" locator-key1="ENTRY_DESCRIPTIVE_THUMBNAIL" />
 		<execute action="CPWebcontent#assertClick" locator-key1="ENTRY_DESCRIPTIVE_TITLE" value1="${webContentTitle}" />
+	</command>
+
+	<command name="gotoEditCP">
+		<var name="key_webContentTitle" value="${webContentTitle}" />
+
+		<execute action="CPWebcontent#click" locator-key1="TOOLBAR_DISPLAY_STYLE_BUTTON" />
+		<execute action="CPWebcontent#assertClick" locator-key1="DISPLAY_STYLE_MENULIST_DESCRIPTIVE" value1="Descriptive" />
+		<execute action="CPWebcontent#assertTextEquals" locator-key1="ENTRY_DESCRIPTIVE_TITLE" value1="${webContentTitle}" />
+		<execute action="CPWebcontent#click" locator-key1="ENTRY_DESCRIPTIVE_MENULIST_ARROW" />
+		<execute action="CPWebcontent#assertClick" locator-key1="ENTRY_MENULIST_EDIT" value1="Edit" />
+	</command>
+
+	<command name="gotoEditPG">
+		<var name="key_webContentTitle" value="${webContentTitle}" />
+
+		<execute action="CPWebcontent#click" locator-key1="TOOLBAR_DISPLAY_STYLE_BUTTON" />
+		<execute action="CPWebcontent#assertClick" locator-key1="DISPLAY_STYLE_MENULIST_DESCRIPTIVE" value1="Descriptive" />
+		<execute action="CPWebcontent#assertTextEquals" locator-key1="ENTRY_DESCRIPTIVE_TITLE" value1="${webContentTitle}" />
+		<execute action="CPWebcontent#click" locator-key1="ENTRY_DESCRIPTIVE_MENULIST_ARROW" />
+		<execute action="CPWebcontent#assertClick" locator-key1="ENTRY_MENULIST_EDIT" value1="Edit" />
 	</command>
 
 	<command name="gotoViewSpecificVersionHistoryCP">
@@ -948,6 +1036,12 @@
 
 		<execute action="CPWebcontentPreview#selectFrame" locator-key1="PREVIEW_IFRAME" />
 		<execute action="CPWebcontentPreview#assertTextEquals" locator-key1="BODY_FIELD" value1="Text: ${webContentText}" />
+	</command>
+
+	<command name="publishBasicCP">
+		<execute action="CPWebcontentEditwebcontent#assertClick" locator-key1="PUBLISH_BUTTON" value1="Publish" />
+
+		<execute action="CPWebcontent#assertTextEquals" locator-key1="SUCCESS_MESSAGE" value1="Your request completed successfully." />
 	</command>
 
 	<command name="publishCP">
@@ -1056,6 +1150,22 @@
 		<execute macro="RecycleBin#emptyCP" />
 	</command>
 
+	<command name="viewCategorizationCategoryCP">
+		<var name="key_webContentTitle" value="${webContentTitle}" />
+
+		<execute action="CPWebcontent#click" locator-key1="TOOLBAR_DISPLAY_STYLE_BUTTON" />
+		<execute action="CPWebcontent#assertClick" locator-key1="DISPLAY_STYLE_MENULIST_DESCRIPTIVE" value1="Descriptive" />
+		<execute action="CPWebcontent#assertTextEquals" locator-key1="ENTRY_DESCRIPTIVE_TITLE" value1="${webContentTitle}" />
+		<execute action="CPWebcontent#click" locator-key1="ENTRY_DESCRIPTIVE_MENULIST_ARROW" />
+		<execute action="CPWebcontent#assertClick" locator-key1="ENTRY_MENULIST_EDIT" value1="Edit" />
+
+		<execute action="CPWebcontentEditwebcontent#click" locator-key1="MENU_CATEGORIZATION" />
+
+		<var name="key_categoryName" value="${categoryName}" />
+
+		<execute action="CPWebcontentCategorization#assertTextEquals" locator-key1="CATEGORY" value1="${categoryName}" />
+	</command>
+
 	<command name="viewCategorizationSelectionCP">
 		<var name="key_webContentTitle" value="${webContentTitle}" />
 
@@ -1068,6 +1178,21 @@
 		<execute action="CPWebcontentAddwebcontent#assertClick" locator-key1="MENU_CATEGORIZATION" value1="Categorization" />
 
 		<execute action="CPWebcontentCategorization#assertTextPresent" locator-key1="TYPE_SELECT" value1="${categorizationType}" />
+	</command>
+
+	<command name="viewConversionLinksPGViaAP">
+		<var name="key_assetTitle" value="${webContentTitle}" />
+
+		<execute macro="WebContent#viewPGViaAP">
+			<var name="key_assetTitle" value="${webContentTitle}" />
+		</execute>
+
+		<for list="${documentTypes}" param="documentType">
+			<var name="documentTypeUppercase" value="${documentType?uppercase()}" />
+
+			<execute action="PGAssetpublisherAsset#assertTextEquals" locator-key1="DOCUMENT_CONVERSION_${documentTypeUppercase}" value1="${documentTypeUppercase}" />
+			<execute action="PGAssetpublisherAsset#assertElementPresent" locator-key1="DOCUMENT_CONVERSION_${documentTypeUppercase}_ICON" />
+		</for>
 	</command>
 
 	<command name="viewCP">
@@ -1228,6 +1353,14 @@
 		<execute action="PGAssetpublisherAsset#assertTextEquals" locator-key1="ASSET_CONTENT" value1="${webContentContent}" />
 	</command>
 
+	<command name="viewLinkToPagePGViaWCD">
+		<execute action="PGWebcontentdisplay#assertClick" locator-key1="WEB_CONTENT_LINK_TO_PAGE" value1="Link to Page" />
+
+		<execute macro="Page#viewChildPG">
+			<var name="childPageName" value="${childPageName}" />
+		</execute>
+	</command>
+
 	<command name="viewNoContentAsGuestPGViaWCD">
 		<var name="key_portletName" value="Web Content Display" />
 
@@ -1237,6 +1370,20 @@
 
 	<command name="viewNoContentPGViaWCD">
 		<execute action="PGWebcontentdisplay#assertTextEquals" locator-key1="ERROR_MESSAGE" value1="The selected web content no longer exists." />
+	</command>
+
+	<command name="viewNoConversionLinksPGViaAP">
+		<var name="key_assetTitle" value="${webContentTitle}" />
+
+		<execute macro="WebContent#viewPGViaAP">
+			<var name="key_assetTitle" value="${webContentTitle}" />
+		</execute>
+
+		<for list="${documentTypes}" param="documentType">
+			<var name="documentTypeUppercase" value="${documentType?uppercase()}" />
+
+			<execute action="PGAssetpublisherAsset#assertElementNotPresent" locator-key1="DOCUMENT_CONVERSION_${documentTypeUppercase}" />
+		</for>
 	</command>
 
 	<command name="viewNoEditWCViaWCD">
@@ -1249,14 +1396,32 @@
 
 		<execute action="PGAssetpublisher#assertTextEquals" locator-key1="ASSET_ABSTRACT_TITLE" value1="${webContentTitle}" />
 		<execute action="PGAssetpublisher#assertTextEquals" locator-key1="ASSET_ABSTRACT_DESCRIPTION" value1="${webContentContent}" />
-		<execute action="PGAssetpublisher#assertClick" locator-key1="ASSET_ABSTRACT_READ_MORE" value1="Read More" />
+
+		<if>
+			<isset var="${author}" />
+			<then>
+				<var name="key_author" value="${author}" />
+
+				<execute action="PGAssetpublisher#assertTextEquals" locator-key1="METADATA_AUTHOR" value1="${author}" />
+			</then>
+		</if>
+
+		<execute action="PGAssetpublisher#assertClick" locator-key1="ASSET_ABSTRACT_TITLE" value1="${webContentTitle}" />
 
 		<execute action="PGAssetpublisherAsset#assertTextEquals" locator-key1="ASSET_TITLE" value1="${webContentTitle}" />
 		<execute action="PGAssetpublisherAsset#assertTextEquals" locator-key1="ASSET_CONTENT" value1="${webContentContent}" />
 	</command>
 
 	<command name="viewPGViaWCD">
-		<execute action="PGWebcontentdisplay#assertTextEquals" locator-key1="WEB_CONTENT_CONTENT" value1="${webContentContent}" />
+		<if>
+			<equals arg1="${expiredContent}" arg2="true" />
+			<then>
+				<execute action="PGWebcontentdisplay#assertTextEquals" locator-key1="ALERT_MESSAGE" value1="${webContentTitle} is expired." />
+			</then>
+			<else>
+				<execute action="PGWebcontentdisplay#assertTextEquals" locator-key1="WEB_CONTENT_CONTENT" value1="${webContentContent}" />
+			</else>
+		</if>
 
 		<if>
 			<equals arg1="${availableLanguages}" arg2="true" />
@@ -1309,6 +1474,17 @@
 		<execute action="CPWebcontent#assertClick" locator-key1="TOOLBAR_ADD" value1="Add" />
 		<execute action="CPWebcontent#assertElementPresent" locator-key1="ADD_MENULIST_STRUCTURE_NAME" />
 		<execute action="CPWebcontent#assertTextEquals" locator-key1="ADD_MENULIST_STRUCTURE_NAME" value1="${structureName}" />
+	</command>
+
+	<command name="viewTextFieldWidth">
+		<var name="key_structureName" value="${structureName}" />
+
+		<execute action="CPWebcontent#assertClick" locator-key1="TOOLBAR_ADD" value1="Add"  />
+		<execute action="CPWebcontent#assertClick" locator-key1="ADD_MENULIST_STRUCTURE_NAME" value1="${structureName}" />
+
+		<var name="key_widthSize" value="${widthSize}" />
+
+		<execute action="CPWebcontentAddwebcontent#assertElementPresent" locator-key1="TEXT_FIELD_WIDTH" value1="${widthSize}" />
 	</command>
 
 	<command name="viewTranslationCmdCP">

@@ -25,7 +25,6 @@ import com.liferay.portal.NoSuchLayoutPrototypeException;
 import com.liferay.portal.NoSuchLayoutSetPrototypeException;
 import com.liferay.portal.kernel.backgroundtask.BackgroundTaskThreadLocal;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.lar.ExportImportHelperUtil;
 import com.liferay.portal.kernel.lar.ExportImportThreadLocal;
@@ -77,7 +76,6 @@ import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.ServiceContextThreadLocal;
 import com.liferay.portal.service.persistence.LayoutUtil;
 import com.liferay.portal.servlet.filters.cache.CacheUtil;
-import com.liferay.portal.util.comparator.LayoutPriorityComparator;
 import com.liferay.portlet.journalcontent.util.JournalContentUtil;
 import com.liferay.portlet.sites.util.Sites;
 import com.liferay.portlet.sites.util.SitesUtil;
@@ -87,13 +85,10 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.NavigableSet;
 import java.util.Set;
-import java.util.TreeSet;
 
 import org.apache.commons.lang.time.StopWatch;
 
@@ -304,11 +299,6 @@ public class LayoutImporter {
 		ManifestSummary manifestSummary =
 			ExportImportHelperUtil.getManifestSummary(portletDataContext);
 
-		if (BackgroundTaskThreadLocal.hasBackgroundTask()) {
-			PortletDataHandlerStatusMessageSenderUtil.sendStatusMessage(
-				"layout", manifestSummary);
-		}
-
 		portletDataContext.setManifestSummary(manifestSummary);
 
 		// Layout and layout set prototype
@@ -448,12 +438,32 @@ public class LayoutImporter {
 				groupId, privateLayout, settings);
 		}
 
-		// Read asset tags, expando tables, locks, and permissions to make them
-		// available to the data handlers through the context
-
 		Element portletsElement = rootElement.element("portlets");
 
 		List<Element> portletElements = portletsElement.elements("portlet");
+
+		if (BackgroundTaskThreadLocal.hasBackgroundTask()) {
+			List<String> portletIds = new ArrayList<String>();
+
+			for (Element portletElement : portletElements) {
+				String portletId = portletElement.attributeValue("portlet-id");
+
+				Portlet portlet = PortletLocalServiceUtil.getPortletById(
+					portletDataContext.getCompanyId(), portletId);
+
+				if (!portlet.isActive() || portlet.isUndeployedPortlet()) {
+					continue;
+				}
+
+				portletIds.add(portletId);
+			}
+
+			PortletDataHandlerStatusMessageSenderUtil.sendStatusMessage(
+				"layout", ArrayUtil.toStringArray(portletIds), manifestSummary);
+		}
+
+		// Read asset tags, expando tables, locks, and permissions to make them
+		// available to the data handlers through the portlet data context
 
 		if (importPermissions) {
 			for (Element portletElement : portletElements) {
@@ -599,6 +609,11 @@ public class LayoutImporter {
 
 			portletDataContext.setPlid(plid);
 			portletDataContext.setOldPlid(oldPlid);
+
+			if (BackgroundTaskThreadLocal.hasBackgroundTask()) {
+				PortletDataHandlerStatusMessageSenderUtil.sendStatusMessage(
+					"portlet", portletId, manifestSummary);
+			}
 
 			Document portletDocument = SAXReaderUtil.read(
 				portletDataContext.getZipEntryAsString(portletPath));
@@ -757,7 +772,7 @@ public class LayoutImporter {
 			}
 
 			// The layout set may be stale because LayoutUtil#update(layout)
-			// triggers LayoutSetPrototypeLayoutListener and that may have
+			// triggers LayoutSetPrototypeLayoutModelListener and that may have
 			// updated this layout set
 
 			layoutSet = LayoutSetLocalServiceUtil.getLayoutSet(
@@ -782,7 +797,8 @@ public class LayoutImporter {
 
 		// Page priorities
 
-		updateLayoutPriorities(portletDataContext, layoutElements);
+		updateLayoutPriorities(
+			portletDataContext, layoutElements, privateLayout);
 
 		// Deletion system events
 
@@ -913,23 +929,27 @@ public class LayoutImporter {
 	}
 
 	protected void updateLayoutPriorities(
-			PortletDataContext portletDataContext, List<Element> layoutElements)
-		throws PortalException, SystemException {
+		PortletDataContext portletDataContext, List<Element> layoutElements,
+		boolean privateLayout) {
 
 		Map<Long, Layout> layouts =
 			(Map<Long, Layout>)portletDataContext.getNewPrimaryKeysMap(
 				Layout.class + ".layout");
 
-		Map<Long, NavigableSet<Layout>> navigableSets =
-			new HashMap<Long, NavigableSet<Layout>>();
+		Map<Long, Integer> layoutPriorities = new HashMap<Long, Integer>();
 
-		List<Layout> importedLayouts = new LinkedList<Layout>();
-
-		// Gathering imported layouts and create a navigable set for each parent
-		// layout ID to handle each priority queue separately
+		int maxPriority = Integer.MIN_VALUE;
 
 		for (Element layoutElement : layoutElements) {
 			String action = layoutElement.attributeValue(Constants.ACTION);
+
+			if (action.equals(Constants.SKIP)) {
+
+				// We only want to update priorites if there are no elements
+				// with the SKIP action
+
+				return;
+			}
 
 			if (action.equals(Constants.ADD)) {
 				long layoutId = GetterUtil.getLong(
@@ -937,76 +957,29 @@ public class LayoutImporter {
 
 				Layout layout = layouts.get(layoutId);
 
-				NavigableSet<Layout> navigableSet = navigableSets.get(
-					layout.getParentLayoutId());
+				int layoutPriority = GetterUtil.getInteger(
+					layoutElement.attributeValue("layout-priority"));
 
-				if (navigableSet == null) {
-					navigableSets.put(
-						layout.getParentLayoutId(),
-						new TreeSet<Layout>(new LayoutPriorityComparator()));
-				}
+				layoutPriorities.put(layout.getPlid(), layoutPriority);
 
-				importedLayouts.add(
-					LayoutLocalServiceUtil.getLayout(layout.getPlid()));
-			}
-		}
-
-		List<Layout> unmodifiedLayouts = new LinkedList<Layout>(
-			LayoutLocalServiceUtil.getLayouts(
-				portletDataContext.getGroupId(),
-				portletDataContext.isPrivateLayout()));
-
-		unmodifiedLayouts.removeAll(importedLayouts);
-
-		// Priorities are up to date if there are no unmodified layouts
-
-		if (unmodifiedLayouts.isEmpty()) {
-			return;
-		}
-
-		// Fill the navigable sets with layouts that were not updated by the
-		// import
-
-		for (Layout unmodifiedLayout : unmodifiedLayouts) {
-			NavigableSet<Layout> navigableSet = navigableSets.get(
-				unmodifiedLayout.getParentLayoutId());
-
-			if (navigableSet != null) {
-				navigableSet.add(unmodifiedLayout);
-			}
-		}
-
-		for (Layout importedLayout : importedLayouts) {
-			NavigableSet<Layout> navigableSet = navigableSets.get(
-				importedLayout.getParentLayoutId());
-
-			if (navigableSet.isEmpty()) {
-				continue;
-			}
-
-			// Ensure that priorities are unique
-
-			Set<Layout> tailLayouts = navigableSet.tailSet(
-				importedLayout, true);
-
-			int priority = importedLayout.getPriority();
-
-			for (Layout tailLayout : tailLayouts) {
-				if (tailLayout.getPriority() == priority) {
-					tailLayout.setPriority(++priority);
-				}
-				else {
-					break;
+				if (maxPriority < layoutPriority) {
+					maxPriority = layoutPriority;
 				}
 			}
-
-			navigableSet.add(importedLayout);
 		}
 
-		for (NavigableSet<Layout> navigableSet : navigableSets.values()) {
-			for (Layout layout : navigableSet) {
-				LayoutUtil.update(layout);
+		List<Layout> layoutSetLayouts = LayoutLocalServiceUtil.getLayouts(
+			portletDataContext.getGroupId(), privateLayout);
+
+		for (Layout layout : layoutSetLayouts) {
+			if (layoutPriorities.containsKey(layout.getPlid())) {
+				layout.setPriority(layoutPriorities.get(layout.getPlid()));
 			}
+			else {
+				layout.setPriority(++maxPriority);
+			}
+
+			LayoutLocalServiceUtil.updateLayout(layout);
 		}
 	}
 

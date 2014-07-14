@@ -38,7 +38,7 @@ import com.liferay.portal.service.UserGroupLocalServiceUtil;
 import com.liferay.portal.service.persistence.BasePersistence;
 import com.liferay.portal.service.persistence.PersistenceExecutionTestListener;
 import com.liferay.portal.test.LiferayPersistenceIntegrationJUnitTestRunner;
-import com.liferay.portal.test.persistence.TransactionalPersistenceAdvice;
+import com.liferay.portal.test.persistence.test.TransactionalPersistenceAdvice;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.portal.util.test.RandomTestUtil;
 
@@ -51,6 +51,7 @@ import org.junit.runner.RunWith;
 
 import java.io.Serializable;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -284,7 +285,7 @@ public class UserGroupPersistenceTest {
 		}
 	}
 
-	protected OrderByComparator getOrderByComparator() {
+	protected OrderByComparator<UserGroup> getOrderByComparator() {
 		return OrderByComparatorFactoryUtil.create("UserGroup", "mvccVersion",
 			true, "uuid", true, "userGroupId", true, "companyId", true,
 			"userId", true, "userName", true, "createDate", true,
@@ -308,6 +309,88 @@ public class UserGroupPersistenceTest {
 		UserGroup missingUserGroup = _persistence.fetchByPrimaryKey(pk);
 
 		Assert.assertNull(missingUserGroup);
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereAllPrimaryKeysExist()
+		throws Exception {
+		UserGroup newUserGroup1 = addUserGroup();
+		UserGroup newUserGroup2 = addUserGroup();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(newUserGroup1.getPrimaryKey());
+		primaryKeys.add(newUserGroup2.getPrimaryKey());
+
+		Map<Serializable, UserGroup> userGroups = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertEquals(2, userGroups.size());
+		Assert.assertEquals(newUserGroup1,
+			userGroups.get(newUserGroup1.getPrimaryKey()));
+		Assert.assertEquals(newUserGroup2,
+			userGroups.get(newUserGroup2.getPrimaryKey()));
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereNoPrimaryKeysExist()
+		throws Exception {
+		long pk1 = RandomTestUtil.nextLong();
+
+		long pk2 = RandomTestUtil.nextLong();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(pk1);
+		primaryKeys.add(pk2);
+
+		Map<Serializable, UserGroup> userGroups = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertTrue(userGroups.isEmpty());
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereSomePrimaryKeysExist()
+		throws Exception {
+		UserGroup newUserGroup = addUserGroup();
+
+		long pk = RandomTestUtil.nextLong();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(newUserGroup.getPrimaryKey());
+		primaryKeys.add(pk);
+
+		Map<Serializable, UserGroup> userGroups = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertEquals(1, userGroups.size());
+		Assert.assertEquals(newUserGroup,
+			userGroups.get(newUserGroup.getPrimaryKey()));
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithNoPrimaryKeys()
+		throws Exception {
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		Map<Serializable, UserGroup> userGroups = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertTrue(userGroups.isEmpty());
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithOnePrimaryKey()
+		throws Exception {
+		UserGroup newUserGroup = addUserGroup();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(newUserGroup.getPrimaryKey());
+
+		Map<Serializable, UserGroup> userGroups = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertEquals(1, userGroups.size());
+		Assert.assertEquals(newUserGroup,
+			userGroups.get(newUserGroup.getPrimaryKey()));
 	}
 
 	@Test

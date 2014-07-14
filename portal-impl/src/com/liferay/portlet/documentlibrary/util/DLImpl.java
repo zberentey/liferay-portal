@@ -16,7 +16,6 @@ package com.liferay.portlet.documentlibrary.util;
 
 import com.liferay.portal.kernel.configuration.Filter;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -28,9 +27,6 @@ import com.liferay.portal.kernel.repository.model.Folder;
 import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.Hits;
-import com.liferay.portal.kernel.settings.ParameterMapSettings;
-import com.liferay.portal.kernel.settings.Settings;
-import com.liferay.portal.kernel.settings.SettingsFactoryUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HtmlUtil;
@@ -50,7 +46,6 @@ import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.kernel.workflow.WorkflowHandlerRegistryUtil;
 import com.liferay.portal.model.Company;
 import com.liferay.portal.model.Group;
-import com.liferay.portal.model.Layout;
 import com.liferay.portal.model.LayoutConstants;
 import com.liferay.portal.model.Subscription;
 import com.liferay.portal.service.GroupLocalServiceUtil;
@@ -64,7 +59,6 @@ import com.liferay.portal.util.PortletKeys;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.portlet.PortletURLFactoryUtil;
 import com.liferay.portlet.documentlibrary.DLPortletInstanceSettings;
-import com.liferay.portlet.documentlibrary.DLSettings;
 import com.liferay.portlet.documentlibrary.model.DLFileEntry;
 import com.liferay.portlet.documentlibrary.model.DLFileEntryConstants;
 import com.liferay.portlet.documentlibrary.model.DLFileEntryType;
@@ -185,7 +179,7 @@ public class DLImpl implements DL {
 		PortletDisplay portletDisplay = themeDisplay.getPortletDisplay();
 
 		DLPortletInstanceSettings dlPortletInstanceSettings =
-			DLUtil.getDLPortletInstanceSettings(
+			DLPortletInstanceSettings.getInstance(
 				themeDisplay.getLayout(), portletDisplay.getId());
 
 		data.put("folder-id", dlPortletInstanceSettings.getDefaultFolderId());
@@ -208,7 +202,7 @@ public class DLImpl implements DL {
 		PortletDisplay portletDisplay = themeDisplay.getPortletDisplay();
 
 		DLPortletInstanceSettings dlPortletInstanceSettings =
-			DLUtil.getDLPortletInstanceSettings(
+			DLPortletInstanceSettings.getInstance(
 				themeDisplay.getLayout(), portletDisplay.getId());
 
 		long defaultFolderId = dlPortletInstanceSettings.getDefaultFolderId();
@@ -287,8 +281,7 @@ public class DLImpl implements DL {
 		if (strutsAction.equals("/document_library/select_file_entry") ||
 			strutsAction.equals("/document_library/select_folder") ||
 			strutsAction.equals("/document_library_display/select_folder") ||
-			strutsAction.equals(
-				"/dynamic_data_mapping/select_document_library") ||
+			strutsAction.equals("/document_selector/view") ||
 			strutsAction.equals("/image_gallery_display/select_folder")) {
 
 			ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(
@@ -358,7 +351,7 @@ public class DLImpl implements DL {
 
 	@Override
 	public String getAbsolutePath(PortletRequest portletRequest, long folderId)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		ThemeDisplay themeDisplay = (ThemeDisplay)portletRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
@@ -442,7 +435,7 @@ public class DLImpl implements DL {
 	@Override
 	public String getDLFileEntryControlPanelLink(
 			PortletRequest portletRequest, long fileEntryId)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		ThemeDisplay themeDisplay = (ThemeDisplay)portletRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
@@ -462,7 +455,7 @@ public class DLImpl implements DL {
 	@Override
 	public String getDLFolderControlPanelLink(
 			PortletRequest portletRequest, long folderId)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		ThemeDisplay themeDisplay = (ThemeDisplay)portletRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
@@ -479,51 +472,24 @@ public class DLImpl implements DL {
 	}
 
 	@Override
-	public DLPortletInstanceSettings getDLPortletInstanceSettings(
-			Layout layout, String portletId)
-		throws PortalException, SystemException {
+	public String getDownloadURL(
+		FileEntry fileEntry, FileVersion fileVersion, ThemeDisplay themeDisplay,
+		String queryString) {
 
-		Settings settings = SettingsFactoryUtil.getPortletInstanceSettings(
-			layout, portletId);
-
-		return new DLPortletInstanceSettings(settings);
+		return getDownloadURL(
+			fileEntry, fileVersion, themeDisplay, queryString, true, true);
 	}
 
 	@Override
-	public DLPortletInstanceSettings getDLPortletInstanceSettings(
-			Layout layout, String portletId, HttpServletRequest request)
-		throws PortalException, SystemException {
+	public String getDownloadURL(
+		FileEntry fileEntry, FileVersion fileVersion, ThemeDisplay themeDisplay,
+		String queryString, boolean appendVersion, boolean absoluteURL) {
 
-		Settings settings = SettingsFactoryUtil.getPortletInstanceSettings(
-			layout, portletId);
+		String previewURL = getPreviewURL(
+			fileEntry, fileVersion, themeDisplay, queryString, appendVersion,
+			absoluteURL);
 
-		Settings parameterMapSettings = new ParameterMapSettings(
-			request.getParameterMap(), settings);
-
-		return new DLPortletInstanceSettings(parameterMapSettings);
-	}
-
-	@Override
-	public DLSettings getDLSettings(long groupId)
-		throws PortalException, SystemException {
-
-		Settings settings = SettingsFactoryUtil.getGroupServiceSettings(
-			groupId, DLConstants.SERVICE_NAME);
-
-		return new DLSettings(settings);
-	}
-
-	@Override
-	public DLSettings getDLSettings(long groupId, HttpServletRequest request)
-		throws PortalException, SystemException {
-
-		Settings settings = SettingsFactoryUtil.getGroupServiceSettings(
-			groupId, DLConstants.SERVICE_NAME);
-
-		Settings parameterMapSettings = new ParameterMapSettings(
-			request.getParameterMap(), settings);
-
-		return new DLSettings(parameterMapSettings);
+		return HttpUtil.addParameter(previewURL, "download", true);
 	}
 
 	@Override
@@ -735,9 +701,7 @@ public class DLImpl implements DL {
 	}
 
 	@Override
-	public Set<Long> getFileEntryTypeSubscriptionClassPKs(long userId)
-		throws SystemException {
-
+	public Set<Long> getFileEntryTypeSubscriptionClassPKs(long userId) {
 		List<Subscription> subscriptions =
 			SubscriptionLocalServiceUtil.getUserSubscriptions(
 				userId, DLFileEntryType.class.getName());
@@ -758,6 +722,11 @@ public class DLImpl implements DL {
 		}
 
 		return extension;
+	}
+
+	@Override
+	public String getFileIconCssClass(String extension) {
+		return "icon-file-alt";
 	}
 
 	@Override
@@ -902,7 +871,7 @@ public class DLImpl implements DL {
 	}
 
 	@Override
-	public OrderByComparator getRepositoryModelOrderByComparator(
+	public <T> OrderByComparator<T> getRepositoryModelOrderByComparator(
 		String orderByCol, String orderByType) {
 
 		boolean orderByAsc = true;
@@ -911,25 +880,27 @@ public class DLImpl implements DL {
 			orderByAsc = false;
 		}
 
-		OrderByComparator orderByComparator = null;
+		OrderByComparator<T> orderByComparator = null;
 
 		if (orderByCol.equals("creationDate")) {
-			orderByComparator = new RepositoryModelCreateDateComparator(
+			orderByComparator = new RepositoryModelCreateDateComparator<T>(
 				orderByAsc);
 		}
 		else if (orderByCol.equals("downloads")) {
-			orderByComparator = new RepositoryModelReadCountComparator(
+			orderByComparator = new RepositoryModelReadCountComparator<T>(
 				orderByAsc);
 		}
 		else if (orderByCol.equals("modifiedDate")) {
-			orderByComparator = new RepositoryModelModifiedDateComparator(
+			orderByComparator = new RepositoryModelModifiedDateComparator<T>(
 				orderByAsc);
 		}
 		else if (orderByCol.equals("size")) {
-			orderByComparator = new RepositoryModelSizeComparator(orderByAsc);
+			orderByComparator = new RepositoryModelSizeComparator<T>(
+				orderByAsc);
 		}
 		else {
-			orderByComparator = new RepositoryModelNameComparator(orderByAsc);
+			orderByComparator = new RepositoryModelNameComparator<T>(
+				orderByAsc);
 		}
 
 		return orderByComparator;
@@ -1051,7 +1022,7 @@ public class DLImpl implements DL {
 	@Override
 	public String getWebDavURL(
 			ThemeDisplay themeDisplay, Folder folder, FileEntry fileEntry)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		return getWebDavURL(themeDisplay, folder, fileEntry, false);
 	}
@@ -1060,7 +1031,7 @@ public class DLImpl implements DL {
 	public String getWebDavURL(
 			ThemeDisplay themeDisplay, Folder folder, FileEntry fileEntry,
 			boolean manualCheckInRequired)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		return getWebDavURL(
 			themeDisplay, folder, fileEntry, manualCheckInRequired, false);
@@ -1070,7 +1041,7 @@ public class DLImpl implements DL {
 	public String getWebDavURL(
 			ThemeDisplay themeDisplay, Folder folder, FileEntry fileEntry,
 			boolean manualCheckInRequired, boolean openDocumentUrl)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		StringBundler webDavURL = new StringBundler(8);
 
@@ -1204,8 +1175,7 @@ public class DLImpl implements DL {
 
 	@Override
 	public boolean isSubscribedToFileEntryType(
-			long companyId, long groupId, long userId, long fileEntryTypeId)
-		throws SystemException {
+		long companyId, long groupId, long userId, long fileEntryTypeId) {
 
 		if (fileEntryTypeId ==
 				DLFileEntryTypeConstants.FILE_ENTRY_TYPE_ID_BASIC_DOCUMENT) {
@@ -1221,7 +1191,7 @@ public class DLImpl implements DL {
 	@Override
 	public boolean isSubscribedToFolder(
 			long companyId, long groupId, long userId, long folderId)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		return isSubscribedToFolder(companyId, groupId, userId, folderId, true);
 	}
@@ -1230,7 +1200,7 @@ public class DLImpl implements DL {
 	public boolean isSubscribedToFolder(
 			long companyId, long groupId, long userId, long folderId,
 			boolean recursive)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		List<Long> ancestorFolderIds = new ArrayList<Long>();
 
@@ -1280,7 +1250,7 @@ public class DLImpl implements DL {
 	public void startWorkflowInstance(
 			long userId, DLFileVersion dlFileVersion, String syncEventType,
 			ServiceContext serviceContext)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		Map<String, Serializable> workflowContext =
 			new HashMap<String, Serializable>();
@@ -1299,7 +1269,7 @@ public class DLImpl implements DL {
 
 	protected String getEntryURL(
 			DLFileVersion dlFileVersion, ServiceContext serviceContext)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		HttpServletRequest request = serviceContext.getRequest();
 

@@ -17,7 +17,6 @@ package com.liferay.portlet.trash;
 import com.liferay.portal.NoSuchModelException;
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
-import com.liferay.portal.kernel.dao.orm.FinderCacheUtil;
 import com.liferay.portal.kernel.dao.orm.Property;
 import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
@@ -25,7 +24,6 @@ import com.liferay.portal.kernel.search.Hits;
 import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.IndexerRegistryUtil;
 import com.liferay.portal.kernel.search.SearchContext;
-import com.liferay.portal.kernel.transaction.Transactional;
 import com.liferay.portal.kernel.trash.TrashHandler;
 import com.liferay.portal.kernel.trash.TrashHandlerRegistryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -39,9 +37,9 @@ import com.liferay.portal.model.Group;
 import com.liferay.portal.model.SystemEventConstants;
 import com.liferay.portal.model.TrashedModel;
 import com.liferay.portal.model.WorkflowedModel;
-import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.SystemEventLocalServiceUtil;
+import com.liferay.portal.test.DeleteAfterTestRun;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.test.GroupTestUtil;
 import com.liferay.portal.util.test.SearchContextTestUtil;
@@ -58,7 +56,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -72,18 +69,10 @@ public abstract class BaseTrashHandlerTestCase {
 
 	@Before
 	public void setUp() throws Exception {
-		FinderCacheUtil.clearCache();
-
 		group = GroupTestUtil.addGroup();
 	}
 
-	@After
-	public void tearDown() throws Exception {
-		GroupLocalServiceUtil.deleteGroup(group);
-	}
-
 	@Test
-	@Transactional
 	public void testDeleteTrashVersions() throws Exception {
 		ServiceContext serviceContext =
 			ServiceContextTestUtil.getServiceContext(group.getGroupId());
@@ -114,31 +103,26 @@ public abstract class BaseTrashHandlerTestCase {
 	}
 
 	@Test
-	@Transactional
 	public void testTrashAndDeleteApproved() throws Exception {
 		trashBaseModel(true, true);
 	}
 
 	@Test
-	@Transactional
 	public void testTrashAndDeleteDraft() throws Exception {
 		trashBaseModel(false, true);
 	}
 
 	@Test
-	@Transactional
 	public void testTrashAndRestoreApproved() throws Exception {
 		trashBaseModel(true, false);
 	}
 
 	@Test
-	@Transactional
 	public void testTrashAndRestoreDraft() throws Exception {
 		trashBaseModel(false, false);
 	}
 
 	@Test
-	@Transactional
 	public void testTrashBaseModelAndParentAndDeleteGroupTrashEntries()
 		throws Exception {
 
@@ -146,25 +130,21 @@ public abstract class BaseTrashHandlerTestCase {
 	}
 
 	@Test
-	@Transactional
 	public void testTrashBaseModelAndParentAndDeleteParent() throws Exception {
 		trashParentBaseModel(true, true, false);
 	}
 
 	@Test
-	@Transactional
 	public void testTrashBaseModelAndParentAndRestoreModel() throws Exception {
 		trashParentBaseModel(true, false, false);
 	}
 
 	@Test
-	@Transactional
 	public void testTrashDuplicate() throws Exception {
 		trashDuplicateBaseModel();
 	}
 
 	@Test
-	@Transactional
 	public void testTrashGrandparentBaseModelAndRestoreParentModel()
 		throws Exception {
 
@@ -172,85 +152,71 @@ public abstract class BaseTrashHandlerTestCase {
 	}
 
 	@Test
-	@Transactional
 	public void testTrashIsRestorableBaseModel() throws Exception {
 		trashIsRestorableBaseModel();
 	}
 
 	@Test
-	@Transactional
 	public void testTrashIsRestorableBaseModelWithParent1() throws Exception {
 		trashIsRestorableBaseModelWithParent(false, false);
 	}
 
 	@Test
-	@Transactional
 	public void testTrashIsRestorableBaseModelWithParent2() throws Exception {
 		trashIsRestorableBaseModelWithParent(true, false);
 	}
 
 	@Test
-	@Transactional
 	public void testTrashIsRestorableBaseModelWithParent3() throws Exception {
 		trashIsRestorableBaseModelWithParent(false, true);
 	}
 
 	@Test
-	@Transactional
 	public void testTrashIsRestorableBaseModelWithParent4() throws Exception {
 		trashIsRestorableBaseModelWithParent(true, true);
 	}
 
 	@Test
-	@Transactional
 	public void testTrashMoveBaseModel() throws Exception {
 		trashMoveBaseModel();
 	}
 
 	@Test
-	@Transactional
 	public void testTrashMyBaseModel() throws Exception {
 		trashMyBaseModel();
 	}
 
 	@Test
-	@Transactional
 	public void testTrashParentAndDeleteGroupTrashEntries() throws Exception {
 		trashParentBaseModel(false, false, true);
 	}
 
 	@Test
-	@Transactional
 	public void testTrashParentAndDeleteParent() throws Exception {
 		trashParentBaseModel(false, true, false);
 	}
 
 	@Test
-	@Transactional
 	public void testTrashRecentBaseModel() throws Exception {
 		trashRecentBaseModel();
 	}
 
 	@Test
-	@Transactional
 	public void testTrashVersionBaseModelAndDelete() throws Exception {
 		trashVersionBaseModel(true);
 	}
 
 	@Test
-	@Transactional
 	public void testTrashVersionBaseModelAndRestore() throws Exception {
 		trashVersionBaseModel(false);
 	}
 
 	@Test
-	@Transactional
 	public void testTrashVersionParentBaseModel() throws Exception {
 		trashVersionParentBaseModel(false);
 	}
 
 	@Test
-	@Transactional
 	public void testTrashVersionParentBaseModelAndRestore() throws Exception {
 		trashVersionParentBaseModel(true);
 	}
@@ -1407,6 +1373,8 @@ public abstract class BaseTrashHandlerTestCase {
 	}
 
 	protected BaseModel<?> baseModel;
+
+	@DeleteAfterTestRun
 	protected Group group;
 
 }

@@ -49,6 +49,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>CONFIRMATION</td>
+	<td></td>
+	<td></td>
+</tr>
+<tr>
 	<td></td>
 	<td></td>
 	<td></td>
@@ -122,7 +127,7 @@
 </tr>
 <tr>
 	<td>DOCUMENT_INFO_RELATED_ASSETS_HEADER</td>
-	<td>//h2[@class='asset-links-title']</td>
+	<td>//h2[contains(@class,'asset-links-title')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -156,18 +161,18 @@
 	<td></td>
 </tr>
 <tr>
+	<td>DOCUMENT_INFO_WORKFLOW_STATUS</td>
+	<td>//span[@class='workflow-status']/strong</td>
+	<td></td>
+</tr>
+<tr>
 	<td>DOCUMENT_INFO_LAST_UPDATED_BY</td>
-	<td>//div[@class='lfr-asset-icon lfr-asset-author' and contains(.,'Last Updated by Test Test')]</td>
+	<td>//div[contains(@class,'lfr-asset-icon') and contains(.,'Last Updated by Test Test')]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>DOCUMENT_INFO_DATE</td>
-	<td>//div[contains(@class,'lfr-asset-icon') and contains(@class,'lfr-asset-date')]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>DOCUMENT_INFO_WORKFLOW_STATUS</td>
-	<td>//span[@class='workflow-status workflow-status-icon']</td>
+	<td>//div[contains(@class,'lfr-asset-icon') and contains(@class,'icon-calendar')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -359,6 +364,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>COMMENTS_AUTHOR</td>
+	<td>//div[contains(@class,'lfr-discussion') and contains(.,'${key_commentBody}')]//span[@class='user-name']</td>
+	<td></td>
+</tr>
+<tr>
 	<td>COMMENTS_BODY</td>
 	<td>//div[contains(@class,'lfr-discussion') and contains(.,'${key_commentBody}')]//div[@class='lfr-discussion-message']</td>
 	<td></td>
@@ -483,12 +493,12 @@
 </tr>
 <tr>
 	<td>DOCUMENT_DETAILS_UPLOADER</td>
-	<td>//div[@class='asset-details-content']/div[contains(@class,'lfr-asset-icon') and contains(@class,'lfr-asset-author')]</td>
+	<td>//div[@class='asset-details-content']/div[contains(@class,'icon-user') and contains(@class,'lfr-asset-icon')]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>DOCUMENT_DETAILS_DATE</td>
-	<td>//div[@class='asset-details-content']//div[contains(@class,'lfr-asset-icon') and contains(@class,'lfr-asset-date')]</td>
+	<td>//div[@class='asset-details-content']//div[contains(@class,'lfr-asset-icon') and contains(@class,'icon-calendar')]</td>
 	<td></td>
 </tr>
 <tr>

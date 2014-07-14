@@ -339,7 +339,8 @@ public class VideoProcessorImpl
 								DL_FILE_ENTRY_THUMBNAIL_VIDEO_FRAME_PERCENTAGE);
 
 					Future<String> future = ProcessExecutor.execute(
-						ClassPathUtil.getPortalClassPath(), processCallable);
+						ClassPathUtil.getPortalProcessConfig(),
+						processCallable);
 
 					String processIdentity = String.valueOf(
 						fileVersion.getFileVersionId());
@@ -512,7 +513,7 @@ public class VideoProcessorImpl
 					PropsUtil.getProperties(PropsKeys.XUGGLER_FFPRESET, true));
 
 			Future<String> future = ProcessExecutor.execute(
-				ClassPathUtil.getPortalClassPath(), processCallable);
+				ClassPathUtil.getPortalProcessConfig(), processCallable);
 
 			String processIdentity = Long.toString(
 				fileVersion.getFileVersionId());

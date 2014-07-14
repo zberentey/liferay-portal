@@ -34,6 +34,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>CONFIRMATION</td>
+	<td></td>
+	<td></td>
+</tr>
+<tr>
 	<td>PORTLET_BODY</td>
 	<td>//section[contains(.,'${key_portletName}')]//div[@class='portlet-body']</td>
 	<td></td>
@@ -142,27 +147,27 @@
 <!--MAIN_NAVIGATION-->
 <tr>
 	<td>NAVIGATION_FRONTPAGE</td>
-	<td>//div[@class='navbar ']//li/a[contains(.,'FrontPage')]</td>
+	<td>//div[@class='navbar ' or contains(@class,'navbar-default')]//li/a[contains(.,'FrontPage')]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>NAVIGATION_RECENT_CHANGES</td>
-	<td>//div[@class='navbar ']//li/a[contains(.,'Recent Changes')]</td>
+	<td>//div[@class='navbar ' or contains(@class,'navbar-default')]//li/a[contains(.,'Recent Changes')]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>NAVIGATION_ALL_PAGES</td>
-	<td>//div[@class='navbar ']//li/a[contains(.,'All Pages')]</td>
+	<td>//div[@class='navbar ' or contains(@class,'navbar-default')]//li/a[contains(.,'All Pages')]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>NAVIGATION_ORPHAN_PAGES</td>
-	<td>//div[@class='navbar ']//li/a[contains(.,'Orphan Pages')]</td>
+	<td>//div[@class='navbar ' or contains(@class,'navbar-default')]//li/a[contains(.,'Orphan Pages')]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>NAVIGATION_DRAFT_PAGES</td>
-	<td>//div[@class='navbar ']//li/a[contains(.,'Draft Pages')]</td>
+	<td>//div[@class='navbar ' or contains(@class,'navbar-default')]//li/a[contains(.,'Draft Pages')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -234,8 +239,13 @@
 </tr>
 <!--COMMENTS-->
 <tr>
+	<td>COMMENTS_SUCCESS</td>
+	<td>//div[@class='lfr-message-response alert alert-success']</td>
+	<td></td>
+</tr>
+<tr>
 	<td>COMMENTS_DROP_DOWN</td>
-	<td>//div[@id='wikiCommentsPanelContainer']//div[@class='accordion-toggle']</td>
+	<td>//div[@id='wikiCommentsPanelContainer']//div[@class='panel-toggle']</td>
 	<td></td>
 </tr>
 <tr>
@@ -256,6 +266,11 @@
 <tr>
 	<td>COMMENTS_UNSUBSCRIBE_FROM_COMMENTS_LINK</td>
 	<td>//span[contains(.,'Unsubscribe from Comments')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>COMMENTS_USER_NAME</td>
+	<td>//span[@class='user-name']</td>
 	<td></td>
 </tr>
 <tr>
@@ -281,6 +296,31 @@
 <tr>
 	<td>COMMENTS_CANCEL_BUTTON</td>
 	<td>//div[@class='button-holder ']/button[contains(.,'Cancel')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>COMMENTS_COMMENT_DELETE</td>
+	<td>//div[@class='lfr-discussion-message' and contains(.,'${key_commentBody}')]//..//li/span/a/span[contains(.,'Delete')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>COMMENTS_COMMENT_EDIT</td>
+	<td>//div[@class='lfr-discussion-message' and contains(.,'${key_commentBody}')]//..//li/span/a/span[contains(.,'Edit')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>COMMENTS_COMMENT_EDIT_BODY_FIELD</td>
+	<td>//div[@class='lfr-discussion-message' and contains(.,'${key_commentBody}')]//..//..//..//textarea[contains(@id,'editReplyBody')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>COMMENTS_COMMENT_EDIT_PUBLISH_BUTTON</td>
+	<td>//div[@class='lfr-discussion-message' and contains(.,'${key_commentBody}')]//..//..//..//button[contains(.,'Publish')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>COMMENTS_COMMENT_EDIT_CANCEL_BUTTON</td>
+	<td>//div[@class='lfr-discussion-message' and contains(.,'${key_commentBody}')]//..//..//..//button[contains(@class,'btn') and contains(@class,'btn-cancel')]</td>
 	<td></td>
 </tr>
 <tr>

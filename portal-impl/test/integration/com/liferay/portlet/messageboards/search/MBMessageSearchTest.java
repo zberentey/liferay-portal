@@ -62,6 +62,12 @@ public class MBMessageSearchTest extends BaseSearchTestCase {
 	@Ignore()
 	@Override
 	@Test
+	public void testLocalizedSearch() throws Exception {
+	}
+
+	@Ignore()
+	@Override
+	@Test
 	public void testSearchByDDMStructureField() throws Exception {
 	}
 
@@ -141,7 +147,8 @@ public class MBMessageSearchTest extends BaseSearchTestCase {
 		MBCategory category = (MBCategory)parentBaseModel;
 
 		return MBTestUtil.addMessage(
-			category.getCategoryId(), keywords, approved, serviceContext);
+			category.getGroupId(), category.getCategoryId(), keywords, approved,
+			serviceContext);
 	}
 
 	@Override

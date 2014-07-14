@@ -45,6 +45,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>FIND_MEMBERS_USER_PENDING</td>
+	<td>//div[contains(@class,'pending-member-request')]/span[contains(.,'${key_userName}')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td></td>
 	<td></td>
 	<td></td>
@@ -53,6 +58,27 @@
 <tr>
 	<td>MEMBERS_INVITE_LIST</td>
 	<td>//div[@class='user-invited']/div/div[contains(.,'${key_userName}')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td></td>
+	<td></td>
+	<td></td>
+</tr>
+<!--INVITE_BY_EMAIL-->
+<tr>
+	<td>INVITE_BY_EMAIL_FIELD</td>
+	<td>//input[@id='new-member-email-address']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>INVITE_BY_EMAIL_ADD_EMAIL_ADDRESS_BUTTON</td>
+	<td>//input[@value='Add Email Address']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>INVITE_BY_EMAIL_EMAIL_ADDRESS</td>
+	<td>//div[@data-emailaddress='${key_userEmailAddress}']</td>
 	<td></td>
 </tr>
 <tr>

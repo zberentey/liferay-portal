@@ -35,7 +35,7 @@ import com.liferay.portal.service.ImageLocalServiceUtil;
 import com.liferay.portal.service.persistence.BasePersistence;
 import com.liferay.portal.service.persistence.PersistenceExecutionTestListener;
 import com.liferay.portal.test.LiferayPersistenceIntegrationJUnitTestRunner;
-import com.liferay.portal.test.persistence.TransactionalPersistenceAdvice;
+import com.liferay.portal.test.persistence.test.TransactionalPersistenceAdvice;
 import com.liferay.portal.util.test.RandomTestUtil;
 
 import org.junit.After;
@@ -47,6 +47,7 @@ import org.junit.runner.RunWith;
 
 import java.io.Serializable;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -200,7 +201,7 @@ public class ImagePersistenceTest {
 		}
 	}
 
-	protected OrderByComparator getOrderByComparator() {
+	protected OrderByComparator<Image> getOrderByComparator() {
 		return OrderByComparatorFactoryUtil.create("Image", "mvccVersion",
 			true, "imageId", true, "modifiedDate", true, "type", true,
 			"height", true, "width", true, "size", true);
@@ -222,6 +223,84 @@ public class ImagePersistenceTest {
 		Image missingImage = _persistence.fetchByPrimaryKey(pk);
 
 		Assert.assertNull(missingImage);
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereAllPrimaryKeysExist()
+		throws Exception {
+		Image newImage1 = addImage();
+		Image newImage2 = addImage();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(newImage1.getPrimaryKey());
+		primaryKeys.add(newImage2.getPrimaryKey());
+
+		Map<Serializable, Image> images = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertEquals(2, images.size());
+		Assert.assertEquals(newImage1, images.get(newImage1.getPrimaryKey()));
+		Assert.assertEquals(newImage2, images.get(newImage2.getPrimaryKey()));
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereNoPrimaryKeysExist()
+		throws Exception {
+		long pk1 = RandomTestUtil.nextLong();
+
+		long pk2 = RandomTestUtil.nextLong();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(pk1);
+		primaryKeys.add(pk2);
+
+		Map<Serializable, Image> images = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertTrue(images.isEmpty());
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereSomePrimaryKeysExist()
+		throws Exception {
+		Image newImage = addImage();
+
+		long pk = RandomTestUtil.nextLong();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(newImage.getPrimaryKey());
+		primaryKeys.add(pk);
+
+		Map<Serializable, Image> images = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertEquals(1, images.size());
+		Assert.assertEquals(newImage, images.get(newImage.getPrimaryKey()));
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithNoPrimaryKeys()
+		throws Exception {
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		Map<Serializable, Image> images = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertTrue(images.isEmpty());
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithOnePrimaryKey()
+		throws Exception {
+		Image newImage = addImage();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(newImage.getPrimaryKey());
+
+		Map<Serializable, Image> images = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertEquals(1, images.size());
+		Assert.assertEquals(newImage, images.get(newImage.getPrimaryKey()));
 	}
 
 	@Test

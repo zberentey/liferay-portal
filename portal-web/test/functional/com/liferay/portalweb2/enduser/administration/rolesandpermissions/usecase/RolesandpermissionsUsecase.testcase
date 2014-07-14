@@ -214,13 +214,9 @@
 
 		<execute action="Permissions#assertTextEquals" locator-key1="CONFIGURATION_PERMISSIONS_TEAM_ROLE_NAME" value1="${teamName}" />
 
-		<execute macro="Page#gotoUsersCP">
+		<execute macro="PermissionsInline#gotoSiteTeamsCP">
 			<var name="portletName" value="Site Teams" />
 			<var name="siteScopeName" value="Site Name" />
-		</execute>
-
-		<execute macro="Team#viewPermissionsCP">
-			<var name="teamName" value="Site Team Name" />
 		</execute>
 
 		<execute macro="Role#definePermissionPG">
@@ -420,6 +416,11 @@
 		<execute macro="User#loginUserPG">
 			<var name="password" value="test" />
 			<var name="userEmailAddress" value="userea@liferay.com" />
+		</execute>
+
+		<execute macro="Bookmark#gotoPG">
+			<var name="bookmarkName" value="Test Bookmark1 Name" />
+			<var name="bookmarkURL" value="http://www.liferay.com" />
 		</execute>
 
 		<execute macro="Bookmark#viewPG">
@@ -1021,73 +1022,63 @@
 			<var name="ddlDataDefinitionName" value="${ddlDataDefinitionName}" />
 		</execute>
 
-		<execute macro="DDLRecord#populateField">
+		<execute macro="DDLRecord#populateFieldBoolean">
 			<var name="ddlRecordFieldData" value="true" />
-			<var name="field" value="Boolean" />
 			<var name="fieldFieldLabel" value="Employee" />
 			<var name="fieldName" value="Employee" />
 		</execute>
 
-		<execute macro="DDLRecord#populateField">
+		<execute macro="DDLRecord#populateFieldDate">
 			<var name="ddlRecordFieldData" value="04/01/2015" />
-			<var name="field" value="Date" />
 			<var name="fieldFieldLabel" value="Start Date" />
 			<var name="fieldName" value="Start_Date" />
 		</execute>
 
-		<execute macro="DDLRecord#populateField">
+		<execute macro="DDLRecord#populateFieldDecimal">
 			<var name="ddlRecordFieldData" value="35000" />
-			<var name="field" value="Decimal" />
 			<var name="fieldFieldLabel" value="Salary" />
 			<var name="fieldName" value="Salary" />
 		</execute>
 
-		<execute macro="DDLRecord#populateField">
+		<execute macro="DDLRecord#populateFieldDocumentsAndMedia">
 			<var name="ddlRecordFieldData" value="Document Title" />
 			<var name="document" value="Document_1.txt" />
-			<var name="field" value="Documents and Media" />
 			<var name="fieldFieldLabel" value="Resume" />
 			<var name="fieldName" value="Resume" />
 		</execute>
 
-		<execute macro="DDLRecord#populateField">
+		<execute macro="DDLRecord#populateFieldInteger">
 			<var name="ddlRecordFieldData" value="30" />
-			<var name="field" value="Integer" />
 			<var name="fieldFieldLabel" value="Age" />
 			<var name="fieldName" value="Age" />
 		</execute>
 
-		<execute macro="DDLRecord#populateField">
+		<execute macro="DDLRecord#populateFieldNumber">
 			<var name="ddlRecordFieldData" value="40" />
-			<var name="field" value="Number" />
 			<var name="fieldFieldLabel" value="Weekly Hours" />
 			<var name="fieldName" value="Weekly_Hours" />
 		</execute>
 
-		<execute macro="DDLRecord#populateField">
+		<execute macro="DDLRecord#populateFieldRadio">
 			<var name="ddlRecordFieldData" value="QA Engineer" />
-			<var name="field" value="Radio" />
 			<var name="fieldFieldLabel" value="Department" />
 			<var name="fieldName" value="Department" />
 		</execute>
 
-		<execute macro="DDLRecord#populateField">
+		<execute macro="DDLRecord#populateFieldSelect">
 			<var name="ddlRecordFieldData" value="5+" />
-			<var name="field" value="Select" />
 			<var name="fieldFieldLabel" value="Years Worked" />
 			<var name="fieldName" value="Years_Worked" />
 		</execute>
 
-		<execute macro="DDLRecord#populateField">
+		<execute macro="DDLRecord#populateFieldText">
 			<var name="ddlRecordFieldData" value="Joe Engineer" />
-			<var name="field" value="Text" />
 			<var name="fieldFieldLabel" value="Name" />
 			<var name="fieldName" value="Name" />
 		</execute>
 
-		<execute macro="DDLRecord#populateField">
+		<execute macro="DDLRecord#populateFieldTextBox">
 			<var name="ddlRecordFieldData" value="Joe Engineer works in QA" />
-			<var name="field" value="Text Box" />
 			<var name="fieldFieldLabel" value="Description" />
 			<var name="fieldName" value="Description" />
 		</execute>
@@ -1888,7 +1879,7 @@
 		<execute action="PGMessageboards#assertElementNotPresent" locator-key1="ADD_CATEGORY_BUTTON" />
 		<execute action="PGMessageboards#assertElementNotPresent" locator-key1="PERMISSIONS_BUTTON" />
 
-		<execute macro="AssetPublisherPortlet#addBlogsEntryPG">
+		<execute macro="BlogsEntry#addPGViaAP">
 			<var name="entryContent" value="This is a movie blog by usersn2" />
 			<var name="entryTitle" value="Movie Blog" />
 		</execute>
@@ -2117,6 +2108,11 @@
 		<execute macro="User#loginUserPG">
 			<var name="password" value="test" />
 			<var name="userEmailAddress" value="userea@liferay.com" />
+		</execute>
+
+		<execute macro="Bookmark#gotoPG">
+			<var name="bookmarkName" value="Test Bookmark Name" />
+			<var name="bookmarkURL" value="http://www.liferay.com" />
 		</execute>
 
 		<execute macro="Bookmark#viewPG">
@@ -2409,6 +2405,82 @@
 			<var name="permissionDefinitionKey" value="${permissionDefinitionKey}" />
 			<var name="permissionDefinitionValue" value="${permissionDefinitionValue}" />
 			<var name="roleName" value="${roleName}" />
+		</execute>
+	</command>
+
+	<command name="ViewPreferencesPanelPermissionSiteMemberRole" priority="5">
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Users and Organizations" />
+		</execute>
+
+		<execute macro="User#addCP">
+			<var name="userEmailAddress" value="userea@liferay.com" />
+			<var name="userFirstName" value="userfn" />
+			<var name="userLastName" value="userln" />
+			<var name="userScreenName" value="usersn" />
+		</execute>
+
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Users and Organizations" />
+		</execute>
+
+		<execute macro="User#editUserSiteCP">
+			<var name="siteName" value="Liferay" />
+			<var name="userScreenName" value="usersn" />
+		</execute>
+
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Users and Organizations" />
+		</execute>
+
+		<execute macro="User#editPasswordCP">
+			<var name="userEmailAddress" value="userea@liferay.com" />
+			<var name="userScreenName" value="usersn" />
+		</execute>
+
+		<execute macro="Portlet#addPG">
+			<var name="portletName" value="Currency Converter" />
+		</execute>
+
+		<execute macro="PermissionsInline#gotoConfigurationPG">
+			<var name="portletName" value="Currency Converter" />
+			<var name="portletOption" value="Configuration" />
+		</execute>
+
+		<execute macro="Role#definePermissionPG">
+			<var name="permissionDefinitionKey" value="CONTENT_PERMISSIONS_VIEW_CHECKBOX" />
+			<var name="roleName" value="Site Member" />
+		</execute>
+
+		<execute macro="Role#definePermissionPG">
+			<var name="permissionDefinitionKey" value="CONTENT_PERMISSIONS_PREFERENCES_CHECKBOX" />
+			<var name="roleName" value="Site Member" />
+		</execute>
+
+		<execute macro="User#logoutPG" />
+
+		<execute macro="User#loginUserPG">
+			<var name="password" value="test" />
+			<var name="userEmailAddress" value="userea@liferay.com" />
+		</execute>
+
+		<execute macro="Portlet#gotoPortletOptions">
+			<var name="portletName" value="Currency Converter" />
+			<var name="portletOption" value="Preferences" />
+		</execute>
+
+		<var name="key_pageName" value="Welcome" />
+
+		<execute action="Home#assertElementPresent" locator-key1="PAGE" value1="Welcome" />
+
+		<execute action="PGHelloworld#assertTextEquals" locator-key1="PORTLET_TITLE" value1="Hello World" />
+		<execute action="PGHelloworld#assertElementPresent" locator-key1="PORTLET_CONTENT" value1="Welcome to Liferay Portal" />
+
+		<execute macro="User#logoutPG" />
+
+		<execute macro="User#loginUserPG">
+			<var name="password" value="test" />
+			<var name="userEmailAddress" value="test@liferay.com" />
 		</execute>
 	</command>
 </definition>

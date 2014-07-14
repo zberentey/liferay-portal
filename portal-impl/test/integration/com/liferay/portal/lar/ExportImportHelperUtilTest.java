@@ -14,8 +14,6 @@
 
 package com.liferay.portal.lar;
 
-import com.liferay.portal.kernel.dao.orm.FinderCacheUtil;
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.lar.ExportImportHelperUtil;
 import com.liferay.portal.kernel.lar.ExportImportPathUtil;
 import com.liferay.portal.kernel.lar.MissingReference;
@@ -24,7 +22,6 @@ import com.liferay.portal.kernel.lar.PortletDataContext;
 import com.liferay.portal.kernel.lar.PortletDataContextFactoryUtil;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.test.ExecutionTestListeners;
-import com.liferay.portal.kernel.transaction.Transactional;
 import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.ListUtil;
@@ -46,11 +43,11 @@ import com.liferay.portal.model.User;
 import com.liferay.portal.repository.liferayrepository.model.LiferayFileEntry;
 import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portal.service.LayoutLocalServiceUtil;
+import com.liferay.portal.test.DeleteAfterTestRun;
 import com.liferay.portal.test.LiferayIntegrationJUnitTestRunner;
 import com.liferay.portal.test.MainServletExecutionTestListener;
 import com.liferay.portal.test.Sync;
 import com.liferay.portal.test.SynchronousDestinationExecutionTestListener;
-import com.liferay.portal.test.TransactionalExecutionTestListener;
 import com.liferay.portal.util.PortalImpl;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.PropsValues;
@@ -80,7 +77,6 @@ import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -95,18 +91,14 @@ import org.powermock.api.mockito.PowerMockito;
 @ExecutionTestListeners(
 	listeners = {
 		MainServletExecutionTestListener.class,
-		SynchronousDestinationExecutionTestListener.class,
-		TransactionalExecutionTestListener.class
+		SynchronousDestinationExecutionTestListener.class
 	})
 @RunWith(LiferayIntegrationJUnitTestRunner.class)
 @Sync
-@Transactional
 public class ExportImportHelperUtilTest extends PowerMockito {
 
 	@Before
 	public void setUp() throws Exception {
-		FinderCacheUtil.clearCache();
-
 		_liveGroup = GroupTestUtil.addGroup();
 		_stagingGroup = GroupTestUtil.addGroup();
 
@@ -175,12 +167,6 @@ public class ExportImportHelperUtilTest extends PowerMockito {
 			RandomTestUtil.randomString());
 	}
 
-	@After
-	public void tearDown() throws Exception {
-		GroupLocalServiceUtil.deleteGroup(_liveGroup);
-		GroupLocalServiceUtil.deleteGroup(_stagingGroup);
-	}
-
 	@Test
 	public void testDeleteTimestampFromDLReferenceURLs() throws Exception {
 		String content = replaceParameters(
@@ -244,6 +230,27 @@ public class ExportImportHelperUtilTest extends PowerMockito {
 			Assert.assertTrue(
 				content.contains("[$dl-reference=" + entry + "$]"));
 		};
+	}
+
+	@Test
+	public void testExportDLReferencesInvalidReference() throws Exception {
+		_portletDataContextExport.setZipWriter(new TestReaderWriter());
+
+		StringBundler sb = new StringBundler(9);
+
+		sb.append("{{/documents/}}");
+		sb.append(StringPool.NEW_LINE);
+		sb.append("[[/documents/]]");
+		sb.append(StringPool.NEW_LINE);
+		sb.append("<a href=/documents/>Link</a>");
+		sb.append(StringPool.NEW_LINE);
+		sb.append("<a href=\"/documents/\">Link</a>");
+		sb.append(StringPool.NEW_LINE);
+		sb.append("<a href='/documents/'>Link</a>");
+
+		ExportImportHelperUtil.replaceExportDLReferences(
+			_portletDataContextExport, _referrerStagedModel, sb.toString(),
+			true);
 	}
 
 	@Test
@@ -533,8 +540,7 @@ public class ExportImportHelperUtilTest extends PowerMockito {
 	}
 
 	protected void assertLinksToLayouts(
-			String content, Layout layout, long groupId)
-		throws SystemException {
+		String content, Layout layout, long groupId) {
 
 		StringBundler sb = new StringBundler();
 
@@ -717,13 +723,19 @@ public class ExportImportHelperUtilTest extends PowerMockito {
 	private static String _OLD_LAYOUT_FRIENDLY_URL_PRIVATE_USER_SERVLET_MAPPING;
 
 	private FileEntry _fileEntry;
+
+	@DeleteAfterTestRun
 	private Group _liveGroup;
+
 	private Layout _livePublicLayout;
 	private Pattern _pattern = Pattern.compile("href=|\\{|\\[");
 	private PortletDataContext _portletDataContextExport;
 	private PortletDataContext _portletDataContextImport;
 	private StagedModel _referrerStagedModel;
+
+	@DeleteAfterTestRun
 	private Group _stagingGroup;
+
 	private Layout _stagingPrivateLayout;
 	private Layout _stagingPublicLayout;
 
@@ -783,12 +795,12 @@ public class ExportImportHelperUtilTest extends PowerMockito {
 		}
 
 		@Override
-		public List<String> getFolderEntries(String path) {
+		public File getFile() {
 			return null;
 		}
 
 		@Override
-		public File getFile() {
+		public List<String> getFolderEntries(String path) {
 			return null;
 		}
 

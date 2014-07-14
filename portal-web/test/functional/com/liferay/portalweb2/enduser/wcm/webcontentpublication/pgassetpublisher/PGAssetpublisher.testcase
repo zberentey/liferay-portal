@@ -120,6 +120,38 @@
 		</execute>
 	</command>
 
+	<command name="AddCustomTitleViaAP" priority="5">
+		<execute macro="Page#addPG">
+			<var name="pageName" value="Test Page" />
+		</execute>
+
+		<execute macro="Page#gotoPG">
+			<var name="pageName" value="Test Page" />
+		</execute>
+
+		<execute macro="Portlet#addPG">
+			<var name="portletName" value="Asset Publisher" />
+		</execute>
+
+		<execute action="Home#refresh" />
+
+		<execute macro="Portlet#gotoPortletOptions">
+			<var name="portletOption" value="Look and Feel" />
+		</execute>
+
+		<execute macro="Portlet#configureCustomTitleViaLookandfeelPG">
+			<var name="portletName" value="Asset Publisher" />
+		</execute>
+
+		<execute macro="Page#gotoPG">
+			<var name="pageName" value="Test Page" />
+		</execute>
+
+		<execute macro="Portlet#viewSpecificPG">
+			<var name="portletName" value="Asset Publisher Custom" />
+		</execute>
+	</command>
+
 	<command name="AssertViewPermissionsViaCPAndPG" priority="4">
 		<var name="roleName1" value="Advertiser Admin Name" />
 		<var name="roleName2" value="Press Secretary Name" />
@@ -389,7 +421,7 @@
 
 		<var name="key_structureName" value="${structure1Name}" />
 
-		<execute action="CPWebcontentStructures#assertClick" locator-key1="STRUCTURE_TABLE_ACTIONS" value1="Actions" />
+		<execute action="CPWebcontentStructures#click" locator-key1="STRUCTURE_TABLE_ACTIONS" />
 		<execute action="CPWebcontentStructures#assertClick" locator-key1="STRUCTURE_MENULIST_PERMISSIONS" value1="Permissions" />
 
 		<execute macro="PermissionsInline#addOrRemoveViewPermissionFromAllRoles">
@@ -415,7 +447,7 @@
 
 		<var name="key_structureName" value="${structure2Name}" />
 
-		<execute action="CPWebcontentStructures#assertClick" locator-key1="STRUCTURE_TABLE_ACTIONS" value1="Actions" />
+		<execute action="CPWebcontentStructures#click" locator-key1="STRUCTURE_TABLE_ACTIONS" />
 		<execute action="CPWebcontentStructures#click" locator-key1="STRUCTURE_MENULIST_PERMISSIONS" />
 
 		<execute macro="PermissionsInline#addOrRemoveViewPermissionFromAllRoles">
@@ -443,7 +475,7 @@
 
 		<var name="key_templateName" value="${template1Name}" />
 
-		<execute action="CPWebcontentTemplates#assertClick" locator-key1="TEMPLATE_TABLE_ACTIONS" value1="Actions" />
+		<execute action="CPWebcontentTemplates#click" locator-key1="TEMPLATE_TABLE_ACTIONS" />
 		<execute action="CPWebcontentTemplates#click" locator-key1="TEMPLATE_MENULIST_PERMISSIONS" />
 
 		<execute macro="PermissionsInline#addOrRemoveViewPermissionFromAllRoles">
@@ -471,7 +503,7 @@
 
 		<var name="key_templateName" value="${template2Name}" />
 
-		<execute action="CPWebcontentTemplates#assertClick" locator-key1="TEMPLATE_TABLE_ACTIONS" value1="Actions" />
+		<execute action="CPWebcontentTemplates#click" locator-key1="TEMPLATE_TABLE_ACTIONS" />
 		<execute action="CPWebcontentTemplates#click" locator-key1="TEMPLATE_MENULIST_PERMISSIONS" />
 
 		<execute macro="PermissionsInline#addOrRemoveViewPermissionFromAllRoles">
@@ -977,6 +1009,45 @@
 		<execute macro="AssetPublisherPortlet#viewRate4StarsPG" />
 	</command>
 
+	<command name="ConfigureAPPortletScopeMultipleSites" priority="4">
+		<var name="siteName" value="Test Site" />
+
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Sites" />
+		</execute>
+
+		<execute macro="Site#addBlankCP">
+			<var name="siteName" value="${siteName}" />
+		</execute>
+
+		<execute macro="Page#gotoPG">
+			<var name="pageName" value="${pageName}" />
+		</execute>
+
+		<execute macro="Portlet#addDuplicatePG">
+			<var name="portletName" value="${portletName}" />
+		</execute>
+
+		<execute macro="Page#gotoPG">
+			<var name="pageName" value="${pageName}" />
+		</execute>
+
+		<execute macro="AssetPublisherPortlet#configureAddSiteScopes">
+			<var name="addSite" value="true" />
+			<var name="defaultSite" value="true" />
+			<var name="siteName" value="${siteName}" />
+		</execute>
+
+		<execute macro="Page#gotoPG">
+			<var name="pageName" value="${pageName}" />
+		</execute>
+
+		<execute macro="AssetPublisherPortlet#viewMultipleSiteScopesAddDropdowns">
+			<var name="siteName1" value="Liferay" />
+			<var name="siteName2" value="${siteName}" />
+		</execute>
+	</command>
+
 	<command name="ConfigureAPPortletSelectedBlogsEntry" priority="4">
 		<var name="selectedAsset" value="Blogs Entry" />
 
@@ -1132,6 +1203,224 @@
 
 		<execute macro="AssetPublisherPortlet#viewConfigureAPMoveToSelectedPG">
 			<var name="assetTitle" value="${bookmarkName}" />
+		</execute>
+	</command>
+
+	<command name="FindSiteAPViaSearchScopeSelector" priority="4">
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="Sites" />
+		</execute>
+
+		<execute macro="Site#addBlankCP">
+			<var name="siteName" value="Site Name" />
+		</execute>
+
+		<execute macro="Page#gotoPG">
+			<var name="pageName" value="${pageName}" />
+		</execute>
+
+		<execute macro="AssetPublisherPortlet#assertSiteScopeSearch">
+			<var name="siteName" value="Site Name" />
+		</execute>
+	</command>
+
+	<command name="OrderContentByModifiedDateViaAP" priority="3">
+		<execute macro="Page#gotoPG">
+			<var name="pageName" value="Asset Publisher Page" />
+		</execute>
+
+		<execute macro="AssetPublisherPortlet#configureAssetDisplayOrderPG">
+			<var name="fieldNameOrder" value="Modified Date" />
+			<var name="sortOrder" value="Descending" />
+		</execute>
+
+		<execute macro="Page#gotoPG">
+			<var name="pageName" value="Asset Publisher Page" />
+		</execute>
+
+		<execute macro="WebContent#addPGViaAP" >
+			<var name="webContentContent" value="WebContent Content 1" />
+			<var name="webContentTitle" value="WebContent Title 1" />
+		</execute>
+
+		<execute macro="Page#gotoPG">
+			<var name="pageName" value="Asset Publisher Page" />
+		</execute>
+
+		<execute macro="WebContent#addPGViaAP" >
+			<var name="webContentContent" value="WebContent Content 2" />
+			<var name="webContentTitle" value="WebContent Title 2" />
+		</execute>
+
+		<execute macro="Page#gotoPG">
+			<var name="pageName" value="Asset Publisher Page" />
+		</execute>
+
+		<execute macro="WebContent#addPGViaAP" >
+			<var name="webContentContent" value="WebContent Content 3" />
+			<var name="webContentTitle" value="WebContent Title 3" />
+		</execute>
+
+		<execute macro="Page#gotoPG">
+			<var name="pageName" value="Asset Publisher Page" />
+		</execute>
+
+		<execute macro="AssetPublisherPortlet#viewMultipleAssetOrderPGViaAP">
+			<var name="assetTitle1" value="WebContent Title 3" />
+			<var name="assetTitle2" value="WebContent Title 2" />
+			<var name="assetTitle3" value="WebContent Title 1" />
+		</execute>
+
+		<execute macro="WebContent#editPGViaAP">
+			<var name="assetTitle" value="WebContent Title 1" />
+			<var name="webContentContentEdit" value="WebContent Content 1 Edit" />
+			<var name="webContentTitleEdit" value="WebContent Title 1 Edit" />
+		</execute>
+
+		<execute macro="Page#gotoPG">
+			<var name="pageName" value="Asset Publisher Page" />
+		</execute>
+
+		<execute macro="AssetPublisherPortlet#viewMultipleAssetOrderPGViaAP">
+			<var name="assetTitle1" value="WebContent Title 1 Edit" />
+			<var name="assetTitle2" value="WebContent Title 3" />
+			<var name="assetTitle3" value="WebContent Title 2" />
+		</execute>
+	</command>
+
+	<command name="OrderWCByModifiedDateViaAP" priority="3">
+		<execute macro="Page#gotoPG">
+			<var name="pageName" value="Asset Publisher Page" />
+		</execute>
+
+		<execute macro="AssetPublisherPortlet#configureAssetTypePG">
+			<var name="assetSubtype" value="Any" />
+			<var name="selectedAsset" value="Web Content Article" />
+		</execute>
+
+		<execute macro="Page#gotoPG">
+			<var name="pageName" value="Asset Publisher Page" />
+		</execute>
+
+		<execute macro="AssetPublisherPortlet#configureAssetDisplayOrderPG">
+			<var name="fieldNameOrder" value="Modified Date" />
+			<var name="sortOrder" value="Descending" />
+		</execute>
+
+		<execute macro="Page#gotoPG">
+			<var name="pageName" value="Asset Publisher Page" />
+		</execute>
+
+		<execute macro="WebContent#addPGViaAP" >
+			<var name="assetTypeConfigured" value="true" />
+			<var name="webContentContent" value="WebContent Content 1" />
+			<var name="webContentTitle" value="WebContent Title 1" />
+		</execute>
+
+		<execute macro="Page#gotoPG">
+			<var name="pageName" value="Asset Publisher Page" />
+		</execute>
+
+		<execute macro="WebContent#addPGViaAP" >
+			<var name="assetTypeConfigured" value="true" />
+			<var name="webContentContent" value="WebContent Content 2" />
+			<var name="webContentTitle" value="WebContent Title 2" />
+		</execute>
+
+		<execute macro="Page#gotoPG">
+			<var name="pageName" value="Asset Publisher Page" />
+		</execute>
+
+		<execute macro="WebContent#addPGViaAP" >
+			<var name="assetTypeConfigured" value="true" />
+			<var name="webContentContent" value="WebContent Content 3" />
+			<var name="webContentTitle" value="WebContent Title 3" />
+		</execute>
+
+		<execute macro="Page#gotoPG">
+			<var name="pageName" value="Asset Publisher Page" />
+		</execute>
+
+		<execute macro="AssetPublisherPortlet#viewMultipleAssetOrderPGViaAP">
+			<var name="assetTitle1" value="WebContent Title 3" />
+			<var name="assetTitle2" value="WebContent Title 2" />
+			<var name="assetTitle3" value="WebContent Title 1" />
+		</execute>
+
+		<execute macro="WebContent#editPGViaAP">
+			<var name="assetTitle" value="WebContent Title 1" />
+			<var name="webContentContentEdit" value="WebContent Content 1 Edit" />
+			<var name="webContentTitleEdit" value="WebContent Title 1 Edit" />
+		</execute>
+
+		<execute macro="Page#gotoPG">
+			<var name="pageName" value="Asset Publisher Page" />
+		</execute>
+
+		<execute macro="AssetPublisherPortlet#viewMultipleAssetOrderPGViaAP">
+			<var name="assetTitle1" value="WebContent Title 1 Edit" />
+			<var name="assetTitle2" value="WebContent Title 3" />
+			<var name="assetTitle3" value="WebContent Title 2" />
+		</execute>
+	</command>
+
+	<command name="OrderWCByPublishDateViaAP" priority="3">
+		<execute macro="Page#gotoPG">
+			<var name="pageName" value="Asset Publisher Page" />
+		</execute>
+
+		<execute macro="AssetPublisherPortlet#configureAssetTypePG">
+			<var name="assetSubtype" value="Any" />
+			<var name="selectedAsset" value="Web Content Article" />
+		</execute>
+
+		<execute macro="Page#gotoPG">
+			<var name="pageName" value="Asset Publisher Page" />
+		</execute>
+
+		<execute macro="AssetPublisherPortlet#configureAssetDisplayOrderPG">
+			<var name="fieldNameOrder" value="Publish Date" />
+			<var name="sortOrder" value="Descending" />
+		</execute>
+
+		<execute macro="Page#gotoPG">
+			<var name="pageName" value="Asset Publisher Page" />
+		</execute>
+
+		<execute macro="WebContent#addPGViaAP" >
+			<var name="assetTypeConfigured" value="true" />
+			<var name="webContentContent" value="WebContent Content 1" />
+			<var name="webContentTitle" value="WebContent Title 1" />
+		</execute>
+
+		<execute macro="Page#gotoPG">
+			<var name="pageName" value="Asset Publisher Page" />
+		</execute>
+
+		<execute macro="WebContent#addPGViaAP" >
+			<var name="assetTypeConfigured" value="true" />
+			<var name="webContentContent" value="WebContent Content 2" />
+			<var name="webContentTitle" value="WebContent Title 2" />
+		</execute>
+
+		<execute macro="Page#gotoPG">
+			<var name="pageName" value="Asset Publisher Page" />
+		</execute>
+
+		<execute macro="WebContent#addPGViaAP" >
+			<var name="assetTypeConfigured" value="true" />
+			<var name="webContentContent" value="WebContent Content 3" />
+			<var name="webContentTitle" value="WebContent Title 3" />
+		</execute>
+
+		<execute macro="Page#gotoPG">
+			<var name="pageName" value="Asset Publisher Page" />
+		</execute>
+
+		<execute macro="AssetPublisherPortlet#viewMultipleAssetOrderPGViaAP">
+			<var name="assetTitle1" value="WebContent Title 3" />
+			<var name="assetTitle2" value="WebContent Title 2" />
+			<var name="assetTitle3" value="WebContent Title 1" />
 		</execute>
 	</command>
 

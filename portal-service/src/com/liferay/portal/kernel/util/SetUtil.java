@@ -160,7 +160,7 @@ public class SetUtil {
 	}
 
 	public static <E> Set<E> fromCollection(Collection<? extends E> c) {
-		if ((c != null) && Set.class.isAssignableFrom(c.getClass())) {
+		if ((c != null) && (c instanceof Set)) {
 			return (Set<E>)c;
 		}
 
@@ -258,6 +258,10 @@ public class SetUtil {
 		set1.retainAll(set2);
 
 		return set1;
+	}
+
+	public static Set<Long> intersect(long[] array1, long[] array2) {
+		return intersect(fromArray(array1), fromArray(array2));
 	}
 
 }

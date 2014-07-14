@@ -36,12 +36,12 @@ if (Validator.isNull(body)) {
 		sb.append(MBThreadConstants.NEW_THREAD_URL);
 		sb.append("</a>");
 
-		body = LanguageUtil.format(pageContext, "the-new-thread-can-be-found-at-x", sb.toString(), false);
+		body = LanguageUtil.format(request, "the-new-thread-can-be-found-at-x", sb.toString(), false);
 	}
 }
 %>
 
-<liferay-ui:input-editor editorImpl="<%= HTML_EDITOR_WYSIWYG_IMPL_KEY %>" />
+<liferay-ui:input-editor allowBrowseDocuments="<%= false %>" editorImpl="<%= HTML_EDITOR_WYSIWYG_IMPL_KEY %>" />
 
 <aui:script>
 	function <portlet:namespace />getHTML() {

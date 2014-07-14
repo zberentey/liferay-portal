@@ -391,7 +391,6 @@ public class BundleServletContextTest extends PowerMockito {
 
 	@Test
 	public void testUnregisterHttpSessionBindingListener() {
-
 		unregisterListener(_httpSessionBindingListener);
 	}
 
@@ -619,7 +618,6 @@ public class BundleServletContextTest extends PowerMockito {
 
 		private Logger _logger = Logger.getLogger(
 			MockLoggingFilter.class.getName());
-
 		private String _message;
 
 	}

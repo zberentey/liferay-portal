@@ -5,11 +5,11 @@
 
 	${portletURL.setAnchor(false)}
 	${portletURL.setParameter("struts_action", "/language/view")}
-	${portletURL.setParameter("redirect", portalUtil.getCurrentURL(request))}
+	${portletURL.setParameter("redirect", currentURL)}
 	${portletURL.setPortletMode("view")}
 	${portletURL.setWindowState("normal")}
 
-	<@liferay_ui["icon-menu"] icon=themeDisplay.getPathThemeImages() + "/common/global.png" message=locale.getDisplayName(locale)>
+	<@liferay_ui["icon-menu"] icon="../aui/globe" message=locale.getDisplayName(locale)>
 		<#assign languageId = localeUtil.toLanguageId(locale) />
 
 		<#list entries as entry>

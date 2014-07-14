@@ -14,7 +14,6 @@
 
 package com.liferay.portal.service.persistence.impl;
 
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.test.CodeCoverageAssertor;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
@@ -41,7 +40,7 @@ public class NestedSetsTreeManagerTest {
 		new CodeCoverageAssertor();
 
 	@Test
-	public void testCountAncestors() throws SystemException {
+	public void testCountAncestors() {
 		testInsert();
 
 		assertCountAncestors(1, _simpleNestedSetsTreeNodes[0]);
@@ -56,7 +55,7 @@ public class NestedSetsTreeManagerTest {
 	}
 
 	@Test
-	public void testCountDescendants() throws SystemException {
+	public void testCountDescendants() {
 		testInsert();
 
 		assertCountDescendants(5, _simpleNestedSetsTreeNodes[0]);
@@ -71,7 +70,7 @@ public class NestedSetsTreeManagerTest {
 	}
 
 	@Test
-	public void testDelete() throws SystemException {
+	public void testDelete() {
 		testInsert();
 
 		_nestedSetsTreeManager.delete(_simpleNestedSetsTreeNodes[7]);
@@ -125,7 +124,7 @@ public class NestedSetsTreeManagerTest {
 	}
 
 	@Test
-	public void testGetAncestors() throws SystemException {
+	public void testGetAncestors() {
 		testInsert();
 
 		assertGetAncestors(_simpleNestedSetsTreeNodes[0]);
@@ -149,7 +148,7 @@ public class NestedSetsTreeManagerTest {
 	}
 
 	@Test
-	public void testGetDescendants() throws SystemException {
+	public void testGetDescendants() {
 		testInsert();
 
 		assertGetDescendants(
@@ -172,7 +171,7 @@ public class NestedSetsTreeManagerTest {
 	}
 
 	@Test
-	public void testInsert() throws SystemException {
+	public void testInsert() {
 
 		// (0)
 
@@ -252,7 +251,7 @@ public class NestedSetsTreeManagerTest {
 	}
 
 	@Test
-	public void testMove() throws SystemException {
+	public void testMove() {
 		testInsert();
 
 		_nestedSetsTreeManager.move(_simpleNestedSetsTreeNodes[4], null, null);
@@ -323,9 +322,8 @@ public class NestedSetsTreeManagerTest {
 	}
 
 	protected void assertCountAncestors(
-			long ancestorsCount,
-			SimpleNestedSetsTreeNode simpleNestedSetsTreeNode)
-		throws SystemException {
+		long ancestorsCount,
+		SimpleNestedSetsTreeNode simpleNestedSetsTreeNode) {
 
 		Assert.assertEquals(
 			ancestorsCount,
@@ -333,9 +331,7 @@ public class NestedSetsTreeManagerTest {
 	}
 
 	protected void assertCountDescendants(
-			long childrenCount,
-			SimpleNestedSetsTreeNode simpleNestedSetsTreeNode)
-		throws SystemException {
+		long childrenCount, SimpleNestedSetsTreeNode simpleNestedSetsTreeNode) {
 
 		Assert.assertEquals(
 			childrenCount,
@@ -343,9 +339,8 @@ public class NestedSetsTreeManagerTest {
 	}
 
 	protected void assertGetAncestors(
-			SimpleNestedSetsTreeNode simpleNestedSetsTreeNode,
-			SimpleNestedSetsTreeNode... ancestorSimpleNestedSetsTreeNodes)
-		throws SystemException {
+		SimpleNestedSetsTreeNode simpleNestedSetsTreeNode,
+		SimpleNestedSetsTreeNode... ancestorSimpleNestedSetsTreeNodes) {
 
 		List<SimpleNestedSetsTreeNode> simpleNestedSetsTreeNodes =
 			new ArrayList<SimpleNestedSetsTreeNode>(
@@ -361,9 +356,8 @@ public class NestedSetsTreeManagerTest {
 	}
 
 	protected void assertGetDescendants(
-			SimpleNestedSetsTreeNode simpleNestedSetsTreeNode,
-			SimpleNestedSetsTreeNode... childSimpleNestedSetsTreeNodes)
-		throws SystemException {
+		SimpleNestedSetsTreeNode simpleNestedSetsTreeNode,
+		SimpleNestedSetsTreeNode... childSimpleNestedSetsTreeNodes) {
 
 		List<SimpleNestedSetsTreeNode> simpleNestedSetsTreeNodes =
 			new ArrayList<SimpleNestedSetsTreeNode>(
@@ -438,11 +432,6 @@ public class NestedSetsTreeManagerTest {
 		}
 
 		@Override
-		public long getPrimaryKey() {
-			return _primaryKey;
-		}
-
-		@Override
 		public long getNestedSetsTreeNodeLeft() {
 			return _nestedSetsTreeNodeLeft;
 		}
@@ -455,6 +444,11 @@ public class NestedSetsTreeManagerTest {
 		@Override
 		public long getNestedSetsTreeNodeScopeId() {
 			return 0;
+		}
+
+		@Override
+		public long getPrimaryKey() {
+			return _primaryKey;
 		}
 
 		@Override
@@ -492,9 +486,7 @@ public class NestedSetsTreeManagerTest {
 		extends NestedSetsTreeManager<SimpleNestedSetsTreeNode> {
 
 		@Override
-		public void delete(SimpleNestedSetsTreeNode simpleNestedSetsTreeNode)
-			throws SystemException {
-
+		public void delete(SimpleNestedSetsTreeNode simpleNestedSetsTreeNode) {
 			super.delete(simpleNestedSetsTreeNode);
 
 			_simpleNestedSetsTreeNodeList.remove(simpleNestedSetsTreeNode);
@@ -506,9 +498,8 @@ public class NestedSetsTreeManagerTest {
 
 		@Override
 		public void insert(
-				SimpleNestedSetsTreeNode simpleNestedSetsTreeNode,
-				SimpleNestedSetsTreeNode parentSimpleNestedSetsTreeNode)
-			throws SystemException {
+			SimpleNestedSetsTreeNode simpleNestedSetsTreeNode,
+			SimpleNestedSetsTreeNode parentSimpleNestedSetsTreeNode) {
 
 			super.insert(
 				simpleNestedSetsTreeNode, parentSimpleNestedSetsTreeNode);

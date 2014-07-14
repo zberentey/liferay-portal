@@ -20,7 +20,7 @@
 </tr>
 <tr>
 	<td>SELECT_VERSION_IFRAME</td>
-	<td>//iframe[contains(@id,'selectVersion')]</td>
+	<td>//iframe[contains(@id,'compareVersions')]</td>
 	<td></td>
 </tr>
 <tr>

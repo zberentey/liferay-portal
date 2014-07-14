@@ -19,6 +19,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>ADD_TASK_IFRAME</td>
+	<td>//iframe[contains(@id,'tasksportlet_Dialog_iframe')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>TASK_DESCRIPTION_FIELD</td>
 	<td>//input[contains(@id,'tasksportlet_title')]</td>
 	<td></td>
@@ -67,6 +72,26 @@
 <tr>
 	<td>DUE_DATE_FIELD</td>
 	<td>//input[@name='_1_WAR_tasksportlet_dueDate']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>DUE_DATE_HOUR</td>
+	<td>//input[@id='_1_WAR_tasksportlet_dueDateHour']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>DUE_DATE_MINUTE</td>
+	<td>//input[@id='_1_WAR_tasksportlet_dueDateMinute']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>DUE_DATE_MERIDIAN</td>
+	<td>//input[@id='_1_WAR_tasksportlet_dueDateAmPm']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>DUE_DATE_TIME_FIELD</td>
+	<td>//input[@id='_1_WAR_tasksportlet_dueDateTime']</td>
 	<td></td>
 </tr>
 <tr>

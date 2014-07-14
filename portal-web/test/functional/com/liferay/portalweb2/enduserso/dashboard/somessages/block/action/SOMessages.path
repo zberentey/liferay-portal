@@ -54,6 +54,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>MESSAGES_POP_UP_WINDOW</td>
+	<td>title=Messages - Liferay</td>
+	<td></td>
+</tr>
+<tr>
 	<td>CONFIRMATION</td>
 	<td></td>
 	<td></td>
@@ -91,7 +96,7 @@
 </tr>
 <tr>
 	<td>MESSAGE_CHECKBOX</td>
-	<td>//tr[contains(.,'${key_messageBody}')]//input[contains(@name,'ThreadCheckbox')]</td>
+	<td>//tr[contains(.,'${key_messageBody}')]//input[contains(@name,'Thread')]</td>
 	<td></td>
 </tr>
 <tr>

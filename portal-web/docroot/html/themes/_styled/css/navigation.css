@@ -38,10 +38,6 @@
 		}
 	}
 
-	.lfr-nav-sortable > a > span {
-		padding-left: 28px;
-	}
-
 	.drag-handle {
 		background-color: #555;
 
@@ -60,16 +56,6 @@
 		width: 1em;
 	}
 
-	@include respond-to(desktop) {
-		.lfr-nav-sortable > a > span {
-			padding-left: 0;
-		}
-
-		.drag-handle {
-			display: none;
-		}
-	}
-
 	.lfr-nav-updateable {
 		.add-page-editor {
 			.add-page-editor-input {
@@ -83,7 +69,7 @@
 			@include respond-to(phone, tablet) {
 				margin: 0 5px;
 
-				.input-append {
+				.input-group {
 					margin: 6px 0 7px;
 					width: 100%;
 				}
@@ -93,8 +79,6 @@
 				}
 
 				.add-page-editor-input {
-					@include box-sizing(border-box);
-
 					width: 70%;
 					z-index: 1;
 				}
@@ -122,9 +106,35 @@
 	}
 }
 
+.touch .modify-pages {
+	.lfr-nav-sortable > a > span {
+		padding-left: 28px;
+	}
+
+	@include respond-to(desktop) {
+		.lfr-nav-sortable > a > span {
+			padding-left: 0;
+		}
+
+		.drag-handle {
+			display: none;
+		}
+	}
+}
+
 .nav {
 	li .toolbar {
 		margin-top: 5px;
+	}
+}
+
+/* ---------- General navigation ---------- */
+
+.navigation-pane .app-view-navigation-entry .overlay.entry-action .btn {
+	padding: 11px 14px;
+
+	@include respond-to(desktop) {
+		padding: 14px 10px;
 	}
 }
 

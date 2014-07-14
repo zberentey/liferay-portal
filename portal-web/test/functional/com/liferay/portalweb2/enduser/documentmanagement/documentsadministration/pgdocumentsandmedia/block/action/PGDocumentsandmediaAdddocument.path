@@ -35,12 +35,12 @@
 </tr>
 <tr>
 	<td>ERROR_MESSAGE</td>
-	<td>//div[contains(@class,'alert-error')]</td>
+	<td>//div[(contains(@class,'alert-error') or contains(@class,'alert-danger'))]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>UNIQUE_DOCUMENT_ERROR_MESSAGE</td>
-	<td>//div[contains(@class,'alert alert-error') and contains(.,'Please enter a unique document name.')]</td>
+	<td>//div[contains(@class,'alert-danger') and contains(.,'Please enter a unique document name.')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -95,7 +95,7 @@
 </tr>
 <tr>
 	<td>CANCEL_BUTTON</td>
-	<td>//button[contains(.,'Cancel')]</td>
+	<td>//a[contains(@class,'btn-cancel')]</td>
 	<td></td>
 </tr>
 </tbody>

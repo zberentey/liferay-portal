@@ -14,7 +14,6 @@
 
 package com.liferay.portal.kernel.lar;
 
-import com.liferay.portal.kernel.backgroundtask.BackgroundTaskThreadLocal;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
@@ -62,13 +61,7 @@ public abstract class BasePortletDataHandler implements PortletDataHandler {
 			startTime = System.currentTimeMillis();
 		}
 
-		ClassLoader classLoader = portletDataContext.getClassLoader();
-
 		try {
-			Class<?> clazz = getClass();
-
-			portletDataContext.setClassLoader(clazz.getClassLoader());
-
 			return doAddDefaultData(
 				portletDataContext, portletId, portletPreferences);
 		}
@@ -86,8 +79,6 @@ public abstract class BasePortletDataHandler implements PortletDataHandler {
 					"Added default data to portlet in " +
 						Time.getDuration(duration));
 			}
-
-			portletDataContext.setClassLoader(classLoader);
 		}
 	}
 
@@ -105,13 +96,7 @@ public abstract class BasePortletDataHandler implements PortletDataHandler {
 			startTime = System.currentTimeMillis();
 		}
 
-		ClassLoader classLoader = portletDataContext.getClassLoader();
-
 		try {
-			Class<?> clazz = getClass();
-
-			portletDataContext.setClassLoader(clazz.getClassLoader());
-
 			return doDeleteData(
 				portletDataContext, portletId, portletPreferences);
 		}
@@ -127,10 +112,8 @@ public abstract class BasePortletDataHandler implements PortletDataHandler {
 
 				_log.info("Deleted portlet in " + Time.getDuration(duration));
 			}
-
-			portletDataContext.setClassLoader(classLoader);
 		}
-	};
+	}
 
 	@Override
 	public String exportData(
@@ -146,13 +129,7 @@ public abstract class BasePortletDataHandler implements PortletDataHandler {
 			startTime = System.currentTimeMillis();
 		}
 
-		ClassLoader classLoader = portletDataContext.getClassLoader();
-
 		try {
-			Class<?> clazz = getClass();
-
-			portletDataContext.setClassLoader(clazz.getClassLoader());
-
 			portletDataContext.addDeletionSystemEventStagedModelTypes(
 				getDeletionSystemEventStagedModelTypes());
 
@@ -161,19 +138,6 @@ public abstract class BasePortletDataHandler implements PortletDataHandler {
 
 				addUncheckedModelAdditionCount(
 					portletDataContext, portletDataHandlerControl);
-			}
-
-			if (BackgroundTaskThreadLocal.hasBackgroundTask()) {
-				PortletDataContext clonePortletDataContext =
-					PortletDataContextFactoryUtil.clonePortletDataContext(
-						portletDataContext);
-
-				prepareManifestSummary(
-					clonePortletDataContext, portletPreferences);
-
-				PortletDataHandlerStatusMessageSenderUtil.sendStatusMessage(
-					"portlet", portletId,
-					clonePortletDataContext.getManifestSummary());
 			}
 
 			return doExportData(
@@ -191,8 +155,6 @@ public abstract class BasePortletDataHandler implements PortletDataHandler {
 
 				_log.info("Exported portlet in " + Time.getDuration(duration));
 			}
-
-			portletDataContext.setClassLoader(classLoader);
 		}
 	}
 
@@ -397,13 +359,7 @@ public abstract class BasePortletDataHandler implements PortletDataHandler {
 
 		long sourceGroupId = portletDataContext.getSourceGroupId();
 
-		ClassLoader classLoader = portletDataContext.getClassLoader();
-
 		try {
-			Class<?> clazz = getClass();
-
-			portletDataContext.setClassLoader(clazz.getClassLoader());
-
 			if (Validator.isXml(data)) {
 				addImportDataRootElement(portletDataContext, data);
 			}
@@ -428,8 +384,6 @@ public abstract class BasePortletDataHandler implements PortletDataHandler {
 
 				_log.info("Imported portlet in " + Time.getDuration(duration));
 			}
-
-			portletDataContext.setClassLoader(classLoader);
 		}
 	}
 
@@ -504,13 +458,7 @@ public abstract class BasePortletDataHandler implements PortletDataHandler {
 			PortletPreferences portletPreferences)
 		throws PortletDataException {
 
-		ClassLoader classLoader = portletDataContext.getClassLoader();
-
 		try {
-			Class<?> clazz = getClass();
-
-			portletDataContext.setClassLoader(clazz.getClassLoader());
-
 			doPrepareManifestSummary(portletDataContext, portletPreferences);
 		}
 		catch (PortletDataException pde) {
@@ -518,9 +466,6 @@ public abstract class BasePortletDataHandler implements PortletDataHandler {
 		}
 		catch (Exception e) {
 			throw new PortletDataException(e);
-		}
-		finally {
-			portletDataContext.setClassLoader(classLoader);
 		}
 	}
 
@@ -558,13 +503,7 @@ public abstract class BasePortletDataHandler implements PortletDataHandler {
 			portletDataContext.setScopeGroupId(previousScopeGroupId);
 		}
 
-		ClassLoader classLoader = portletDataContext.getClassLoader();
-
 		try {
-			Class<?> clazz = getClass();
-
-			portletDataContext.setClassLoader(clazz.getClassLoader());
-
 			return doProcessExportPortletPreferences(
 				portletDataContext, portletId, portletPreferences);
 		}
@@ -574,9 +513,6 @@ public abstract class BasePortletDataHandler implements PortletDataHandler {
 		catch (Exception e) {
 			throw new PortletDataException(e);
 		}
-		finally {
-			portletDataContext.setClassLoader(classLoader);
-		}
 	}
 
 	@Override
@@ -585,13 +521,7 @@ public abstract class BasePortletDataHandler implements PortletDataHandler {
 			PortletPreferences portletPreferences)
 		throws PortletDataException {
 
-		ClassLoader classLoader = portletDataContext.getClassLoader();
-
 		try {
-			Class<?> clazz = getClass();
-
-			portletDataContext.setClassLoader(clazz.getClassLoader());
-
 			String displayStyle = getDisplayTemplate(
 				portletDataContext, portletId, portletPreferences);
 
@@ -715,9 +645,6 @@ public abstract class BasePortletDataHandler implements PortletDataHandler {
 		}
 		catch (Exception e) {
 			throw new PortletDataException(e);
-		}
-		finally {
-			portletDataContext.setClassLoader(classLoader);
 		}
 	}
 

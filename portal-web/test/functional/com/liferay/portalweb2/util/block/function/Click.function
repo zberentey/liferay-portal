@@ -69,7 +69,7 @@
 	<command name="clickAtSidebarClickAt">
 		<execute argument1="1000" selenium="pause" />
 
-		<execute argument1="//ul[@class='nav nav-add-controls']" selenium="clickAt" />
+		<execute argument1="//ul[@class='nav nav-add-controls'] | //ul[contains(@class,'nav nav-add-controls')]" selenium="clickAt" />
 
 		<execute argument1="//script[contains(@src,'/html/js/liferay/node.js')]" selenium="waitForElementPresent" />
 
@@ -81,7 +81,7 @@
 	<command name="clickAtSidebarClickAtWaitForScript">
 		<execute argument1="1000" selenium="pause" />
 
-		<execute argument1="//ul[@class='nav nav-add-controls']" selenium="clickAt" />
+		<execute argument1="//ul[@class='nav nav-add-controls'] | //ul[contains(@class,'nav nav-add-controls')]" selenium="clickAt" />
 
 		<execute argument1="//script[contains(@src,'/html/js/liferay/node.js')]" selenium="waitForElementPresent" />
 
@@ -89,7 +89,7 @@
 
 		<execute function="Click#clickAt" />
 
-		<execute argument1="//script[contains(@src,'/html/js/liferay/dockbar_add_application.js')]" selenium="waitForElementPresent" />
+		<execute argument1="//script[contains(@src,'/html/js/liferay/dockbar_add_application.js')] | //script[contains(@src,'/html/js/liferay/dockbar_add_page.js')] " selenium="waitForElementPresent" />
 	</command>
 
 	<command name="clickWaitForInlineCKEditor">

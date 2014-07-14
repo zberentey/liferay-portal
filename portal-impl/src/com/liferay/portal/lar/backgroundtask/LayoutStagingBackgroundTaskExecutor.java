@@ -53,9 +53,14 @@ import org.springframework.transaction.interceptor.TransactionAttribute;
 public class LayoutStagingBackgroundTaskExecutor
 	extends BaseStagingBackgroundTaskExecutor {
 
+	public LayoutStagingBackgroundTaskExecutor() {
+		setBackgroundTaskStatusMessageTranslator(
+			new LayoutStagingBackgroundTaskStatusMessageTranslator());
+	}
+
 	@Override
 	public BackgroundTaskResult execute(BackgroundTask backgroundTask)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		Map<String, Serializable> taskContextMap =
 			backgroundTask.getTaskContextMap();
@@ -114,7 +119,7 @@ public class LayoutStagingBackgroundTaskExecutor
 
 	protected void initLayoutSetBranches(
 			long userId, long sourceGroupId, long targetGroupId)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		Group sourceGroup = GroupLocalServiceUtil.getGroup(sourceGroupId);
 
@@ -150,22 +155,8 @@ public class LayoutStagingBackgroundTaskExecutor
 
 	private class LayoutStagingCallable implements Callable<MissingReferences> {
 
-		private LayoutStagingCallable(
-			long backgroundTaskId,
-			ExportImportConfiguration exportImportConfiguration,
-			long sourceGroupId, long targetGroupId, long userId) {
-
-			_backgroundTaskId = backgroundTaskId;
-			_exportImportConfiguration = exportImportConfiguration;
-			_sourceGroupId = sourceGroupId;
-			_targetGroupId = targetGroupId;
-			_userId = userId;
-		}
-
 		@Override
-		public MissingReferences call()
-			throws PortalException, SystemException {
-
+		public MissingReferences call() throws PortalException {
 			File file = null;
 			MissingReferences missingReferences = null;
 
@@ -180,7 +171,8 @@ public class LayoutStagingBackgroundTaskExecutor
 				Map<String, String[]> parameterMap =
 					(Map<String, String[]>)settingsMap.get("parameterMap");
 				DateRange dateRange = ExportImportDateUtil.getDateRange(
-					_exportImportConfiguration);
+					_exportImportConfiguration,
+					ExportImportDateUtil.RANGE_FROM_LAST_PUBLISH_DATE);
 
 				file = LayoutLocalServiceUtil.exportLayoutsAsFile(
 					_sourceGroupId, privateLayout, layoutIds, parameterMap,
@@ -225,6 +217,18 @@ public class LayoutStagingBackgroundTaskExecutor
 			}
 
 			return missingReferences;
+		}
+
+		private LayoutStagingCallable(
+			long backgroundTaskId,
+			ExportImportConfiguration exportImportConfiguration,
+			long sourceGroupId, long targetGroupId, long userId) {
+
+			_backgroundTaskId = backgroundTaskId;
+			_exportImportConfiguration = exportImportConfiguration;
+			_sourceGroupId = sourceGroupId;
+			_targetGroupId = targetGroupId;
+			_userId = userId;
 		}
 
 		private long _backgroundTaskId;

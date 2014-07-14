@@ -12,7 +12,7 @@
 
 		<var name="key_userScreenName" value="${userScreenName}" />
 
-		<execute action="CPUsersandorganizationsViewusers#click" locator-key1="USER_TABLE_ACTIONS" value1="Actions" />
+		<execute action="CPUsersandorganizationsViewusers#click" locator-key1="USER_TABLE_ACTIONS" />
 		<execute action="CPUsersandorganizationsViewusers#assertClick" locator-key1="USER_MENULIST_ACTIVATE" value1="Activate" />
 		<execute action="CPUsersandorganizationsViewusers#assertTextEquals" locator-key1="SUCCESS_MESSAGE" value1="Your request completed successfully." />
 		<execute action="CPUsersandorganizationsViewusers#assertTextEquals" locator-key1="INFO_MESSAGE" value1="No users were found." />
@@ -240,18 +240,22 @@
 
 	<command name="addProfilePictureViaMyAccount">
 		<execute action="Myaccount#click" locator-key1="DETAILS_PICTURE_CHANGE_BUTTON" />
+		<execute action="Myaccount#pause" locator1="1000" />
 		<execute action="Myaccount#selectFrame" value1="relative=top" />
 
 		<execute action="MyaccountUploadimage#selectFrame" locator-key1="UPLOAD_IMAGE_IFRAME" />
 		<execute action="MyaccountUploadimage#uploadCommonFile" locator-key1="BROWSE_BUTTON" value1="${imageFileName}" />
+		<execute action="MyaccountUploadimage#pause" locator1="1000" />
 		<execute action="MyaccountUploadimage#selectFrame" value1="relative=top" />
 		<execute action="MyaccountUploadimage#selectFrame" locator-key1="UPLOAD_IMAGE_IFRAME" />
 		<execute action="MyaccountUploadimage#click" locator-key1="SAVE_BUTTON" />
+		<execute action="MyaccountUploadimage#pause" locator1="1000" />
 		<execute action="MyaccountUploadimage#selectFrame" value1="relative=top" />
 
 		<execute action="Myaccount#selectFrame" locator-key1="MY_ACCOUNT_IFRAME" />
 		<execute action="Myaccount#click" locator-key1="SAVE_BUTTON" />
 		<execute action="Myaccount#assertTextEquals" locator-key1="SUCCESS_MESSAGE" value1="Your request completed successfully." />
+		<execute action="Myaccount#pause" locator1="1000" />
 		<execute action="Myaccount#selectFrame" value1="relative=top" />
 	</command>
 
@@ -692,7 +696,7 @@
 
 		<var name="key_userScreenName" value="${userScreenName}" />
 
-		<execute action="CPUsersandorganizationsViewusers#click" locator-key1="USER_TABLE_ACTIONS" value1="Actions" />
+		<execute action="CPUsersandorganizationsViewusers#click" locator-key1="USER_TABLE_ACTIONS" />
 		<execute action="CPUsersandorganizationsViewusers#assertClick" locator-key1="USER_MENULIST_EDIT" value1="Edit" />
 
 		<execute action="CPUsersandorganizationsUser#assertClick" locator-key1="MENU_USER_INFORMATION_ROLES" value1="Roles" />
@@ -717,7 +721,7 @@
 
 		<var name="key_userScreenName" value="${userScreenName}" />
 
-		<execute action="CPUsersandorganizationsViewusers#click" locator-key1="USER_TABLE_ACTIONS" value1="Actions" />
+		<execute action="CPUsersandorganizationsViewusers#click" locator-key1="USER_TABLE_ACTIONS" />
 		<execute action="CPUsersandorganizationsViewusers#assertClick" locator-key1="USER_MENULIST_EDIT" value1="Edit" />
 
 		<execute action="CPUsersandorganizationsUser#assertClick" locator-key1="MENU_USER_INFORMATION_ROLES" value1="Roles" />
@@ -742,7 +746,7 @@
 
 		<var name="key_userScreenName" value="${userScreenName}" />
 
-		<execute action="CPUsersandorganizationsViewusers#click" locator-key1="USER_TABLE_ACTIONS" value1="Actions" />
+		<execute action="CPUsersandorganizationsViewusers#click" locator-key1="USER_TABLE_ACTIONS" />
 		<execute action="CPUsersandorganizationsViewusers#assertClick" locator-key1="USER_MENULIST_EDIT" value1="Edit" />
 
 		<execute action="CPUsersandorganizationsUser#assertClick" locator-key1="MENU_USER_INFORMATION_ROLES" value1="Roles" />
@@ -770,11 +774,11 @@
 		<if>
 			<isset var="notAdmin" />
 			<then>
-				<execute action="CPUsersandorganizationsViewusers#assertElementNotPresent" locator-key1="USER_TABLE_ACTIONS" value1="Actions" />
+				<execute action="CPUsersandorganizationsViewusers#assertElementNotPresent" locator-key1="USER_TABLE_ACTIONS" />
 				<execute action="CPUsersandorganizationsViewusers#assertElementNotPresent" locator-key1="USER_TABLE_IMPERSONATE" value1="Impersonate User (Opens New Window)" />
 			</then>
 			<else>
-				<execute action="CPUsersandorganizationsViewusers#click" locator-key1="USER_TABLE_ACTIONS" value1="Actions" />
+				<execute action="CPUsersandorganizationsViewusers#click" locator-key1="USER_TABLE_ACTIONS" />
 				<execute action="CPUsersandorganizationsViewusers#assertElementNotPresent" locator-key1="USER_MENULIST_IMPERSONATE_USER" value1="Impersonate User (Opens New Window)" />
 			</else>
 		</if>
@@ -840,6 +844,8 @@
 		<if>
 			<equals arg1="${userPassword}" arg2="Invalid" />
 			<then>
+				<execute action="Myaccount#selectFrame" locator-key1="MY_ACCOUNT_IFRAME" />
+
 				<execute action="Myaccount#assertClick" locator-key1="MENU_USER_INFORMATION_PASSWORD" value1="Password" />
 				<execute action="Myaccount#type" locator-key1="PASSWORD_CURRENT_PASSWORD_FIELD" value1="" />
 				<execute action="Myaccount#type" locator-key1="PASSWORD_NEW_PASSWORD_FIELD" value1="test1" />
@@ -865,6 +871,8 @@
 				</execute>
 			</then>
 			<else>
+				<execute action="Myaccount#selectFrame" locator-key1="MY_ACCOUNT_IFRAME" />
+
 				<execute action="Myaccount#assertClick" locator-key1="MENU_USER_INFORMATION_PASSWORD" value1="Password" />
 				<execute action="Myaccount#type" locator-key1="PASSWORD_CURRENT_PASSWORD_FIELD" value1="test" />
 				<execute action="Myaccount#type" locator-key1="PASSWORD_NEW_PASSWORD_FIELD" value1="test1" />
@@ -902,7 +910,7 @@
 			<then>
 				<var name="key_userScreenName" value="${userScreenName}" />
 
-				<execute action="CPUsersandorganizationsViewusers#click" locator-key1="USER_TABLE_ACTIONS" value1="Actions" />
+				<execute action="CPUsersandorganizationsViewusers#click" locator-key1="USER_TABLE_ACTIONS" />
 				<execute action="CPUsersandorganizationsViewusers#assertClick" locator-key1="USER_MENULIST_DEACTIVATE" value1="Deactivate" />
 				<execute action="CPUsersandorganizationsViewusers#confirm" locator-key1="CONFIRMATION" value1="Are you sure you want to deactivate this?" />
 				<execute action="CPUsersandorganizationsViewusers#assertTextEquals" locator-key1="SUCCESS_MESSAGE" value1="Your request completed successfully." />
@@ -951,7 +959,6 @@
 			</then>
 		</if>
 
-		<execute action="CPUsersandorganizationsViewusers#assertTextEquals" locator-key1="INFO_MESSAGE" value1="No users were found." />
 		<execute action="CPUsersandorganizationsViewusers#assertElementNotPresent" locator-key1="DELETE" value1="Delete" />
 	</command>
 
@@ -959,6 +966,34 @@
 		<execute action="Myaccount#click" locator-key1="DETAILS_PICTURE_DELETE_BUTTON" />
 		<execute action="Myaccount#pause" value1="1000" />
 		<execute action="Myaccount#click" locator-key1="SAVE_BUTTON" />
+		<execute action="Myaccount#assertTextEquals" locator-key1="SUCCESS_MESSAGE" value1="Your request completed successfully." />
+		<execute action="Myaccount#selectFrame" value1="relative=top" />
+	</command>
+
+	<command name="editAnnouncementNotificationsViaMyAccount">
+		<execute action="Myaccount#assertClick" locator-key1="MENU_MISCELLANEOUS_ANNOUNCEMENTS" value1="Announcements" />
+
+		<var name="key_announcementType" value="${announcementType}" />
+		<var name="key_notificationType" value="${notificationType}" />
+
+		<execute action="Myaccount#check" locator-key1="ANNOUNCEMENTS_NOTIFICATION_CHECKBOX" />
+		<execute action="Myaccount#assertClick" locator-key1="SAVE_BUTTON" value1="Save" />
+		<execute action="Myaccount#assertTextEquals" locator-key1="SUCCESS_MESSAGE" value1="Your request completed successfully." />
+		<execute action="Myaccount#selectFrame" value1="relative=top" />
+	</command>
+
+	<command name="editDetailsViaMyAccount">
+		<execute action="Myaccount#selectFrame" locator-key1="MY_ACCOUNT_IFRAME" />
+		<execute action="Myaccount#assertClick" locator-key1="MENU_USER_INFORMATION_DETAILS" value1="Details" />
+
+		<if>
+			<isset var="userScreenNameEdit" />
+			<then>
+				<execute action="Myaccount#type" locator-key1="DETAILS_SCREEN_NAME_FIELD" value1="${userScreenNameEdit}" />
+			</then>
+		</if>
+
+		<execute action="Myaccount#assertClick" locator-key1="SAVE_BUTTON" value1="Save" />
 		<execute action="Myaccount#assertTextEquals" locator-key1="SUCCESS_MESSAGE" value1="Your request completed successfully." />
 		<execute action="Myaccount#selectFrame" value1="relative=top" />
 	</command>
@@ -971,7 +1006,7 @@
 
 		<var name="key_userScreenName" value="${userScreenName}" />
 
-		<execute action="CPUsersandorganizationsViewusers#click" locator-key1="USER_TABLE_ACTIONS" value1="Actions" />
+		<execute action="CPUsersandorganizationsViewusers#click" locator-key1="USER_TABLE_ACTIONS" />
 		<execute action="CPUsersandorganizationsViewusers#assertClick" locator-key1="USER_MENULIST_EDIT" value1="Edit" />
 
 		<execute action="CPUsersandorganizationsUser#assertClick" locator-key1="MENU_MISCELLANEOUS_DISPLAY_SETTINGS" value1="Display Settings" />
@@ -985,6 +1020,7 @@
 
 		<var name="key_userScreenName" value="${userScreenName}" />
 
+		<execute action="CPUsersandorganizationsViewusers#pause" locator1="1000" />
 		<execute action="CPUsersandorganizationsViewusers#type" locator-key1="BASIC_SEARCH_FIELD" value1="${userScreenName}" />
 		<execute action="CPUsersandorganizationsViewusers#assertClick" locator-key1="BASIC_SEARCH_BUTTON" value1="Search" />
 		<execute action="CPUsersandorganizationsViewusers#assertTextEquals" locator-key1="USER_TABLE_SCREEN_NAME" value1="${userScreenName}" />
@@ -1056,6 +1092,17 @@
 				<execute action="CPUsersandorganizationsUser#assertTextEquals" locator-key1="ERROR_MESSAGE_2" value1="That password is invalid. Please enter in a different password." />
 			</else>
 		</if>
+	</command>
+
+	<command name="editPasswordViaMyAccount">
+		<execute action="Myaccount#selectFrame" locator-key1="MY_ACCOUNT_IFRAME" />
+		<execute action="Myaccount#assertClick" locator-key1="MENU_USER_INFORMATION_PASSWORD" value1="Password" />
+		<execute action="Myaccount#type" locator-key1="PASSWORD_CURRENT_PASSWORD_FIELD" value1="${currentPassword}" />
+		<execute action="Myaccount#type" locator-key1="PASSWORD_NEW_PASSWORD_FIELD" value1="${newPassword}" />
+		<execute action="Myaccount#type" locator-key1="PASSWORD_ENTER_AGAIN_FIELD" value1="${newPassword}" />
+		<execute action="Myaccount#assertClick" locator-key1="SAVE_BUTTON" value1="Save" />
+		<execute action="Myaccount#assertTextEquals" locator-key1="SUCCESS_MESSAGE" value1="Your request completed successfully." />
+		<execute action="Myaccount#selectFrame" value1="relative=top" />
 	</command>
 
 	<command name="editUserDisplaySettingsCP">
@@ -1138,7 +1185,7 @@
 		<execute action="CPUsersandorganizationsUser#selectFrame" locator-key1="SITES_SELECT_IFRAME" />
 
 		<execute action="CPUsersandorganizationsUser#type" locator-key1="SITES_SELECT_SEARCH_FIELD" value1="${siteName}" />
-		<execute action="CPUsersandorganizationsUser#keyPress" locator-key1="SITES_SELECT_SEARCH_BUTTON" value1="\\13" />
+		<execute action="CPUsersandorganizationsUser#keyPress" locator-key1="SITES_SELECT_SEARCH_FIELD" value1="\\13" />
 		<execute action="CPUsersandorganizationsUser#assertTextEquals" locator-key1="SITES_SELECT_TABLE_NAME" value1="${siteName}" />
 		<execute action="CPUsersandorganizationsUser#assertClick" locator-key1="SITES_SELECT_CHOOSE_BUTTON" value1="Choose" />
 
@@ -1212,26 +1259,34 @@
 		<if>
 			<equals arg1="${notAdmin}" arg2="true" />
 			<then>
-				<execute action="CPUsersandorganizationsViewusers#assertElementNotPresent" locator-key1="USER_TABLE_ACTIONS" value1="Actions" />
+				<execute action="CPUsersandorganizationsViewusers#assertElementNotPresent" locator-key1="USER_TABLE_ACTIONS" />
 				<execute action="CPUsersandorganizationsViewusers#assertClick" locator-key1="USER_TABLE_IMPERSONATE" value1="Impersonate User (Opens New Window)" />
 			</then>
 			<else>
-				<execute action="CPUsersandorganizationsViewusers#click" locator-key1="USER_TABLE_ACTIONS" value1="Actions" />
+				<execute action="CPUsersandorganizationsViewusers#click" locator-key1="USER_TABLE_ACTIONS" />
 				<execute action="CPUsersandorganizationsViewusers#assertClick" locator-key1="USER_MENULIST_IMPERSONATE_USER" value1="Impersonate User (Opens New Window)" />
 			</else>
 		</if>
 
 		<execute action="Home#selectWindow" locator1="title=Welcome - Liferay" />
 
-		<execute action="Dockbar#assertElementPresent" locator-key1="ADMIN_SITE_ADMINISTRATION_IMPERSONATE_USER_ICON" />
-		<execute action="Dockbar#assertClick" locator-key1="ADMIN_SITE_ADMINISTRATION_IMPERSONATE_USER_ICON" />
-		<execute action="Dockbar#assertElementPresent" locator-key1="ADMIN_SITE_ADMINISTRATION_IMPERSONATE_USER_MESSAGE" />
+		<execute action="Dockbar#assertElementPresent" locator-key1="IMPERSONATE_USER_ICON" />
+		<execute action="Dockbar#assertClick" locator-key1="IMPERSONATE_USER_ICON" />
+		<execute action="Dockbar#assertElementPresent" locator-key1="USER_IMPERSONATE_USER_MESSAGE" />
 	</command>
 
 	<command name="loginPG">
 		<description message="Log into Liferay Portal as ${userEmailAddress} using the password ${password}." />
 
-		<execute macro="Page#openURL" />
+		<if>
+			<isset var="nodePort" />
+			<then>
+				<execute action="Home#open" locator1="http://localhost:${nodePort}" />
+			</then>
+			<else>
+				<execute macro="Page#openURL" />
+			</else>
+		</if>
 
 		<if>
 			<equals arg1="${authenticationMethod}" arg2="By Screen Name" />
@@ -1328,7 +1383,15 @@
 	<command name="logoutPG">
 		<description message="Log out of Liferay Portal." />
 
-		<execute macro="Page#openURL" />
+		<if>
+			<isset var="nodePort" />
+			<then>
+				<execute action="Home#open" locator1="http://localhost:${nodePort}" />
+			</then>
+			<else>
+				<execute macro="Page#openURL" />
+			</else>
+		</if>
 
 		<if>
 			<condition action="Dockbar#isElementPresent" locator-key1="USER_NAME" />
@@ -1377,7 +1440,7 @@
 
 		<var name="key_userScreenName" value="${userScreenName}" />
 
-		<execute action="CPUsersandorganizationsViewusers#click" locator-key1="USER_TABLE_ACTIONS" value1="Actions" />
+		<execute action="CPUsersandorganizationsViewusers#click" locator-key1="USER_TABLE_ACTIONS" />
 		<execute action="CPUsersandorganizationsViewusers#assertClick" locator-key1="USER_MENULIST_EDIT" value1="Edit" />
 
 		<execute action="CPUsersandorganizationsUser#assertClick" locator-key1="MENU_USER_INFORMATION_ROLES" value1="Roles" />
@@ -1449,6 +1512,24 @@
 				<execute action="CPUsersandorganizationsUser#assertTextEquals" locator-key1="USER_NAME" value1="${userFirstName} ${userLastName}" />
 			</else>
 		</if>
+	</command>
+
+	<command name="viewLoginPG">
+		<if>
+			<equals arg1="${authenticationMethod}" arg2="By Screen Name" />
+			<then>
+				<execute action="PGLogin#assertElementPresent" locator-key1="SCREEN_NAME_FIELD" />
+			</then>
+			<else>
+				<execute action="PGLogin#assertElementPresent" locator-key1="EMAIL_ADDRESS_FIELD" />
+			</else>
+		</if>
+
+		<execute action="PGLogin#assertElementPresent" locator-key1="PASSWORD_FIELD" />
+
+		<execute action="PGLogin#assertElementPresent" locator-key1="REMEMBER_ME_CHECKBOX" />
+
+		<execute action="PGLogin#assertTextEquals" locator-key1="SIGN_IN_BUTTON" value1="Sign In" />
 	</command>
 
 	<command name="viewUserInfomationOrganizationSitesCP">

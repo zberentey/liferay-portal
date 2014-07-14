@@ -15,7 +15,6 @@
 package com.liferay.portlet.asset.util;
 
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
@@ -186,7 +185,7 @@ public class AssetUtil {
 
 	public static long[] filterCategoryIds(
 			PermissionChecker permissionChecker, long[] categoryIds)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		List<Long> viewableCategoryIds = new ArrayList<Long>();
 
@@ -208,7 +207,7 @@ public class AssetUtil {
 
 	public static long[] filterTagIds(
 			PermissionChecker permissionChecker, long[] tagIds)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		List<Long> viewableTagIds = new ArrayList<Long>();
 
@@ -226,7 +225,7 @@ public class AssetUtil {
 
 	public static long[][] filterTagIdsArray(
 			PermissionChecker permissionChecker, long[][] tagIdsArray)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		List<long[]> viewableTagIdsArray = new ArrayList<long[]>();
 
@@ -253,7 +252,8 @@ public class AssetUtil {
 	}
 
 	public static List<AssetVocabulary> filterVocabularies(
-		List<AssetVocabulary> vocabularies, String className) {
+		List<AssetVocabulary> vocabularies, String className,
+		final long classTypePK) {
 
 		final long classNameId = PortalUtil.getClassNameId(className);
 
@@ -261,9 +261,10 @@ public class AssetUtil {
 			new PredicateFilter<AssetVocabulary>() {
 
 				@Override
-				public boolean filter(AssetVocabulary vocabulary) {
-					return vocabulary.isAssociatedToAssetRendererFactory(
-						classNameId);
+				public boolean filter(AssetVocabulary assetVocabulary) {
+					return
+						assetVocabulary.isAssociatedToClassNameIdAndClassTypePK(
+							classNameId, classTypePK);
 				}
 
 			};
@@ -273,7 +274,7 @@ public class AssetUtil {
 
 	public static long[] filterVocabularyIds(
 			PermissionChecker permissionChecker, long[] vocabularyIds)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		List<Long> viewableVocabularyIds = new ArrayList<Long>();
 
@@ -577,9 +578,7 @@ public class AssetUtil {
 		return assetEntries;
 	}
 
-	public static String getAssetKeywords(String className, long classPK)
-		throws SystemException {
-
+	public static String getAssetKeywords(String className, long classPK) {
 		List<AssetTag> tags = AssetTagLocalServiceUtil.getTags(
 			className, classPK);
 		List<AssetCategory> categories =
@@ -723,8 +722,7 @@ public class AssetUtil {
 	}
 
 	public static String substituteCategoryPropertyVariables(
-			long groupId, long categoryId, String s)
-		throws SystemException {
+		long groupId, long categoryId, String s) {
 
 		String result = s;
 
@@ -751,7 +749,7 @@ public class AssetUtil {
 
 	public static String substituteTagPropertyVariables(
 			long groupId, String tagName, String s)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		String result = s;
 

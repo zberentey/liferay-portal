@@ -33,7 +33,7 @@ import com.liferay.portal.model.ModelListener;
 import com.liferay.portal.service.persistence.BasePersistence;
 import com.liferay.portal.service.persistence.PersistenceExecutionTestListener;
 import com.liferay.portal.test.LiferayPersistenceIntegrationJUnitTestRunner;
-import com.liferay.portal.test.persistence.TransactionalPersistenceAdvice;
+import com.liferay.portal.test.persistence.test.TransactionalPersistenceAdvice;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.portal.util.test.RandomTestUtil;
 
@@ -51,6 +51,7 @@ import org.junit.runner.RunWith;
 
 import java.io.Serializable;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -259,7 +260,7 @@ public class SocialActivityLimitPersistenceTest {
 		}
 	}
 
-	protected OrderByComparator getOrderByComparator() {
+	protected OrderByComparator<SocialActivityLimit> getOrderByComparator() {
 		return OrderByComparatorFactoryUtil.create("SocialActivityLimit",
 			"activityLimitId", true, "groupId", true, "companyId", true,
 			"userId", true, "classNameId", true, "classPK", true,
@@ -282,6 +283,88 @@ public class SocialActivityLimitPersistenceTest {
 		SocialActivityLimit missingSocialActivityLimit = _persistence.fetchByPrimaryKey(pk);
 
 		Assert.assertNull(missingSocialActivityLimit);
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereAllPrimaryKeysExist()
+		throws Exception {
+		SocialActivityLimit newSocialActivityLimit1 = addSocialActivityLimit();
+		SocialActivityLimit newSocialActivityLimit2 = addSocialActivityLimit();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(newSocialActivityLimit1.getPrimaryKey());
+		primaryKeys.add(newSocialActivityLimit2.getPrimaryKey());
+
+		Map<Serializable, SocialActivityLimit> socialActivityLimits = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertEquals(2, socialActivityLimits.size());
+		Assert.assertEquals(newSocialActivityLimit1,
+			socialActivityLimits.get(newSocialActivityLimit1.getPrimaryKey()));
+		Assert.assertEquals(newSocialActivityLimit2,
+			socialActivityLimits.get(newSocialActivityLimit2.getPrimaryKey()));
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereNoPrimaryKeysExist()
+		throws Exception {
+		long pk1 = RandomTestUtil.nextLong();
+
+		long pk2 = RandomTestUtil.nextLong();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(pk1);
+		primaryKeys.add(pk2);
+
+		Map<Serializable, SocialActivityLimit> socialActivityLimits = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertTrue(socialActivityLimits.isEmpty());
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereSomePrimaryKeysExist()
+		throws Exception {
+		SocialActivityLimit newSocialActivityLimit = addSocialActivityLimit();
+
+		long pk = RandomTestUtil.nextLong();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(newSocialActivityLimit.getPrimaryKey());
+		primaryKeys.add(pk);
+
+		Map<Serializable, SocialActivityLimit> socialActivityLimits = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertEquals(1, socialActivityLimits.size());
+		Assert.assertEquals(newSocialActivityLimit,
+			socialActivityLimits.get(newSocialActivityLimit.getPrimaryKey()));
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithNoPrimaryKeys()
+		throws Exception {
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		Map<Serializable, SocialActivityLimit> socialActivityLimits = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertTrue(socialActivityLimits.isEmpty());
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithOnePrimaryKey()
+		throws Exception {
+		SocialActivityLimit newSocialActivityLimit = addSocialActivityLimit();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(newSocialActivityLimit.getPrimaryKey());
+
+		Map<Serializable, SocialActivityLimit> socialActivityLimits = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertEquals(1, socialActivityLimits.size());
+		Assert.assertEquals(newSocialActivityLimit,
+			socialActivityLimits.get(newSocialActivityLimit.getPrimaryKey()));
 	}
 
 	@Test

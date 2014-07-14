@@ -15,6 +15,7 @@
 package com.liferay.portlet.journal.service;
 
 import com.liferay.portal.kernel.test.ExecutionTestListeners;
+import com.liferay.portal.test.DeleteAfterTestRun;
 import com.liferay.portal.test.LiferayIntegrationJUnitTestRunner;
 import com.liferay.portal.test.MainServletExecutionTestListener;
 import com.liferay.portal.util.test.RandomTestUtil;
@@ -26,7 +27,6 @@ import com.liferay.portlet.journal.util.test.JournalTestUtil;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -38,15 +38,6 @@ import org.testng.Assert;
 @ExecutionTestListeners(listeners = {MainServletExecutionTestListener.class})
 @RunWith(LiferayIntegrationJUnitTestRunner.class)
 public class JournalArticleLocalServiceTreeTest {
-
-	@After
-	public void tearDown() throws Exception {
-		for (int i = _articles.size() - 1; i >= 0; i--) {
-			JournalArticleLocalServiceUtil.deleteArticle(_articles.get(i));
-		}
-
-		JournalFolderLocalServiceUtil.deleteFolder(_folder);
-	}
 
 	@Test
 	public void testRebuildTree() throws Exception {
@@ -86,7 +77,10 @@ public class JournalArticleLocalServiceTreeTest {
 		_articles.add(articleAA);
 	}
 
+	@DeleteAfterTestRun
 	private List<JournalArticle> _articles = new ArrayList<JournalArticle>();
+
+	@DeleteAfterTestRun
 	private JournalFolder _folder;
 
 }

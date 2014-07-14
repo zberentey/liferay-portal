@@ -25,7 +25,7 @@
 </tr>
 <tr>
 	<td>ERROR_MESSAGE</td>
-	<td>//div[contains(@class,'alert') and contains(@class,'alert-error')]</td>
+	<td>//div[contains(@class,'alert') and (contains(@class,'alert-error') or contains(@class,'alert-danger'))]</td>
 	<td></td>
 </tr>
 <tr>
@@ -67,6 +67,11 @@
 <tr>
 	<td>KB_ARTICLE_DELETE</td>
 	<td>//div[@class='kb-article-icons']//a/span[contains(.,'Delete')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>KB_ARTICLE_STATUS</td>
+	<td>//span[contains(@class,'workflow-status')]/strong</td>
 	<td></td>
 </tr>
 <tr>

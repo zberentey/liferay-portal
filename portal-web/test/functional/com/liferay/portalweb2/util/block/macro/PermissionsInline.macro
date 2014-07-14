@@ -100,7 +100,7 @@
 
 		<var name="key_entryTitle" value="${entryTitle}" />
 
-		<execute action="CPBlogs#assertClick" locator-key1="ENTRY_TABLE_ACTIONS" value1="Actions" />
+		<execute action="CPBlogs#click" locator-key1="ENTRY_TABLE_ACTIONS" />
 		<execute action="CPBlogs#assertClick" locator-key1="ENTRY_MENULIST_PERMISSIONS" value1="Permissions" />
 
 		<execute action="Permissions#selectFrame" locator-key1="PERMISSIONS_IFRAME" />
@@ -247,7 +247,8 @@
 		</if>
 
 		<execute action="Dockbar#click" locator-key1="EDIT" />
-		<execute action="Dockbar#click" locator-key1="EDIT_PERMISSIONS" />
+
+		<execute action="DockbarEditpanel#click" locator-key1="TOOLBAR_PERMISSIONS" />
 
 		<execute action="Permissions#selectFrame" locator-key1="PERMISSIONS_IFRAME" />
 	</command>
@@ -255,7 +256,7 @@
 	<command name="gotoPollPermissionsCP">
 		<var name="key_pollsQuestionTitle" value="${pollsQuestionTitle}" />
 
-		<execute action="CPPolls#assertClick" locator-key1="POLLS_TABLE_ACTION" value1="Actions" />
+		<execute action="CPPolls#click" locator-key1="POLLS_TABLE_ACTION" />
 		<execute action="CPPolls#assertClick" locator-key1="POLLS_MENULIST_PERMISSIONS" value1="Permissions" />
 
 		<execute action="Permissions#selectFrame" locator-key1="PERMISSIONS_IFRAME" />
@@ -274,6 +275,20 @@
 		<execute action="Permissions#selectFrame" locator-key1="PERMISSIONS_IFRAME" />
 	</command>
 
+	<command name="gotoSiteTeamsCP">
+		<execute macro="Page#gotoUsersCP">
+			<var name="portletName" value="${portletName}" />
+			<var name="siteScopeName" value="${siteScopeName}" />
+		</execute>
+
+		<var name="key_teamName" value="${teamName}" />
+
+		<execute action="CPSiteteams#click" locator-key1="TEAM_TABLE_ACTIONS" />
+		<execute action="CPSiteteams#assertClick" locator-key1="TEAM_MENULIST_PERMISSIONS" value1="Permissions" />
+
+		<execute action="Permissions#selectFrame" locator-key1="PERMISSIONS_IFRAME" />
+	</command>
+
 	<command name="gotoSiteTemplateCP">
 		<execute macro="Page#gotoPagesCP">
 			<var name="portletName" value="${portletName}" />
@@ -286,6 +301,17 @@
 		<execute action="CPSitepages#assertClick" locator-key1="TOOLBAR_PERMISSIONS" value1="Permissions" />
 
 		<execute action="Permissions#selectFrame" locator-key1="PERMISSIONS_IFRAME" />
+	</command>
+
+	<command name="gotoUserGroupSitePermissionsCP">
+		<execute macro="Page#gotoCP">
+			<var name="portletName" value="User Groups" />
+		</execute>
+
+		<var name="key_userGroupName" value="${userGroupName}" />
+
+		<execute action="CPUsergroups#click" locator-key1="USER_GROUP_TABLE_ACTIONS" />
+		<execute action="CPUsergroups#assertClick" locator-key1="USER_GROUP_MENULIST_SITE_PERMISSIONS" value1="Site Permissions" />
 	</command>
 
 	<command name="gotoWCArticle">

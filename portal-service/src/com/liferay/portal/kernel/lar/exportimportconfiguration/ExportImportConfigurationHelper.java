@@ -17,7 +17,7 @@ package com.liferay.portal.kernel.lar.exportimportconfiguration;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.lar.PortletDataHandlerKeys;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.model.ExportImportConfiguration;
@@ -40,7 +40,7 @@ public class ExportImportConfigurationHelper {
 	public static ExportImportConfiguration
 			addExportLayoutExportImportConfiguration(
 				PortletRequest portletRequest)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		return addExportImportConfiguration(
 			portletRequest,
@@ -50,7 +50,7 @@ public class ExportImportConfigurationHelper {
 	public static ExportImportConfiguration
 			addPublishLayoutLocalExportImportConfiguration(
 				PortletRequest portletRequest)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		return addExportImportConfiguration(
 			portletRequest,
@@ -60,7 +60,7 @@ public class ExportImportConfigurationHelper {
 	public static ExportImportConfiguration
 			addPublishLayoutRemoteExportImportConfiguration(
 				PortletRequest portletRequest)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		return addExportImportConfiguration(
 			portletRequest,
@@ -70,7 +70,7 @@ public class ExportImportConfigurationHelper {
 	public static ExportImportConfiguration
 			updateExportLayoutExportImportConfiguration(
 				PortletRequest portletRequest)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		return updateExportImportConfiguration(
 			portletRequest,
@@ -80,7 +80,7 @@ public class ExportImportConfigurationHelper {
 	public static ExportImportConfiguration
 			updatePublishLayoutLocalExportImportConfiguration(
 				PortletRequest portletRequest)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		return updateExportImportConfiguration(
 			portletRequest,
@@ -90,7 +90,7 @@ public class ExportImportConfigurationHelper {
 	public static ExportImportConfiguration
 			updatePublishLayoutRemoteExportImportConfiguration(
 				PortletRequest portletRequest)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		return updateExportImportConfiguration(
 			portletRequest,
@@ -99,7 +99,7 @@ public class ExportImportConfigurationHelper {
 
 	protected static ExportImportConfiguration addExportImportConfiguration(
 			PortletRequest portletRequest, int type)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		ThemeDisplay themeDisplay = (ThemeDisplay)portletRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
@@ -112,6 +112,18 @@ public class ExportImportConfigurationHelper {
 			ExportImportConfigurationSettingsMapFactory.buildSettingsMap(
 				portletRequest, groupId, type);
 
+		Map<String, String[]> parameterMap =
+			(Map<String, String[]>)settingsMap.get("parameterMap");
+
+		if ((parameterMap != null) &&
+			(type ==
+				ExportImportConfigurationConstants.TYPE_PUBLISH_LAYOUT_LOCAL)) {
+
+			parameterMap.put(
+				PortletDataHandlerKeys.PERFORM_DIRECT_BINARY_IMPORT,
+				new String[]{Boolean.TRUE.toString()});
+		}
+
 		return ExportImportConfigurationLocalServiceUtil.
 			addExportImportConfiguration(
 				themeDisplay.getUserId(), groupId, name, description, type,
@@ -120,7 +132,7 @@ public class ExportImportConfigurationHelper {
 
 	protected static ExportImportConfiguration updateExportImportConfiguration(
 			PortletRequest portletRequest, int type)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		ThemeDisplay themeDisplay = (ThemeDisplay)portletRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);

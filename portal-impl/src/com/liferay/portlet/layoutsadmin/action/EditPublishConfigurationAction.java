@@ -16,7 +16,6 @@ package com.liferay.portlet.layoutsadmin.action;
 
 import com.liferay.portal.NoSuchGroupException;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.lar.exportimportconfiguration.ExportImportConfigurationConstants;
 import com.liferay.portal.kernel.lar.exportimportconfiguration.ExportImportConfigurationHelper;
 import com.liferay.portal.kernel.lar.exportimportconfiguration.ExportImportConfigurationSettingsMapFactory;
@@ -170,16 +169,20 @@ public class EditPublishConfigurationAction
 	protected void addSessionMessages(ActionRequest actionRequest)
 		throws Exception {
 
+		String portletId = PortalUtil.getPortletId(actionRequest);
 		long exportImportConfigurationId = ParamUtil.getLong(
 			actionRequest, "exportImportConfigurationId");
 
 		SessionMessages.add(
-			actionRequest,
-			PortalUtil.getPortletId(actionRequest) +
-				"exportImportConfigurationId",
+			actionRequest, portletId + "exportImportConfigurationId",
 			exportImportConfigurationId);
 
-		long groupId = ParamUtil.getLong(actionRequest, "groupId");
+		String name = ParamUtil.getString(actionRequest, "name");
+		String description = ParamUtil.getString(actionRequest, "description");
+
+		SessionMessages.add(actionRequest, portletId + "name", name);
+		SessionMessages.add(
+			actionRequest, portletId + "description", description);
 
 		int exportImportConfigurationType =
 			ExportImportConfigurationConstants.TYPE_PUBLISH_LAYOUT_REMOTE;
@@ -192,19 +195,19 @@ public class EditPublishConfigurationAction
 				ExportImportConfigurationConstants.TYPE_PUBLISH_LAYOUT_LOCAL;
 		}
 
+		long groupId = ParamUtil.getLong(actionRequest, "groupId");
+
 		Map<String, Serializable> settingsMap =
 			ExportImportConfigurationSettingsMapFactory.buildSettingsMap(
 				actionRequest, groupId, exportImportConfigurationType);
 
 		SessionMessages.add(
-			actionRequest,
-			PortalUtil.getPortletId(actionRequest) + "settingsMap",
-			settingsMap);
+			actionRequest, portletId + "settingsMap", settingsMap);
 	}
 
 	protected void relaunchPublishLayoutConfiguration(
 			long userId, ActionRequest actionRequest)
-		throws PortalException, SystemException {
+		throws PortalException {
 
 		long backgroundTaskId = ParamUtil.getLong(
 			actionRequest, "backgroundTaskId");

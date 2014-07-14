@@ -31,10 +31,10 @@ DLActionsDisplayContext dlActionsDisplayContext = new DLActionsDisplayContext(re
 		long repositoryId = GetterUtil.getLong((String)request.getAttribute("view.jsp-repositoryId"));
 		%>
 
-		<c:if test="<%= dlActionsDisplayContext.isShowTabs() || dlPortletInstanceSettings.getShowFoldersSearch() %>">
+		<c:if test="<%= dlActionsDisplayContext.isShowTabs() || dlPortletInstanceSettings.isShowFoldersSearch() %>">
 			<aui:nav-bar>
 				<c:if test="<%= dlActionsDisplayContext.isShowTabs() %>">
-					<aui:nav>
+					<aui:nav cssClass="navbar-nav">
 
 						<%
 						PortletURL portletURL = renderResponse.createRenderURL();
@@ -72,13 +72,13 @@ DLActionsDisplayContext dlActionsDisplayContext = new DLActionsDisplayContext(re
 					</aui:nav>
 				</c:if>
 
-				<c:if test="<%= dlPortletInstanceSettings.getShowFoldersSearch() %>">
+				<c:if test="<%= dlPortletInstanceSettings.isShowFoldersSearch() %>">
 					<liferay-portlet:renderURL varImpl="searchURL">
 						<portlet:param name="struts_action" value="/document_library_display/search" />
 					</liferay-portlet:renderURL>
 
-					<aui:nav-bar-search cssClass="pull-right">
-						<div class="form-search">
+					<aui:nav-bar-search>
+						<div class="col-xs-12 form-search">
 							<aui:form action="<%= searchURL %>" method="get" name="searchFm">
 								<liferay-portlet:renderURLParams varImpl="searchURL" />
 								<aui:input name="redirect" type="hidden" value="<%= currentURL %>" />
@@ -101,7 +101,7 @@ DLActionsDisplayContext dlActionsDisplayContext = new DLActionsDisplayContext(re
 			</aui:nav-bar>
 		</c:if>
 	</c:when>
-	<c:when test="<%= (dlActionsDisplayContext.isShowTabs() || dlPortletInstanceSettings.getShowFoldersSearch()) && portletName.equals(PortletKeys.DOCUMENT_LIBRARY_DISPLAY) %>">
+	<c:when test="<%= (dlActionsDisplayContext.isShowTabs() || dlPortletInstanceSettings.isShowFoldersSearch()) && portletName.equals(PortletKeys.DOCUMENT_LIBRARY_DISPLAY) %>">
 		<liferay-ui:header
 			title="home"
 		/>

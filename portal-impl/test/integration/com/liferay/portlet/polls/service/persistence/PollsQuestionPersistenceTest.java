@@ -34,7 +34,7 @@ import com.liferay.portal.model.ModelListener;
 import com.liferay.portal.service.persistence.BasePersistence;
 import com.liferay.portal.service.persistence.PersistenceExecutionTestListener;
 import com.liferay.portal.test.LiferayPersistenceIntegrationJUnitTestRunner;
-import com.liferay.portal.test.persistence.TransactionalPersistenceAdvice;
+import com.liferay.portal.test.persistence.test.TransactionalPersistenceAdvice;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.portal.util.test.RandomTestUtil;
 
@@ -52,6 +52,7 @@ import org.junit.runner.RunWith;
 
 import java.io.Serializable;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -288,7 +289,7 @@ public class PollsQuestionPersistenceTest {
 		}
 	}
 
-	protected OrderByComparator getOrderByComparator() {
+	protected OrderByComparator<PollsQuestion> getOrderByComparator() {
 		return OrderByComparatorFactoryUtil.create("PollsQuestion", "uuid",
 			true, "questionId", true, "groupId", true, "companyId", true,
 			"userId", true, "userName", true, "createDate", true,
@@ -312,6 +313,88 @@ public class PollsQuestionPersistenceTest {
 		PollsQuestion missingPollsQuestion = _persistence.fetchByPrimaryKey(pk);
 
 		Assert.assertNull(missingPollsQuestion);
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereAllPrimaryKeysExist()
+		throws Exception {
+		PollsQuestion newPollsQuestion1 = addPollsQuestion();
+		PollsQuestion newPollsQuestion2 = addPollsQuestion();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(newPollsQuestion1.getPrimaryKey());
+		primaryKeys.add(newPollsQuestion2.getPrimaryKey());
+
+		Map<Serializable, PollsQuestion> pollsQuestions = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertEquals(2, pollsQuestions.size());
+		Assert.assertEquals(newPollsQuestion1,
+			pollsQuestions.get(newPollsQuestion1.getPrimaryKey()));
+		Assert.assertEquals(newPollsQuestion2,
+			pollsQuestions.get(newPollsQuestion2.getPrimaryKey()));
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereNoPrimaryKeysExist()
+		throws Exception {
+		long pk1 = RandomTestUtil.nextLong();
+
+		long pk2 = RandomTestUtil.nextLong();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(pk1);
+		primaryKeys.add(pk2);
+
+		Map<Serializable, PollsQuestion> pollsQuestions = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertTrue(pollsQuestions.isEmpty());
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereSomePrimaryKeysExist()
+		throws Exception {
+		PollsQuestion newPollsQuestion = addPollsQuestion();
+
+		long pk = RandomTestUtil.nextLong();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(newPollsQuestion.getPrimaryKey());
+		primaryKeys.add(pk);
+
+		Map<Serializable, PollsQuestion> pollsQuestions = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertEquals(1, pollsQuestions.size());
+		Assert.assertEquals(newPollsQuestion,
+			pollsQuestions.get(newPollsQuestion.getPrimaryKey()));
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithNoPrimaryKeys()
+		throws Exception {
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		Map<Serializable, PollsQuestion> pollsQuestions = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertTrue(pollsQuestions.isEmpty());
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithOnePrimaryKey()
+		throws Exception {
+		PollsQuestion newPollsQuestion = addPollsQuestion();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(newPollsQuestion.getPrimaryKey());
+
+		Map<Serializable, PollsQuestion> pollsQuestions = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertEquals(1, pollsQuestions.size());
+		Assert.assertEquals(newPollsQuestion,
+			pollsQuestions.get(newPollsQuestion.getPrimaryKey()));
 	}
 
 	@Test

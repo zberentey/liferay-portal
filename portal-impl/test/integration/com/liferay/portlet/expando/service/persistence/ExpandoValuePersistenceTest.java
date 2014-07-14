@@ -32,7 +32,7 @@ import com.liferay.portal.model.ModelListener;
 import com.liferay.portal.service.persistence.BasePersistence;
 import com.liferay.portal.service.persistence.PersistenceExecutionTestListener;
 import com.liferay.portal.test.LiferayPersistenceIntegrationJUnitTestRunner;
-import com.liferay.portal.test.persistence.TransactionalPersistenceAdvice;
+import com.liferay.portal.test.persistence.test.TransactionalPersistenceAdvice;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.portal.util.test.RandomTestUtil;
 
@@ -50,6 +50,7 @@ import org.junit.runner.RunWith;
 
 import java.io.Serializable;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -328,7 +329,7 @@ public class ExpandoValuePersistenceTest {
 		}
 	}
 
-	protected OrderByComparator getOrderByComparator() {
+	protected OrderByComparator<ExpandoValue> getOrderByComparator() {
 		return OrderByComparatorFactoryUtil.create("ExpandoValue", "valueId",
 			true, "companyId", true, "tableId", true, "columnId", true,
 			"rowId", true, "classNameId", true, "classPK", true, "data", true);
@@ -350,6 +351,88 @@ public class ExpandoValuePersistenceTest {
 		ExpandoValue missingExpandoValue = _persistence.fetchByPrimaryKey(pk);
 
 		Assert.assertNull(missingExpandoValue);
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereAllPrimaryKeysExist()
+		throws Exception {
+		ExpandoValue newExpandoValue1 = addExpandoValue();
+		ExpandoValue newExpandoValue2 = addExpandoValue();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(newExpandoValue1.getPrimaryKey());
+		primaryKeys.add(newExpandoValue2.getPrimaryKey());
+
+		Map<Serializable, ExpandoValue> expandoValues = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertEquals(2, expandoValues.size());
+		Assert.assertEquals(newExpandoValue1,
+			expandoValues.get(newExpandoValue1.getPrimaryKey()));
+		Assert.assertEquals(newExpandoValue2,
+			expandoValues.get(newExpandoValue2.getPrimaryKey()));
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereNoPrimaryKeysExist()
+		throws Exception {
+		long pk1 = RandomTestUtil.nextLong();
+
+		long pk2 = RandomTestUtil.nextLong();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(pk1);
+		primaryKeys.add(pk2);
+
+		Map<Serializable, ExpandoValue> expandoValues = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertTrue(expandoValues.isEmpty());
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereSomePrimaryKeysExist()
+		throws Exception {
+		ExpandoValue newExpandoValue = addExpandoValue();
+
+		long pk = RandomTestUtil.nextLong();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(newExpandoValue.getPrimaryKey());
+		primaryKeys.add(pk);
+
+		Map<Serializable, ExpandoValue> expandoValues = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertEquals(1, expandoValues.size());
+		Assert.assertEquals(newExpandoValue,
+			expandoValues.get(newExpandoValue.getPrimaryKey()));
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithNoPrimaryKeys()
+		throws Exception {
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		Map<Serializable, ExpandoValue> expandoValues = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertTrue(expandoValues.isEmpty());
+	}
+
+	@Test
+	public void testFetchByPrimaryKeysWithOnePrimaryKey()
+		throws Exception {
+		ExpandoValue newExpandoValue = addExpandoValue();
+
+		Set<Serializable> primaryKeys = new HashSet<Serializable>();
+
+		primaryKeys.add(newExpandoValue.getPrimaryKey());
+
+		Map<Serializable, ExpandoValue> expandoValues = _persistence.fetchByPrimaryKeys(primaryKeys);
+
+		Assert.assertEquals(1, expandoValues.size());
+		Assert.assertEquals(newExpandoValue,
+			expandoValues.get(newExpandoValue.getPrimaryKey()));
 	}
 
 	@Test

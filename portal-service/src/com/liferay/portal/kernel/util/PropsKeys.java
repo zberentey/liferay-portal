@@ -197,6 +197,8 @@ public interface PropsKeys {
 
 	public static final String AUTH_TOKEN_IMPL = "auth.token.impl";
 
+	public static final String AUTH_TOKEN_LENGTH = "auth.token.length";
+
 	public static final String AUTH_TOKEN_SHARED_SECRET = "auth.token.shared.secret";
 
 	public static final String AUTH_VERIFIER = "auth.verifier.";
@@ -287,8 +289,6 @@ public interface PropsKeys {
 
 	public static final String BLOGS_LINKBACK_EXCERPT_LENGTH = "blogs.linkback.excerpt.length";
 
-	public static final String BLOGS_LINKBACK_JOB_INTERVAL = "blogs.linkback.job.interval";
-
 	public static final String BLOGS_PAGE_ABSTRACT_LENGTH = "blogs.page.abstract.length";
 
 	public static final String BLOGS_PING_GOOGLE_ENABLED = "blogs.ping.google.enabled";
@@ -344,6 +344,8 @@ public interface PropsKeys {
 	public static final String BREADCRUMB_DISPLAY_STYLE_DEFAULT = "breadcrumb.display.style.default";
 
 	public static final String BREADCRUMB_DISPLAY_STYLE_OPTIONS = "breadcrumb.display.style.options";
+
+	public static final String BREADCRUMB_DISPLAY_TEMPLATES_CONFIG = "breadcrumb.display.templates.config";
 
 	public static final String BREADCRUMB_SHOW_GUEST_GROUP = "breadcrumb.show.guest.group";
 
@@ -657,6 +659,8 @@ public interface PropsKeys {
 
 	public static final String DISCUSSION_THREAD_VIEW = "discussion.thread.view";
 
+	public static final String DL_ACTIONS_VISIBLE = "dl.actions.visible";
+
 	public static final String DL_CHAR_BLACKLIST = "dl.char.blacklist";
 
 	public static final String DL_CHAR_LAST_BLACKLIST = "dl.char.last.blacklist";
@@ -791,6 +795,8 @@ public interface PropsKeys {
 
 	public static final String DL_FOLDER_COLUMNS = "dl.folder.columns";
 
+	public static final String DL_FOLDER_MENU_VISIBLE = "dl.folder.menu.visible";
+
 	public static final String DL_FOLDERS_SEARCH_VISIBLE = "dl.folders.search.visible";
 
 	public static final String DL_NAME_BLACKLIST = "dl.name.blacklist";
@@ -845,6 +851,8 @@ public interface PropsKeys {
 
 	public static final String DL_SUBFOLDERS_VISIBLE = "dl.subfolders.visible";
 
+	public static final String DL_TABS_VISIBLE = "dl.tabs.visible";
+
 	public static final String DOCKBAR_ADD_PORTLETS = "dockbar.add.portlets";
 
 	public static final String DOCKBAR_ADMINISTRATIVE_LINKS_SHOW_IN_POP_UP = "dockbar.administrative.links.show.in.pop.up";
@@ -866,6 +874,8 @@ public interface PropsKeys {
 	public static final String DYNAMIC_DATA_MAPPING_STRUCTURE_PRIVATE_FIELD_NAMES = "dynamic.data.mapping.structure.private.field.names";
 
 	public static final String DYNAMIC_DATA_MAPPING_STRUCTURE_PRIVATE_FIELD_REPEATABLE = "dynamic.data.mapping.structure.private.field.repeatable";
+
+	public static final String DYNAMIC_DATA_MAPPING_TEMPLATE_FORCE_AUTOGENERATE_KEY = "dynamic.data.mapping.template.force.autogenerate.key";
 
 	public static final String DYNAMIC_DATA_MAPPING_TEMPLATE_LANGUAGE_CONTENT = "dynamic.data.mapping.template.language.content";
 
@@ -916,8 +926,6 @@ public interface PropsKeys {
 	public static final String FACEBOOK_CONNECT_OAUTH_TOKEN_URL = "facebook.connect.oauth.token.url";
 
 	public static final String FACEBOOK_CONNECT_VERIFIED_ACCOUNT_REQUIRED = "facebook.connect.verified.account.required";
-
-	public static final String FIELD_ALL_USERS_EDITABLE_ROLES = "field.all.users.editable.roles";
 
 	public static final String FIELD_EDITABLE_DOMAINS = "field.editable.domains";
 
@@ -1091,6 +1099,10 @@ public interface PropsKeys {
 
 	public static final String INTRABAND_MAILBOX_STORAGE_LIFE = "intraband.mailbox.storage.life";
 
+	public static final String INTRABAND_PROXY_DUMP_CLASSES_DIR = "intraband.proxy.dump.classes.dir";
+
+	public static final String INTRABAND_PROXY_DUMP_CLASSES_ENABLED = "intraband.proxy.dump.classes.enabled";
+
 	public static final String INTRABAND_TIMEOUT_DEFAULT = "intraband.timeout.default";
 
 	public static final String INTRABAND_WELDER_IMPL = "intraband.welder.impl";
@@ -1134,6 +1146,8 @@ public interface PropsKeys {
 	public static final String JAVASCRIPT_FAST_LOAD = "javascript.fast.load";
 
 	public static final String JAVASCRIPT_LOG_ENABLED = "javascript.log.enabled";
+
+	public static final String JAVASCRIPT_SINGLE_PAGE_APPLICATION_ENABLED = "javascript.single.page.application.enabled";
 
 	public static final String JCR_INITIALIZE_ON_STARTUP = "jcr.initialize.on.startup";
 
@@ -1715,6 +1729,8 @@ public interface PropsKeys {
 
 	public static final String MESSAGE_BOARDS_SUBSCRIBE_BY_DEFAULT = "message.boards.subscribe.by.default";
 
+	public static final String MESSAGE_BOARDS_THREAD_AS_QUESTION_BY_DEFAULT = "message.boards.thread.as.question.by.default";
+
 	public static final String MESSAGE_BOARDS_THREAD_PREVIOUS_AND_NEXT_NAVIGATION_ENABLED = "message.boards.thread.previous.and.next.navigation.enabled";
 
 	public static final String MESSAGE_BOARDS_THREAD_PRIORITIES = "message.boards.thread.priorities";
@@ -1780,6 +1796,18 @@ public interface PropsKeys {
 	public static final String MODULE_FRAMEWORK_SYSTEM_BUNDLE_IGNORED_FRAGMENTS = "module.framework.system.bundle.ignored.fragments";
 
 	public static final String MODULE_FRAMEWORK_SYSTEM_PACKAGES_EXTRA = "module.framework.system.packages.extra";
+
+	public static final String MODULE_FRAMEWORK_WEB_EXTENDER_DEFAULT_SERVLET_PACKAGES = "module.framework.web.extender.default.servlet.packages";
+
+	public static final String MODULE_FRAMEWORK_WEB_EXTENDER_EXCLUDED_PATHS = "module.framework.web.extender.excluded.paths";
+
+	public static final String MODULE_FRAMEWORK_WEB_EXTENDER_GENERATED_WABS_STORE = "module.framework.web.extender.generated.wabs.store";
+
+	public static final String MODULE_FRAMEWORK_WEB_EXTENDER_GENERATED_WABS_STORE_DIR = "module.framework.web.extender.generated.wabs.store.dir";
+
+	public static final String MODULE_FRAMEWORK_WEB_EXTENDER_HEADERS = "module.framework.web.extender.headers.";
+
+	public static final String MODULE_FRAMEWORK_WEB_EXTENDER_JSP_COMPILER_DEPENDENCIES = "module.framework.web.extender.jsp.compiler.dependencies";
 
 	public static final String MONITORING_PORTAL_REQUEST = "monitoring.portal.request";
 
@@ -2341,11 +2369,17 @@ public interface PropsKeys {
 
 	public static final String SHOPPING_ITEM_SHOW_AVAILABILITY = "shopping.item.show.availability";
 
+	public static final String SHOPPING_MIN_ORDER = "shopping.min.order";
+
 	public static final String SHOPPING_ORDER_COMMENTS_ENABLED = "shopping.order.comments.enabled";
+
+	public static final String SHOPPING_PAYPAL_EMAIL_ADDRESS = "shopping.paypal.email.address";
 
 	public static final String SHOPPING_SHIPPING = "shopping.shipping";
 
 	public static final String SHOPPING_SHIPPING_FORMULA = "shopping.shipping.formula";
+
+	public static final String SHOPPING_TAX_RATE = "shopping.tax.rate";
 
 	public static final String SHOPPING_TAX_STATE = "shopping.tax.state";
 
@@ -2480,6 +2514,8 @@ public interface PropsKeys {
 	public static final String STRIP_JS_LANGUAGE_ATTRIBUTE_SUPPORT_ENABLED = "strip.js.language.attribute.support.enabled";
 
 	public static final String STRIP_MIME_TYPES = "strip.mime.types";
+
+	public static final String STRUTS_PORTLET_IGNORED_PARAMETERS_REGEXP = "struts.portlet.ignored.parameters.regexp";
 
 	public static final String STRUTS_PORTLET_REQUEST_PROCESSOR = "struts.portlet.request.processor";
 
@@ -2693,6 +2729,8 @@ public interface PropsKeys {
 
 	public static final String VIRTUAL_HOSTS_IGNORE_PATHS = "virtual.hosts.ignore.paths";
 
+	public static final String VIRTUAL_HOSTS_VALID_HOSTS = "virtual.hosts.valid.hosts";
+
 	public static final String WEB_SERVER_DISPLAY_NODE = "web.server.display.node";
 
 	public static final String WEB_SERVER_HOST = "web.server.host";
@@ -2724,6 +2762,8 @@ public interface PropsKeys {
 	public static final String WIDGET_SERVLET_MAPPING = "widget.servlet.mapping";
 
 	public static final String WIKI_COMMENT_RATINGS_ENABLED = "wiki.comment.ratings.enabled";
+
+	public static final String WIKI_DISPLAY_STYLE = "wiki.display.style";
 
 	public static final String WIKI_DISPLAY_TEMPLATES_CONFIG = "wiki.display.templates.config";
 

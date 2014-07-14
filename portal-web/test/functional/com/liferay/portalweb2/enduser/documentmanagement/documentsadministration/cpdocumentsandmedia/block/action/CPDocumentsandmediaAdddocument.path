@@ -45,6 +45,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>SUBMIT_FOR_PUBLICATION_BUTTON</td>
+	<td>//button[contains(@id,'publishButton') and contains(.,'Submit for Publication')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>CANCEL_BUTTON</td>
 	<td>//div[@class='button-holder ']/button[contains(.,'Cancel')]</td>
 	<td></td>
@@ -174,7 +179,7 @@
 </tr>
 <tr>
 	<td>CATEGORIZATION_TAGS_REMOVE_ICON_GENERIC</td>
-	<td>//div[@class='control-group' and label[contains(.,'Tags')]]//span[@class='textboxlistentry-remove']/i</td>
+	<td>//div[@class='form-group' and label[contains(.,'Tags')]]//span[@class='textboxlistentry-remove']/i</td>
 	<td></td>
 </tr>
 <tr>
