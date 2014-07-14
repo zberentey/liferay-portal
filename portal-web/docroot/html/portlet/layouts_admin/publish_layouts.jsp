@@ -116,21 +116,13 @@ treeId = treeId + privateLayout + layoutSetBranchId;
 
 long[] selectedLayoutIds = GetterUtil.getLongValues(StringUtil.split(SessionTreeJSClicks.getOpenNodes(request, treeId + "SelectedNode"), ','));
 
-List<Layout> selectedLayouts = new ArrayList<Layout>();
-
 long selectedLayoutsGroupId = group.getGroupId();
 
 if (stagingGroupId > 0) {
 	selectedLayoutsGroupId = stagingGroupId;
 }
 
-for (int i = 0; i < selectedLayoutIds.length; i++) {
-	try {
-		selectedLayouts.add(LayoutLocalServiceUtil.getLayout(selectedLayoutsGroupId, privateLayout, selectedLayoutIds[i]));
-	}
-	catch (NoSuchLayoutException nsle) {
-	}
-}
+String layoutIdsString = ExportImportHelperUtil.getSelectedLayoutsJSON(request, selectedLayoutsGroupId, privateLayout, treeId + "SelectedNode");
 
 UnicodeProperties liveGroupTypeSettings = liveGroup.getTypeSettingsProperties();
 
@@ -343,6 +335,7 @@ else {
 									<liferay-util:include page="/html/portlet/layouts_admin/export_configuration/select_pages.jsp">
 										<liferay-util:param name="<%= Constants.CMD %>" value="<%= Constants.PUBLISH %>" />
 										<liferay-util:param name="groupId" value="<%= String.valueOf(stagingGroupId) %>" />
+										<liferay-util:param name="layoutIdsString" value="<%= layoutIdsString %>" />
 										<liferay-util:param name="layoutSetBranchId" value="<%= String.valueOf(layoutSetBranchId) %>" />
 										<liferay-util:param name="privateLayout" value="<%= String.valueOf(privateLayout) %>" />
 										<liferay-util:param name="treeId" value="<%= treeId %>" />

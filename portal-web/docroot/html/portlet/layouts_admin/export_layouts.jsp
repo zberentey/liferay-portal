@@ -79,19 +79,7 @@ if (!cmd.equals(Constants.UPDATE)) {
 	selectedLayoutIds = GetterUtil.getLongValues(StringUtil.split(SessionTreeJSClicks.getOpenNodes(request, treeId + "SelectedNode"), ','));
 }
 
-List<Layout> selectedLayouts = new ArrayList<Layout>();
-
-for (int i = 0; i < selectedLayoutIds.length; i++) {
-	try {
-		selectedLayouts.add(LayoutLocalServiceUtil.getLayout(liveGroupId, privateLayout, selectedLayoutIds[i]));
-	}
-	catch (NoSuchLayoutException nsle) {
-	}
-}
-
-if (selectedLayouts.isEmpty()) {
-	selectedLayouts = LayoutLocalServiceUtil.getLayouts(liveGroupId, privateLayout);
-}
+String layoutIdsString = ExportImportHelperUtil.getSelectedLayoutsJSON(request, groupId, privateLayout, treeId + "SelectedNode");
 
 PortletURL portletURL = renderResponse.createRenderURL();
 
@@ -203,6 +191,7 @@ if (!cmd.equals(Constants.ADD)) {
 
 							<liferay-util:include page="/html/portlet/layouts_admin/export_configuration/select_pages.jsp">
 								<liferay-util:param name="<%= Constants.CMD %>" value="<%= Constants.EXPORT %>" />
+								<liferay-util:param name="layoutIdsString" value="<%= layoutIdsString %>" />
 								<liferay-util:param name="privateLayout" value="<%= String.valueOf(privateLayout) %>" />
 								<liferay-util:param name="treeId" value="<%= treeId %>" />
 								<liferay-util:param name="selectedLayoutIds" value="<%= StringUtil.merge(selectedLayoutIds) %>" />

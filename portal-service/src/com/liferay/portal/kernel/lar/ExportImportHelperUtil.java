@@ -28,13 +28,13 @@ import com.liferay.portal.model.StagedModel;
 import com.liferay.portal.theme.ThemeDisplay;
 
 import java.io.File;
-
 import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 
 import javax.portlet.PortletPreferences;
 import javax.portlet.PortletRequest;
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * @author Zsolt Berentey
@@ -265,6 +265,14 @@ public class ExportImportHelperUtil {
 
 		return getExportImportHelper().getModelDeletionCount(
 			portletDataContext, stagedModelType);
+	}
+
+	public static String getSelectedLayoutsJSON(
+		HttpServletRequest request, long groupId, boolean privateLayout,
+		String treeId) {
+
+		return getExportImportHelper().getSelectedLayoutsJSON(
+			request, groupId, privateLayout, treeId);
 	}
 
 	public static FileEntry getTempFileEntry(

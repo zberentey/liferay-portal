@@ -27,13 +27,13 @@ import com.liferay.portal.model.StagedModel;
 import com.liferay.portal.theme.ThemeDisplay;
 
 import java.io.File;
-
 import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 
 import javax.portlet.PortletPreferences;
 import javax.portlet.PortletRequest;
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * @author Zsolt Berentey
@@ -218,6 +218,10 @@ public interface ExportImportHelper {
 
 	public boolean isReferenceWithinExportScope(
 		PortletDataContext portletDataContext, StagedModel stagedModel);
+
+	public String getSelectedLayoutsJSON(
+		HttpServletRequest request, long groupId, boolean privateLayout,
+		String treeId);
 
 	/**
 	 * @deprecated As of 7.0.0, replaced by {@link
